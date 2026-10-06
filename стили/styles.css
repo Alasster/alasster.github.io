@@ -1,0 +1,932 @@
+/* ==========================================================================
+   LIQUID GLASS & VISION-OS AIRY DESIGN SYSTEM
+   ========================================================================== */
+:root {
+  --bg: #F6F8FC;
+  --glass-surface: rgba(255, 255, 255, 0.65);
+  --glass-surface-hover: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-border-subtle: rgba(226, 232, 240, 0.7);
+
+  --primary: #4F46E5;
+  --primary-light: rgba(79, 70, 229, 0.08);
+  --primary-glow: rgba(99, 102, 241, 0.35);
+
+  --teal: #0D9488;
+  --teal-light: rgba(13, 148, 136, 0.08);
+
+  --amber: #D97706;
+  --amber-light: rgba(217, 119, 6, 0.08);
+
+  --text: #0F172A;
+  --text-muted: #64748B;
+
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  /* Glass Shadows */
+  --glass-shadow:
+    0 16px 36px -10px rgba(99, 102, 241, 0.08),
+    0 0 1px 1px rgba(255, 255, 255, 0.9) inset,
+    0 4px 16px rgba(15, 23, 42, 0.03);
+
+  --glass-shadow-hover:
+    0 24px 50px -12px rgba(99, 102, 241, 0.22),
+    0 0 1px 1px rgba(255, 255, 255, 1) inset,
+    0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-main);
+  color: var(--text);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 90% 15%, rgba(6, 182, 212, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+  background-attachment: fixed;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Ambient animated orbs behind glass */
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.55;
+  animation: orbFloat 20s infinite alternate ease-in-out;
+}
+.orb-1 {
+  width: 550px;
+  height: 550px;
+  top: -120px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(165, 180, 252, 0.7) 0%, transparent 70%);
+}
+.orb-2 {
+  width: 500px;
+  height: 500px;
+  top: 35%;
+  right: -120px;
+  background: radial-gradient(circle, rgba(153, 246, 228, 0.6) 0%, transparent 70%);
+  animation-delay: -6s;
+}
+.orb-3 {
+  width: 450px;
+  height: 450px;
+  bottom: -100px;
+  left: 15%;
+  background: radial-gradient(circle, rgba(254, 215, 170, 0.55) 0%, transparent 70%);
+  animation-delay: -12s;
+}
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 50px) scale(1.08); }
+  100% { transform: translate(-30px, -40px) scale(0.95); }
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   AIRY FROSTED GLASS (VISION-OS STYLE)
+   ========================================================================== */
+.glass-card {
+  background: var(--glass-surface);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.glass-card:hover {
+  background: var(--glass-surface-hover);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+/* ==========================================================================
+   ANIMATED CONTOUR / BORDER BEAM EFFECT (AIRY LUMINESCENCE)
+   ========================================================================== */
+.beam-card {
+  position: relative;
+  border-radius: var(--radius-xl);
+  padding: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.beam-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent,
+    transparent 280deg,
+    #6366F1 320deg,
+    #06B6D4 345deg,
+    #A855F7 360deg
+  );
+  animation: rotateContour 6s linear infinite;
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 0;
+}
+.beam-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--glass-shadow-hover);
+}
+.beam-card:hover::before {
+  animation-duration: 3s;
+  opacity: 1;
+}
+
+.beam-inner-content {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: calc(var(--radius-xl) - 2px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+@keyframes rotateContour {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Vector selection corners (Figma / UI handles) */
+.figma-point {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #FFFFFF;
+  border: 2px solid #6366F1;
+  border-radius: 2px;
+  z-index: 2;
+  opacity: 0.6;
+  transition: all 0.25s ease;
+}
+.point-tl { top: -4px; left: -4px; }
+.point-tr { top: -4px; right: -4px; }
+.point-bl { bottom: -4px; left: -4px; }
+.point-br { bottom: -4px; right: -4px; }
+.beam-card:hover .figma-point {
+  opacity: 1;
+  transform: scale(1.25);
+  border-color: #06B6D4;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+}
+
+/* ==========================================================================
+   AIRY PILL NAVIGATION BAR (FIXED: NO OVERFLOW, NO WRAPPING)
+   ========================================================================== */
+.nav-wrapper {
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-full);
+  padding: 8px 16px 8px 20px;
+  box-shadow:
+    0 10px 30px -5px rgba(99, 102, 241, 0.08),
+    0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.brand-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.brand-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #4F46E5, #06B6D4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+.brand-title-text {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: #0F172A;
+  white-space: nowrap;
+}
+
+/* Fixed Navigation Links (white-space: nowrap prevents vertical wrapping!) */
+.nav-links-menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  flex-shrink: 1;
+}
+.nav-links-menu li {
+  white-space: nowrap;
+}
+.nav-pill-link {
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.nav-pill-link:hover {
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.nav-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mobile-burger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* ==========================================================================
+   HERO SECTION WITH 3D CANVAS & AIRY GLASS
+   ========================================================================== */
+.hero-section {
+  padding: 30px 0 50px;
+  position: relative;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.hero-heading {
+  font-size: clamp(2.3rem, 4.5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  color: #0F172A;
+}
+.gradient-text {
+  background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+
+.hero-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.btn-glass-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4F46E5, #6366F1);
+  color: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-glass-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(79, 70, 229, 0.45);
+}
+
+.btn-glass-soft {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  box-shadow: var(--glass-shadow);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-glass-soft:hover {
+  background: #FFFFFF;
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-hover);
+}
+
+/* ==========================================================================
+   3D MOTION STAGE & INTERACTIVE CANVAS (THREE.JS)
+   ========================================================================== */
+.hero-3d-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+}
+#three-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  z-index: 2;
+  border-radius: var(--radius-xl);
+}
+
+.hero-glass-overlay {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 420px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.hero-glass-overlay * {
+  pointer-events: auto;
+}
+
+/* Floating 3D Micro-Card (Interactive PC Goal Card) */
+.glass-voice-box {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: floatMotion3D 6s ease-in-out infinite alternate;
+}
+.voice-play-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #C7D2FE, #E0E7FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4F46E5;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.18);
+  flex-shrink: 0;
+}
+.voice-content {
+  flex: 1;
+}
+.voice-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.3;
+}
+.voice-desc {
+  font-size: 0.82rem;
+  color: #475569;
+  font-weight: 500;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+
+@keyframes floatMotion3D {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-12px) rotate(1deg); }
+}
+
+/* Floating Stats Bar */
+.glass-stats-bar {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  animation: floatMotion3D 7s ease-in-out infinite alternate-reverse;
+}
+.stats-item,
+.glass-stats-bar > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center !important;
+}
+.stats-item-digit {
+  width: 100%;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  text-align: center !important;
+}
+.stats-item-desc {
+  width: 100%;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center !important;
+}
+
+/* ==========================================================================
+   USER'S GOOGLE SITE IMAGE SHOWCASE (FROSTED GLASS FRAME)
+   ========================================================================== */
+/* ==========================================================================
+   NATIONAL MOTTO BANNER (ТУҒАН ЖЕР)
+   ========================================================================== */
+/* ==========================================================================
+   CURRICULUM CARDS GRID (6 CLASSES WITH ANIMATED CONTOUR BEAMS)
+   ========================================================================== */
+.section-header-wrap {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.pill-chip-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+.section-main-title {
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0F172A;
+  margin-bottom: 8px;
+}
+.section-main-sub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.grades-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+  margin-bottom: 50px;
+}
+
+.grade-card-content {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.grade-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.grade-icon-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+.icon-c-indigo { background: #EEF2FF; color: #4F46E5; }
+.icon-c-teal { background: #CCFBF1; color: #0D9488; }
+.icon-c-amber { background: #FEF3C7; color: #D97706; }
+.icon-c-cyan { background: #E0F2FE; color: #0284C7; }
+.icon-c-emerald { background: #D1FAE5; color: #059669; }
+.icon-c-purple { background: #EDE9FE; color: #7C3AED; }
+
+.grade-chip-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.grade-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 8px;
+}
+.grade-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+  min-height: 42px;
+}
+
+.grade-meta-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 12px 0;
+  border-top: 1px dashed rgba(203, 213, 225, 0.8);
+  margin-bottom: 14px;
+}
+.grade-count-number {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.grade-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.btn-action-list {
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--primary);
+  font-size: 0.86rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.btn-action-list:hover {
+  background: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+}
+
+.btn-action-start {
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--glass-border-subtle);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.btn-action-start:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #FFFFFF;
+}
+
+/* ==========================================================================
+   MODAL DRAWER: LESSONS LIST
+   ========================================================================== */
+/* Responsive Breakpoints */
+@media (max-width: 1100px) {
+  .nav-links-menu {
+    gap: 2px;
+  }
+  .nav-pill-link {
+    padding: 6px 9px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .grades-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .grades-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Component details extracted from the HTML. */
+.text-indigo { color: #4F46E5; }
+.text-teal { color: #0D9488; }
+.text-amber { color: #D97706; }
+.text-primary { color: var(--primary); }
+.voice-content { flex: 1; }
+.voice-title { font-size: 0.85rem; font-weight: 700; color: #0F172A; }
+.motion-badge { font-size: 0.9rem; font-weight: 800; background: #FEE2E2; color: #E11D48; padding: 4px 10px; border-radius: 9999px; }
+.badge-indigo { background: #EEF2FF; color: #4F46E5; }
+.badge-teal { background: #CCFBF1; color: #0D9488; }
+.badge-amber { background: #FEF3C7; color: #D97706; }
+.badge-cyan { background: #E0F2FE; color: #0284C7; }
+.badge-emerald { background: #D1FAE5; color: #059669; }
+.badge-violet { background: #EDE9FE; color: #7C3AED; }
+.modal-title-group { display: flex; align-items: center; gap: 12px; }
+
+
+/* Welcome and teacher introduction */
+.teacher-card {
+  padding: 28px;
+  margin: 28px 0 0;
+  background: linear-gradient(125deg, rgba(255,255,255,.92), rgba(238,242,255,.7) 65%, rgba(236,254,255,.8));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px);
+}
+.teacher-heading { display: flex; gap: 20px; align-items: center; }
+.teacher-monogram {
+  display: grid;
+  place-items: center;
+  flex: 0 0 68px;
+  height: 68px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #4F46E5, #06B6D4);
+  box-shadow: 0 8px 22px rgba(79,70,229,.2), inset 0 1px 1px rgba(255,255,255,.5);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.teacher-role { color: var(--primary); font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+.teacher-name { font-size: clamp(1.2rem, 1.65vw, 1.4rem); line-height: 1.4; letter-spacing: -.025em; }
+.teacher-description {
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(99,102,241,.12);
+}
+
+/* Adal Azamat quotation */
+.motto-wrapper { margin: 10px auto 48px; }
+.motto-glass-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 32px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(120deg, rgba(255,255,255,.8), rgba(238,242,255,.65), rgba(236,254,255,.65));
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px);
+}
+.motto-quote-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  color: var(--primary);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+  align-self: center;
+  flex-shrink: 0;
+}
+.motto-label,
+.modal-eyebrow {
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 6px;
+  font-family: var(--font-main);
+}
+.motto-text {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-main);
+}
+.motto-kz {
+  font-family: var(--font-main);
+  font-size: clamp(1.05rem, 1.7vw, 1.25rem);
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.motto-ru {
+  font-family: var(--font-main);
+  font-size: clamp(0.92rem, 1.35vw, 1.05rem);
+  line-height: 1.45;
+  font-weight: 500;
+  color: #475569;
+  margin-top: 6px;
+}
+
+/* Shared class selection */
+.nav-pill-link { border: 0; background: transparent; font-family: inherit; cursor: pointer; min-height: 42px; }
+.nav-right-actions { display: none; }
+:where(button, a):focus-visible { outline: 3px solid rgba(79,70,229,.6); outline-offset: 4px; }
+.mobile-burger-btn { align-items: center; gap: 12px; min-height: 44px; padding: 8px 14px; background: var(--primary-light); border-radius: var(--radius-full); color: var(--primary); }
+.menu-toggle-label { font: 700 .9rem var(--font-main); }
+.menu-toggle-icon { position: relative; width: 18px; height: 14px; }
+.menu-toggle-icon::before, .menu-toggle-icon::after { content: ''; position: absolute; left: 0; width: 18px; height: 2px; border-radius: 2px; background: currentColor; transition: transform .3s ease, top .3s ease; }
+.menu-toggle-icon::before { top: 3px; }
+.menu-toggle-icon::after { top: 10px; }
+[aria-expanded="true"] .menu-toggle-icon::before { top: 6px; transform: rotate(45deg); }
+[aria-expanded="true"] .menu-toggle-icon::after { top: 6px; transform: rotate(-45deg); }
+
+/* Glass lesson dialog */
+body.modal-open { overflow: hidden; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(30,41,75,.28); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility 0s linear .3s; }
+.modal-backdrop.active { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+.modal-glass-container { width: 100%; max-width: 720px; max-height: min(84dvh, 850px); display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-xl); border: 1px solid rgba(255,255,255,.95); background: linear-gradient(140deg, rgba(250,251,255,.97), rgba(239,246,255,.95) 55%, rgba(239,253,253,.95)); box-shadow: 0 32px 90px -20px rgba(49,46,129,.3), 0 0 0 5px rgba(255,255,255,.15); transform: translateY(24px) scale(.96); transition: transform .35s cubic-bezier(.16,1,.3,1); }
+.modal-backdrop.active .modal-glass-container { transform: translateY(0) scale(1); }
+.modal-header-bar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 28px 28px 24px; border-bottom: 1px solid var(--glass-border-subtle); }
+.modal-title-group { min-width: 0; }
+.modal-heading-text { font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.3; }
+.modal-subtitle { color: var(--text-muted); font-size: .88rem; margin-top: 8px; }
+.btn-close-modal { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border: 1px solid white; border-radius: 50%; background: rgba(255,255,255,.8); box-shadow: 0 3px 12px rgba(99,102,241,.08); color: var(--text-muted); font: 28px/1 var(--font-main); cursor: pointer; transition: background .2s, color .2s, transform .2s; }
+.btn-close-modal:hover { color: var(--primary); background: white; transform: rotate(90deg); }
+.modal-lessons-scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c7d2fe transparent; padding: 20px 28px 28px; display: flex; flex-direction: column; gap: 12px; }
+.lesson-row-card { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid rgba(255,255,255,.95); border-radius: 20px; background: rgba(255,255,255,.78); box-shadow: 0 4px 16px rgba(99,102,241,.04); transition: background .2s, box-shadow .2s, border-color .2s; }
+.lesson-row-card:hover, .lesson-row-card:focus-within { background: white; border-color: rgba(99,102,241,.25); box-shadow: 0 8px 20px rgba(99,102,241,.1); }
+.lesson-badge-id { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#eef2ff,#e0f2fe); color: var(--primary); font: 600 .8rem var(--font-mono); }
+.lesson-title-label { flex: 1; min-width: 0; font-size: .9rem; font-weight: 600; color: var(--text); line-height: 1.5; }
+.btn-launch-lesson { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 10px 14px; min-height: 42px; border-radius: var(--radius-full); background: var(--primary-light); color: var(--primary); font-size: .9rem; font-weight: 700; transition: background .2s, color .2s; }
+.btn-launch-lesson:hover { background: var(--primary); color: white; }
+
+@media (max-width: 860px) {
+  .nav-wrapper { padding: 12px 0; }
+  .navbar { position: relative; padding: 8px 10px 8px 12px; }
+  .nav-right-actions, .mobile-burger-btn { display: flex; }
+  .nav-links-menu { display: flex; flex-direction: column; align-items: stretch; gap: 6px; position: absolute; top: calc(100% + 12px); left: 0; right: 0; padding: 18px; border-radius: 28px; background: linear-gradient(135deg, rgba(250,251,255,.98), rgba(238,247,255,.98)); border: 1px solid white; box-shadow: 0 20px 48px -12px rgba(79,70,229,.22); backdrop-filter: blur(28px); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-12px) scale(.98); transform-origin: top center; transition: opacity .28s ease, transform .35s cubic-bezier(.16,1,.3,1), visibility 0s linear .3s; }
+  .nav-links-menu::before { content: 'Выберите класс'; padding: 4px 12px 10px; color: var(--text-muted); font-size: .9rem; font-weight: 600; }
+  .nav-links-menu.is-open { transition-delay: 0s; opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
+  .nav-links-menu li { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .3s; }
+  .nav-links-menu.is-open li { opacity: 1; transform: translateY(0); }
+  .nav-links-menu.is-open li:nth-child(2) { transition-delay: .035s; }
+  .nav-links-menu.is-open li:nth-child(3) { transition-delay: .07s; }
+  .nav-links-menu.is-open li:nth-child(4) { transition-delay: .105s; }
+  .nav-links-menu.is-open li:nth-child(5) { transition-delay: .14s; }
+  .nav-pill-link { width: 100%; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,.75); border: 1px solid white; border-radius: 16px; color: var(--text); font-size: .9rem; }
+  .nav-pill-link::after { content: '↗'; color: var(--primary); }
+  .motto-glass-pill { gap: 16px; padding: 24px; align-items: flex-start; }
+}
+@media (max-width: 540px) {
+  .container { padding-left: 16px; padding-right: 16px; }
+  .brand-title-text { font-size: .85rem; }
+  .brand-icon-box { width: 32px; height: 32px; }
+  .brand-logo-group { gap: 8px; }
+  .mobile-burger-btn { gap: 8px; padding: 8px 10px; }
+  .hero-section { padding-top: 24px; padding-bottom: 28px; }
+  .hero-heading { font-size: clamp(1.85rem, 7.5vw, 2.5rem); }
+    .teacher-card { padding: 22px; }
+  .teacher-heading { gap: 14px; align-items: flex-start; }
+  .teacher-monogram { flex-basis: 48px; height: 48px; border-radius: 16px; font-size: 1.1rem; }
+  .teacher-name { font-size: 1.15rem; }
+  .teacher-role, .teacher-description { font-size: 1rem; }
+  .hero-buttons-row { gap: 10px; }
+  .hero-buttons-row a { padding: 12px 18px; font-size: .82rem; }
+  .motto-glass-pill {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 16px;
+  }
+  .motto-quote-badge {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+  }
+  .motto-label { font-size: 0.75rem; margin-bottom: 4px; }
+  .motto-kz { font-size: 0.95rem; line-height: 1.4; }
+  .motto-ru { font-size: 0.85rem; margin-top: 4px; line-height: 1.4; }
+  .modal-backdrop { padding: 12px; align-items: flex-end; }
+  .modal-glass-container { max-height: 90dvh; border-radius: 28px; transform: translateY(48px); }
+  .modal-header-bar { padding: 22px 20px 18px; }
+  .modal-lessons-scroll { padding: 16px; }
+  .lesson-row-card { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 14px; border-radius: 18px; }
+  .lesson-badge-id { width: 32px; height: 32px; }
+  .lesson-title-label { font-size: .86rem; }
+  .btn-launch-lesson { grid-column: 2; justify-self: start; padding: 8px 14px; min-height: 40px; }
+  .glass-stats-bar { padding: 14px 10px; gap: 6px; }
+  .stats-item-digit { font-size: 1.25rem; }
+  .stats-item-desc { font-size: 0.76rem; }
+}

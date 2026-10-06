@@ -19,1096 +19,10 @@
   <!-- Font Awesome 6 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Three.js for 3D Motion Elements -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Local Three.js keeps the original animation available without a CDN. -->
+  <script src="скрипты/three.min.js"></script>
 
-  <style>
-    /* ==========================================================================
-       LIQUID GLASS & VISION-OS AIRY DESIGN SYSTEM
-       ========================================================================== */
-    :root {
-      --bg: #F6F8FC;
-      --glass-surface: rgba(255, 255, 255, 0.65);
-      --glass-surface-hover: rgba(255, 255, 255, 0.82);
-      --glass-border: rgba(255, 255, 255, 0.85);
-      --glass-border-subtle: rgba(226, 232, 240, 0.7);
-      
-      --primary: #4F46E5;
-      --primary-light: rgba(79, 70, 229, 0.08);
-      --primary-glow: rgba(99, 102, 241, 0.35);
-
-      --teal: #0D9488;
-      --teal-light: rgba(13, 148, 136, 0.08);
-
-      --amber: #D97706;
-      --amber-light: rgba(217, 119, 6, 0.08);
-
-      --text: #0F172A;
-      --text-muted: #64748B;
-
-      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-
-      --radius-sm: 10px;
-      --radius-md: 18px;
-      --radius-lg: 24px;
-      --radius-xl: 32px;
-      --radius-full: 9999px;
-
-      /* Glass Shadows */
-      --glass-shadow: 
-        0 16px 36px -10px rgba(99, 102, 241, 0.08),
-        0 0 1px 1px rgba(255, 255, 255, 0.9) inset,
-        0 4px 16px rgba(15, 23, 42, 0.03);
-
-      --glass-shadow-hover: 
-        0 24px 50px -12px rgba(99, 102, 241, 0.22),
-        0 0 1px 1px rgba(255, 255, 255, 1) inset,
-        0 8px 24px rgba(15, 23, 42, 0.05);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-height: 100vh;
-      font-family: var(--font-main);
-      color: var(--text);
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
-        radial-gradient(circle at 90% 15%, rgba(6, 182, 212, 0.1) 0%, transparent 45%),
-        radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.07) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
-      background-attachment: fixed;
-      line-height: 1.6;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* Ambient animated orbs behind glass */
-    .ambient-orb {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      filter: blur(80px);
-      z-index: 0;
-      opacity: 0.55;
-      animation: orbFloat 20s infinite alternate ease-in-out;
-    }
-    .orb-1 {
-      width: 550px;
-      height: 550px;
-      top: -120px;
-      left: -100px;
-      background: radial-gradient(circle, rgba(165, 180, 252, 0.7) 0%, transparent 70%);
-    }
-    .orb-2 {
-      width: 500px;
-      height: 500px;
-      top: 35%;
-      right: -120px;
-      background: radial-gradient(circle, rgba(153, 246, 228, 0.6) 0%, transparent 70%);
-      animation-delay: -6s;
-    }
-    .orb-3 {
-      width: 450px;
-      height: 450px;
-      bottom: -100px;
-      left: 15%;
-      background: radial-gradient(circle, rgba(254, 215, 170, 0.55) 0%, transparent 70%);
-      animation-delay: -12s;
-    }
-    @keyframes orbFloat {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(40px, 50px) scale(1.08); }
-      100% { transform: translate(-30px, -40px) scale(0.95); }
-    }
-
-    .container {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 24px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ==========================================================================
-       AIRY FROSTED GLASS (VISION-OS STYLE)
-       ========================================================================== */
-    .glass-card {
-      background: var(--glass-surface);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--glass-shadow);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-    }
-    .glass-card:hover {
-      background: var(--glass-surface-hover);
-      box-shadow: var(--glass-shadow-hover);
-      transform: translateY(-6px);
-      border-color: rgba(255, 255, 255, 1);
-    }
-
-    /* ==========================================================================
-       ANIMATED CONTOUR / BORDER BEAM EFFECT (AIRY LUMINESCENCE)
-       ========================================================================== */
-    .beam-card {
-      position: relative;
-      border-radius: var(--radius-xl);
-      padding: 2px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      box-shadow: var(--glass-shadow);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .beam-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: conic-gradient(
-        transparent,
-        transparent 280deg,
-        #6366F1 320deg,
-        #06B6D4 345deg,
-        #A855F7 360deg
-      );
-      animation: rotateContour 6s linear infinite;
-      opacity: 0.75;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .beam-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--glass-shadow-hover);
-    }
-    .beam-card:hover::before {
-      animation-duration: 3s;
-      opacity: 1;
-    }
-
-    .beam-inner-content {
-      position: relative;
-      z-index: 1;
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: calc(var(--radius-xl) - 2px);
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border: 1px solid rgba(255, 255, 255, 0.9);
-    }
-
-    @keyframes rotateContour {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Vector selection corners (Figma / UI handles) */
-    .figma-point {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #FFFFFF;
-      border: 2px solid #6366F1;
-      border-radius: 2px;
-      z-index: 2;
-      opacity: 0.6;
-      transition: all 0.25s ease;
-    }
-    .point-tl { top: -4px; left: -4px; }
-    .point-tr { top: -4px; right: -4px; }
-    .point-bl { bottom: -4px; left: -4px; }
-    .point-br { bottom: -4px; right: -4px; }
-    .beam-card:hover .figma-point {
-      opacity: 1;
-      transform: scale(1.25);
-      border-color: #06B6D4;
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
-    }
-
-    /* ==========================================================================
-       AIRY PILL NAVIGATION BAR (FIXED: NO OVERFLOW, NO WRAPPING)
-       ========================================================================== */
-    .nav-wrapper {
-      padding: 16px 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .navbar {
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: var(--radius-full);
-      padding: 8px 16px 8px 20px;
-      box-shadow: 
-        0 10px 30px -5px rgba(99, 102, 241, 0.08),
-        0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      width: 100%;
-    }
-
-    .brand-logo-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .brand-icon-box {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #4F46E5, #06B6D4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-    }
-    .brand-title-text {
-      font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: -0.02em;
-      color: #0F172A;
-      white-space: nowrap;
-    }
-
-    /* Fixed Navigation Links (white-space: nowrap prevents vertical wrapping!) */
-    .nav-links-menu {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      list-style: none;
-      flex-shrink: 1;
-    }
-    .nav-links-menu li {
-      white-space: nowrap;
-    }
-    .nav-pill-link {
-      padding: 7px 12px;
-      border-radius: var(--radius-full);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .nav-pill-link:hover {
-      color: var(--primary);
-      background: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    }
-
-    .nav-right-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .nav-portal-btn {
-      padding: 8px 18px;
-      border-radius: var(--radius-full);
-      font-size: 0.85rem;
-      font-weight: 700;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      color: var(--primary);
-      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.1);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-    .nav-portal-btn:hover {
-      background: #FFFFFF;
-      border-color: var(--primary);
-      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .mobile-burger-btn {
-      display: none;
-      background: transparent;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--text);
-      cursor: pointer;
-      padding: 6px;
-    }
-
-    /* ==========================================================================
-       HERO SECTION WITH 3D CANVAS & AIRY GLASS
-       ========================================================================== */
-    .hero-section {
-      padding: 30px 0 50px;
-      position: relative;
-    }
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 40px;
-      align-items: center;
-    }
-
-    .badge-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--primary);
-      box-shadow: var(--glass-shadow);
-      margin-bottom: 20px;
-    }
-    .pulse-dot-green {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #10B981;
-      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
-      animation: pulseGreen 2s infinite;
-    }
-    @keyframes pulseGreen {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.8; }
-    }
-
-    .hero-heading {
-      font-size: clamp(2.3rem, 4.5vw, 3.5rem);
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 16px;
-      color: #0F172A;
-    }
-    .gradient-text {
-      background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-    }
-
-    .domain-badge-wrap {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: var(--radius-full);
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 0.92rem;
-      color: var(--primary);
-      margin-bottom: 22px;
-      box-shadow: var(--glass-shadow);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .domain-badge-wrap:hover {
-      transform: translateY(-2px);
-      border-color: var(--primary);
-      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.18);
-    }
-    .copy-chip-btn {
-      font-size: 0.72rem;
-      background: rgba(79, 70, 229, 0.1);
-      color: var(--primary);
-      padding: 3px 8px;
-      border-radius: var(--radius-full);
-      border: none;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .hero-bio {
-      font-size: 1.08rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-      margin-bottom: 28px;
-    }
-    .hero-bio strong {
-      color: var(--text);
-    }
-
-    .hero-buttons-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      align-items: center;
-    }
-
-    .btn-glass-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 13px 26px;
-      border-radius: var(--radius-full);
-      font-size: 0.95rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #4F46E5, #6366F1);
-      color: #FFFFFF;
-      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-glass-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(79, 70, 229, 0.45);
-    }
-
-    .btn-glass-soft {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 13px 24px;
-      border-radius: var(--radius-full);
-      font-size: 0.95rem;
-      font-weight: 700;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      color: var(--text);
-      box-shadow: var(--glass-shadow);
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-    .btn-glass-soft:hover {
-      background: #FFFFFF;
-      color: var(--primary);
-      border-color: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: var(--glass-shadow-hover);
-    }
-
-    /* ==========================================================================
-       3D MOTION STAGE & INTERACTIVE CANVAS (THREE.JS)
-       ========================================================================== */
-    .hero-3d-stage {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 420px;
-    }
-    #three-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: auto;
-      z-index: 2;
-      border-radius: var(--radius-2xl);
-    }
-
-    .hero-glass-overlay {
-      position: relative;
-      z-index: 3;
-      width: 100%;
-      max-width: 420px;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .hero-glass-overlay * {
-      pointer-events: auto;
-    }
-
-    /* Floating 3D Micro-Card (Audio / Waveform as in reference) */
-    .glass-voice-box {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.95);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-      box-shadow: var(--glass-shadow);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      animation: floatMotion3D 6s ease-in-out infinite alternate;
-    }
-    .voice-play-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #C7D2FE, #E0E7FF);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #4F46E5;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-    }
-    .wave-bars-container {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      flex: 1;
-      height: 26px;
-    }
-    .bar-line {
-      width: 3.5px;
-      background: #CBD5E1;
-      border-radius: 2px;
-      animation: wavePulse 1.4s ease-in-out infinite alternate;
-    }
-    .bar-line:nth-child(2) { height: 60%; animation-delay: 0.1s; }
-    .bar-line:nth-child(3) { height: 90%; animation-delay: 0.2s; background: #6366F1; }
-    .bar-line:nth-child(4) { height: 40%; animation-delay: 0.3s; }
-    .bar-line:nth-child(5) { height: 75%; animation-delay: 0.4s; background: #06B6D4; }
-    .bar-line:nth-child(6) { height: 100%; animation-delay: 0.5s; background: #6366F1; }
-    .bar-line:nth-child(7) { height: 50%; animation-delay: 0.6s; }
-    .bar-line:nth-child(8) { height: 85%; animation-delay: 0.7s; }
-    .bar-line:nth-child(9) { height: 35%; animation-delay: 0.8s; }
-
-    @keyframes wavePulse {
-      0% { transform: scaleY(0.35); }
-      100% { transform: scaleY(1.25); }
-    }
-    @keyframes floatMotion3D {
-      0% { transform: translateY(0px) rotate(0deg); }
-      100% { transform: translateY(-12px) rotate(1deg); }
-    }
-
-    /* Floating Stats Bar */
-    .glass-stats-bar {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border: 1px solid rgba(255, 255, 255, 0.95);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-      box-shadow: var(--glass-shadow);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      animation: floatMotion3D 7s ease-in-out infinite alternate-reverse;
-    }
-    .stats-item-digit {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #0F172A;
-      line-height: 1;
-    }
-    .stats-item-desc {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    /* ==========================================================================
-       USER'S GOOGLE SITE IMAGE SHOWCASE (FROSTED GLASS FRAME)
-       ========================================================================== */
-    .portal-banner-section {
-      margin: 15px 0 45px;
-    }
-    .portal-glass-banner {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: var(--radius-2xl);
-      padding: 24px 30px;
-      box-shadow: var(--glass-shadow);
-      display: grid;
-      grid-template-columns: 1fr 1.15fr;
-      gap: 30px;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .portal-img-frame {
-      width: 100%;
-      height: 220px;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: linear-gradient(135deg, #EEF2FF, #E0F2FE);
-      border: 1px solid rgba(255, 255, 255, 0.95);
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-      position: relative;
-    }
-    .portal-img-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s ease;
-    }
-    .portal-img-frame:hover img {
-      transform: scale(1.05);
-    }
-    .portal-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: var(--radius-full);
-      background: rgba(79, 70, 229, 0.1);
-      color: var(--primary);
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-    }
-    .portal-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #0F172A;
-      margin-bottom: 8px;
-    }
-    .portal-desc {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-      margin-bottom: 16px;
-    }
-
-    /* ==========================================================================
-       NATIONAL MOTTO BANNER (ТУҒАН ЖЕР)
-       ========================================================================== */
-    .motto-wrapper {
-      margin: 10px 0 45px;
-    }
-    .motto-glass-pill {
-      background: linear-gradient(135deg, rgba(255, 251, 235, 0.75) 0%, rgba(254, 243, 199, 0.75) 100%);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(253, 230, 138, 0.85);
-      border-radius: var(--radius-xl);
-      padding: 22px 30px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      box-shadow: 0 8px 24px rgba(234, 179, 8, 0.12);
-    }
-    .motto-sun-circle {
-      width: 50px;
-      height: 50px;
-      min-width: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #F59E0B, #D97706);
-      color: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
-    }
-    .motto-kz {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #78350F;
-      line-height: 1.3;
-    }
-    .motto-ru {
-      font-size: 0.96rem;
-      font-weight: 600;
-      color: #92400E;
-    }
-
-    /* ==========================================================================
-       CURRICULUM CARDS GRID (6 CLASSES WITH ANIMATED CONTOUR BEAMS)
-       ========================================================================== */
-    .section-header-wrap {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .pill-chip-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 14px;
-      border-radius: var(--radius-full);
-      background: rgba(79, 70, 229, 0.1);
-      color: var(--primary);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-    }
-    .section-main-title {
-      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #0F172A;
-      margin-bottom: 8px;
-    }
-    .section-main-sub {
-      font-size: 1rem;
-      color: var(--text-muted);
-      max-width: 580px;
-      margin: 0 auto;
-    }
-
-    .grades-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 26px;
-      margin-bottom: 50px;
-    }
-
-    .grade-card-content {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-    }
-
-    .grade-top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .grade-icon-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-    }
-    .icon-c-indigo { background: #EEF2FF; color: #4F46E5; }
-    .icon-c-teal { background: #CCFBF1; color: #0D9488; }
-    .icon-c-amber { background: #FEF3C7; color: #D97706; }
-    .icon-c-cyan { background: #E0F2FE; color: #0284C7; }
-    .icon-c-emerald { background: #D1FAE5; color: #059669; }
-    .icon-c-purple { background: #EDE9FE; color: #7C3AED; }
-
-    .grade-chip-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .grade-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: #0F172A;
-      margin-bottom: 8px;
-    }
-    .grade-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 20px;
-      min-height: 42px;
-    }
-
-    .grade-meta-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      padding: 12px 0;
-      border-top: 1px dashed rgba(203, 213, 225, 0.8);
-      margin-bottom: 14px;
-    }
-    .grade-count-number {
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .grade-actions-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .btn-action-list {
-      padding: 10px 14px;
-      border-radius: var(--radius-full);
-      background: rgba(79, 70, 229, 0.08);
-      color: var(--primary);
-      font-size: 0.86rem;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-    .btn-action-list:hover {
-      background: var(--primary);
-      color: #FFFFFF;
-      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
-    }
-
-    .btn-action-start {
-      padding: 10px 14px;
-      border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid var(--glass-border-subtle);
-      color: var(--text);
-      font-size: 0.86rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-    .btn-action-start:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: #FFFFFF;
-    }
-
-    /* ==========================================================================
-       MODAL DRAWER: LESSONS LIST
-       ========================================================================== */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.45);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      padding: 20px;
-    }
-    .modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-glass-container {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border: 1px solid rgba(255, 255, 255, 0.95);
-      border-radius: var(--radius-2xl);
-      max-width: 640px;
-      width: 100%;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.2);
-      transform: translateY(20px) scale(0.97);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      overflow: hidden;
-    }
-    .modal-backdrop.active .modal-glass-container {
-      transform: translateY(0) scale(1);
-    }
-
-    .modal-header-bar {
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.6);
-    }
-    .modal-heading-text {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #0F172A;
-    }
-    .btn-close-modal {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      background: #FFFFFF;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-    }
-    .btn-close-modal:hover {
-      background: #FEE2E2;
-      color: #EF4444;
-      transform: rotate(90deg);
-    }
-
-    .modal-lessons-scroll {
-      padding: 20px 24px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .lesson-row-card {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      transition: all 0.2s ease;
-    }
-    .lesson-row-card:hover {
-      background: #FFFFFF;
-      border-color: var(--primary);
-      transform: translateX(4px);
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-    }
-    .lesson-badge-id {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(79, 70, 229, 0.1);
-      color: var(--primary);
-      font-weight: 800;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .lesson-title-label {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: #0F172A;
-      flex: 1;
-    }
-    .btn-launch-lesson {
-      padding: 6px 14px;
-      border-radius: var(--radius-full);
-      background: rgba(79, 70, 229, 0.08);
-      color: var(--primary);
-      font-size: 0.8rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-    .btn-launch-lesson:hover {
-      background: var(--primary);
-      color: #FFFFFF;
-    }
-
-    /* ==========================================================================
-       FOOTER (CLEAN & AIRY)
-       ========================================================================== */
-    .site-footer {
-      border-top: 1px solid rgba(226, 232, 240, 0.8);
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(20px);
-      padding: 36px 0 24px;
-      margin-top: 40px;
-    }
-    .footer-flex-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .footer-author-text {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-    .footer-author-text strong {
-      color: var(--text);
-    }
-
-    /* Responsive Breakpoints */
-    @media (max-width: 1100px) {
-      .nav-links-menu {
-        gap: 2px;
-      }
-      .nav-pill-link {
-        padding: 6px 9px;
-        font-size: 0.82rem;
-      }
-      .portal-glass-banner {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 1024px) {
-      .grades-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 860px) {
-      .nav-links-menu {
-        display: none;
-      }
-      .mobile-burger-btn {
-        display: block;
-      }
-      .grades-grid {
-        grid-template-columns: 1fr;
-      }
-      .motto-glass-pill {
-        flex-direction: column;
-        text-align: center;
-        padding: 20px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="стили/styles.css?v=1.2">
 </head>
 <body>
 
@@ -1132,24 +46,18 @@
         </a>
 
         <!-- Desktop Navigation Items (white-space: nowrap) -->
-        <ul class="nav-links-menu">
-          <li><a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="nav-pill-link" title="Оригинальный сайт"><i class="fa-solid fa-house"></i> Главная страница</a></li>
-          <li><a href="#c11" class="nav-pill-link">11 класс</a></li>
-          <li><a href="#c10emn" class="nav-pill-link">10 ЕМН</a></li>
-          <li><a href="#c10ogn" class="nav-pill-link">10 ОГН</a></li>
-          <li><a href="#c9" class="nav-pill-link">9 класс</a></li>
-          <li><a href="#c8" class="nav-pill-link">8 класс</a></li>
-          <li><a href="#cextra" class="nav-pill-link">Дополнительно</a></li>
+        <ul class="nav-links-menu" id="main-navigation">
+          <li><button type="button" class="nav-pill-link" data-class-id="c11" aria-haspopup="dialog">11 класс</button></li>
+          <li><button type="button" class="nav-pill-link" data-class-id="c10emn" aria-haspopup="dialog">10 ЕМН</button></li>
+          <li><button type="button" class="nav-pill-link" data-class-id="c10ogn" aria-haspopup="dialog">10 ОГН</button></li>
+          <li><button type="button" class="nav-pill-link" data-class-id="c9" aria-haspopup="dialog">9 класс</button></li>
+
         </ul>
 
-        <!-- Right Action Button -->
+        <!-- Mobile Navigation Toggle -->
         <div class="nav-right-actions">
-          <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="nav-portal-btn">
-            <span>WWW.ALASSTER.SITE</span>
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
-          <button class="mobile-burger-btn" onclick="toggleNavMenu()" aria-label="Меню">
-            <i class="fa-solid fa-bars"></i>
+          <button class="mobile-burger-btn" aria-expanded="false" aria-controls="main-navigation" aria-label="Меню">
+            <span class="menu-toggle-label">Классы</span><span class="menu-toggle-icon" aria-hidden="true"></span>
           </button>
         </div>
       </nav>
@@ -1163,39 +71,23 @@
     <div class="container hero-grid">
       <!-- Left Content -->
       <div>
-        <div class="badge-chip">
-          <span class="pulse-dot-green"></span>
-          <span>Учебный сайт по информатике</span>
-        </div>
-
         <h1 class="hero-heading">
           Добро пожаловать!<br>
-          <span class="gradient-text">Информатика 5 - 11 классы</span>
+          <span class="gradient-text">На учебный сайт<br>по информатике</span>
         </h1>
 
-        <!-- Domain Chip with Copy -->
-        <div class="domain-badge-wrap" onclick="copyDomainToClipboard()" title="Скопировать адрес сайта">
-          <i class="fa-solid fa-globe"></i>
-          <span>WWW.ALASSTER.SITE</span>
-          <button class="copy-chip-btn" id="copy-btn-el">Копировать</button>
+        <div class="teacher-card">
+          <div class="teacher-heading">
+            <span class="teacher-monogram" aria-hidden="true">ЖК</span>
+            <div>
+              <p class="teacher-role">Ваш учитель информатики</p>
+              <h2 class="teacher-name">Кадыржанов Жанас<br>Кайыржанович</h2>
+            </div>
+          </div>
+          <p class="teacher-description">Школа-гимназия № 22</p>
         </div>
 
-        <p class="hero-bio">
-          Я — <strong>Кадыржанов Жанас Кайыржанович</strong>, учитель информатики для учеников <strong>5 - 11 классов</strong>.<br>
-          Цель сайта — помочь вам освоить информатику легко и интересно. Материалы доступны в любое время с любого устройства.
-        </p>
 
-        <div class="hero-buttons-row">
-          <a href="#curriculum" class="btn-glass-primary">
-            <i class="fa-solid fa-book-open"></i> Выбрать класс
-          </a>
-          <a href="свалка/python online.html" target="_blank" class="btn-glass-soft">
-            <i class="fa-brands fa-python" style="color: #4F46E5;"></i> Python Web IDE
-          </a>
-          <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="btn-glass-soft">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Главная страница
-          </a>
-        </div>
       </div>
 
       <!-- Right 3D Motion Stage -->
@@ -1205,75 +97,32 @@
 
         <!-- Floating Glass Micro-Widgets -->
         <div class="hero-glass-overlay">
-          <!-- Voice Message / Audio Wave Widget -->
+          <!-- Interactive Widget (PC / Goal Card) -->
           <div class="glass-voice-box">
             <div class="voice-play-icon">
-              <i class="fa-solid fa-play"></i>
+              <i class="fa-solid fa-desktop"></i>
             </div>
-            <div style="flex: 1;">
-              <div style="font-size: 0.85rem; font-weight: 700; color: #0F172A;">Интерактивный урок</div>
-              <div class="wave-bars-container">
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-                <span class="bar-line"></span>
-              </div>
+            <div class="voice-content">
+              <div class="voice-title">Интерактивные уроки и задания</div>
+              <p class="voice-desc">Цель сайта — помочь вам освоить информатику легко и интересно.</p>
             </div>
-            <span style="font-size: 0.75rem; font-weight: 800; background: #FEE2E2; color: #E11D48; padding: 4px 10px; border-radius: 9999px;">3D Motion</span>
           </div>
 
           <!-- Glass Stats Bar -->
           <div class="glass-stats-bar">
-            <div>
-              <div class="stats-item-digit" style="color: #4F46E5;">40+</div>
-              <div class="stats-item-desc">Уроков с практикой</div>
+            <div class="stats-item" style="text-align: center; flex: 1;">
+              <div class="stats-item-digit text-indigo" style="text-align: center;">40+</div>
+              <div class="stats-item-desc" style="text-align: center;">Уроков<br>с практикой</div>
             </div>
-            <div>
-              <div class="stats-item-digit" style="color: #0D9488;">5–11</div>
-              <div class="stats-item-desc">Классы обучения</div>
+            <div class="stats-item" style="text-align: center; flex: 1;">
+              <div class="stats-item-digit text-teal" style="text-align: center;">9–11</div>
+              <div class="stats-item-desc" style="text-align: center;">Классы<br>обучения</div>
             </div>
-            <div>
-              <div class="stats-item-digit" style="color: #D97706;">24/7</div>
-              <div class="stats-item-desc">Любое устройство</div>
+            <div class="stats-item" style="text-align: center; flex: 1;">
+              <div class="stats-item-digit text-amber" style="text-align: center;">24/7</div>
+              <div class="stats-item-desc" style="text-align: center;">Любое<br>устройство</div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================================================
-       PORTAL SHOWCASE (USER GOOGLE SITE IMAGE EMBEDDED IN AIRY GLASS)
-       ========================================================================== -->
-  <section class="container portal-banner-section">
-    <div class="portal-glass-banner">
-      <div class="portal-img-frame">
-        <img 
-          src="https://sites.google.com/u/0/sitesv-images-rt/AMxu72tTuwaOhye2dessxTP3WA4mwYg-8d1APmpypI8NQvDISLzT3oRw3SADHTAydnTivDbbrBkOhkpfS2ZGcYP4m4gnMy6nVrLfWnmiiRi56MwuIm4RLJUWGSZFlEI-EJzI9RrWaBiyGTWhHRkAuShumgVx60CacOpw8xim79FDoDfQ1LRhLxN7hHU9gmj4SS4=w16383" 
-          alt="Образовательный ресурс WWW.ALASSTER.SITE"
-          loading="lazy"
-          referrerpolicy="no-referrer"
-          onerror="this.onerror=null; this.src='Дизайн/soon-design-c055fbe1e4e93970.webp';">
-      </div>
-      <div>
-        <span class="portal-tag"><i class="fa-solid fa-graduation-cap"></i> Официальный ресурс</span>
-        <h2 class="portal-title">Единый образовательный портал</h2>
-        <p class="portal-desc">
-          Электронная платформа по информатике учителя <strong>Кадыржанова Жанаса Кайыржановича</strong>.
-          Все темы систематизированы по четвертям и направлениям (ЕМН и ОГН). Занимайтесь в комфортном ритме на любых смартфонах, планшетах и компьютерах!
-        </p>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <a href="#curriculum" class="btn-glass-primary" style="padding: 10px 22px; font-size: 0.88rem;">
-            <i class="fa-solid fa-layer-group"></i> Изучить программы
-          </a>
-          <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="btn-glass-soft" style="padding: 10px 20px; font-size: 0.88rem;">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Site
-          </a>
         </div>
       </div>
     </div>
@@ -1284,12 +133,16 @@
        ========================================================================== -->
   <div class="container motto-wrapper">
     <div class="motto-glass-pill">
-      <div class="motto-sun-circle">
-        <i class="fa-solid fa-sun"></i>
+      <div class="motto-quote-badge" aria-hidden="true">
+        <i class="fa-solid fa-quote-left"></i>
       </div>
-      <div>
-        <div class="motto-kz">«Туған жердей жер болмас, туған елдей ел болмас»</div>
+      <div class="motto-text">
+        <p class="motto-label">Адал азамат · Цитата</p>
+        <blockquote class="motto-kz" lang="kk">«Туған жердей жер болмас, туған елдей ел болмас»</blockquote>
         <div class="motto-ru">«Нет земли лучше родной, нет народа лучше родного»</div>
+      </div>
+      <div class="motto-quote-badge" aria-hidden="true">
+        <i class="fa-solid fa-quote-right"></i>
       </div>
     </div>
   </div>
@@ -1301,7 +154,6 @@
     <div class="section-header-wrap">
       <span class="pill-chip-tag"><i class="fa-solid fa-layer-group"></i> Программа</span>
       <h2 class="section-main-title">Учебные модули по классам</h2>
-      <p class="section-main-sub">Выберите ваш класс для просмотра уроков 1 четверти и практических материалов</p>
     </div>
 
     <div class="grades-grid">
@@ -1316,7 +168,7 @@
           <div>
             <div class="grade-top-bar">
               <div class="grade-icon-avatar icon-c-indigo"><i class="fa-solid fa-brain"></i></div>
-              <span class="grade-chip-badge" style="background: #EEF2FF; color: #4F46E5;">1 Четверть</span>
+              <span class="grade-chip-badge badge-indigo">1 Четверть</span>
             </div>
             <h3 class="grade-title">11 класс</h3>
             <p class="grade-desc">Искусственные нейронные сети, классификация задач ИИ и управление жестами.</p>
@@ -1327,7 +179,7 @@
               <span class="grade-count-number">6 уроков</span>
             </div>
             <div class="grade-actions-row">
-              <button class="btn-action-list" onclick="showClassModal('c11')">
+              <button class="btn-action-list" data-class-id="c11">
                 <i class="fa-solid fa-list"></i> Все уроки
               </button>
               <a href="11 класс/1 четверть/1 урок.html" class="btn-action-start">
@@ -1348,7 +200,7 @@
           <div>
             <div class="grade-top-bar">
               <div class="grade-icon-avatar icon-c-teal"><i class="fa-solid fa-chart-line"></i></div>
-              <span class="grade-chip-badge" style="background: #CCFBF1; color: #0D9488;">ЕМН Профиль</span>
+              <span class="grade-chip-badge badge-teal">ЕМН Профиль</span>
             </div>
             <h3 class="grade-title">10 класс ЕМН</h3>
             <p class="grade-desc">Машинное обучение, перцептрон в Excel, модели МО и алгоритм k-NN.</p>
@@ -1359,7 +211,7 @@
               <span class="grade-count-number">9 уроков</span>
             </div>
             <div class="grade-actions-row">
-              <button class="btn-action-list" onclick="showClassModal('c10emn')">
+              <button class="btn-action-list" data-class-id="c10emn">
                 <i class="fa-solid fa-list"></i> Все уроки
               </button>
               <a href="10 ЕМН/1 четверть/1 -2 урок.html" class="btn-action-start">
@@ -1380,7 +232,7 @@
           <div>
             <div class="grade-top-bar">
               <div class="grade-icon-avatar icon-c-amber"><i class="fa-solid fa-users"></i></div>
-              <span class="grade-chip-badge" style="background: #FEF3C7; color: #D97706;">ОГН Профиль</span>
+              <span class="grade-chip-badge badge-amber">ОГН Профиль</span>
             </div>
             <h3 class="grade-title">10 класс ОГН</h3>
             <p class="grade-desc">История ИИ, понятия машинного обучения, модели МО и проектная мастерская.</p>
@@ -1391,7 +243,7 @@
               <span class="grade-count-number">6 уроков</span>
             </div>
             <div class="grade-actions-row">
-              <button class="btn-action-list" onclick="showClassModal('c10ogn')">
+              <button class="btn-action-list" data-class-id="c10ogn">
                 <i class="fa-solid fa-list"></i> Все уроки
               </button>
               <a href="10 ОГН/1 четверть/1 урок.html" class="btn-action-start">
@@ -1412,7 +264,7 @@
           <div>
             <div class="grade-top-bar">
               <div class="grade-icon-avatar icon-c-cyan"><i class="fa-solid fa-network-wired"></i></div>
-              <span class="grade-chip-badge" style="background: #E0F2FE; color: #0284C7;">1 Четверть</span>
+              <span class="grade-chip-badge badge-cyan">1 Четверть</span>
             </div>
             <h3 class="grade-title">9 класс</h3>
             <p class="grade-desc">Этика ИИ, IP-адреса компьютеров, маска подсети, протоколы и доменная система DNS.</p>
@@ -1423,7 +275,7 @@
               <span class="grade-count-number">6 уроков</span>
             </div>
             <div class="grade-actions-row">
-              <button class="btn-action-list" onclick="showClassModal('c9')">
+              <button class="btn-action-list" data-class-id="c9">
                 <i class="fa-solid fa-list"></i> Все уроки
               </button>
               <a href="9 класс/1 четверть/1 урок.html" class="btn-action-start">
@@ -1434,69 +286,7 @@
         </div>
       </div>
 
-      <!-- 8 КЛАСС -->
-      <div class="beam-card tilt-card" id="c8">
-        <span class="figma-point point-tl"></span>
-        <span class="figma-point point-tr"></span>
-        <span class="figma-point point-bl"></span>
-        <span class="figma-point point-br"></span>
-        <div class="beam-inner-content grade-card-content">
-          <div>
-            <div class="grade-top-bar">
-              <div class="grade-icon-avatar icon-c-emerald"><i class="fa-solid fa-microchip"></i></div>
-              <span class="grade-chip-badge" style="background: #D1FAE5; color: #059669;">1 Четверть</span>
-            </div>
-            <h3 class="grade-title">8 класс</h3>
-            <p class="grade-desc">Измерение информации, архитектура процессора, компьютерные сети и кибербезопасность.</p>
-          </div>
-          <div>
-            <div class="grade-meta-info">
-              <span>Тематика: Базовая информатика</span>
-              <span class="grade-count-number">7 уроков</span>
-            </div>
-            <div class="grade-actions-row">
-              <button class="btn-action-list" onclick="showClassModal('c8')">
-                <i class="fa-solid fa-list"></i> Все уроки
-              </button>
-              <a href="8 класс/1 четверть/2 урок.html" class="btn-action-start">
-                Урок 2 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- ДОПОЛНИТЕЛЬНО -->
-      <div class="beam-card tilt-card" id="cextra">
-        <span class="figma-point point-tl"></span>
-        <span class="figma-point point-tr"></span>
-        <span class="figma-point point-bl"></span>
-        <span class="figma-point point-br"></span>
-        <div class="beam-inner-content grade-card-content">
-          <div>
-            <div class="grade-top-bar">
-              <div class="grade-icon-avatar icon-c-purple"><i class="fa-brands fa-python"></i></div>
-              <span class="grade-chip-badge" style="background: #EDE9FE; color: #7C3AED;">Практикум</span>
-            </div>
-            <h3 class="grade-title">Дополнительно</h3>
-            <p class="grade-desc">Курс Python с нуля (15 модулей), онлайн компилятор в браузере и мастерская ИИ.</p>
-          </div>
-          <div>
-            <div class="grade-meta-info">
-              <span>Тематика: Python & Инструменты</span>
-              <span class="grade-count-number">20 уроков</span>
-            </div>
-            <div class="grade-actions-row">
-              <button class="btn-action-list" onclick="showClassModal('cextra')">
-                <i class="fa-solid fa-list"></i> Каталог
-              </button>
-              <a href="Python основы/1.Основа.html" class="btn-action-start">
-                Python 1 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </section>
@@ -1504,15 +294,18 @@
   <!-- ==========================================================================
        MODAL DRAWER: LESSONS LIST
        ========================================================================== -->
-  <div class="modal-backdrop" id="modal-backdrop-el" onclick="hideClassModal(event)">
-    <div class="modal-glass-container" onclick="event.stopPropagation()">
+  <div class="modal-backdrop" id="modal-backdrop-el" inert>
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el" aria-describedby="modal-subtitle-el" tabindex="-1">
       <div class="modal-header-bar">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <i class="fa-solid fa-book-bookmark" style="color: var(--primary);"></i>
-          <h3 class="modal-heading-text" id="modal-heading-el">11 класс</h3>
+        <div class="modal-title-group">
+          <div>
+            <p class="modal-eyebrow">Учебные материалы</p>
+            <h3 class="modal-heading-text" id="modal-heading-el">11 класс</h3>
+            <p class="modal-subtitle" id="modal-subtitle-el"></p>
+          </div>
         </div>
-        <button class="btn-close-modal" onclick="hideClassModal()" aria-label="Закрыть">
-          <i class="fa-solid fa-xmark"></i>
+        <button class="btn-close-modal" aria-label="Закрыть">
+          <span aria-hidden="true">×</span>
         </button>
       </div>
 
@@ -1523,333 +316,8 @@
   </div>
 
   <!-- ==========================================================================
-       FOOTER
-       ========================================================================== -->
-  <footer class="site-footer">
-    <div class="container footer-flex-row">
-      <div>
-        <a href="index.html" style="font-weight: 800; font-size: 1.1rem; color: #0F172A;">ALASSTER.SITE</a>
-        <div class="footer-author-text" style="margin-top: 4px;">
-          Учитель информатики: <strong>Кадыржанов Жанас Кайыржанович</strong> • для учеников 5 - 11 классов
-        </div>
-      </div>
-      <div style="font-size: 0.88rem; color: var(--text-muted);">
-        <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" style="color: var(--primary); font-weight: 700;">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> WWW.ALASSTER.SITE
-        </a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ==========================================================================
        JAVASCRIPT: THREE.JS 3D MOTION & INTERACTIONS
        ========================================================================== -->
-  <script>
-    /* Complete Curriculum Data */
-    const LESSONS_DATABASE = {
-      c11: {
-        title: "11 класс • Нейронные сети и ИИ",
-        lessons: [
-          { num: 1, title: "Искусственные нейронные сети", path: "11 класс/1 четверть/1 урок.html" },
-          { num: 2, title: "Задачи нейронных сетей", path: "11 класс/1 четверть/2 урок.html" },
-          { num: 3, title: "Классификация задач ИИ", path: "11 класс/1 четверть/3 урок.html" },
-          { num: 4, title: "Классификация задач ИИ — практика", path: "11 класс/1 четверть/4 урок.html" },
-          { num: 5, title: "Управление приложением жестами", path: "11 класс/1 четверть/5 урок.html" },
-          { num: 6, title: "Основы моделирования нейронных сетей", path: "11 класс/1 четверть/6 урок.html" }
-        ]
-      },
-      c10emn: {
-        title: "10 класс ЕМН • Машинное обучение",
-        lessons: [
-          { num: "1-2", title: "История развития искусственного интеллекта", path: "10 ЕМН/1 четверть/1 -2 урок.html" },
-          { num: 3, title: "Основные понятия машинного обучения", path: "10 ЕМН/1 четверть/3 урок.html" },
-          { num: 4, title: "Практика: понятия машинного обучения", path: "10 ЕМН/1 четверть/4 урок.html" },
-          { num: 5, title: "Перцептрон и его назначение", path: "10 ЕМН/1 четверть/5 урок.html" },
-          { num: 6, title: "Практика: перцептрон в Excel", path: "10 ЕМН/1 четверть/6 урок.html" },
-          { num: 7, title: "Практика: однослойный перцептрон в Excel", path: "10 ЕМН/1 четверть/7 урок.html" },
-          { num: 8, title: "Модели машинного обучения", path: "10 ЕМН/1 четверть/8 урок.html" },
-          { num: 9, title: "Управление приложением жестами", path: "10 ЕМН/1 четверть/9 урок.html" },
-          { num: 10, title: "Алгоритмы МО: k-NN (Ближайшие соседи)", path: "10 ЕМН/1 четверть/10 урок.html" }
-        ]
-      },
-      c10ogn: {
-        title: "10 класс ОГН • Информационные технологии",
-        lessons: [
-          { num: 1, title: "История развития искусственного интеллекта", path: "10 ОГН/1 четверть/1 урок.html" },
-          { num: 2, title: "Основные понятия машинного обучения", path: "10 ОГН/1 четверть/2 урок.html" },
-          { num: 3, title: "Модели машинного обучения", path: "10 ОГН/1 четверть/3 урок.html" },
-          { num: 4, title: "Проектная мастерская: презентация о МО", path: "10 ОГН/1 четверть/4 урок.html" },
-          { num: 5, title: "Перцептрон и его назначение", path: "10 ОГН/1 четверть/5 урок.html" },
-          { num: 6, title: "Практика: перцептрон в Excel", path: "10 ОГН/1 четверть/6 урок.html" }
-        ]
-      },
-      c9: {
-        title: "9 класс • Компьютерные сети",
-        lessons: [
-          { num: 1, title: "Социальные и этические аспекты ИИ", path: "9 класс/1 четверть/1 урок.html" },
-          { num: 2, title: "IP-адрес компьютера", path: "9 класс/1 четверть/2 урок.html" },
-          { num: 3, title: "IP-адрес и сетевые протоколы", path: "9 класс/1 четверть/3 урок.html" },
-          { num: 4, title: "IP-адрес. Маска подсети", path: "9 класс/1 четверть/4 урок.html" },
-          { num: 5, title: "Доменная система имён (DNS)", path: "9 класс/1 четверть/5 урок.html" },
-          { num: 6, title: "Определение пропускной способности сети", path: "9 класс/1 четверть/6 урок.html" }
-        ]
-      },
-      c8: {
-        title: "8 класс • Архитектура и безопасность",
-        lessons: [
-          { num: 2, title: "Алфавитный подход к измерению информации", path: "8 класс/1 четверть/2 урок.html" },
-          { num: 3, title: "Процессор — мозг компьютера", path: "8 класс/1 четверть/3 урок.html" },
-          { num: 4, title: "Компьютерные сети: Пропускная способность", path: "8 класс/1 четверть/4 урок.html" },
-          { num: 5, title: "Практические задания по компьютерным сетям", path: "8 класс/1 четверть/5 Урок.html" },
-          { num: 6, title: "Негативные аспекты работы на компьютере", path: "8 класс/1 четверть/6 урок.html" },
-          { num: 7, title: "Безопасность в интернете", path: "8 класс/1 четверть/7 урок.html" },
-          { num: 8, title: "Мошенничество в интернете", path: "8 класс/1 четверть/8 урок.html" }
-        ]
-      },
-      cextra: {
-        title: "Дополнительно • Python Практикум",
-        lessons: [
-          { num: 1, title: "Python: Введение и Основы", path: "Python основы/1.Основа.html" },
-          { num: 2, title: "Python: Вывод данных (print)", path: "Python основы/2.print.html" },
-          { num: 3, title: "Python: Переменные и память", path: "Python основы/3.Переменные.html" },
-          { num: 4, title: "Python: Типы данных", path: "Python основы/4.Типы.html" },
-          { num: 5, title: "Python: Ввод данных (input)", path: "Python основы/5.Input.html" },
-          { num: 6, title: "Python: Математические операции", path: "Python основы/6.Математика.html" },
-          { num: 7, title: "Python: Логические выражения", path: "Python основы/7.Логика.html" },
-          { num: 8, title: "Python: Условные конструкции", path: "Python основы/8.Условия.html" },
-          { num: 9, title: "Python: Цикл for", path: "Python основы/9.For.html" },
-          { num: 10, title: "Python: Цикл while", path: "Python основы/10.While.html" },
-          { num: 11, title: "Python: Списки (List)", path: "Python основы/11.Списки.html" },
-          { num: 12, title: "Python: Работа со списками", path: "Python основы/12.Работа со списками.html" },
-          { num: 13, title: "Python: Строки (Strings)", path: "Python основы/13.Строки.html" },
-          { num: 14, title: "Python: Функции (def)", path: "Python основы/14.Функции.html" },
-          { num: 15, title: "Python: Работа с файлами", path: "Python основы/15.Файлы.html" },
-          { num: "IDE", title: "Онлайн компилятор Python (Web IDE)", path: "свалка/python online.html" }
-        ]
-      }
-    };
-
-    function showClassModal(id) {
-      const data = LESSONS_DATABASE[id];
-      if (!data) return;
-
-      document.getElementById('modal-heading-el').textContent = data.title;
-      const list = document.getElementById('modal-lessons-list');
-      list.innerHTML = '';
-
-      data.lessons.forEach(l => {
-        const row = document.createElement('div');
-        row.className = 'lesson-row-card';
-        row.innerHTML = `
-          <div class="lesson-badge-id">${l.num}</div>
-          <div class="lesson-title-label">${l.title}</div>
-          <a href="${encodeURI(l.path)}" class="btn-launch-lesson">
-            <span>Открыть</span> <i class="fa-solid fa-arrow-right"></i>
-          </a>
-        `;
-        list.appendChild(row);
-      });
-
-      document.getElementById('modal-backdrop-el').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function hideClassModal() {
-      document.getElementById('modal-backdrop-el').classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') hideClassModal();
-    });
-
-    function copyDomainToClipboard() {
-      navigator.clipboard.writeText('WWW.ALASSTER.SITE').then(() => {
-        const btn = document.getElementById('copy-btn-el');
-        btn.textContent = 'Скопировано!';
-        btn.style.background = '#10B981';
-        btn.style.color = '#FFFFFF';
-        setTimeout(() => {
-          btn.textContent = 'Копировать';
-          btn.style.background = '';
-          btn.style.color = '';
-        }, 2000);
-      });
-    }
-
-    function toggleNavMenu() {
-      const menu = document.querySelector('.nav-links-menu');
-      if (menu.style.display === 'flex') {
-        menu.style.display = 'none';
-      } else {
-        menu.style.display = 'flex';
-        menu.style.flexDirection = 'column';
-        menu.style.position = 'absolute';
-        menu.style.top = '65px';
-        menu.style.left = '16px';
-        menu.style.right = '16px';
-        menu.style.background = 'rgba(255,255,255,0.92)';
-        menu.style.backdropFilter = 'blur(24px)';
-        menu.style.borderRadius = '24px';
-        menu.style.padding = '16px';
-        menu.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
-        menu.style.border = '1px solid rgba(255,255,255,0.9)';
-      }
-    }
-
-    /* ==========================================================================
-       THREE.JS 3D MOTION OBJECTS (FLOATING GLASS SHAPES IN HERO)
-       ========================================================================== */
-    (function initThreeScene() {
-      const container = document.getElementById('stage-3d-container');
-      const canvas = document.getElementById('three-canvas');
-      if (!container || !canvas || typeof THREE === 'undefined') return;
-
-      const scene = new THREE.Scene();
-
-      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-      camera.position.z = 7;
-
-      const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      // Lighting: subtle ambient + two colored directional lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-      scene.add(ambientLight);
-
-      const light1 = new THREE.PointLight(0x6366F1, 2.5, 50);
-      light1.position.set(5, 5, 5);
-      scene.add(light1);
-
-      const light2 = new THREE.PointLight(0x06B6D4, 2.2, 50);
-      light2.position.set(-5, -5, 3);
-      scene.add(light2);
-
-      const light3 = new THREE.PointLight(0xF59E0B, 1.5, 30);
-      light3.position.set(0, 4, -2);
-      scene.add(light3);
-
-      // 3D Glass Objects
-      const group = new THREE.Group();
-      scene.add(group);
-
-      // 1. Central Translucent Torus Knot
-      const torusGeo = new THREE.TorusKnotGeometry(1.2, 0.35, 120, 16);
-      const glassMat = new THREE.MeshPhysicalMaterial({
-        color: 0xEEF2FF,
-        emissive: 0x4F46E5,
-        emissiveIntensity: 0.15,
-        metalness: 0.1,
-        roughness: 0.15,
-        transmission: 0.6,
-        transparent: true,
-        opacity: 0.88,
-        reflectivity: 0.9,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.1
-      });
-      const torusKnot = new THREE.Mesh(torusGeo, glassMat);
-      torusKnot.position.set(0.2, 0.1, 0);
-      group.add(torusKnot);
-
-      // 2. Floating Glass Icosahedron (Neural AI node)
-      const icoGeo = new THREE.IcosahedronGeometry(0.55, 0);
-      const icoMat = new THREE.MeshPhysicalMaterial({
-        color: 0x06B6D4,
-        emissive: 0x06B6D4,
-        emissiveIntensity: 0.25,
-        roughness: 0.2,
-        metalness: 0.1,
-        transparent: true,
-        opacity: 0.75,
-        wireframe: false
-      });
-      const ico = new THREE.Mesh(icoGeo, icoMat);
-      ico.position.set(-2.2, 1.3, 0.5);
-      group.add(ico);
-
-      // 3. Floating Glass Octahedron
-      const octGeo = new THREE.OctahedronGeometry(0.48, 0);
-      const octMat = new THREE.MeshPhysicalMaterial({
-        color: 0xA855F7,
-        emissive: 0xA855F7,
-        emissiveIntensity: 0.2,
-        roughness: 0.2,
-        transparent: true,
-        opacity: 0.8
-      });
-      const oct = new THREE.Mesh(octGeo, octMat);
-      oct.position.set(2.3, -1.2, 0.4);
-      group.add(oct);
-
-      // Mouse Parallax
-      let mouseX = 0, mouseY = 0;
-      let targetX = 0, targetY = 0;
-
-      window.addEventListener('mousemove', (e) => {
-        const rect = container.getBoundingClientRect();
-        mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        mouseY = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      });
-
-      // Window Resize
-      function onWindowResize() {
-        if (!container) return;
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
-      }
-      window.addEventListener('resize', onWindowResize);
-
-      // Render Loop
-      let clock = new THREE.Clock();
-      function animate() {
-        requestAnimationFrame(animate);
-        const elapsedTime = clock.getElapsedTime();
-
-        // Smooth rotation
-        torusKnot.rotation.x = elapsedTime * 0.4;
-        torusKnot.rotation.y = elapsedTime * 0.5;
-
-        ico.rotation.x = elapsedTime * 0.6;
-        ico.rotation.y = elapsedTime * 0.8;
-        ico.position.y = 1.3 + Math.sin(elapsedTime * 1.5) * 0.15;
-
-        oct.rotation.x = -elapsedTime * 0.5;
-        oct.rotation.y = elapsedTime * 0.7;
-        oct.position.y = -1.2 + Math.cos(elapsedTime * 1.8) * 0.12;
-
-        // Subtle mouse parallax
-        targetX += (mouseX - targetX) * 0.05;
-        targetY += (mouseY - targetY) * 0.05;
-        group.rotation.y = targetX * 0.4;
-        group.rotation.x = -targetY * 0.4;
-
-        renderer.render(scene, camera);
-      }
-      animate();
-    })();
-
-    /* 3D Perspective Card Tilt on Mousemove */
-    if (window.matchMedia('(min-width: 1024px)').matches) {
-      document.querySelectorAll('.tilt-card').forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -6;
-          const rotateY = ((x - centerX) / centerX) * 6;
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
-        });
-      });
-    }
-  </script>
+  <script src="скрипты/script.js?v=1.2"></script>
 </body>
 </html>
