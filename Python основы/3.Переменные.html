@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3. Переменные </title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --accent: #3d7fff;
+    --accent2: #ff6b35;
+    --accent3: #22c55e;
+    --text: #1a1a2e;
+    --text2: #4a4a6a;
+    --text3: #8888aa;
+    --border: #e2ddd6;
+    --snake: #ffd700;
+    --code-bg: #f8f6f0;
+    --code-text: #383a42;
+    --code-green: #50a14f;
+    --code-blue: #4078f2;
+    --code-yellow: #986801;
+    --code-red: #e45649;
+    --code-comment: #a0a1a7;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --divider-w: 70%;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Geologica', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .topbar-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 900; font-size: 18px; color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .topbar-logo span { color: var(--accent2); }
+  .topbar-badge {
+    background: linear-gradient(135deg, #3d7fff22, #3d7fff11);
+    border: 1px solid #3d7fff44;
+    color: var(--accent);
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .topbar-progress {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .progress-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+  .progress-dots { display: flex; gap: 5px; }
+  .progress-dots .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--border); transition: all .3s;
+  }
+  .progress-dots .dot.active { background: var(--accent); }
+  .progress-dots .dot.done { background: var(--accent3); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    flex: 0 0 65%;
+    min-width: 320px;
+    max-width: calc(100% - 280px);
+    overflow-y: auto;
+    background: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 6px;
+    background: var(--border);
+    cursor: col-resize;
+    flex-shrink: 0;
+    position: relative;
+    transition: background .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .divider:hover, .divider.dragging {
+    background: var(--accent);
+  }
+  .divider::after {
+    content: '⋮';
+    color: var(--text3);
+    font-size: 16px;
+    line-height: 1;
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+  }
+  .divider:hover::after, .divider.dragging::after { color: white; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    flex: 1;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .right-header {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f0ede8;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .right-header-title {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+    flex: 1;
+  }
+  .rh-actions { display: flex; gap: 6px; align-items: center; }
+  .rh-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Geologica', sans-serif; color: var(--text2);
+    transition: all .15s;
+  }
+  .rh-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .rh-btn.run-btn {
+    background: var(--accent); border-color: var(--accent);
+    color: white; padding: 5px 14px;
+  }
+  .rh-btn.run-btn:hover { background: #2d6fee; }
+  .rh-btn.stop-btn {
+    background: #e45649; border-color: #e45649;
+    color: white; padding: 5px 14px;
+  }
+  .rh-btn.stop-btn:hover { background: #c73d30; }
+
+  .live-badge {
+    background: #22c55e; color: white;
+    font-size: 9px; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px;
+    letter-spacing: 0.5px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+
+  /* ── COMPILER LAYOUT ── */
+  .compiler-wrap {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ── EDITOR AREA ── */
+  .editor-area {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    border-bottom: 2px solid var(--border);
+    background: #fafaf8;
+    min-height: 0;
+  }
+
+  .editor-gutter {
+    width: 44px;
+    flex-shrink: 0;
+    background: #f0ede8;
+    border-right: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    font-size: var(--editor-font-size, 13px);
+    line-height: 1.65;
+    color: #bbb8b0;
+    text-align: right;
+    padding: 14px 6px 14px 0;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+  .editor-gutter div {
+    height: var(--editor-line-height, 21.45px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* ── FONT SIZE DROPDOWN ── */
+  .font-size-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .font-size-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Geologica', sans-serif; color: var(--text2);
+    transition: all .15s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .font-size-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .font-size-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 100;
+    display: none;
+    min-width: 120px;
+  }
+  .font-size-dropdown.open { display: block; }
+  .font-size-opt {
+    display: block; width: 100%;
+    padding: 8px 14px;
+    font-size: 12px; font-weight: 600;
+    font-family: 'Geologica', sans-serif;
+    color: var(--text2); background: none; border: none;
+    cursor: pointer; text-align: left;
+    transition: background .15s;
+  }
+  .font-size-opt:hover { background: #3d7fff10; color: var(--accent); }
+  .font-size-opt.active { color: var(--accent); background: #3d7fff08; }
+
+  /* ── SYNTAX HIGHLIGHT OVERLAY ── */
+  .editor-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
+    background: #fafaf8;
+  }
+  .editor-highlight {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    font-size: var(--editor-font-size, 13px);
+    line-height: 1.65;
+    color: #383a42;
+    background: #fafaf8;
+    padding: 14px;
+    tab-size: 4;
+    white-space: pre;
+    overflow: hidden;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .editor-highlight .code-line {
+    display: block;
+    min-height: var(--editor-line-height, 21.45px);
+  }
+  .editor-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    font-size: var(--editor-font-size, 13px);
+    line-height: 1.65;
+    color: transparent;
+    background: transparent;
+    padding: 14px;
+    tab-size: 4;
+    white-space: pre;
+    overflow: auto;
+    caret-color: #383a42;
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-text-fill-color: transparent;
+  }
+  .editor-input::selection {
+    background: rgba(61, 127, 255, 0.22);
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Syntax token colors — light theme (One Light palette) */
+  .tk-kw    { color: #a626a4; }  /* keywords: purple */
+  .tk-bi    { color: #0184bc; }  /* builtins: blue */
+  .tk-str   { color: #50a14f; }  /* strings: green */
+  .tk-num   { color: #986801; }  /* numbers: amber */
+  .tk-op    { color: #4078f2; }  /* operators: blue */
+  .tk-cm    { color: #a0a1a7; font-style: italic; }  /* comments: grey */
+  .tk-paren { color: #383a42; font-weight: 600; }    /* brackets: bold dark */
+  .tk-bool  { color: #e45649; }  /* True/False/None: red */
+  .tk-self  { color: #e45649; }  /* self: red */
+
+  /* ── OUTPUT ── */
+  .output-area {
+    height: 40%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fafaf8;
+    overflow: hidden;
+  }
+  .output-header {
+    padding: 7px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text3);
+    background: #f0ede8; border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .output-status {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0; text-transform: none;
+  }
+  .output-status.ok { color: var(--accent3); }
+  .output-status.err { color: #e45649; }
+  .output-status.running { color: var(--accent); }
+
+  .output-body {
+    flex: 1; overflow-y: auto; padding: 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    line-height: 1.7; color: var(--text);
+    background: #fafaf8;
+    display: flex; flex-direction: column; gap: 0;
+  }
+
+  .out-line { display: block; white-space: pre-wrap; color: #383a42; padding: 0 14px; }
+  .out-line:first-child { padding-top: 10px; }
+  .out-hint { color: var(--text3); font-style: italic; font-family: 'Geologica', sans-serif; font-size: 12px; padding: 10px 14px; }
+
+  /* Input prompt */
+  .out-input-line {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 2px 0;
+    padding: 4px 14px;
+    background: #eef3ff;
+    border-left: 3px solid var(--accent);
+  }
+  .out-input-prompt {
+    color: var(--accent);
+    font-weight: 600;
+    white-space: pre;
+    flex-shrink: 0;
+  }
+  .out-input-field {
+    border: 1.5px solid var(--accent);
+    outline: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: #ffffff;
+    color: #1a1a2e;
+    padding: 3px 8px;
+    min-width: 140px;
+    flex: 1;
+    border-radius: 6px;
+    box-shadow: 0 0 0 3px #3d7fff18;
+  }
+  .out-input-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px #3d7fff30;
+  }
+  .out-input-done {
+    color: var(--accent3);
+    font-weight: 600;
+    white-space: pre;
+  }
+
+  /* Error block */
+  .out-error-block {
+    background: #fff5f5;
+    border-left: 3px solid #e45649;
+    padding: 10px 14px;
+    margin: 4px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .out-error-type {
+    color: #e45649;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .out-error-location {
+    color: #986801;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .out-error-msg {
+    color: #c0392b;
+    white-space: pre-wrap;
+    margin-bottom: 8px;
+  }
+  .out-error-tip {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: 'Geologica', sans-serif;
+    font-size: 12px;
+    color: #6d4c00;
+    line-height: 1.5;
+  }
+  .out-error-tip-label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+    color: #92400e;
+  }
+
+  /* ── LEFT CONTENT ── */
+  .lesson-content {
+    padding: 32px 36px 60px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lesson-hero {
+    margin-bottom: 40px;
+    animation: fadeUp .6s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .lesson-num {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  .lesson-num::before {
+    content: ''; width: 20px; height: 2px; background: var(--accent); border-radius: 2px;
+  }
+
+  .lesson-title {
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .lesson-title span { color: var(--accent); }
+
+  .lesson-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text2);
+    max-width: 600px;
+  }
+
+  .snake-mascot {
+    font-size: 56px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,.12));
+    animation: float 4s ease-in-out infinite;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  @keyframes float {
+    0%,100%{ transform: translateY(0) rotate(-3deg); }
+    50%{ transform: translateY(-10px) rotate(3deg); }
+  }
+
+  /* Параметры таблица */
+  .params-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  .params-table th { background: #edeae3; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); border-bottom: 2px solid var(--border); }
+  .params-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text2); line-height: 1.55; vertical-align: top; }
+  .params-table tr:last-child td { border-bottom: none; }
+  .params-table tr:hover td { background: #3d7fff05; }
+  .params-table .param-name { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+  .params-table .param-default { font-family: 'JetBrains Mono', monospace; color: #986801; font-size: 12px; }
+  .subtopic-nav {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 36px;
+    animation: fadeUp .6s .1s ease both;
+  }
+  .subtopic-btn {
+    padding: 7px 14px; border: 1.5px solid var(--border);
+    background: var(--surface); border-radius: 20px;
+    font-size: 12px; font-weight: 600; color: var(--text2);
+    cursor: pointer; transition: all .2s;
+    font-family: 'Geologica', sans-serif;
+  }
+  .subtopic-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .subtopic-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .section { margin-bottom: 48px; animation: fadeUp .5s ease both; }
+  .section-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+  .section-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .section-icon.blue { background: #3d7fff18; }
+  .section-icon.orange { background: #ff6b3518; }
+  .section-icon.green { background: #22c55e18; }
+  .section-icon.red { background: #ef444418; }
+  
+  .section-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+  .section-title { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.3; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px 24px; margin-bottom: 14px;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .card p { font-size: 14px; line-height: 1.75; color: var(--text2); }
+  .card p + p { margin-top: 10px; }
+  .card strong { color: var(--text); font-weight: 700; }
+  .card.highlight { border-color: #3d7fff33; background: linear-gradient(135deg, #3d7fff08, #ffffff); }
+  .card.highlight-orange { border-color: #ff6b3533; background: linear-gradient(135deg, #ff6b3508, #ffffff); }
+  .card.highlight-green { border-color: #22c55e33; background: linear-gradient(135deg, #22c55e08, #ffffff); }
+
+  .code-block { background: var(--code-bg); border-radius: 12px; overflow: hidden; margin: 14px 0; border: 1px solid #ddd9d0; }
+  .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #edeae3; border-bottom: 1px solid #ddd9d0; }
+  .code-block-lang { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+  .copy-btn { font-size: 11px; font-weight: 600; color: #999; background: none; border: none; cursor: pointer; padding: 2px 8px; border-radius: 6px; transition: all .2s; font-family: 'Geologica', sans-serif; }
+  .copy-btn:hover { background: #ddd9d0; color: var(--text); }
+  .copy-btn.copied { color: var(--code-green); }
+  .code-block pre { padding: 18px 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: var(--code-text); overflow-x: auto; }
+
+  .ck { color: var(--code-blue); }
+  .cf { color: #cba6f7; }
+  .cs { color: var(--code-yellow); }
+  .cc { color: var(--code-comment); font-style: italic; }
+  .ce { color: var(--code-red); }
+  .cn { color: #fab387; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .compare-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .compare-item-title { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+  .compare-item p { font-size: 13px; line-height: 1.65; color: var(--text2); }
+
+  .steps { list-style: none; margin: 14px 0; }
+  .steps li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; font-size: 14px; line-height: 1.65; color: var(--text2); transition: all .2s; }
+  .steps li:hover { border-color: var(--accent); background: #3d7fff05; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: white; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+  .ic { background: #3d7fff18; color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; padding: 2px 7px; border-radius: 6px; border: 1px solid #3d7fff22; }
+
+  .error-anatomy { background: #fff8f8; border: 1.5px solid #fccaca; border-radius: 12px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: #383a42; margin: 14px 0; position: relative; }
+  .error-line-1 { color: #e45649; font-weight: 600; }
+  .error-line-2 { color: #986801; }
+  .error-line-3 { color: #383a42; }
+  .error-line-4 { color: #e45649; font-weight: 700; }
+  .error-annotation { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .ann-item { display: flex; align-items: flex-start; gap: 10px; font-family: 'Geologica', sans-serif; font-size: 13px; color: var(--text2); }
+  .ann-dot { width: 8px; height: 8px; border-radius: 50%; background: #e45649; margin-top: 5px; flex-shrink: 0; }
+  .ann-dot.yellow { background: #986801; }
+  .ann-dot.white { background: #383a42; }
+
+  .try-card { background: linear-gradient(135deg, #3d7fff, #6366f1); border-radius: 16px; padding: 22px 24px; color: white; display: flex; align-items: center; gap: 16px; margin-top: 16px; cursor: pointer; transition: transform .2s, box-shadow .2s; border: none; width: 100%; font-family: 'Geologica', sans-serif; text-align: left; }
+  .try-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #3d7fff44; }
+  .try-icon { font-size: 32px; flex-shrink: 0; }
+  .try-text-title { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
+  .try-text-sub { font-size: 12px; opacity: .8; }
+  .try-arrow { margin-left: auto; font-size: 20px; opacity: .7; }
+
+  .quiz-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-top: 16px; }
+  .quiz-q { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { padding: 11px 16px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 13px; font-family: 'Geologica', sans-serif; background: var(--bg); color: var(--text2); text-align: left; transition: all .2s; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--accent); background: #3d7fff08; }
+  .quiz-opt.correct { border-color: var(--accent3); background: #22c55e12; color: var(--accent3); }
+  .quiz-opt.wrong { border-color: #ef4444; background: #ef444412; color: #ef4444; }
+  .quiz-feedback { margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 10px; display: none; line-height: 1.6; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #22c55e12; color: #16a34a; border: 1px solid #22c55e33; }
+  .quiz-feedback.no { background: #ef444412; color: #dc2626; border: 1px solid #ef444433; }
+
+  .section-divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 40px 0; }
+
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin: 14px 0; }
+  .tool-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--surface); cursor: pointer; transition: all .2s; text-decoration: none; }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .tool-icon { font-size: 24px; margin-bottom: 6px; }
+  .tool-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .tool-desc { font-size: 11px; color: var(--text3); }
+
+  @media (max-width: 768px) {
+    body { overflow: auto; }
+    .layout { flex-direction: column; height: auto; overflow: visible; }
+    .left-panel { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: unset; overflow: visible; height: auto; }
+    .divider { display: none; }
+    .right-panel { width: 100% !important; min-width: unset; min-height: 550px; height: auto; flex-shrink: 0; }
+    .lesson-content { padding: 24px 20px 48px; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .left-panel::-webkit-scrollbar { width: 5px; }
+  .left-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  .output-body::-webkit-scrollbar { width: 5px; }
+  .output-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  .editor-input::-webkit-scrollbar { width: 5px; height: 5px; }
+  .editor-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  .section:nth-child(1) { animation-delay: .05s; }
+  .section:nth-child(2) { animation-delay: .1s; }
+  .section:nth-child(3) { animation-delay: .15s; }
+  .section:nth-child(4) { animation-delay: .2s; }
+
+  /* ── PYODIDE STATUS ── */
+  .py-status {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+    background: #eee; color: #888;
+    margin-left: 6px;
+  }
+  .py-status.ready { background: #dcfce7; color: #166534; }
+   /* Вывод-превью */
+  .output-preview {
+    background: #1e1e2e;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #cdd6f4;
+    margin: 10px 0;
+    border: 1px solid #313244;
+  }
+  .output-preview .op-prompt { color: #6c7086; user-select: none; }
+  .output-preview .op-out { color: #a6e3a1; }
+  .output-preview .op-label { color: #89b4fa; font-style: italic; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">🐍 Py<span>thon</span></div>
+  <div class="topbar-badge">Урок 3</div>
+  
+</div>
+
+<!-- LAYOUT -->
+<div class="layout" id="layout">
+
+  <!-- LEFT: THEORY -->
+  <div class="left-panel" id="leftPanel">
+    <div class="lesson-content">
+
+      <div class="lesson-hero">
+        <div class="snake-mascot">📦</div>
+        <div class="lesson-num">Модуль 1</div>
+        <h1 class="lesson-title"><span>Переменные</span></h1>
+        <p class="lesson-desc">Как программа запоминает данные и где она их хранит. Разберемся, как создавать «коробочки» для информации и правильно их подписывать.</p>
+      </div>
+
+      
+      <!-- SECTION 1 -->
+      <div class="section" id="s1">
+        <div class="section-header">
+          <div class="section-icon blue">📦</div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 1</div>
+            <div class="section-title">Что такое переменная</div>
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <p><strong>Переменная</strong> — это именованная область памяти, в которой мы храним данные. Проще говоря, это <strong>подписанная коробочка</strong>, в которую можно положить число, текст или любой другой объект.</p>
+          <p>В Python переменные создаются в тот момент, когда вы впервые присваиваете им значение с помощью знака <span class="ic">=</span>.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">Python</span>
+            <button class="copy-btn" onclick="copyCode(this, 'code1')">Копировать</button>
+          </div>
+          <pre id="code1"><span class="cc"># Создаем переменную name и кладем в нее строку</span>
+name = <span class="cs">"Алексей"</span>
+
+<span class="cc"># Создаем переменную age и кладем число</span>
+age = <span class="cn">25</span>
+
+<span class="cf">print</span>(name)
+<span class="cf">print</span>(age)</pre>
+        </div>
+
+        <div class="output-preview">
+          <div class="op-label"># вывод ↓</div>
+          <div class="op-out">Алексей</div>
+          <div class="op-out">25</div>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-q">🎯 Какую роль выполняет переменная в программировании?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Выводит текст на экран</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q1')">Хранит данные в памяти</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Завершает работу программы</button>
+          </div>
+          <div class="quiz-feedback" id="q1-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 2 -->
+      <div class="section" id="s2">
+        <div class="section-header">
+          <div class="section-icon orange">✍️</div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 2</div>
+            <div class="section-title">Правила именования переменных</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p>Вы можете называть переменные как угодно, но есть несколько <strong>жестких правил</strong>, которые нельзя нарушать:</p>
+        </div>
+
+        <ul class="steps">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>Символы:</strong> Имя может содержать только латинские буквы (a-z), цифры (0-9) и символ подчеркивания (<span class="ic">_</span>).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Цифры:</strong> Имя переменной <strong>не может</strong> начинаться с цифры.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              <strong>Регистр:</strong> Python различает регистр. <span class="ic">age</span>, <span class="ic">Age</span> и <span class="ic">AGE</span> — это три <strong>разные</strong> переменные.
+            </div>
+          </li>
+        </ul>
+
+        <div class="compare-grid">
+          <div class="compare-item">
+            <div class="compare-item-title">✅ Правильно</div>
+            <p>user_name = "Alice"<br>score1 = 100<br>_top_secret = 42</p>
+          </div>
+          <div class="compare-item">
+            <div class="compare-item-title">❌ Ошибка</div>
+            <p>1_place = "Gold"<br>user-name = "Bob"<br>my age = 20</p>
+          </div>
+        </div>
+
+        <div class="card highlight-orange">
+          <p><strong>Совет:</strong> Используйте понятные имена на английском. Вместо <span class="ic">a = 5</span> лучше написать <span class="ic">user_lives = 5</span>. Это делает код читаемым.</p>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-q">🎯 Какое имя переменной вызовет ошибку?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">player_1</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q2')">1_player</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">_player</button>
+          </div>
+          <div class="quiz-feedback" id="q2-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 3 -->
+      <div class="section" id="s3">
+        <div class="section-header">
+          <div class="section-icon green">➡</div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 3</div>
+            <div class="section-title">Присваивание значений</div>
+          </div>
+        </div>
+
+        <div class="card highlight-green">
+          <p>В программировании знак <span class="ic">=</span> — это не математическое равно, а <strong>оператор присваивания</strong>.</p>
+          <p>Он работает так: сначала вычисляется значение <strong>справа</strong> от знака, а затем оно записывается в переменную <strong>слева</strong>.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">Python</span>
+            <button class="copy-btn" onclick="copyCode(this, 'code3')">Копировать</button>
+          </div>
+          <pre id="code3">x = <span class="cn">10</span>
+y = <span class="cn">5</span>
+
+<span class="cc"># Сначала сложится 10 + 5, потом результат попадет в sum</span>
+total = x <span class="ck">+</span> y
+
+<span class="cf">print</span>(total)  <span class="cc"># Выведет 15</span></pre>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-q">🎯 Что будет лежать в переменной x после кода: x = 10 + 5 * 2?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">30</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q3')">20</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">10 + 5 * 2</button>
+          </div>
+          <div class="quiz-feedback" id="q3-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 4 -->
+      <div class="section" id="s4">
+        <div class="section-header">
+          <div class="section-icon purple">🔄</div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 4</div>
+            <div class="section-title">Изменение значения переменной</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p>Значение переменной можно <strong>перезаписать</strong>. При этом старое значение полностью стирается, и переменная начинает ссылаться на новое.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">Python</span>
+            <button class="copy-btn" onclick="copyCode(this, 'code4')">Копировать</button>
+          </div>
+          <pre id="code4">score = <span class="cn">10</span>
+<span class="cf">print</span>(score)
+
+score = <span class="cn">25</span>  <span class="cc"># Старое значение (10) удалено</span>
+<span class="cf">print</span>(score)
+
+<span class="cc"># Можно использовать текущее значение для расчета нового</span>
+score = score <span class="ck">+</span> <span class="cn">5</span>
+<span class="cf">print</span>(score)</pre>
+        </div>
+
+        <div class="output-preview">
+          <div class="op-label"># вывод ↓</div>
+          <div class="op-out">10</div>
+          <div class="op-out">25</div>
+          <div class="op-out">30</div>
+        </div>
+
+        <button class="try-card" onclick="loadVariableExample()">
+          <span class="try-icon">▶️</span>
+          <div>
+            <div class="try-text-title">Попробуй изменить переменную!</div>
+            <div class="try-text-sub">Загрузить пример в компилятор →</div>
+          </div>
+          <span class="try-arrow">→</span>
+        </button>
+
+        <div class="quiz-card">
+          <div class="quiz-q">🎯 Что выведет код: x = 1; x = x + 1; print(x)?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q4')">1</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q4')">2</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q4')">Ошибка</button>
+          </div>
+          <div class="quiz-feedback" id="q4-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+    <!-- SECTION: VARIABLES PRACTICE -->
+      <div class="section" id="variables-practice">
+        <div class="section-header">
+          <div class="section-icon purple">📦</div>
+          <div class="section-meta">
+            <div class="section-tag">Переменные</div>
+            <div class="section-title">Задания: работа с данными</div>
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <p>Переменные — это "коробки" для данных. Попрактикуйся правильно называть их и изменять их содержимое.</p>
+        </div>
+
+        <ul class="steps">
+          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>Стиль Snake Case:</strong> Создай переменную для хранения количества учебных часов и назови её правильно по стандарту Python: <span class="ic">study_hours</span>. Присвой ей значение <span class="ic">5</span> и выведи.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Перезапись:</strong> Создай переменную <span class="ic">status</span> со значением <span class="ic">"Учусь"</span>. На следующей строке измени её значение на <span class="ic">"Отдыхаю"</span>. Выведи переменную.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              <strong>Математика с переменными:</strong> Создай <span class="ic">a = 10</span> и <span class="ic">b = 3</span>. Создай третью переменную <span class="ic">result</span>, в которую запиши их произведение (<span class="ic">*</span>). Выведи <span class="ic">result</span>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <div>
+              <strong>Типы данных:</strong> Создай переменную <span class="ic">score = 100</span>. Выведи её тип с помощью функции <span class="ic">print(type(score))</span>.
+            </div>
+          </li>
+
+          <!-- УРОВЕНЬ: СРЕДНИЙ -->
+          <li>
+            <span class="step-num">5</span>
+            <div>
+              <strong>Краткая запись:</strong> Создай переменную <span class="ic">points = 50</span>. Используй оператор <span class="ic">+=</span>, чтобы увеличить её значение на <span class="ic">10</span>. Выведи итог.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">6</span>
+            <div>
+              <strong>Множественное присваивание:</strong> Одной строкой создай три переменные <span class="ic">x</span>, <span class="ic">y</span>, <span class="ic">z</span> и присвой им значения <span class="ic">1, 2, 3</span> соответственно. Выведи их сумму.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">7</span>
+            <div>
+              <strong>Константы:</strong> Создай "константу" (используй заглавные буквы) для числа Пи: <span class="ic">PI = 3.14</span>. Выведи фразу <span class="ic">"Значение Пи: 3.14"</span>, обращаясь к этой переменной.
+            </div>
+          </li>
+
+          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
+          <li>
+            <span class="step-num">8</span>
+            <div>
+              <strong>Обмен значениями:</strong> Создай <span class="ic">m = 5</span> и <span class="ic">n = 10</span>. Поменяй их значения местами (чтобы в m стало 10, а в n — 5) одной строкой кода: <span class="ic">m, n = n, m</span>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">9</span>
+            <div>
+              <strong>Логическая переменная:</strong> Создай переменную <span class="ic">is_python_fun</span> и присвой ей логическое значение <span class="ic">True</span>. Выведи фразу <span class="ic">"Python — это весело: True"</span> через f-строку.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">10</span>
+            <div>
+              <strong>Калькулятор скидки:</strong> Создай переменные <span class="ic">price = 5000</span> и <span class="ic">discount = 0.1</span> (это 10%). Посчитай итоговую цену и сохрани её в переменную <span class="ic">final_price</span>. Выведи результат.
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider" id="divider"></div>
+
+  <!-- RIGHT: COMPILER -->
+  <div class="right-panel" id="rightPanel">
+    <div class="right-header">
+      <div class="right-header-title">
+        🐍 Python — встроенный компилятор
+        <span class="live-badge">LIVE</span>
+        <span id="pyStatus" class="py-status">Загрузка анализатора...</span>
+      </div>
+      <div class="rh-actions">
+        <!-- Font size picker -->
+        <div class="font-size-wrap" id="fontSizeWrap">
+          <button class="font-size-btn" onclick="toggleFontMenu()" id="fontSizeLabel">Аа 13px ▾</button>
+          <div class="font-size-dropdown" id="fontSizeMenu">
+            <button class="font-size-opt" onclick="setFontSize(11)">Аа 11px — мелкий</button>
+            <button class="font-size-opt active" onclick="setFontSize(13)">Аа 13px — обычный</button>
+            <button class="font-size-opt" onclick="setFontSize(15)">Аа 15px — крупный</button>
+            <button class="font-size-opt" onclick="setFontSize(17)">Аа 17px — большой</button>
+            <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
+          </div>
+        </div>
+        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()">▶ Запустить</button>
+      </div>
+    </div>
+    <div class="compiler-wrap">
+      <div class="editor-area">
+        <div class="editor-gutter" id="gutter"></div>
+        <div class="editor-wrap">
+          <div class="editor-highlight" id="editorHighlight" aria-hidden="true"></div>
+          <textarea class="editor-input" id="codeEditor" spellcheck="false" autocorrect="off" autocapitalize="off"
+            oninput="onEditorInput()"
+            onkeydown="handleKeyDown(event)"
+            onscroll="syncScroll()"># Моя первая программа
+print("Hello, World!")
+
+</textarea>
+        </div>
+      </div>
+      <div class="output-area">
+        <div class="output-header">
+          <span>Вывод</span>
+          <span class="output-status" id="outputStatus"></span>
+        </div>
+        <div class="output-body" id="output">
+          <span class="out-hint">Нажми ▶ Запустить чтобы увидеть результат</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
+<script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
+
+<script>
+// ── DIVIDER (RESIZE) ──
+const layout = document.getElementById('layout');
+const leftPanel = document.getElementById('leftPanel');
+const divider = document.getElementById('divider');
+
+let isDragging = false, rafId = null, pendingX = 0;
+function applyResize() {
+    const lw = layout.getBoundingClientRect().width;
+    const newW = Math.min(Math.max(pendingX, 320), lw - 280);
+    leftPanel.style.flexBasis = newW + 'px';
+    rafId = null;
+}
+function onMove(clientX) {
+    if (!isDragging) return;
+    pendingX = clientX;
+    if (!rafId) rafId = requestAnimationFrame(applyResize);
+}
+divider.addEventListener('mousedown', e => {
+    isDragging = true; divider.classList.add('dragging');
+    document.body.style.userSelect = 'none'; document.body.style.cursor = 'col-resize';
+    e.preventDefault();
+});
+window.addEventListener('mousemove', e => { if (isDragging) onMove(e.clientX); });
+window.addEventListener('mouseup', () => {
+    if (!isDragging) return; isDragging = false;
+    divider.classList.remove('dragging'); document.body.style.userSelect = ''; document.body.style.cursor = '';
+});
+
+// ── FONT SIZE ──
+let currentFontSize = 13;
+function setFontSize(size) {
+    currentFontSize = size;
+    document.documentElement.style.setProperty('--editor-font-size', size + 'px');
+    document.documentElement.style.setProperty('--editor-line-height', (size * 1.65) + 'px');
+    const elements = ['codeEditor', 'editorHighlight', 'output'];
+    elements.forEach(id => document.getElementById(id).style.fontSize = size + 'px');
+    document.getElementById('fontSizeLabel').textContent = `Аа ${size}px ▾`;
+    document.querySelectorAll('.font-size-opt').forEach(o => o.classList.toggle('active', o.textContent.includes(size + 'px')));
+    closeFontMenu(); updateGutter(); highlight(); syncScroll();
+}
+function toggleFontMenu() { document.getElementById('fontSizeMenu').classList.toggle('open'); }
+function closeFontMenu() { document.getElementById('fontSizeMenu').classList.remove('open'); }
+document.addEventListener('click', e => { if (!document.getElementById('fontSizeWrap').contains(e.target)) closeFontMenu(); });
+
+// ── GUTTER & HIGHLIGHT ──
+function updateGutter() {
+    const ta = document.getElementById('codeEditor');
+    const g = document.getElementById('gutter');
+    if (!ta || !g) return;
+    const lines = ta.value.split('\n').length;
+    g.innerHTML = Array.from({length: lines}, (_, i) => `<div>${i + 1}</div>`).join('');
+}
+function syncScroll() {
+    const ta = document.getElementById('codeEditor');
+    const hl = document.getElementById('editorHighlight');
+    const g = document.getElementById('gutter');
+    if (!ta) return;
+    if (hl) { hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; }
+    if (g) g.scrollTop = ta.scrollTop;
+}
+function escHtml(s) { if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function highlight() {
+    const ta = document.getElementById('codeEditor');
+    const hl = document.getElementById('editorHighlight');
+    if (!ta || !hl) return;
+    hl.innerHTML = ta.value
+        .split('\n')
+        .map(line => `<span class="code-line">${tokenizeLine(line)}</span>`)
+        .join('');
+}
+function tokenizeLine(line) {
+    let out = ''; let i = 0; const len = line.length;
+    while (i < len) {
+        if (line[i] === '#') { out += `<span class="tk-cm">${escHtml(line.slice(i))}</span>`; break; }
+        if (line[i] === '"' || line[i] === "'") {
+            const q = line[i]; let j = i + 1;
+            while (j < len && line[j] !== q) { if (line[j] === '\\') j++; j++; }
+            j = Math.min(j + 1, len); out += `<span class="tk-str">${escHtml(line.slice(i, j))}</span>`;
+            i = j; continue;
+        }
+        if (/[0-9]/.test(line[i])) {
+            let j = i; while (j < len && /[0-9.]/.test(line[j])) j++;
+            out += `<span class="tk-num">${escHtml(line.slice(i, j))}</span>`; i = j; continue;
+        }
+        if (/[a-zA-Zа-яА-ЯёЁ_]/.test(line[i])) {
+            let j = i; while (j < len && /[a-zA-Zа-яА-ЯёЁ0-9_]/.test(line[j])) j++;
+            const word = line.slice(i, j);
+            const keywords = ['False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
+            const builtins = ['abs','all','any','bin','bool','bytearray','bytes','callable','chr','classmethod','compile','complex','delattr','dict','dir','divmod','enumerate','eval','exec','filter','float','format','frozenset','getattr','globals','hasattr','hash','help','hex','id','input','int','isinstance','issubclass','iter','len','list','locals','map','max','memoryview','min','next','object','oct','open','ord','pow','print','property','range','repr','reversed','round','set','setattr','slice','sorted','staticmethod','str','sum','super','tuple','type','vars','zip'];
+            let cls = keywords.includes(word) ? 'tk-kw' : builtins.includes(word) ? 'tk-bi' : (['True','False','None'].includes(word) ? 'tk-bool' : (word === 'self' ? 'tk-self' : null));
+            out += cls ? `<span class="${cls}">${escHtml(word)}</span>` : escHtml(word); i = j; continue;
+        }
+        if ('()[]{}'.includes(line[i])) { out += `<span class="tk-paren">${escHtml(line[i])}</span>`; i++; continue; }
+        if ('=+-*/<>!&|^~%@'.includes(line[i])) { out += `<span class="tk-op">${escHtml(line[i])}</span>`; i++; continue; }
+        out += escHtml(line[i]); i++;
+    }
+    return out || '&nbsp;';
+}
+
+function onEditorInput() { updateGutter(); highlight(); syncScroll(); }
+function handleKeyDown(e) {
+    const ta = e.target;
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); toggleRunStop(); return; }
+    if (e.key === 'Tab') {
+        e.preventDefault(); const s = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(end);
+        ta.selectionStart = ta.selectionEnd = s + 4; onEditorInput(); return;
+    }
+    if (e.key === 'Enter') {
+        e.preventDefault(); const pos = ta.selectionStart; const before = ta.value.substring(0, pos);
+        const after = ta.value.substring(ta.selectionEnd); const lines = before.split('\n');
+        const currentLine = lines[lines.length - 1]; let indent = (currentLine.match(/^(\s*)/) || [""])[0];
+        if (currentLine.trimEnd().endsWith(':')) indent += '    ';
+        const insertion = '\n' + indent; ta.value = before + insertion + after;
+        ta.selectionStart = ta.selectionEnd = pos + insertion.length; onEditorInput(); return;
+    }
+}
+
+// ── EXECUTION LOGIC (smart compiler with Pyodide analysis) ──
+let pyodide = null;
+
+async function initPyodide() {
+    const statusEl = document.getElementById('pyStatus');
+    try {
+        pyodide = await loadPyodide();
+        if (statusEl) { statusEl.textContent = "Анализатор: активен"; statusEl.className = "py-status ready"; }
+    } catch (e) {
+        if (statusEl) { statusEl.textContent = "Анализатор: сбой"; }
+    }
+}
+initPyodide();
+
+function getFinalHint(errStr, code) {
+    const full = errStr.toLowerCase();
+    if (full.includes("eol while scanning string literal")) return "Подсказка: строка не закрыта кавычкой (\" или ') в начале или конце";
+    if (full.includes("unterminated string literal")) return "Подсказка: строка не закрыта кавычкой (\" или ') в начале или конце";
+    if (full.includes("unexpected eof while parsing")) return "Подсказка: скорее всего не закрыта скобка, блок или выражение";
+    if (full.includes("unmatched ')'")) return "Подсказка: лишняя или отсутствующая скобка — проверь пары скобок";
+    if (full.includes("expected ':'")) return "Подсказка: Отсутствует ':'";
+    if (full.includes("module 'random' has no attribute 'randit'")) return "Подсказка: У модуля 'random' нет атрибута 'randIT'";
+    if (full.includes("invalid decimal literal")) return "Подсказка: в имени переменной или функции есть недопустимый символ";
+    if (full.includes("invalid character")) return "Подсказка: в имени переменной или функции есть недопустимый символ";
+    if (full.includes("was never closed")) return "Подсказка: скорее всего не закрыта открытая скобка или лишняя";
+    if (full.includes("expected an indented block")) return "Подсказка: после if/for/while/def должен быть отступ (4 пробела или tab)";
+    if (full.includes("unexpected indent")) return "Подсказка: перед строчкой лишний отступы (пробелы)";
+    if (full.includes("unindent does not match any outer indentation level")) return "Подсказка: неправильные отступы, разный уровень пробелов";
+    if (full.includes("is not defined")) {
+        const match = errStr.match(/name '(.*?)' is not defined/);
+        const varName = match ? match[1] : "переменная";
+        return `Подсказка: переменная {${varName}} не создана или написана с ошибкой`;
+    }
+    if (full.includes("unsupported operand type(s) for +") || (full.includes("typeerror") && full.includes("str") && full.includes("int"))) return "Подсказка: математика или сравнения с  разными типами (например число и строка) невозвможна, проверь типы данных";
+    if (full.includes("'nonetype' does not support indexing")) return "Подсказка: переменная равна None, но к ней обращаются как к списку";
+    if (full.includes("'int' object is not iterable")) return "Подсказка: число нельзя использовать в цикле for как список";
+    if (full.includes("object has no attribute")) {
+        const match = errStr.match(/'(.*?)' object has no attribute '(.*?)'/);
+        return `Подсказка: у объекта ${match ? match[1] : ''} нет такого метода (например ${match ? match[2] : 'append'} у числа)`;
+    }
+    if (full.includes("invalid literal for int()")) return "Подсказка: попытка преобразовать строку в число";
+    if (full.includes("division by zero")) return "Подсказка: деление на ноль невозможно";
+    if (full.includes("list index out of range")) return "Подсказка: Такого элемента или индекса нет в списке";
+    if (full.includes("keyerror")) return "Подсказка: такого ключа нет в словаре";
+    if (full.includes("cannot import name")) return "Подсказка: модуль есть, но нужный объект не найден";
+    if (full.includes("is not yet implemented")) return "Подсказка: модуль есть, но компилятор не умеет с ним работать";
+    if (full.includes("no module named")) return "Подсказка: модуль не установлен или написан неправильно";
+    if (full.includes("no such file or directory")) return "Подсказка: файл не найден по указанному пути";
+    if (full.includes("permission denied")) return "Подсказка: нет доступа к файлу или папке";
+    if (full.includes("oserror")) return "Подсказка: ошибка системы (файл, диск, путь или устройство)";
+    if (full.includes("maximum recursion depth exceeded")) return "Подсказка: рекурсия не остановилась — нет базового условия или слишком глубокий вызов";
+    if (full.includes("stopiteration")) return "Подсказка: итератор закончился (больше элементов нет)";
+    if (full.includes("assertionerror")) return "Подсказка: условие assert оказалось ложным";
+    if (full.includes("memoryerror")) return "Подсказка: программе не хватает памяти";
+    if (full.includes("overflowerror")) return "Подсказка: число слишком большое для вычислений";
+    if (full.includes("eof when reading a line")) return "Подсказка: ввод input закончился без данных";
+    if (full.includes("invalid syntax")) return "Подсказка: ошибка синтаксиса — проверь правильность написания кода (скобки, двоеточия, ключевые слова)";
+    return "Подсказка: Проверь опечатки, скобки, кавычки или двоеточия.";
+}
+
+function cleanErr(err) {
+    if (err.includes('File "<stdin>"')) return err.split('File "<stdin>", ').pop();
+    if (err.includes('File "<exec>"')) return err.split('File "<exec>"').pop();
+    return err;
+}
+
+function showErrorBox(msg, hint) {
+    const outEl = document.getElementById('output');
+    const status = document.getElementById('outputStatus');
+    const box = document.createElement('div');
+    box.className = 'out-error-block';
+    box.innerHTML = `<div class="out-error-type">⚠ Ошибка</div><div class="out-error-msg">${escHtml(cleanErr(msg))}</div><div class="out-error-tip"><span class="out-error-tip-label">💡 Как исправить:</span>${hint}</div>`;
+    outEl.appendChild(box);
+    status.textContent = '✗ Ошибка'; status.className = 'output-status err';
+}
+
+async function runCode() {
+    const code = document.getElementById('codeEditor').value;
+    const outEl = document.getElementById('output');
+    const status = document.getElementById('outputStatus');
+    const btn = document.getElementById('runStopBtn');
+
+    outEl.innerHTML = ''; status.textContent = '⏳ выполняется…'; status.className = 'output-status running';
+    if (btn) { btn.textContent = '▶ Запустить'; btn.className = 'rh-btn run-btn'; }
+
+    Sk.configure({
+        output: (t) => {
+            let lastLine = outEl.lastElementChild;
+            if (lastLine && lastLine.classList.contains('out-line') && !lastLine.textContent.endsWith('\n')) {
+                lastLine.textContent += t;
+            } else {
+                const s = document.createElement('span'); s.className = 'out-line'; s.textContent = t; outEl.appendChild(s);
+            }
+            outEl.scrollTop = outEl.scrollHeight;
+        },
+        read: (x) => { if (!Sk.builtinFiles || !Sk.builtinFiles["files"][x]) throw "File not found"; return Sk.builtinFiles["files"][x]; },
+        inputfun: (prompt) => new Promise((resolve) => {
+            const div = document.createElement('div'); div.className = 'out-input-line';
+            div.innerHTML = `<span class="out-input-prompt">${prompt}</span><input type="text" class="out-input-field">`;
+            outEl.appendChild(div); const inp = div.querySelector('input'); inp.focus();
+            inp.onkeydown = (e) => { if (e.key === 'Enter') {
+                const val = inp.value;
+                div.innerHTML = `<span class="out-input-prompt">${prompt}</span><span class="out-input-done">${val}</span>`;
+                resolve(val);
+            }};
+        }),
+        inputfunTakesPrompt: true,
+        execLimit: 10000,
+        yieldLimit: 100
+    });
+
+    try {
+        await Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, code, true));
+        status.textContent = '✓ выполнено'; status.className = 'output-status ok';
+    } catch (e) {
+        let finalErr = e.toString();
+        if (pyodide) {
+            try { pyodide.runPython(`compile(${JSON.stringify(code)}, '<stdin>', 'exec')`); }
+            catch (pyErr) { finalErr = pyErr.toString(); }
+        }
+        const hint = getFinalHint(finalErr, code);
+        showErrorBox(finalErr, hint);
+    }
+    outEl.scrollTop = outEl.scrollHeight;
+}
+
+function toggleRunStop() { runCode(); }
+
+function loadLogicExample() {
+    document.getElementById('codeEditor').value = "x = 10\ny = 5\n\nif x > y:\n    print('X больше Y')\nelse:\n    print('X не больше Y')\n\n# Пример c end\nprint('Загрузка', end='... ')\nprint('Готово!')";
+    onEditorInput();
+}
+
+function quiz(btn, type, qid) {
+    const q = btn.closest('.quiz-card'); q.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+    btn.classList.add(type);
+    const fb = document.getElementById(qid + '-feedback');
+    fb.textContent = type === 'correct' ? '✅ Верно! ' : '❌ Не совсем. ';
+    fb.className = 'quiz-feedback show ' + (type === 'correct' ? 'ok' : 'no');
+}
+
+updateGutter(); highlight();
+</script>
+</body>
+</html>

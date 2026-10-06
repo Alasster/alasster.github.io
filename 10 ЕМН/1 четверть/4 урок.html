@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f2ff">
+<title>10 класс — Практика: Основные понятия машинного обучения</title>
+<style>
+:root{--bg:#f7f2ff;--paper:rgba(255,255,255,.94);--ink:#2e2040;--muted:#65557b;--coral:#7c4dff;--orange:#ff9e68;--butter:#f8d57e;--sage:#51c4a6;--sage2:#ecfff7;--rose:#f1d9ff;--plum:#4c3270;--line:rgba(90,62,140,.12);--shadow:0 18px 50px rgba(90,62,140,.12)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{overflow:hidden;color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;background:radial-gradient(circle at 9% 10%,#f1e7ff 0,transparent 28%),radial-gradient(circle at 92% 85%,#dffaf2 0,transparent 30%),linear-gradient(135deg,#fffafc,#f1f3ff)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background-image:radial-gradient(#8d7db0 .7px,transparent .7px);background-size:20px 20px}#network-bg{position:fixed;inset:0;z-index:0;pointer-events:none;display:block}.bg-spheres{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}.bg-sphere{position:absolute;border-radius:50%;filter:blur(34px);opacity:.38;mix-blend-mode:multiply;animation:float-sphere 18s ease-in-out infinite alternate}.bg-sphere:nth-child(1){width:190px;height:190px;left:7%;top:17%;background:#8b5cf6}.bg-sphere:nth-child(2){width:130px;height:130px;right:12%;top:12%;background:#f472b6;animation-delay:-5s}.bg-sphere:nth-child(3){width:250px;height:250px;right:19%;bottom:-80px;background:#c084fc;animation-delay:-9s}.bg-sphere:nth-child(4){width:95px;height:95px;left:37%;bottom:12%;background:#5eead4;animation-delay:-13s}@keyframes float-sphere{from{transform:translate3d(-18px,-12px) scale(.94)}to{transform:translate3d(105px,68px) scale(1.12)}}
+button,a,input,textarea{font:inherit}button{color:inherit}a{text-decoration:none}.progress{position:fixed;z-index:99;top:0;left:0;height:6px;background:linear-gradient(90deg,var(--coral),var(--orange),var(--butter));transition:.3s}.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;overflow-y:auto;padding:40px 58px 100px;scrollbar-width:none}.slide::-webkit-scrollbar{display:none}.slide.active{display:flex;animation:enter .45s ease}@keyframes enter{from{opacity:0;transform:translateY(14px)}}.wrap{width:min(1160px,100%);margin:auto}.narrow{width:min(980px,100%);margin:auto}.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}.hero-visual{display:flex;justify-content:center}.visual-card{position:relative;width:min(100%,460px);padding:18px;border-radius:26px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(244,235,255,.96));border:1px solid rgba(124,77,255,.18);box-shadow:0 24px 40px rgba(90,62,140,.12)}.visual-card img{display:block;width:100%;height:420px;object-fit:cover;border-radius:20px;border:1px solid rgba(124,77,255,.15)}.visual-caption{position:absolute;left:32px;right:32px;bottom:32px;padding:12px 16px;border-radius:14px;background:rgba(46,32,64,.72);backdrop-filter:blur(8px);color:#fff;font-size:.9rem;line-height:1.4;box-shadow:0 10px 24px rgba(46,32,64,.18)}.visual-caption strong{color:#fff}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid #d7c7ff;border-radius:99px;background:#f4ebff;color:var(--coral);font-size:.82rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.accent{color:var(--coral)}h1,h2,h3,p,ul,ol{margin-top:0}h1{margin-bottom:20px;font-size:clamp(3rem,6vw,5.1rem);line-height:.98;letter-spacing:-.055em}h2{margin-bottom:12px;font-size:clamp(2rem,4vw,3.1rem);line-height:1.08;letter-spacing:-.035em}h3{margin-bottom:7px;font-size:1.15rem}p,li{color:var(--muted);font-size:1.03rem;line-height:1.52}strong{color:var(--ink)}
+.paper{background:var(--paper);border:1px solid rgba(255,255,255,.8);border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}.pad{padding:28px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{position:relative;padding:22px;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:19px}.card:after{content:"";position:absolute;right:-30px;bottom:-38px;width:90px;height:90px;border-radius:50%;background:var(--rose);opacity:.45}.icon{display:grid;place-items:center;width:48px;height:48px;margin-bottom:12px;border-radius:14px;background:#eaf1ff;color:var(--coral);font-size:1.35rem}.goal{display:grid;gap:12px}.goalitem{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border-radius:15px;background:#fffafc;border:1px solid var(--line)}.goalitem b{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:10px;color:white;background:var(--coral)}
+.badge{display:inline-flex;padding:7px 11px;border-radius:999px;background:#ecfff7;color:#227d63;font-weight:850}.scheme{display:grid;grid-template-columns:repeat(5, minmax(0,1fr));gap:10px;align-items:stretch;position:relative;padding:4px 0}.scheme::before{display:none}.step{position:relative;z-index:1;padding:18px 10px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#ffffff,#f9f5ff);box-shadow:0 10px 18px rgba(90,62,140,.06);animation:pulse 2.3s ease-in-out infinite alternate;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.step:nth-child(2n){animation-delay:.3s}.step .icon-box{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 12px;border-radius:16px;background:linear-gradient(135deg,#f3ebff,#e7fff8);color:var(--coral);font-size:1.5rem;box-shadow:inset 0 0 0 1px rgba(124,77,255,.08)}.step strong{display:block;margin-bottom:6px;font-size:1rem}.step span{color:var(--muted);font-size:.82rem;line-height:1.45}.@keyframes pulse{from{transform:translateY(0);box-shadow:0 10px 18px rgba(90,62,140,.06)}to{transform:translateY(-2px);box-shadow:0 14px 26px rgba(124,77,255,.12)}}
+.flow-arrow{display:none}
+.rulebox{display:grid;gap:10px;margin-top:18px}.rule{padding:12px 14px;border-radius:12px;background:#f5f8ff;border:1px solid var(--line);color:var(--muted)}.task-card{padding:20px;border:1px solid var(--line);border-radius:18px;background:#fff}.task-card-visual{display:grid;grid-template-columns:1.28fr .72fr;gap:18px;align-items:center;padding:0;border:none;background:transparent;border-radius:0;box-shadow:none}.task-card-main{padding:18px 20px;border:1px solid rgba(124,77,255,.12);border-radius:22px;background:linear-gradient(180deg,#f7f1ff,#f9f9ff);box-shadow:0 12px 30px rgba(90,62,140,.06)}.task-card-main p{margin:0 0 16px;font-size:1.06rem;line-height:1.55}.task-steps{display:none}.task-step{display:none}.task-video-wrap{position:relative;padding:10px;border-radius:20px;background:linear-gradient(180deg,#ffffff,#f5f0ff);border:1px solid rgba(124,77,255,.12);box-shadow:0 12px 30px rgba(90,62,140,.06)}.task-video-wrap video{display:block;width:100%;height:100%;min-height:360px;object-fit:cover;border-radius:14px;background:#e8dfff;filter:saturate(1.05) contrast(1.08)}.task-cta{margin-top:18px}.task-cta .action{display:inline-flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:14px;font-size:1.05rem;text-decoration:none}.topic-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.topic{padding:16px 14px;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f9f5ff);border:1px solid var(--line);color:var(--ink);font-weight:700;min-height:78px;display:flex;align-items:center;justify-content:center;text-align:center}.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.tag{display:inline-flex;padding:6px 10px;border-radius:999px;background:#f4ebff;color:var(--coral);font-size:.8rem;font-weight:700}.action{display:inline-flex;align-items:center;justify-content:center;padding:11px 17px;cursor:pointer;border:0;border-radius:13px;color:white;background:var(--coral);font-weight:850;box-shadow:0 8px 18px rgba(124,77,255,.28)}.action.secondary{background:#e6ebff;color:var(--ink);box-shadow:none}.link-box{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;background:#fff}.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.step-list{display:grid;gap:10px;margin-top:16px}.step-list div{padding:12px 14px;border-radius:12px;background:#f9f5ff;border:1px solid var(--line)}
+.rubric{display:grid;gap:10px}.rubric-row{display:grid;grid-template-columns:120px 1fr 50px;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff}.rubric-row strong{color:var(--ink)}.final-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:start}.summary-box{padding:18px 18px 14px;border:1px solid rgba(124,77,255,.12);border-radius:20px;background:linear-gradient(180deg,#fff,#f8f4ff);box-shadow:0 12px 28px rgba(90,62,140,.06)}.summary-box h3{margin-bottom:10px}.summary-box ul{margin:0;padding-left:20px;color:var(--muted);display:grid;gap:8px}.summary-box li{font-size:1rem}.dots{position:fixed;z-index:90;right:24px;top:50%;display:grid;gap:9px;transform:translateY(-50%);padding:10px 8px;border:1px solid rgba(255,255,255,.8);border-radius:99px;background:#fffaf1d8;box-shadow:0 10px 28px rgba(90,62,140,.1)}.dot{position:relative;width:13px;height:13px;padding:0;cursor:pointer;border:2px solid #d8c7ef;border-radius:50%;background:#fff;transition:.2s}.dot::after{content:attr(data-label);position:absolute;right:23px;top:50%;width:max-content;max-width:190px;padding:7px 10px;border-radius:9px;background:#2e2040;color:#fff;font-size:.78rem;font-weight:750;opacity:0;pointer-events:none;transform:translateY(-50%) translateX(5px);transition:.18s ease}.dot:hover::after,.dot:focus-visible::after{opacity:1;transform:translateY(-50%) translateX(0)}.dot:hover{border-color:var(--coral);transform:scale(1.16)}.dot.active{border-color:var(--coral);background:var(--coral);box-shadow:0 0 0 5px rgba(124,77,255,.14)}
+.mobile-controls{display:none}.hint{position:fixed;z-index:80;left:27px;bottom:27px;color:rgba(46,32,64,.55);font-size:.81rem}
+@media(max-width:900px){.slide{align-items:flex-start;padding:27px 21px 98px}.hero,.grid2,.grid3,.scheme,.final-layout{grid-template-columns:1fr}.dots{right:10px}.scheme::before{display:none}.flow-arrow{display:none}}@media(max-width:640px){.dots{display:grid}.mobile-controls{position:fixed;z-index:100;top:38px;right:21px;left:auto;bottom:auto;display:flex;gap:8px;transform:none}.mobile-controls button{display:grid;place-items:center;width:42px;height:42px;padding:0;cursor:pointer;border:0;border-radius:11px;background:#9bbaf4;color:#2563eb;font-size:1.15rem;box-shadow:0 8px 18px rgba(23,32,51,.14)}.mobile-controls button:last-child{background:#2563eb;color:#fff}.mobile-controls button:disabled{opacity:.55;cursor:not-allowed}.hint{display:none}}
+ .dots{position:fixed;z-index:100;top:50%;right:22px;display:grid;gap:9px;transform:translateY(-50%);align-content:center;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}.dot{position:relative;width:11px;height:11px;padding:0;border:0;border-radius:99px;background:#d6c9ea;box-shadow:0 3px 10px rgba(76,50,112,.12);cursor:pointer;transition:.2s}.dot:after{content:attr(title);position:absolute;right:24px;top:50%;padding:7px 10px;border-radius:10px;background:#2e2040;color:#fff;font-size:.76rem;font-weight:750;white-space:nowrap;opacity:0;pointer-events:none;transform:translateY(-50%) translateX(5px);transition:.2s}.dot:hover:after,.dot:focus-visible:after{opacity:1;transform:translateY(-50%) translateX(0)}.dot.active{width:11px;height:27px;background:var(--coral)}
+</style>
+</head>
+<body>
+<canvas id="network-bg" aria-hidden="true"></canvas>
+<div class="bg-spheres" aria-hidden="true"><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span></div>
+<div class="progress" id="progress"></div>
+<nav class="dots" id="dotsNav" aria-label="Навигация по слайдам"></nav>
+<main>
+<section class="slide active">
+<div class="wrap hero">
+<div>
+<span class="eyebrow">10 класс ЕМН - 4 урок</span>
+<h1>Практика:<br><span class="accent">Машинное обучение ML</span></h1>
+<p style="font-size:1.25rem">Сегодня мы не просто повторяем термины — будем обучать простую модель в Teachable Machine и увидим, как из данных получается прогноз.</p>
+<div class="goal" style="margin-top:22px">
+<div class="goalitem"><b>✓</b><div><strong>Цель практики</strong><br><span>Понять, как данные, признаки, обучение, модель и прогноз связаны между собой.</span></div></div>
+<div class="goalitem"><b>◌</b><div><strong>Результат</strong><br><span>Каждый создаёт мини-модель и объясняет, как она работает.</span></div></div>
+</div>
+</div>
+<div class="hero-visual">
+<div class="visual-card">
+<img src="https://i.pinimg.com/originals/94/29/58/942958320fa30e02e89add784f140229.gif?nii=t" alt="Анимация машинного обучения и данных">
+<div class="visual-caption"><strong>Шаг за шагом:</strong> данные → признаки → обучение → модель → прогноз</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="slide">
+<div class="narrow">
+<span class="eyebrow">02 · Как это работает</span>
+<h2>Короткая схема машинного обучения</h2>
+<div class="scheme">
+<div class="step"><div class="icon-box">📊</div><strong>Данные</strong><span>Собираем примеры: фото, звук, тексты, жесты.</span></div>
+<div class="step"><div class="icon-box">🔎</div><strong>Признаки</strong><span>Выделяем важные характеристики объектов.</span></div>
+<div class="step"><div class="icon-box">🧠</div><strong>Обучение</strong><span>Модель ищет закономерности по примерам.</span></div>
+<div class="step"><div class="icon-box">⚙️</div><strong>Модель</strong><span>Готовое правило для принятия решений.</span></div>
+<div class="step"><div class="icon-box">🎯</div><strong>Прогноз</strong><span>Ответ для нового объекта или случая.</span></div>
+</div>
+<div class="grid2" style="margin-top:20px">
+<div class="paper pad"><h3>Ключевая логика</h3><p>Модель учится на примерах, а не на прямой инструкции. Она видит шаблоны и затем применяет их к новым данным.</p></div>
+<div class="paper pad"><h3>Главное различие</h3><p><strong>Обучение</strong> — это процесс, <strong>модель</strong> — результат, <strong>прогноз</strong> — ответ на новый случай.</p></div>
+</div>
+</div>
+</section>
+
+<section class="slide">
+<div class="narrow">
+<span class="eyebrow">03 · Задание</span>
+<h2>Научите компьютер распознавать изображения, звуки и позы</h2>
+<div class="task-card task-card-visual">
+<div class="task-card-main">
+<p>Сделать мини-проект в <strong>Teachable Machine</strong>: обучить модель распознавать несколько классов и объяснить, как она это делает.</p>
+<p>В этом проекте ученики собирают данные, обучают модель и проверяют, как она распознаёт новые примеры. Набор классов может быть связан с изображениями, звуками или позами.</p>
+<div class="task-cta">
+<a class="action" href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener">Перейти в сервис</a>
+</div>
+</div>
+<div class="task-video-wrap">
+<video autoplay muted loop playsinline preload="auto" poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80">
+<source src="https://teachablemachine.withgoogle.com/assets/prediction.mp4" type="video/mp4">
+</video>
+</div>
+</div>
+<div class="paper pad" style="margin-top:18px">
+<h3>Темы для обучения</h3>
+<div class="topic-list">
+<div class="topic">1. Жесты руками: «стоп», «ок», «пять»</div>
+<div class="topic">2. Голосовые команды: «да», «нет», «пауза»</div>
+<div class="topic">3. Геометрические фигуры: круг, квадрат, треугольник</div>
+<div class="topic">4. Эмоции на лице: радость, грусть, удивление</div>
+<div class="topic">5. Пози тела: сидя, стоя, наклон</div>
+<div class="topic">6. Предметы класса: книга, тетрадь, пенал</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="slide">
+<div class="narrow">
+<span class="eyebrow">04 · Дискриптор</span>
+<h2>Оценивание: 10 баллов</h2>
+<div class="final-layout">
+<div class="rubric">
+<div class="rubric-row"><strong>2 балла</strong><span>Есть чётко сформулированная тема и 2–3 класса для распознавания.</span></div>
+<div class="rubric-row"><strong>2 балла</strong><span>Собраны качественные обучающие данные и всё оформлено в проекте.</span></div>
+<div class="rubric-row"><strong>2 балла</strong><span>Модель успешно обучена и показывает понятный результат на проверке.</span></div>
+<div class="rubric-row"><strong>2 балла</strong><span>Есть качественное объяснение работы модели и вывод о том, что можно улучшить.</span></div>
+<div class="rubric-row"><strong>2 балла</strong><span>Добавлено 6 классов для распознавания и дано чёткое объяснение результата.</span></div>
+</div>
+<div class="summary-box">
+<h3>Итог урока</h3>
+<ul>
+<li>Мы узнали, как из данных строится модель.</li>
+<li>Поняли разницу между данными, признаками, обучением и прогнозом.</li>
+<li>Создали мини-проект в Teachable Machine и проверили, как модель обучается.</li>
+</ul>
+</div>
+</div>
+<div class="paper pad" style="margin-top:18px">
+<h3>Как получить 10/10</h3>
+<p>Чтобы получить <strong>10 баллов</strong>, работа должна быть не просто готовой, а <strong>осмысленной</strong>: качественные данные, понятные классы, успешное обучение, точное объяснение терминов и умение показать, как модель делает прогноз.</p>
+<div class="tags">
+<span class="tag">хорошие данные</span>
+<span class="tag">чёткие классы</span>
+<span class="tag">успешное обучение</span>
+<span class="tag">ясное объяснение</span>
+<span class="tag">правильный вывод</span>
+</div>
+</div>
+</div>
+</section>
+
+
+<div class="mobile-controls" aria-label="Мобильная навигация"><button type="button" id="mobilePrev" aria-label="Предыдущий слайд">←</button><button type="button" id="mobileNext" aria-label="Следующий слайд">→</button></div>
+<div class="hint">← → листать · F — полный экран</div>
+</main>
+<script>
+const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav');
+const dotLabels=['01 · Начало','02 · Как это работает','03 · Задание','04 · Дискриптор'];
+let current=0;
+slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute('aria-label','Перейти к слайду: '+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});
+const dots=[...document.querySelectorAll('.dot')];
+const mobilePrev=document.getElementById('mobilePrev');const mobileNext=document.getElementById('mobileNext');
+function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
+mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
+document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){if(document.fullscreenElement){document.exitFullscreen?.()}else{document.documentElement.requestFullscreen?.()}}});
+const canvas=document.getElementById('network-bg');
+const ctx=canvas.getContext('2d');
+let particles=[];
+function initParticles(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;particles=Array.from({length:54},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.34,vy:(Math.random()-.5)*.34,r:1.4+Math.random()*2.2}));}
+function drawNetwork(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.10)';ctx.fillStyle='rgba(94,234,212,.18)';particles.forEach((point,index)=>{point.x+=point.vx;point.y+=point.vy;if(point.x<0||point.x>canvas.width)point.vx*=-1;if(point.y<0||point.y>canvas.height)point.vy*=-1;ctx.beginPath();ctx.arc(point.x,point.y,point.r,0,Math.PI*2);ctx.fill();for(let next=index+1;next<particles.length;next++){const other=particles[next];const distance=Math.hypot(point.x-other.x,point.y-other.y);if(distance<150){ctx.globalAlpha=1-distance/150;ctx.beginPath();ctx.moveTo(point.x,point.y);ctx.lineTo(other.x,other.y);ctx.stroke();ctx.globalAlpha=1;}}});requestAnimationFrame(drawNetwork)}
+window.addEventListener('resize',initParticles);initParticles();drawNetwork();show(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок 2: Задачи нейронных сетей</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: rgba(255, 255, 255, 0.7);
+            --panel-border: rgba(148, 163, 184, 0.2);
+            --text: #1e293b;
+            --muted: #64748b;
+            --accent: #6366f1;
+            --accent-light: #a5b4fc;
+            --success: #10b981;
+            --violet: #8b5cf6;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --code-bg: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            color: var(--text);
+            background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.05), transparent 30%), #f8fafc;
+            font-family: "Inter", sans-serif;
+        }
+
+        #network-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        .progress-bar {
+            position: fixed; top: 0; left: 0; z-index: 40; height: 4px; width: 0;
+            background: linear-gradient(90deg, var(--rose), var(--violet));
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            position: absolute; inset: 0; z-index: 1; display: none;
+            align-items: flex-start; justify-content: center;
+            padding: 40px 60px 110px; overflow-y: auto;
+        }
+
+        .slide.active { display: flex; animation: fadeIn 0.6s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .container { width: min(1100px, 100%); z-index: 2; margin: auto 0; }
+
+        .eyebrow {
+            display: inline-block; padding: 6px 12px; background: var(--rose);
+            color: white; border-radius: 6px; font-size: 0.8rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; margin-bottom: 20px; }
+        h2 { font-size: 2.2rem; margin-bottom: 20px; color: var(--text); }
+
+        .accent-text { background: linear-gradient(135deg, var(--rose), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .glass {
+            background: var(--panel); backdrop-filter: blur(12px);
+            border: 1px solid var(--panel-border); padding: 30px;
+            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+        
+        .task-card {
+            background: white; padding: 30px; border-radius: 20px;
+            border: 1px solid var(--panel-border); transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+
+        .task-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+
+        .task-card i { font-size: 2.5rem; margin-bottom: 20px; display: block; }
+        
+        .type-tag {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 0.7rem; font-weight: 700; padding: 4px 10px;
+            border-radius: 20px; background: #f1f5f9; color: var(--muted);
+        }
+
+        /* Визуализация Классификации */
+        .viz-box {
+            height: 150px; background: #f8fafc; border-radius: 12px;
+            margin-top: 15px; position: relative; display: flex; align-items: center; justify-content: center;
+        }
+
+        .dots-classification { display: flex; gap: 10px; }
+        .dot { width: 20px; height: 20px; border-radius: 50%; }
+        .dot.red { background: var(--rose); box-shadow: 0 0 10px var(--rose); }
+        .dot.blue { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+        /* Визуализация Регрессии */
+        .regression-line {
+            width: 80%; height: 2px; background: #cbd5e1; position: relative;
+            transform: rotate(-20deg);
+        }
+        .regression-line::after {
+            content: ''; position: absolute; width: 100%; height: 2px;
+            background: var(--violet); top: -10px;
+        }
+
+        /* Навигация */
+        .nav-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
+        .nav-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            background: white; color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer; display: grid; place-items: center; transition: all 0.2s;
+        }
+        .nav-btn:hover:not(:disabled) { background: var(--rose); color: white; transform: scale(1.1); }
+        
+        .start-btn {
+            width: auto; padding: 0 28px; border-radius: 999px;
+            background: linear-gradient(135deg, var(--rose), var(--violet));
+            color: white; font-weight: 800; cursor: pointer; border: none; height: 54px;
+        }
+
+        .dots-nav { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 120; }
+        .dot-nav { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; cursor: pointer; transition: 0.3s; }
+        .dot-nav.active { background: var(--rose); transform: scale(1.4); }
+
+        @media (max-width: 850px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .slide { padding: 20px 20px 30px; }
+            .nav-controls {
+                top: 12px;
+                right: 20px;
+                bottom: auto;
+                left: auto;
+                transform: none;
+                gap: 8px;
+            }
+            .eyebrow {
+                max-width: calc(100% - 120px);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress"></div>
+    <canvas id="network-bg"></canvas>
+    
+    <div class="dots-nav" id="dotsNav"></div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- Slide 1: Intro -->
+    <section class="slide active">
+        <div class="container">
+            <span class="eyebrow">Информатика · 11 класс · 2 урок</span>
+            <h1>Задачи <span class="accent-text">нейронных сетей</span></h1>
+            <p style="font-size: 1.2rem; max-width: 700px;">Нейронные сети не просто "умные" — они решают три фундаментальных типа задач. Сегодня мы разберем, как отличить классификацию от регрессии и почему распознавание образов — это магия математики.</p>
+            <div style="margin-top: 40px;">
+                <button class="start-btn" onclick="changeSlide(1)">Начать изучение <i class="fas fa-play" style="margin-left: 10px;"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 2: Classification -->
+    <section class="slide">
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <h2>1. Классификация</h2>
+                    <div class="glass">
+                        <p>Это задача разделения данных на <b>заранее известные категории</b> (классы).</p>
+                        <p style="margin-top: 15px;">Нейросеть получает объект и должна сказать: "Это объект типа А" или "Это объект типа Б".</p>
+                        <ul style="margin-top: 20px; list-style: none;">
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> <b>Бинарная:</b> Да/Нет (Спам или не спам).</li>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> <b>Мультиклассовая:</b> Кот, собака или попугай.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="task-card" style="display: flex; flex-direction: column; justify-content: center;">
+                    <span class="type-tag">CATEGORICAL</span>
+                    <div class="viz-box">
+                        <div class="dots-classification">
+                            <div class="dot red"></div><div class="dot red"></div>
+                            <div style="width: 2px; height: 40px; background: #e2e8f0; margin: 0 15px;"></div>
+                            <div class="dot blue"></div><div class="dot blue"></div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: var(--muted);">Сеть проводит "границу" между классами в пространстве данных.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Regression -->
+    <section class="slide">
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <h2>2. Регрессия</h2>
+                    <div class="glass">
+                        <p>Это предсказание <b>конкретного числа</b> (непрерывной величины) вместо категории.</p>
+                        <p style="margin-top: 15px;">Вместо "да/нет" сеть выдает число: температуру, цену, возраст или вероятность.</p>
+                        <div style="margin-top: 20px; background: rgba(244, 63, 94, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--rose);">
+                            <strong>Пример:</strong> Прогноз стоимости квартиры на основе её площади и района. Результат: 45 300 000 ₸.
+                        </div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <span class="type-tag">CONTINUOUS</span>
+                    <div class="viz-box">
+                        <div style="position: absolute; left: 20px; bottom: 20px; width: 80%; height: 80%; border-left: 2px solid #cbd5e1; border-bottom: 2px solid #cbd5e1;"></div>
+                        <div class="regression-line"></div>
+                        <div class="dot red" style="position: absolute; top: 40px; left: 60px; width: 8px; height: 8px;"></div>
+                        <div class="dot red" style="position: absolute; top: 80px; left: 100px; width: 8px; height: 8px;"></div>
+                        <div class="dot red" style="position: absolute; top: 60px; left: 180px; width: 8px; height: 8px;"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: var(--muted);">Цель: найти функцию, которая максимально близко проходит через все точки данных.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Pattern Recognition -->
+    <section class="slide">
+        <div class="container">
+            <h2>3. Распознавание образов</h2>
+            <div class="glass">
+                <p>Самая сложная задача. Это поиск закономерностей в <b>неструктурированных данных</b>: изображениях, звуках или текстах.</p>
+            </div>
+            <div class="grid-2" style="grid-template-columns: repeat(3, 1fr); margin-top: 30px;">
+                <div class="task-card" style="text-align: center;">
+                    <i class="fas fa-face-smile" style="color: var(--accent);"></i>
+                    <h4>Зрение</h4>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-top: 10px;">Поиск лиц на фото, распознавание дорожных знаков.</p>
+                </div>
+                <div class="task-card" style="text-align: center;">
+                    <i class="fas fa-microphone" style="color: var(--violet);"></i>
+                    <h4>Звук</h4>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-top: 10px;">Превращение речи в текст (Siri, Alexa).</p>
+                </div>
+                <div class="task-card" style="text-align: center;">
+                    <i class="fas fa-font" style="color: var(--rose);"></i>
+                    <h4>Текст</h4>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-top: 10px;">Определение смысла предложения или почерка.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Practical Comparison -->
+    <section class="slide">
+        <div class="container">
+            <h2>Сравним задачи?</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 15px; overflow: hidden;">
+                <thead>
+                    <tr style="background: var(--rose); color: white; text-align: left;">
+                        <th style="padding: 20px;">Задача</th>
+                        <th style="padding: 20px;">Что на входе?</th>
+                        <th style="padding: 20px;">Что на выходе?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 20px;"><b>Классификация</b></td>
+                        <td style="padding: 20px;">Параметры письма</td>
+                        <td style="padding: 20px;"><span style="color: var(--rose);">Метка:</span> "Спам" / "Не спам"</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 20px;"><b>Регрессия</b></td>
+                        <td style="padding: 20px;">Данные о погоде</td>
+                        <td style="padding: 20px;"><span style="color: var(--violet);">Число:</span> +24.5 °C</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px;"><b>Распознавание</b></td>
+                        <td style="padding: 20px;">Набор пикселей</td>
+                        <td style="padding: 20px;"><span style="color: var(--accent);">Образ:</span> "Цифра 5"</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Slide 6: Interactive Quiz -->
+    <section class="slide">
+        <div class="container">
+            <h2 style="text-align: center;">Проверь себя</h2>
+            <p style="text-align: center; color: var(--muted); margin-bottom: 30px;">Определи тип задачи для ситуации:</p>
+            <div class="grid-2" id="quiz-container">
+                <div class="task-card" onclick="checkAnswer(this, 'reg')" style="cursor: pointer;">
+                    <p>Прогноз курса доллара на завтра</p>
+                </div>
+                <div class="task-card" onclick="checkAnswer(this, 'class')" style="cursor: pointer;">
+                    <p>Определение болен пациент или здоров</p>
+                </div>
+                <div class="task-card" onclick="checkAnswer(this, 'rec')" style="cursor: pointer;">
+                    <p>Разблокировка телефона по лицу</p>
+                </div>
+                <div class="task-card" onclick="checkAnswer(this, 'class')" style="cursor: pointer;">
+                    <p>Сортировка деталей на конвейере по цвету</p>
+                </div>
+            </div>
+            <div id="quiz-feedback" style="text-align: center; margin-top: 20px; font-weight: 600; height: 24px;"></div>
+        </div>
+    </section>
+
+    <!-- Slide 7: External Resource -->
+    <section class="slide">
+        <div class="container">
+            <div class="glass" style="text-align: center; padding: 50px;">
+                <i class="fas fa-robot" style="font-size: 4rem; color: var(--rose); margin-bottom: 20px;"></i>
+                <h2>Практика: Teachable Machine</h2>
+                <p>Google создал инструмент, где вы можете обучить свою нейросеть классификации прямо в браузере за 2 минуты без кода.</p>
+                <div style="margin-top: 30px;">
+                    <a href="https://teachablemachine.withgoogle.com/train" target="_blank" class="start-btn" style="display: inline-flex; align-items: center; text-decoration: none;">
+                        Попробовать создать модель <i class="fas fa-external-link-alt" style="margin-left: 10px;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dotsNav = document.getElementById('dotsNav');
+        const totalSlides = slides.length;
+
+        // Init Dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `dot-nav ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(i);
+            dotsNav.appendChild(dot);
+        });
+
+        function updateUI() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+            document.querySelectorAll('.dot-nav').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(dir) {
+            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + dir));
+            updateUI();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateUI();
+        }
+
+        function checkAnswer(el, type) {
+            const feedback = document.getElementById('quiz-feedback');
+            el.style.borderColor = 'var(--success)';
+            el.style.background = 'rgba(16, 185, 129, 0.1)';
+            
+            let typeName = "";
+            if(type === 'reg') typeName = "Регрессия (число)";
+            if(type === 'class') typeName = "Классификация (категория)";
+            if(type === 'rec') typeName = "Распознавание (образ)";
+            
+            feedback.innerHTML = `<span style="color: var(--success)">Верно! Это ${typeName}</span>`;
+        }
+
+        // Background particles (same as lesson 1 for consistency)
+        const canvas = document.getElementById('network-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<40; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(244, 63, 94, 0.05)';
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                for(let j=i+1; j<particles.length; j++) {
+                    let p2 = particles[j];
+                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if(dist < 200) {
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', initParticles);
+        initParticles();
+        draw();
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') changeSlide(1);
+            if(e.key === 'ArrowLeft') changeSlide(-1);
+        });
+    </script>
+</body>
+</html>

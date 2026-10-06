@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 3: Классификация задач ИИ — 11 класс</title>
+<style>
+:root{--bg:#f8fafc;--panel:rgba(255,255,255,.8);--panel-border:rgba(148,163,184,.25);--text:#1e293b;--muted:#526176;--accent:#6366f1;--violet:#8b5cf6;--rose:#e83560;--success:#087f5b}
+*{box-sizing:border-box;margin:0;padding:0}body{height:100vh;overflow:hidden;color:var(--text);background:radial-gradient(circle at 10% 10%,rgba(99,102,241,.07),transparent 35%),var(--bg);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.55}#network-bg{position:fixed;inset:0;pointer-events:none;z-index:0}.progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--rose),var(--violet));z-index:50;transition:width .3s}.slide{position:absolute;inset:0;display:none;align-items:flex-start;justify-content:center;padding:38px 65px 108px;overflow-y:auto}.slide.active{display:flex;animation:fadeIn .35s ease-out}.container{width:min(1100px,100%);margin:auto 0;position:relative}@keyframes fadeIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}.eyebrow{display:inline-block;padding:6px 12px;background:var(--rose);color:white;border-radius:6px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px}h1{font-size:clamp(2.5rem,5vw,4rem);line-height:1.12;margin-bottom:24px;font-weight:800}h2{font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.18;margin-bottom:18px}h3{font-size:1.15rem;margin-bottom:10px}.accent-text{background:linear-gradient(135deg,var(--rose),var(--violet));background-clip:text;-webkit-background-clip:text;color:transparent}.lead{font-size:1.2rem;max-width:880px}.muted{color:var(--muted)}.glass,.task-card{background:var(--panel);border:1px solid var(--panel-border);padding:25px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.03)}.glass{backdrop-filter:blur(12px)}.task-card{background:white}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}.stack{display:grid;gap:14px}.tag{display:inline-block;font-weight:800;color:#6240b2;background:#f0ebff;border-radius:9px;padding:5px 12px;margin-bottom:14px;font-size:.9rem}.callout{border-left:4px solid var(--rose);background:#fff0f4;padding:16px 20px;border-radius:0 12px 12px 0;margin-top:22px}.example{background:#f1f5f9;border-radius:12px;padding:16px;margin-top:16px}.example strong{display:block;margin-bottom:5px}.big-code{font-size:3.1rem;font-weight:800;line-height:1.2;color:var(--violet);margin-bottom:14px}.pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.pill{padding:7px 14px;border:1px solid var(--panel-border);border-radius:100px;background:white;font-size:.95rem}.start-btn,.check-btn{border:0;border-radius:100px;background:linear-gradient(135deg,var(--rose),var(--violet));color:white;padding:13px 24px;font:inherit;font-weight:700;cursor:pointer}.start-btn{margin-top:28px}.check-btn{font-size:1rem;margin-top:18px}.nav-controls{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:15px;z-index:100;background:rgba(248,250,252,.95);padding:8px;border-radius:100px}.nav-btn{width:46px;height:46px;border-radius:50%;border:0;background:white;color:var(--text);box-shadow:0 4px 12px #0001;cursor:pointer;font-size:1.5rem}.nav-btn:disabled{opacity:.35;cursor:default}.nav-btn:hover:not(:disabled){background:var(--rose);color:white}#counter{font-size:.95rem;min-width:66px;text-align:center;font-variant-numeric:tabular-nums}.dots-nav{position:fixed;right:15px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;z-index:120}.dot-nav{width:28px;height:28px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center}.dot-nav:before{content:"";width:9px;height:9px;background:#bbc5d3;border-radius:50%}.dot-nav.active:before{background:var(--rose);transform:scale(1.4)}button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:4px}select,textarea{font:inherit;font-size:1rem;color:var(--text);background:white;border:1px solid #94a3b8;border-radius:8px;padding:10px;width:100%}textarea{min-height:90px;resize:vertical;margin-top:8px}label{display:block}.match-row{display:grid;grid-template-columns:1.3fr 1fr;gap:6px 20px;align-items:center;padding:12px 0;border-bottom:1px solid #e2e8f0}.feedback{font-size:.94rem;grid-column:1/-1}.feedback:empty{display:none}.correct{color:#087448}.incorrect{color:#b42342}.result{margin-top:12px;font-weight:700}.step-number{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#f0ebff;color:#6240b2;font-weight:800;margin-right:9px}.table-wrap{overflow:auto;margin-top:22px}table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;font-size:1rem}th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #e2e8f0}th{background:#f0ebff;color:#53349b}.small{font-size:.95rem}.space{margin-top:18px}
+section.slide:nth-of-type(n+5){display:none!important}@media(max-width:850px){.slide{padding:25px 38px 30px 20px}.grid-2,.grid-3{grid-template-columns:1fr}.match-row{grid-template-columns:1fr}body{font-size:17px}.glass,.task-card{padding:20px}.dots-nav{right:3px}.container{margin:0}.nav-controls{top:12px;right:20px;bottom:auto;left:auto;transform:none;gap:8px}.eyebrow{max-width:calc(100% - 180px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}h1{font-size:2.6rem}}@media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}}@media print{body{height:auto;overflow:visible;background:white}.slide,.slide.active{display:block;position:relative;padding:25px;break-after:page;overflow:visible}.nav-controls,.dots-nav,.progress-bar,#network-bg,.start-btn,.check-btn{display:none}.container{margin:0}.glass{backdrop-filter:none}}
+</style>
+</head>
+<body>
+<canvas id="network-bg" aria-hidden="true"></canvas><div class="progress-bar" id="progress"></div>
+<nav class="dots-nav" id="dotsNav" aria-label="Выбор слайда"></nav>
+<nav class="nav-controls" aria-label="Навигация по уроку"><button class="nav-btn" id="prevBtn" aria-label="Предыдущий слайд">‹</button><span id="counter" aria-live="polite"></span><button class="nav-btn" id="nextBtn" aria-label="Следующий слайд">›</button></nav>
+
+<section class="slide active" aria-labelledby="s1"><div class="container">
+<span class="eyebrow">Информатика · 11 класс · Урок 3</span>
+<h1 id="s1">Классификация<br><span class="accent-text">задач ИИ</span></h1>
+<p class="lead">Как понять, какая технология скрывается внутри привычного сервиса?</p>
+<div class="pill-row"><span class="pill">Занятие 1 из 3 по теме</span><span class="pill">От примера — к технологии</span><span class="pill">От продукта — к его частям</span></div>
+<div class="glass space"><h3>Цель обучения · 11.1.2.4</h3><p>Классифицировать технологии искусственного интеллекта (компьютерное зрение, обработка естественного языка, генеративные модели, распознавание, синтез речи) по областям применения.</p></div>
+<p class="space muted">К концу урока: назову технологию, объясню её роль и подберу её для реальной задачи.</p>
+<button class="start-btn" onclick="changeSlide(1)">Начать изучение →</button>
+</div></section>
+
+<section class="slide" aria-labelledby="s2"><div class="container">
+<span class="eyebrow">01 · Карта технологий</span><h2 id="s2">Смотри на <span class="accent-text">действие с данными</span></h2>
+<p class="lead">Задай два вопроса: что получает система и что должна сделать?</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Технология</th><th scope="col">Главная функция</th><th scope="col">Пример применения</th></tr></thead><tbody>
+<tr><td><b>CV</b> · компьютерное зрение</td><td>Анализирует изображения и видео</td><td>Медицина: поиск признаков патологии на снимке</td></tr>
+<tr><td><b>NLP</b> · обработка естественного языка</td><td>Обрабатывает текст, определяет смысл запроса</td><td>Банк: определение темы обращения</td></tr>
+<tr><td><b>GenAI</b> · генеративный ИИ</td><td>Создаёт новый контент по запросу</td><td>Дизайн: создание иллюстрации</td></tr>
+<tr><td><b>STT</b> · Speech-to-Text</td><td>Преобразует речь в текст</td><td>Работа: расшифровка встречи</td></tr>
+<tr><td><b>TTS</b> · Text-to-Speech</td><td>Преобразует текст в речь</td><td>Доступность: озвучивание статьи</td></tr>
+</tbody></table></div>
+<div class="callout">Это удобная карта функций, а не строгие непересекающиеся группы. Например, генерация текста связана и с <b>NLP</b>, и с <b>GenAI</b>.</div>
+</div></section>
+
+<section class="slide" aria-labelledby="s3"><div class="container">
+<span class="eyebrow">02 · Практика · Проектная работа</span><h2 id="s3">Создай презентацию: <span class="accent-text">«ИИ в реальной жизни»</span></h2>
+<p class="lead">Выбери одну технологию со слайда 2 и исследуй её не по определению, а через конкретную проблему, сервис и собственный вывод.</p>
+<div class="glass"><h3>Выбери одну технологию</h3><div class="grid-3">
+<div class="task-card"><span class="tag">CV</span><h3>Компьютерное зрение</h3></div>
+<div class="task-card"><span class="tag">NLP</span><h3>Обработка языка</h3></div>
+<div class="task-card"><span class="tag">GenAI</span><h3>Генеративный ИИ</h3></p></div>
+<div class="task-card"><span class="tag">STT</span><h3>Распознавание речи</h3></div>
+<div class="task-card"><span class="tag">TTS</span><h3>Синтез речи</h3></div>
+</div><p class="small muted space"><b>Важно:</b> выбирай узкую тему: не «NLP», а, например, «анализ отзывов покупателей».</p></div>
+<div class="grid-3">
+<div class="task-card"><span class="tag">Слайд 1 · титульный</span><h3>Представь исследование</h3><p>Название темы, технология, авторы, класс и один вопрос, на который вы хотите ответить.</p></div>
+<div class="task-card"><span class="tag">Слайд 2 · проблема</span><h3>Зачем это нужно?</h3><p>Реальная ситуация, пользователь, трудность и критерий хорошего решения.</p></div>
+<div class="task-card"><span class="tag">Слайд 3 · механизм</span><h3>Что происходит внутри?</h3><p>Авторская схема: входные данные → действие ИИ → результат. Объясните каждый шаг.</p></div>
+<div class="task-card"><span class="tag">Слайд 4 · кейс</span><h3>Где это уже работает?</h3><p>Конкретный сервис, разработчик, пример использования, польза и доказательство из источников.</p></div>
+<div class="task-card"><span class="tag">Слайд 5 · анализ</span><h3>Ваши выводы</h3><p>Сравнение с обычным решением, сильные стороны, ошибки и риски, предложение улучшения.</p></div>
+</div>
+<div class="callout"><b>Итоговый формат:</b> всего 6 слайдов — 1 титульный и 5 содержательных. Последний содержательный слайд должен содержать ссылки на источники и собственный вывод, а не копию найденного текста.</div>
+</div></section>
+
+<section class="slide" aria-labelledby="s4"><div class="container">
+<span class="eyebrow">03 · Дескриптор · Оценивание</span><h2 id="s4">Оценивается не объём текста, а <span class="accent-text">собственное исследование</span></h2>
+<p class="lead">Максимум — 10 баллов. Источники нужны для фактов, но основная оценка — за анализ, авторскую схему, сравнение, аргументы и личные выводы.</p>
+<div class="glass"><div class="table-wrap"><table><thead><tr><th>Критерий</th><th>Максимум</th><th>Дескриптор высокого уровня</th></tr></thead><tbody>
+<tr><td><b>Понимание технологии</b></td><td>2</td><td>Верно объяснена связь «вход → действие → выход», технология соответствует выбранному примеру.</td></tr>
+<tr><td><b>Собственный анализ</b></td><td>3</td><td>Есть сравнение с обычным решением, аргументы, польза, ограничение и выводы авторов, а не пересказ источника.</td></tr>
+<tr><td><b>Авторская работа</b></td><td>3</td><td>Созданы собственная схема, таблица, пример, мини-опрос или предложение улучшения; виден личный вклад.</td></tr>
+<tr><td><b>Источники и защита</b></td><td>2</td><td>Использованы и указаны минимум 4 источника; участники говорят своими словами и отвечают на вопросы.</td></tr>
+</tbody></table></div></div>
+<div class="grid-2"><div class="task-card"><span class="tag">Снижение баллов</span><h3>Что не засчитывается как исследование</h3><p>Сплошной текст из одного сайта, общие фразы без примера, картинки без подписей, список ссылок без проверки, чтение презентации с экрана.</p></div><div class="task-card"><span class="tag">Правило авторства</span><h3>Готовый материал — только основа</h3><p>Если найденный текст вставлен без переработки, за этот фрагмент учитывается только факт наличия источника. Максимальные баллы даются за собственные схемы, сравнения, аргументы и выводы.</p></div></div>
+<div class="callout"><b>Формула хорошей работы:</b> факт из источника → проверка → объяснение своими словами → анализ конкретного примера → собственный вывод. Копирование текста без переработки не даёт баллов за собственный анализ и авторскую работу.</div>
+</div></section>
+
+<section class="slide" aria-labelledby="s5"><div class="container">
+<span class="eyebrow">04 · Создание контента</span><h2 id="s5">Генеративные модели <span class="accent-text">GenAI</span></h2>
+<p class="lead">Создают новый текст, изображение, звук или другой контент на основе закономерностей, усвоенных при обучении.</p>
+<div class="grid-3"><div class="task-card"><span class="tag">Образование</span><h3>Текст</h3><p>По запросу составляют черновик объяснения сложной темы.</p></div><div class="task-card"><span class="tag">Реклама и дизайн</span><h3>Изображение</h3><p>По описанию создают эскиз плаката для школьного фестиваля.</p></div><div class="task-card"><span class="tag">Разработка</span><h3>Код</h3><p>По условию предлагают черновик программы.</p></div></div>
+<div class="grid-2"><div class="glass"><h3>Анализ готового</h3><p>Найти велосипед на фото — <b>CV</b>.</p></div><div class="glass"><h3>Создание нового</h3><p>Создать изображение велосипеда по описанию — <b>GenAI</b>.</p></div></div>
+<div class="callout">Генеративный чат-бот сочетает <b>NLP и GenAI</b>. Убедительный ответ может содержать ошибки: созданный материал нужно проверять.</div>
+</div></section>
+
+<section class="slide" aria-labelledby="s6"><div class="container">
+<span class="eyebrow">05 · Голосовые технологии</span><h2 id="s6">Два направления: <span class="accent-text">речь и текст</span></h2>
+<div class="grid-2"><div class="task-card"><span class="tag">STT · Speech-to-Text</span><h3>Распознавание речи</h3><div class="big-code">Речь → текст</div><p>Человек говорит, система записывает слова.</p><div class="example"><strong>«Встреча завтра в десять»</strong>Из звуковой записи получается текст фразы.</div><p class="space"><b>Где:</b> диктовка сообщения, автоматические субтитры, расшифровка звонка.</p></div>
+<div class="task-card"><span class="tag">TTS · Text-to-Speech</span><h3>Синтез речи</h3><div class="big-code">Текст → речь</div><p>Система произносит переданный ей текст.</p><div class="example"><strong>«Через 200 метров поверните»</strong>Из готовой текстовой инструкции получается голосовая подсказка.</div><p class="space"><b>Где:</b> навигация, озвучивание книги, чтение текста с экрана.</p></div></div>
+<div class="callout"><b>Проверь себя устно:</b> какая технология нужна, чтобы надиктовать заметку? А чтобы прослушать уже написанную?</div>
+</div></section>
+
+<section class="slide" aria-labelledby="s7"><div class="container">
+<span class="eyebrow">06 · Разбираем продукт</span><h2 id="s7">Одна колонка — <span class="accent-text">три функции ИИ</span></h2>
+<p class="lead">Команда: «Какая погода сегодня?» Упрощённый разбор голосового помощника.</p>
+<div class="grid-3"><div class="task-card"><h3><span class="step-number">1</span>Записать слова</h3><span class="tag">STT</span><p>Голосовая команда превращается в текст «Какая погода сегодня?».</p></div><div class="task-card"><h3><span class="step-number">2</span>Разобрать запрос</h3><span class="tag">NLP</span><p>Система определяет намерение: узнать погоду на сегодня.</p></div><div class="task-card"><h3><span class="step-number">3</span>Произнести ответ</h3><span class="tag">TTS</span><p>Готовый текст прогноза превращается в звучащий ответ.</p></div></div>
+<div class="glass space"><h3>Что происходит между шагами 2 и 3?</h3><p>Программа запрашивает данные у погодного сервиса и подставляет их в текст ответа. Сам запрос к сервису не обязательно использует ИИ.</p></div>
+<div class="callout"><b>Декомпозиция</b> — разложение продукта на отдельные функции. Если помощник сам сочиняет ответ, может добавиться GenAI. Для готового шаблона она не обязательна.</div>
+</div></section>
+
+<section class="slide" aria-labelledby="research"><div class="container">
+<span class="eyebrow">07 · Практическое исследование · В группах</span><h2 id="research">Найди, <span class="accent-text">как ИИ работает в реальном сервисе</span></h2>
+<p class="lead">Объединитесь в 3 группы. Ваша задача — не переписать определение, а доказать на примере, какую работу выполняет ИИ.</p>
+<div class="pill-row"><span class="pill">3 мин · роли</span><span class="pill">10 мин · поиск</span><span class="pill">5 мин · подготовка</span><span class="pill">1 мин · защита</span></div>
+<div class="grid-3">
+<div class="task-card"><span class="tag">Группа 1 · CV</span><h3>Умная камера</h3><p>Найдите реальный пример компьютерного зрения: медицина, транспорт, производство или безопасность.</p><p class="small muted space"><b>Запрос:</b> «компьютерное зрение реальный пример как работает»</p></div>
+<div class="task-card"><span class="tag">Группа 2 · NLP / GenAI</span><h3>Работа с текстом</h3><p>Найдите сервис, который понимает текст или создаёт его: чат-бот, переводчик, анализ отзывов.</p><p class="small muted space"><b>Запрос:</b> «NLP сервис пример обработка текста»</p></div>
+<div class="task-card"><span class="tag">Группа 3 · STT / TTS</span><h3>Голосовой сервис</h3><p>Найдите пример распознавания или синтеза речи: субтитры, навигатор, диктовка, электронный чтец.</p><p class="small muted space"><b>Запрос:</b> «распознавание речи где используется пример»</p></div>
+</div>
+<div class="glass space"><h3>Роли и результат группы</h3><p><b>Поисковик</b> находит 2 источника · <b>Проверяющий</b> сравнивает их и отмечает автора/дату · <b>Аналитик</b> выделяет вход, действие и результат · <b>Спикер</b> готовит выступление на 60 секунд.</p><div class="table-wrap"><table><thead><tr><th>Запишите в общий документ или тетрадь</th><th>Ваш ответ</th></tr></thead><tbody><tr><td>Название сервиса и ссылка на источник</td><td>________________________________</td></tr><tr><td>Что поступает на вход?</td><td>________________________________</td></tr><tr><td>Что делает ИИ и какая это технология?</td><td>________________________________</td></tr><tr><td>Что получается на выходе? Польза и возможное ограничение</td><td>________________________________</td></tr></tbody></table></div></div>
+<div class="callout"><b>Правило поиска:</b> сравните минимум два источника. Сайт компании показывает, что обещает сервис, а независимый материал помогает проверить, как он работает. Не копируйте текст — перескажите своими словами.</div>
+</div></section>
+
+<section class="slide" aria-labelledby="s8"><div class="container">
+<span class="eyebrow">08 · Практика · Индивидуально</span><h2 id="s8">Какая технология <span class="accent-text">решает задачу?</span></h2>
+<p>Выбери основную технологию для каждой функции. Затем объясни соседу: <b>«На входе…, система…, на выходе…»</b>.</p>
+<form class="glass space" id="matching"><div id="matchItems"></div><button class="check-btn" type="submit">Проверить сопоставление</button><p class="result" id="matchResult" aria-live="polite"></p></form>
+</div></section>
+
+<section class="slide" aria-labelledby="s9"><div class="container">
+<span class="eyebrow">09 · Практика · В парах</span><h2 id="s9">Разберите <span class="accent-text">голосового помощника банка</span></h2>
+<p>Клиент говорит: «Как заблокировать карту?» Помощник определяет тему, выбирает готовую инструкцию и озвучивает её.</p>
+<form class="glass space" id="decomposition"><div id="decompItems"></div><button class="check-btn" type="submit">Проверить функции</button><p class="result" id="decompResult" aria-live="polite"></p></form>
+<div class="grid-2"><div class="task-card"><h3>Объясните друг другу</h3><p>Почему одного распознавания речи недостаточно, чтобы ответить клиенту?</p></div><div class="task-card"><h3>Изменим продукт</h3><p>Банк хочет, чтобы помощник создавал новые персональные объяснения. Какая технология добавится и почему?</p></div></div>
+</div></section>
+
+<section class="slide" aria-labelledby="s10"><div class="container">
+<span class="eyebrow">10 · Итог · Самостоятельно</span><h2 id="s10">Выбери технологию <span class="accent-text">и обоснуй</span></h2>
+<div class="grid-2"><div class="glass"><h3>1. Новый пример</h3><p>Фермер фотографирует растения. Сервис отмечает на фото повреждённые участки листьев.</p><label class="space" for="exitTech">Основная технология</label><select id="exitTech"></select><button class="check-btn" id="exitCheck">Проверить выбор</button><p class="result" id="exitResult" aria-live="polite"></p></div>
+<div class="glass"><h3>2. Предложи автоматизацию</h3><p>Школьная библиотека хочет сделать материалы доступнее или упростить работу с ними. Придумай одну конкретную задачу.</p><label class="space" for="proposal">Задача · входные данные · технология · результат</label><textarea id="proposal" placeholder="Библиотеке нужно… На входе… Выбираю…, потому что… Результат…"></textarea><p class="small muted">Ответ можно записать в тетрадь. Введённый текст хранится только до перезагрузки страницы.</p></div></div>
+<div class="callout"><b>Проверь свой результат:</b> технология соответствует действию; названа сфера применения; объяснён выбор. При разборе продукта названы отдельные функции и технологии.</div>
+<p class="space muted">Сегодня — различаем технологии и их роли. Далее по теме — более сложные сочетания технологий и выбор решения под условия задачи.</p>
+</div></section>
+
+<script>
+'use strict';
+let currentSlide=0;
+const slides=[...document.querySelectorAll('.slide')].slice(0,4);
+const titles=[...document.querySelectorAll('h1,h2')].map(h=>h.textContent);
+const dotsNav=document.getElementById('dotsNav');
+slides.forEach((slide,i)=>{const dot=document.createElement('button');dot.type='button';dot.className='dot-nav';dot.setAttribute('aria-label',`Слайд ${i+1}: ${titles[i]}`);dot.addEventListener('click',()=>goToSlide(i));dotsNav.appendChild(dot);});
+function updateUI(){slides.forEach((slide,i)=>{slide.classList.toggle('active',i===currentSlide);slide.setAttribute('aria-hidden',String(i!==currentSlide));});[...dotsNav.children].forEach((dot,i)=>{dot.classList.toggle('active',i===currentSlide);if(i===currentSlide)dot.setAttribute('aria-current','step');else dot.removeAttribute('aria-current');});document.getElementById('progress').style.width=`${(currentSlide+1)/slides.length*100}%`;document.getElementById('counter').textContent=`${currentSlide+1} / ${slides.length}`;document.getElementById('prevBtn').disabled=currentSlide===0;document.getElementById('nextBtn').disabled=currentSlide===slides.length-1;}
+function goToSlide(i){currentSlide=Math.max(0,Math.min(slides.length-1,i));updateUI();slides[currentSlide].scrollTop=0;}
+function changeSlide(dir){goToSlide(currentSlide+dir);}
+document.getElementById('prevBtn').addEventListener('click',()=>changeSlide(-1));document.getElementById('nextBtn').addEventListener('click',()=>changeSlide(1));
+document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select,button')||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowRight'){e.preventDefault();changeSlide(1);}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1);}if(e.key==='Home')goToSlide(0);if(e.key==='End')goToSlide(slides.length-1);});
+const options=[['','Выберите технологию'],['cv','CV — компьютерное зрение'],['nlp','NLP — обработка языка'],['gen','GenAI — генеративный ИИ'],['stt','STT — распознавание речи'],['tts','TTS — синтез речи']];
+function fillOptions(select){options.forEach(([value,label])=>select.add(new Option(label,value)));}
+const matchData=[['Логистика: камера находит вмятины на коробках.','cv','Система анализирует изображение упаковки.'],['Торговля: система определяет тему письменной жалобы.','nlp','Система анализирует смысл текста.'],['Дизайн: сервис создаёт эскиз логотипа по описанию.','gen','Система создаёт новое изображение.'],['Медиа: сервис записывает интервью текстом из аудио.','stt','Вход — речь, выход — текст.'],['Транспорт: помощник читает вслух готовое уведомление.','tts','Вход — текст, выход — речь.']];
+const decompData=[['1. Превращает голос клиента в текст.','stt','Этот шаг записывает произнесённые слова.'],['2. Определяет, что клиент хочет заблокировать карту.','nlp','Этот шаг определяет намерение по тексту.'],['3. Произносит готовую инструкцию.','tts','Этот шаг озвучивает текст ответа.']];
+function createPractice(hostId,formId,resultId,data){const host=document.getElementById(hostId);data.forEach(([prompt],i)=>{const row=document.createElement('div');row.className='match-row';const label=document.createElement('label');label.htmlFor=`${hostId}-${i}`;label.textContent=prompt;const select=document.createElement('select');select.id=label.htmlFor;fillOptions(select);const feedback=document.createElement('p');feedback.className='feedback';feedback.id=`${select.id}-feedback`;select.setAttribute('aria-describedby',feedback.id);row.append(label,select,feedback);host.appendChild(row);select.addEventListener('change',()=>{feedback.textContent='';feedback.className='feedback';select.removeAttribute('aria-invalid');document.getElementById(resultId).textContent='';});});document.getElementById(formId).addEventListener('submit',e=>{e.preventDefault();let correct=0,filled=0;[...host.children].forEach((row,i)=>{const select=row.querySelector('select'),feedback=row.querySelector('.feedback');const ok=select.value===data[i][1];if(select.value)filled++;if(ok)correct++;feedback.className=`feedback ${ok?'correct':'incorrect'}`;feedback.textContent=!select.value?'Выбери технологию.':ok?`Верно. ${data[i][2]}`:'Пока неверно. Сравни входные данные и требуемый результат; попробуй ещё раз.';select.setAttribute('aria-invalid',String(!ok));});document.getElementById(resultId).textContent=filled<data.length?`Заполнено ${filled} из ${data.length}. Верно: ${correct}.`:`Верно: ${correct} из ${data.length}. ${correct===data.length?'Теперь объясни выбор своими словами.':'Исправь отмеченные ответы и проверь снова.'}`;});}
+createPractice('matchItems','matching','matchResult',matchData);createPractice('decompItems','decomposition','decompResult',decompData);fillOptions(document.getElementById('exitTech'));
+document.getElementById('exitTech').addEventListener('change',()=>{document.getElementById('exitResult').textContent='';});
+document.getElementById('exitCheck').addEventListener('click',()=>{const value=document.getElementById('exitTech').value;const result=document.getElementById('exitResult');result.className=`result ${value==='cv'?'correct':'incorrect'}`;result.textContent=!value?'Сначала выбери технологию.':value==='cv'?'Верно: CV анализирует изображение и находит повреждения. Назови сферу применения.':'Подумай: сервис анализирует готовое фото или создаёт новый контент? Попробуй ещё раз.';});
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let particles=[];
+function initParticles(){canvas.width=innerWidth;canvas.height=innerHeight;particles=Array.from({length:35},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.9,vy:(Math.random()-.5)*.9,radius:Math.random()*1.5+1}));drawBackground(false);}
+function drawBackground(move){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach((p,i)=>{if(move){p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=canvas.width+30;if(p.x>canvas.width+30)p.x=-30;if(p.y<-30)p.y=canvas.height+30;if(p.y>canvas.height+30)p.y=-30;}particles.slice(i+1).forEach(q=>{const distance=Math.hypot(p.x-q.x,p.y-q.y);if(distance<190){ctx.strokeStyle=`rgba(244,63,94,${.12*(1-distance/190)})`;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}});ctx.fillStyle='rgba(244,63,94,.2)';ctx.beginPath();ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);ctx.fill();});}
+function animate(){if(!document.hidden)drawBackground(true);requestAnimationFrame(animate);}window.addEventListener('resize',initParticles);initParticles();animate();updateUI();
+</script>
+</body>
+</html>

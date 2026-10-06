@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>10 класс — Урок 7. Практика: однослойный перцептрон в Excel</title>
+<style>
+:root{--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)}body{overflow:hidden;background:radial-gradient(circle at 9% 10%,#f1e7ff 0,transparent 28%),radial-gradient(circle at 92% 85%,#dffaf2 0,transparent 30%),linear-gradient(135deg,#fffafc,#f1f3ff)}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background-image:radial-gradient(#8d7db0 .7px,transparent .7px);background-size:20px 20px}#network-bg{position:fixed;inset:0;z-index:0;pointer-events:none}.progress{position:fixed;z-index:99;top:0;left:0;height:6px;background:linear-gradient(90deg,var(--violet),var(--orange),#f8d57e);transition:.3s}
+.slide{position:absolute;inset:0;z-index:1;display:none;align-items:center;justify-content:center;overflow-y:auto;padding:40px 58px 100px;scrollbar-width:none}.slide::-webkit-scrollbar{display:none}.slide.active{display:flex;animation:enter .45s ease}@keyframes enter{from{opacity:0;transform:translateY(14px)}}.wrap{width:min(1160px,100%);margin:auto}.narrow{width:min(1060px,100%);margin:auto}.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 13px;border:1px solid #d7c7ff;border-radius:99px;background:#f4ebff;color:var(--violet);font-size:.82rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{margin:18px 0 20px;font-size:clamp(3rem,6vw,5.2rem);line-height:.98;letter-spacing:-.055em}h2{margin-bottom:12px;font-size:clamp(2rem,4vw,3.1rem);line-height:1.08;letter-spacing:-.035em}h3{margin-bottom:8px}p,li{color:var(--muted);font-size:1.03rem;line-height:1.52}strong{color:var(--ink)}.accent{color:var(--violet)}.lead{font-size:1.2rem}.paper{background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}.pad{padding:27px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.card{padding:20px;background:#fff;border:1px solid var(--line);border-radius:18px}.goal{display:grid;gap:10px;margin-top:20px}.goalitem{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#fffafc;border:1px solid var(--line)}.goalitem b{display:grid;place-items:center;flex:none;width:31px;height:31px;border-radius:10px;color:#fff;background:var(--violet)}.badge{display:inline-flex;padding:6px 10px;border-radius:99px;background:#f4ebff;color:var(--violet);font-weight:850;font-size:.82rem}.definition{padding:17px 20px;margin:16px 0;border-left:5px solid var(--violet);border-radius:0 16px 16px 0;background:#f4ebff;font-size:1.07rem;line-height:1.48}.answer{padding:14px 17px;border-radius:14px;background:#ecfff7;color:#227d63}.task{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;background:linear-gradient(145deg,#fff,#f7f1ff);border:1px solid #e5d9f7;box-shadow:0 14px 30px rgba(90,62,140,.08)}.task ol{padding-left:23px}.task ol li{margin-bottom:10px}.task ol li::marker{color:var(--violet);font-weight:900}.art{position:relative;min-height:380px;overflow:hidden;padding:22px;border-radius:27px;background:linear-gradient(145deg,#f1e7ff,#ecfff7);box-shadow:var(--shadow);border:1px solid #fff}.art h3{position:relative;z-index:2}.art svg{position:absolute;inset:0;width:100%;height:100%}.art text{font-family:"Segoe UI",Arial,sans-serif;fill:var(--ink);font-weight:700}.flow{stroke:var(--violet);stroke-width:3;stroke-dasharray:8 8;animation:dash 2.2s linear infinite}.flow.orange{stroke:var(--orange)}@keyframes dash{to{stroke-dashoffset:-32}}.bubble{fill:#fff;stroke:#d7c7ff;stroke-width:2;filter:drop-shadow(0 8px 12px rgba(76,50,112,.14))}.bubble.violet{fill:var(--violet);stroke:var(--violet)}.bubble.mint{fill:#ecfff7;stroke:var(--mint)}.float{animation:float 2.6s ease-in-out infinite alternate}@keyframes float{to{transform:translateY(-7px)}}
+.dots{position:fixed;z-index:100;top:50%;right:22px;display:grid;gap:9px;transform:translateY(-50%);align-content:center}.dot{position:relative;width:11px;height:11px;padding:0;border:0;border-radius:99px;background:#d6c9ea;box-shadow:0 3px 10px rgba(76,50,112,.12);cursor:pointer;transition:.2s}.dot:after{content:attr(title);position:absolute;right:24px;top:50%;padding:7px 10px;border-radius:10px;background:#2e2040;color:#fff;font-size:.76rem;font-weight:750;white-space:nowrap;opacity:0;pointer-events:none;transform:translateY(-50%) translateX(5px);transition:.2s}.dot:hover:after,.dot:focus-visible:after{opacity:1;transform:translateY(-50%) translateX(0)}.dot.active{width:11px;height:27px;background:var(--violet)}.slide-nav{position:fixed;z-index:100;right:18px;bottom:22px;display:none;gap:8px}.slide-nav button{display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:13px;background:#fff;color:var(--violet);font-size:1.2rem;cursor:pointer;box-shadow:0 8px 20px rgba(76,50,112,.14)}.slide-nav button:disabled{opacity:.35;cursor:not-allowed}.hint{position:fixed;z-index:80;left:27px;bottom:27px;color:rgba(46,32,64,.55);font-size:.81rem}
+.download-card{display:grid;gap:14px;padding:18px;border:1px solid #e3d7ff;border-radius:26px;background:linear-gradient(145deg,#fff,#f5eeff);box-shadow:0 12px 26px rgba(124,77,255,.08)}.task-image-link{display:block;overflow:hidden;border-radius:18px;border:1px solid #d5c5ff;background:#fff;box-shadow:0 12px 24px rgba(90,62,140,.08)}.task-image-link img{display:block;width:100%;height:auto;transition:transform .25s ease, box-shadow .25s ease}.task-image-link:hover img{transform:scale(1.02)}.download-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 4px 2px}.download-meta p{margin:0;color:var(--muted);font-weight:700}.download-chip{display:inline-flex;align-items:center;gap:8px;justify-content:center;padding:11px 16px;border-radius:12px;background:var(--violet);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 12px 22px rgba(124,77,255,.22)}
+.task-layout{display:grid;grid-template-columns:1fr;gap:18px}.instruction-shell{display:grid;gap:14px}.step-list{display:grid;gap:12px}.step{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 8px 18px rgba(90,62,140,.04)}.step span{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--violet),#a77cff);color:#fff;font-weight:900}.step p{margin:0}.summary-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}.summary-shell{display:grid;gap:18px}.score-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.figure-score{padding:16px 12px;border-radius:18px;border:1px solid #e5d7ff;background:linear-gradient(145deg,#fff,#f9f3ff);box-shadow:0 10px 18px rgba(124,77,255,.06);text-align:center}.figure-score span{display:block;color:var(--muted);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}.figure-score strong{display:block;margin-top:10px;font-size:1.8rem;line-height:1;color:var(--violet)}.criteria-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.criteria-card{padding:16px 14px;border-radius:16px;background:#fff;border:1px solid var(--line);display:grid;gap:8px;align-items:start;box-shadow:0 8px 18px rgba(90,62,140,.04)}.criteria-card b{font-size:.8rem;color:var(--violet);letter-spacing:.06em;text-transform:uppercase}.criteria-card strong{font-size:1.35rem;color:var(--ink)}.criteria-card.total{background:linear-gradient(135deg,#f3ebff,#ecfff7);border-color:#d7c7ff}.summary-rubric{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7ddff;border-radius:16px;overflow:hidden}.summary-rubric th,.summary-rubric td{padding:13px 14px;border-bottom:1px solid #efe7ff;text-align:left;vertical-align:top}.summary-rubric th{background:#f4ebff;color:var(--violet);font-size:.82rem;letter-spacing:.04em;text-transform:uppercase}.summary-rubric td small{display:block;color:var(--muted);margin-top:5px}.score-badge{display:inline-flex;padding:7px 10px;border-radius:999px;background:#ecfff7;color:#227d63;font-weight:850}.summary-total{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;margin-top:12px;border-radius:14px;background:#f7f2ff;color:var(--ink);font-weight:800}.summary-takeaways{display:grid;gap:14px}.note{font-size:.92rem;color:var(--muted)}
+@media(max-width:900px){.slide{align-items:flex-start;padding:28px 21px 98px}.hero,.grid2,.summary-layout{grid-template-columns:1fr}.dots{right:10px}.art{min-height:320px}.score-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.criteria-grid{grid-template-columns:1fr 1fr}}@media(max-width:640px){.dots{display:grid;right:10px}.slide-nav{display:flex;top:38px;right:21px;left:auto;bottom:auto;gap:8px;transform:none}.score-grid,.criteria-grid{grid-template-columns:1fr}.download-meta{flex-direction:column;align-items:flex-start}.slide-nav button{display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;border-radius:13px;background:#fff;color:var(--violet);font-size:1.2rem;cursor:pointer;box-shadow:0 8px 20px rgba(76,50,112,.14)}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<canvas id="network-bg" aria-hidden="true"></canvas>
+
+<section class="slide active">
+  <div class="wrap hero">
+    <div>
+      <span class="eyebrow">10 класс · ЕМН · урок 7</span>
+      <h1>Однослойный<br><span class="accent">перцептрон</span><br>в Excel</h1>
+      <p class="lead">Это продолжение практики: мы работаем с готовым документом и строим решение на основе входных признаков, весов и net.</p>
+      <div class="goal">
+        <div class="goalitem"><b>1</b><span><strong>Скачиваем</strong> файл с заданием и изучаем структуру модели.</span></div>
+        <div class="goalitem"><b>2</b><span><strong>Рисуем</strong> первую фигуру в матрице 3×3 и расставляем веса.</span></div>
+        <div class="goalitem"><b>3</b><span><strong>Считаем</strong> x·w, net и проверяем итог по каждой фигуре.</span></div>
+      </div>
+    </div>
+    <div class="art">
+      <h3>Схема работы модели</h3>
+      <svg viewBox="0 0 500 380" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <radialGradient id="coreGlow"><stop stop-color="#fff"/><stop offset=".7" stop-color="#d9c8ff"/><stop offset="1" stop-color="#a980ff"/></radialGradient>
+        </defs>
+        <line class="flow" x1="80" y1="145" x2="205" y2="190"/>
+        <line class="flow" x1="80" y1="270" x2="205" y2="190"/>
+        <line class="flow orange" x1="300" y1="190" x2="425" y2="190"/>
+        <circle class="bubble float" cx="70" cy="140" r="37"/>
+        <circle class="bubble float" cx="70" cy="270" r="37"/>
+        <circle class="bubble violet float" cx="250" cy="190" r="70" fill="url(#coreGlow)"/>
+        <circle cx="250" cy="190" r="52" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="6 8"><animateTransform attributeName="transform" type="rotate" from="0 250 190" to="360 250 190" dur="12s" repeatCount="indefinite"/></circle>
+        <circle class="bubble mint float" cx="425" cy="190" r="45"/>
+        <text x="58" y="148" font-size="24">x₁</text>
+        <text x="58" y="278" font-size="24">x₂</text>
+        <text x="250" y="184" text-anchor="middle" font-size="24" fill="#fff">Σ</text>
+        <text x="250" y="210" text-anchor="middle" font-size="13" fill="#fff">net → φ</text>
+        <text x="425" y="198" text-anchor="middle" font-size="25">y</text>
+        <text x="250" y="350" text-anchor="middle" font-size="15">Признаки → расчёт → решение</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap narrow">
+    <span class="eyebrow">02 · Практическое задание</span>
+    <h2>Скачайте документ и выполните задачу в Excel</h2>
+    <div class="task-layout" style="margin-top:20px">
+      <div class="paper pad">
+        <div class="download-card">
+          <a id="excelDownload" class="task-image-link" href="https://drive.usercontent.google.com/u/0/uc?id=17P4T3k9Lz9euX0rqiQ2CJA2gwFE8H4rT&export=download" download="perceptron-practice.xlsx" aria-label="Скачать документ с заданием" rel="noopener">
+            <img src="https://i.ibb.co.com/kV6V3Y43/2026-09-22-22-14-23.png" alt="Задание по однослойному перцептрону в Excel">
+          </a>
+          <div class="download-meta">
+            <span class="badge">Файл для работы</span>
+            <p>Нажмите на изображение, чтобы скачать документ.</p>
+          </div>
+          <a class="download-chip" href="https://drive.usercontent.google.com/u/0/uc?id=17P4T3k9Lz9euX0rqiQ2CJA2gwFE8H4rT&export=download" download="perceptron-practice.xlsx">Скачать документ</a>
+        </div>
+      </div>
+      <div class="paper pad instruction-shell">
+        <h3>Как выполнять задание</h3>
+        <div class="step-list">
+          <div class="step"><span>1</span><p>Скачайте документ и откройте его в Excel.</p></div>
+          <div class="step"><span>2</span><p>В <strong>входном рисунке</strong> в матрице <strong>3×3</strong> нужно нарисовать <strong>первую фигуру снизу</strong> единицами <strong>(1)</strong>.</p></div>
+          <div class="step"><span>3</span><p>Дальше выставьте <strong>веса</strong> для этой фигуры. Пока можно ставить <strong>1</strong> в тех ячейках, где активировался нейрон, то есть там, где стоит <strong>x</strong>.</p></div>
+          <div class="step"><span>4</span><p>В таблице по середине найдите <strong>x·w</strong> для <strong>фигуры 1</strong>, а затем в таблице с выводом посчитайте <strong>net</strong> и <strong>f(net)</strong>.</p></div>
+          <div class="step"><span>5</span><p>Повторите эти действия для остальных фигур, чтобы заполнить модель полностью.</p></div>
+        </div>
+        <div class="definition">
+          <strong>Однослойный перцептрон</strong> — это простая нейронная сеть: входные значения <strong>x</strong> умножаются на веса <strong>w</strong>, затем все сигналы суммируются в <strong>net</strong>, и после активации получается выход <strong>y</strong>.
+        </div>
+        <p class="note">Главная идея: сначала <strong>x·w</strong>, потом <strong>сумма net</strong>, и только после этого — результат. Если что-то не получается, возвращайтесь к этой цепочке шаг за шагом.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide summary-slide">
+  <div class="wrap">
+    <span class="eyebrow">03 · Дескриптор и итог</span>
+    <h2>Проверка задания: <span class="accent">10 баллов</span></h2>
+    <div class="summary-layout">
+      <div class="paper pad">
+        <table class="summary-rubric">
+          <thead>
+            <tr><th>Дескриптор</th><th>Баллы</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Фигура 1</strong><small>Правильно построена фигура, выставлены веса и посчитаны x·w, net.</small></td><td><span class="score-badge">2 балла</span></td></tr>
+            <tr><td><strong>Фигура 2</strong><small>Корректно выполнена вторая фигура, все расчёты и итог оформлены без ошибок.</small></td><td><span class="score-badge">2 балла</span></td></tr>
+            <tr><td><strong>Фигура 3</strong><small>Правильно заполнены входные данные, вычисления и результат по третьей фигуре.</small></td><td><span class="score-badge">2 балла</span></td></tr>
+            <tr><td><strong>Фигура 4</strong><small>Верно сделана четвёртая фигура, рассчитаны x·w, net и сделан правильный вывод.</small></td><td><span class="score-badge">2 балла</span></td></tr>
+            <tr><td><strong>Общее качество работы и защита</strong><small>Аккуратное оформление, правильные формулы, умение объяснить, как работает перцептрон и что такое net.</small></td><td><span class="score-badge">2 балла</span></td></tr>
+          </tbody>
+        </table>
+        <div class="summary-total"><strong>Итого: 10 баллов</strong></div>
+      </div>
+      <div class="summary-takeaways">
+        <div class="paper pad">
+          <h3>Что мы учимся</h3>
+          <p><strong>Фигуры</strong> помогают увидеть, как нейрон распознаёт шаблон по входным сигналам.</p>
+          <p><strong>Веса</strong> показывают важность каждого признака.</p>
+          <p><strong>net</strong> — это сумма произведений x·w, то есть общий сигнал на выходе.</p>
+        </div>
+        <div class="paper pad">
+          <h3>Главный смысл</h3>
+          <p>Каждая фигура — это отдельный пример распознавания. Мы последовательно считали, как модель «смотрит» на входные данные, суммирует сигналы и принимает решение.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<nav class="dots" id="dotsNav" aria-label="Навигация по слайдам"></nav>
+<div class="slide-nav" aria-label="Навигация по слайдам">
+  <button type="button" id="mobilePrev" aria-label="Предыдущий слайд">←</button>
+  <button type="button" id="mobileNext" aria-label="Следующий слайд">→</button>
+</div>
+<div class="hint">← → листать · F — полный экран</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Титул','02 · Задание','03 · Итог'];let current=0;
+slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
+function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;}
+prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
+const downloadLinks=[...document.querySelectorAll('a[download]')];downloadLinks.forEach(link=>{link.addEventListener('click',()=>{const randomName='perceptron-' + Math.random().toString(36).slice(2,8) + '-' + Date.now(); link.setAttribute('download', randomName + '.xlsx');});});
+document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+</script>
+</body>
+</html>

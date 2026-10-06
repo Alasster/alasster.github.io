@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8fafc">
+  <title>Урок 5: Управление приложением жестами · 11 класс</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: rgba(255, 255, 255, .82);
+      --panel-border: rgba(148, 163, 184, .25);
+      --text: #1e293b;
+      --muted: #526176;
+      --accent: #6366f1;
+      --violet: #8b5cf6;
+      --rose: #e83560;
+      --success: #087f5b;
+      --error: #b42342;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, .07), transparent 35%), var(--bg);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    #network-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 50;
+      height: 4px;
+      background: linear-gradient(90deg, var(--rose), var(--violet));
+      transition: width .3s;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 38px 65px 108px;
+      overflow-y: auto;
+      z-index: 1;
+    }
+
+    .slide.active { display: flex; animation: fadeIn .35s ease-out; }
+    .container { width: min(1100px, 100%); margin: auto 0; position: relative; z-index: 2; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--rose);
+      color: white;
+      border-radius: 6px;
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+    }
+
+    .glass, .task-card {
+      min-width: 0;
+      padding: 25px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .03);
+    }
+
+    .glass { backdrop-filter: blur(12px); }
+    .task-card { background: white; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
+    .stack { display: grid; gap: 14px; }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 5px 12px;
+      color: #6240b2;
+      background: #f0ebff;
+      border-radius: 9px;
+      font-size: .9rem;
+      font-weight: 800;
+    }
+
+    .callout {
+      margin-top: 22px;
+      padding: 16px 20px;
+      background: #fff0f4;
+      border-left: 4px solid var(--rose);
+      border-radius: 0 12px 12px 0;
+    }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .pill { padding: 7px 14px; background: white; border: 1px solid var(--panel-border); border-radius: 100px; font-size: .95rem; }
+
+    .start-btn, .action, .secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 11px 20px;
+      border: 0;
+      border-radius: 100px;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .start-btn, .action {
+      color: white;
+      background: linear-gradient(135deg, var(--rose), var(--violet));
+    }
+
+    .secondary-btn { color: var(--text); background: #eef2f7; }
+    .start-btn { margin-top: 28px; }
+    .cover { max-width: 850px; margin: auto; text-align: center; }
+    .cover h1 { margin-bottom: 12px; font-size: clamp(3rem, 6vw, 5rem); line-height: 1.02; letter-spacing: -.05em; }
+    .cover .lead { margin: 0 auto; }
+    .cover .eyebrow { margin-bottom: 12px; }
+    .cover .pill-row { justify-content: center; }
+    .cover .pill-row { margin-top: 14px; }
+    .cover .start-btn { margin-top: 18px; padding: 12px 24px; }
+    .gesture-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 24px; }
+    .combined-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; margin-top: 18px; }
+    .combined-layout .gesture-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+    .combined-layout .callout { margin-top: 16px; }
+    .combined-task-title { margin-bottom: 0; }
+    .combined-layout .task-layout { grid-template-columns: 1fr; align-items: start; margin-top: 0; }
+    .combined-layout .task-layout video { height: auto; min-height: 210px; max-height: 220px; }
+    .combined-layout .glass { padding: 18px; font-size: 16px; line-height: 1.45; }
+    .combined-layout .steps { gap: 8px; margin-top: 12px; }
+    .combined-layout .steps li { padding: 10px 12px 10px 48px; }
+    .combined-layout .steps li::before { left: 10px; top: 10px; width: 26px; height: 26px; }
+    .gesture-card { padding: 18px; background: white; border: 1px solid var(--panel-border); border-radius: 14px; }
+    .gesture-card .icon { display: block; margin-bottom: 6px; font-size: 1.8rem; }
+    .combined-layout .gesture-card { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 10px 12px; }
+    .combined-layout .gesture-card .icon { flex: 0 0 auto; margin: 0; font-size: 1.5rem; }
+    .task-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); gap: 20px; align-items: stretch; margin-top: 20px; }
+    .task-layout > * { min-width: 0; }
+    .task-layout video { display: block; width: 100%; height: 100%; min-height: 270px; background: #f0ebff; border-radius: 14px; object-fit: contain; }
+    .panel-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
+    .model-panel-heading { align-items: flex-start; flex-wrap: wrap; }
+    .dino-heading { align-items: flex-start; flex-wrap: wrap; }
+    .model-panel-heading .panel-download { flex: 0 0 auto; }
+    .panel-heading h2 { margin-bottom: 4px; }
+    .panel-heading p { color: var(--muted); font-size: .95rem; }
+    .panel-content { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .panel-section { min-width: 0; padding: 18px; background: #f8fafc; border: 1px solid var(--panel-border); border-radius: 14px; }
+    .panel-section h3 { margin-bottom: 12px; }
+    .panel-mapping { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 12px; }
+    .panel-content > .panel-section:first-child .panel-mapping { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .panel-content > .panel-section:first-child .panel-mapping .field { grid-template-columns: 1fr; gap: 4px; padding: 6px 8px; }
+    .panel-content > .panel-section:first-child .panel-mapping .field label { font-size: .82rem; line-height: 1.25; }
+    .panel-content > .panel-section:first-child .panel-mapping .field select { min-height: 36px; padding: 5px 8px; font-size: .85rem; }
+    .panel-mapping .field { padding: 10px; background: white; border: 1px solid var(--panel-border); border-radius: 10px; }
+    .panel-status { display: flex; align-items: start; gap: 9px; }
+    .panel-status::before { content: "●"; color: var(--violet); }
+    .camera-frame { min-height: 210px; aspect-ratio: 4 / 3; }
+    .camera-actions { display: grid; grid-template-columns: 1fr auto; }
+    .audio-panel { display: grid; gap: 12px; }
+    .music-panel { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(180px, .8fr); gap: 18px; align-items: start; }
+    .music-panel > div:first-child { display: contents; }
+    .music-panel > div:first-child h3 { grid-column: 1 / -1; margin-bottom: -6px; }
+    .music-panel #webcam-container { grid-column: 1; grid-row: 2; }
+    .music-panel .camera-actions { grid-column: 1; grid-row: 3; margin-top: 0; }
+    .music-panel > div:nth-child(2) { display: grid; grid-column: 2; grid-row: 2 / 4; align-content: start; gap: 12px; min-width: 0; }
+    .music-panel > div:nth-child(2) .status { margin-top: 0; }
+    .music-panel .prediction { grid-column: 1; grid-row: auto; }
+    .music-panel > .recognition-panel { grid-column: 3; grid-row: 2 / 4; }
+    .recognition-panel { display: grid; align-content: start; gap: 12px; }
+    .recognition-panel .meter { margin-top: 0; }
+    .audio-panel audio { width: 100%; }
+    .audio-upload { display: grid; gap: 8px; }
+    .audio-file-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; }
+    .audio-upload-button { width: fit-content; gap: 8px; box-shadow: 0 5px 14px rgba(99, 102, 241, .2); }
+    .audio-file-input:focus-visible + .audio-upload-button { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .prediction { min-height: 68px; }
+    .threshold-row { padding: 10px 12px; background: white; border-radius: 10px; }
+    .dino-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .8fr); gap: 18px; margin-top: 18px; }
+    .dino-workbench { display: grid; gap: 16px; }
+    .dino-top-layout, .dino-bottom-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; margin-top: 0; }
+    .dino-workbench .workbench-form, .dino-workbench > .panel-status, .dino-workbench .camera-help { margin-top: 0; }
+    .dino-game-panel { min-width: 0; }
+    .dino-game { display: block; width: 100%; height: auto; margin-top: 12px; background: #f8fafc; border: 1px solid var(--panel-border); border-radius: 12px; }
+    .dino-camera { aspect-ratio: 4 / 3; }
+    .dino-status { min-height: 1.6em; }
+    .dino-score { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-weight: 700; }
+    button:hover:not(:disabled) { filter: brightness(.97); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .steps { display: grid; gap: 12px; margin-top: 18px; list-style: none; counter-reset: step; }
+    .steps li { position: relative; padding: 14px 16px 14px 58px; background: white; border: 1px solid var(--panel-border); border-radius: 12px; counter-increment: step; }
+    .steps li::before { content: counter(step); position: absolute; left: 16px; top: 13px; display: grid; place-items: center; width: 30px; height: 30px; color: #6240b2; background: #f0ebff; border-radius: 50%; font-weight: 800; }
+
+    .pipeline { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 22px; align-items: stretch; }
+    .pipeline-item { position: relative; padding: 18px 12px; text-align: center; background: white; border: 1px solid var(--panel-border); border-radius: 14px; }
+    .pipeline-item:not(:last-child)::after { content: "→"; position: absolute; right: -15px; top: 50%; z-index: 1; color: var(--violet); font-size: 1.3rem; font-weight: 800; transform: translateY(-50%); }
+    .pipeline-item b { display: block; margin-bottom: 5px; }
+
+    .code {
+      overflow-x: auto;
+      margin-top: 18px;
+      padding: 18px;
+      color: #e2e8f0;
+      background: #172033;
+      border-radius: 12px;
+      font: .88rem/1.6 "Cascadia Code", Consolas, monospace;
+      white-space: pre;
+    }
+
+    .table-wrap { overflow-x: auto; margin-top: 18px; border: 1px solid var(--panel-border); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; background: white; font-size: 1rem; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+    th { color: #53349b; background: #f0ebff; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .workbench { border: 1px solid var(--panel-border); }
+    .workbench h3 { margin-bottom: 8px; }
+    .workbench-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; margin-top: 16px; }
+    .field { display: grid; gap: 6px; min-width: 0; }
+    .field label, .field-label { font-size: .92rem; font-weight: 700; }
+    .field input, .field select {
+      width: 100%;
+      min-height: 44px;
+      padding: 9px 12px;
+      color: var(--text);
+      background: white;
+      border: 1px solid #94a3b8;
+      border-radius: 8px;
+      font: inherit;
+      font-size: .95rem;
+    }
+
+    .workbench-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .camera-frame { display: grid; place-items: center; min-height: 215px; overflow: hidden; color: var(--muted); background: #f1f5f9; border: 1px dashed #94a3b8; border-radius: 12px; }
+    #webcam-container video { display: block; width: 100%; height: 100%; max-height: 320px; object-fit: cover; transform: scaleX(-1); }
+    .prediction { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 12px 14px; background: white; border: 1px solid var(--panel-border); border-radius: 10px; }
+    .prediction strong { font-size: 1.1rem; }
+    .meter { height: 10px; margin-top: 8px; overflow: hidden; background: #e2e8f0; border-radius: 99px; }
+    .meter-fill { width: 0; height: 100%; background: linear-gradient(90deg, var(--rose), var(--violet)); transition: width .15s; }
+    .audio-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+    .audio-controls input[type="range"] { flex: 1 1 150px; accent-color: var(--violet); }
+    .audio-controls input[type="file"] { max-width: 100%; font: inherit; font-size: .9rem; }
+    .status { min-height: 1.6em; margin-top: 12px; font-size: .94rem; }
+    .status[data-kind="success"] { color: var(--success); }
+    .status[data-kind="error"] { color: var(--error); }
+    .status[data-kind="working"] { color: #6240b2; }
+    .camera-help { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; }
+    .camera-help .action { min-height: 40px; padding: 8px 16px; font-size: .92rem; }
+    .mapping-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .mapping-grid .field { padding: 12px; background: #f8fafc; border-radius: 10px; }
+    .threshold-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+    .threshold-row input { accent-color: var(--violet); }
+    .rubric { display: grid; gap: 10px; }
+    .rubric-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding: 14px 16px; background: white; border: 1px solid var(--panel-border); border-radius: 12px; }
+    .rubric-row strong { align-self: start; padding: 4px 8px; color: #6240b2; background: #f0ebff; border-radius: 8px; text-align: center; }
+    .nav-controls { position: fixed; bottom: 24px; left: 50%; z-index: 100; display: none; align-items: center; gap: 15px; padding: 8px; background: rgba(248, 250, 252, .95); border-radius: 100px; transform: translateX(-50%); }
+    .nav-btn { width: 46px; height: 46px; border: 0; border-radius: 50%; color: var(--text); background: white; box-shadow: 0 4px 12px #0001; cursor: pointer; font-size: 1.5rem; }
+    .nav-btn:disabled { opacity: .35; cursor: default; }
+    .nav-btn:hover:not(:disabled) { color: white; background: var(--rose); }
+    #counter { min-width: 66px; text-align: center; font-size: .95rem; font-variant-numeric: tabular-nums; }
+    .dots-nav { position: fixed; top: 50%; right: 15px; z-index: 120; display: flex; flex-direction: column; transform: translateY(-50%); }
+    .dot-nav { display: grid; place-items: center; width: 28px; height: 28px; border: 0; background: transparent; cursor: pointer; }
+    .dot-nav::before { content: ""; width: 9px; height: 9px; background: #bbc5d3; border-radius: 50%; }
+    .dot-nav.active::before { background: var(--rose); transform: scale(1.4); }
+
+    @media (max-width: 850px) {
+      body { font-size: 17px; }
+      .slide { padding: 25px 38px 30px 20px; }
+      .container { margin: 0; }
+      .grid-2, .grid-3, .workbench-columns, .task-layout, .panel-content { grid-template-columns: 1fr; }
+      .panel-content > .panel-section:first-child .panel-mapping { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .music-panel { grid-template-columns: 1fr; }
+      .music-panel > div:first-child h3, .music-panel #webcam-container, .music-panel .camera-actions,
+      .music-panel > div:nth-child(2), .music-panel > .recognition-panel { grid-column: 1; grid-row: auto; }
+      .combined-layout { grid-template-columns: 1fr; }
+      .dino-layout { grid-template-columns: 1fr; }
+      .pipeline { grid-template-columns: 1fr; }
+      .gesture-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pipeline-item:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -18px; transform: translateX(50%); }
+      .workbench-form { grid-template-columns: 1fr; }
+      .dots-nav { right: 3px; }
+      .nav-controls { top: 12px; right: 20px; bottom: auto; left: auto; gap: 8px; transform: none; }
+      .eyebrow { max-width: calc(100% - 180px); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      h1 { font-size: 2.6rem; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-controls { display: flex; }
+    }
+
+    @media (max-width: 520px) {
+      .mapping-grid, .gesture-grid, .panel-mapping { grid-template-columns: 1fr; }
+      .panel-content > .panel-section:first-child .panel-mapping { grid-template-columns: 1fr; }
+      .rubric-row { grid-template-columns: 1fr; gap: 8px; }
+      .panel-heading { display: block; }
+      .panel-heading .panel-download { display: flex; width: max-content; max-width: 100%; margin: 10px 0 0 auto; }
+      .camera-actions { grid-template-columns: 1fr; }
+      .glass, .task-card { padding: 18px; }
+      .nav-btn { width: 40px; height: 40px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+
+    @media print {
+      body { height: auto; overflow: visible; background: white; }
+      .slide, .slide.active { position: relative; display: block; padding: 25px; overflow: visible; break-after: page; }
+      .nav-controls, .dots-nav, .progress-bar, #network-bg, .start-btn, .workbench-form button, video { display: none; }
+      .container { margin: 0; }
+      .glass { backdrop-filter: none; }
+    }
+  </style>
+  <style>
+    :root {
+      --bg: #f7f2ff;
+      --panel: rgba(255, 255, 255, .95);
+      --panel-border: rgba(90, 62, 140, .13);
+      --text: #2e2040;
+      --muted: #65557b;
+      --accent: #7c4dff;
+      --violet: #7c4dff;
+      --rose: #7c4dff;
+      --success: #227d63;
+      --error: #b9475e;
+    }
+
+    html, body { min-height: 100%; font-family: "Segoe UI", Arial, sans-serif; font-size: 16px; color: var(--text); }
+    body {
+      background:
+        radial-gradient(circle at 9% 10%, #f1e7ff 0, transparent 28%),
+        radial-gradient(circle at 92% 85%, #dffaf2 0, transparent 30%),
+        linear-gradient(135deg, #fffafc, #f1f3ff);
+    }
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      content: "";
+      opacity: .2;
+      background-image: radial-gradient(#8d7db0 .7px, transparent .7px);
+      background-size: 20px 20px;
+    }
+    .progress-bar { z-index: 99; height: 6px; background: linear-gradient(90deg, var(--violet), #ff9e68, #f8d57e); }
+    .slide { align-items: center; padding: 40px 58px 100px; scrollbar-width: none; }
+    .slide::-webkit-scrollbar { display: none; }
+    .slide.active { animation: enter .45s ease; }
+    @keyframes enter { from { opacity: 0; transform: translateY(14px); } }
+    .container { width: min(1160px, 100%); margin: auto; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(3rem, 6vw, 5.2rem); line-height: .98; letter-spacing: -.055em; }
+    h2 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.08; letter-spacing: -.035em; }
+    p, li { color: var(--muted); font-size: 1.03rem; line-height: 1.52; }
+    .lead { font-size: 1.2rem; }
+    .accent-text { color: var(--violet); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 13px;
+      color: var(--violet);
+      background: #f4ebff;
+      border: 1px solid #d7c7ff;
+      border-radius: 99px;
+      font-size: .82rem;
+      letter-spacing: .06em;
+    }
+    .glass, .task-card {
+      background: var(--panel);
+      border: 1px solid #fff;
+      border-radius: 25px;
+      box-shadow: 0 18px 50px rgba(90, 62, 140, .12);
+    }
+    .glass { backdrop-filter: blur(12px); }
+    .task-card { background: #fff; }
+    .start-btn, .action, .secondary-btn {
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 13px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: .92rem;
+      box-shadow: 0 8px 20px rgba(76, 50, 112, .14);
+      transition: filter .2s, transform .2s;
+    }
+    .start-btn, .action { color: #fff; background: var(--violet); }
+    .secondary-btn { color: var(--violet); background: #fff; }
+    .start-btn:hover:not(:disabled), .action:hover:not(:disabled), .secondary-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--violet);
+      outline-offset: 3px;
+    }
+    .dots { position: fixed; z-index: 100; top: 50%; right: 22px; display: grid; gap: 9px; transform: translateY(-50%); align-content: center; }
+    .dot-nav { position: relative; width: 11px; height: 11px; padding: 0; border: 0; border-radius: 99px; background: #d6c9ea; box-shadow: 0 3px 10px rgba(76, 50, 112, .12); cursor: pointer; transition: .2s; }
+    .dot-nav::before { display: none; }
+    .dot-nav.active::before { display: none; }
+    .dot-nav::after {
+      position: absolute;
+      top: 50%;
+      right: 24px;
+      padding: 7px 10px;
+      color: #fff;
+      background: #2e2040;
+      border-radius: 10px;
+      content: attr(title);
+      font-size: .76rem;
+      font-weight: 750;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-50%) translateX(5px);
+      transition: .2s;
+    }
+    .dot-nav:hover::after, .dot-nav:focus-visible::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+    .dot-nav.active { width: 11px; height: 27px; background: var(--violet); }
+    .nav-controls { position: fixed; z-index: 100; right: 18px; bottom: 22px; left: auto; display: none; gap: 8px; padding: 0; background: transparent; border-radius: 0; transform: none; }
+    .nav-btn {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 13px;
+      color: var(--violet);
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(76, 50, 112, .14);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+    #counter { display: none; }
+    @media (max-width: 900px) {
+      .slide { align-items: flex-start; padding: 28px 21px 98px; }
+      .dots { right: 10px; }
+      .container { margin: auto; }
+    }
+    @media (max-width: 640px) {
+      .dots { right: 10px; }
+      .nav-controls { display: flex; top: 33px; right: 21px; bottom: auto; }
+      .eyebrow { max-width: calc(100% - 102px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.active { animation: none; }
+      .start-btn, .action, .secondary-btn, .dot-nav, .dot-nav::after { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="network-bg" aria-hidden="true"></canvas>
+  <div class="progress-bar" id="progress"></div>
+  <nav class="dots-nav dots" id="dotsNav" aria-label="Выбор слайда"></nav>
+  <nav class="nav-controls" aria-label="Навигация по уроку">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд">←</button>
+    <span id="counter" aria-live="polite"></span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд">→</button>
+  </nav>
+
+  <main>
+    <section class="slide active" aria-labelledby="s1">
+      <div class="container cover">
+        <span class="eyebrow">Информатика · 10 ЕМН  · Урок 9</span>
+        <h1 id="s1">Управление<br><span class="accent-text">жестами</span></h1>
+        <p class="lead">Обучаем модель распознавать жесты и управлять музыкой.</p>
+        <div class="pill-row">
+          <span class="pill">Teachable Machine</span>
+          <span class="pill">Камера · модель · команда</span>
+        </div>
+        <button class="start-btn" id="startBtn">Начать →</button>
+      </div>
+    </section>
+
+    <section class="slide" aria-labelledby="s2">
+      <div class="container">
+        <span class="eyebrow">Задание · Обучи модель</span>
+        <h2 id="s2">Научи модель управлять <span class="accent-text">музыкой жестами</span></h2>
+        <div class="combined-layout">
+          <div>
+            <p class="lead">В Teachable Machine выбери <b>Проект с изображением</b>. Создай отдельный класс для каждой команды и обучи модель.</p>
+            <div class="gesture-grid">
+              <div class="gesture-card"><span class="icon">🔊</span><b>Громкость +</b></div>
+              <div class="gesture-card"><span class="icon">🔉</span><b>Громкость −</b></div>
+              <div class="gesture-card"><span class="icon">▶️</span><b>Пуск</b></div>
+              <div class="gesture-card"><span class="icon">⏸️</span><b>Пауза</b></div>
+              <div class="gesture-card"><span class="icon">⏭️</span><b>Перемотка вперёд</b></div>
+              <div class="gesture-card"><span class="icon">⏮️</span><b>Перемотка назад</b></div>
+              <div class="gesture-card"><span class="icon">✋</span><b>Нейтральный жест</b></div>
+            </div>
+            <div class="callout"><b>Задание:</b> создай 7 классов: шесть команд и нейтральный жест. Для каждого придумай отдельный жест и собери примеры.</div>
+          </div>
+          <div>
+            
+
+            <div class="task-layout">
+              <div class="glass">
+                <h3>Создайте собственную модель</h3>
+                <ol class="steps">
+                  <li>Создайте отдельный класс для каждой из шести команд и нейтрального жеста.</li>
+                  <li>Снимите примеры, меняя положение руки и расстояние. Нажмите <b>Обучить модель</b>.</li>
+                  <li>Выберите <b>Экспорт модели → Загрузить мою модель</b> и скопируйте ссылку.</li>
+                </ol>
+                <p class="space"><a class="action" href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener noreferrer">Открыть Teachable Machine ↗</a></p>
+              </div>
+              <figure class="task-card">
+                <video autoplay muted loop playsinline preload="auto" aria-label="Демонстрация обучения и распознавания модели в Teachable Machine">
+                  <source src="https://teachablemachine.withgoogle.com/assets/prediction.mp4" type="video/mp4">
+                  Видео недоступно. Откройте Teachable Machine по ссылке.
+                </video>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-labelledby="s4">
+      <div class="container">
+        <span class="eyebrow">Практика · Запустите свою модель</span>
+        <div class="panel-heading model-panel-heading">
+          <div>
+            <h2 id="s4">AI-панель: <span class="accent-text">камера → команда</span></h2>
+            <p>Вставьте ссылку на модель, назначьте жесты и проверьте управление.</p>
+          </div>
+          <button class="action panel-download" id="download-slide" type="button">Скачать слайд 3 и открыть отдельно ↗</button>
+        </div>
+        <div class="glass workbench">
+          <form class="workbench-form" id="model-form">
+            <div class="field">
+              <label for="model-url">1. Ссылка на опубликованную модель</label>
+              <input id="model-url" name="model-url" type="url" inputmode="url" placeholder="https://teachablemachine.withgoogle.com/models/..." autocomplete="url" required>
+            </div>
+            <button class="action" id="load-model" type="submit">Подключить модель</button>
+          </form>
+          <p class="status panel-status" id="model-status" role="status" aria-live="polite">Сначала подключите модель Teachable Machine.</p>
+
+          <div class="panel-content">
+            <section class="panel-section" aria-labelledby="mapping-title">
+              <h3 id="mapping-title">2. Назначьте классы жестам</h3>
+              <div class="mapping-grid panel-mapping" aria-label="Назначение классов командам">
+                <div class="field"><label for="map-up">🔊 Громкость +</label><select id="map-up" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="map-down">🔉 Громкость −</label><select id="map-down" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="map-play">▶️ Пуск</label><select id="map-play" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="map-pause">⏸️ Пауза</label><select id="map-pause" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="map-forward">⏭️ Вперёд</label><select id="map-forward" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="map-back">⏮️ Назад</label><select id="map-back" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="map-neutral">✋ Нейтральный жест</label><select id="map-neutral" disabled><option value="">Сначала подключите модель</option></select></div>
+              </div>
+              <div class="threshold-row">
+                <label for="threshold"><b>Порог уверенности:</b> <output id="threshold-value">80%</output></label>
+                <input id="threshold" type="range" min="50" max="99" value="80" disabled>
+              </div>
+              <p class="small muted space">Между командами покажите нейтральный жест. Одно распознавание — одно действие.</p>
+            </section>
+            <section class="panel-section audio-panel music-panel" aria-label="Камера и управление аудио">
+              <div>
+                <h3>3. Запустите камеру</h3>
+                <div class="camera-frame" id="webcam-container"><span>Видео с камеры появится здесь</span></div>
+                <div class="audio-controls camera-actions">
+                  <button class="action" id="camera-button" type="button" disabled>Запустить камеру</button>
+                  <button class="secondary-btn" id="stop-button" type="button" disabled>Остановить</button>
+                </div>
+              </div>
+              <div>
+                <div class="audio-upload">
+                  <span class="field-label">Музыка</span>
+                  <p class="small muted">Скачайте MP3-файл на устройство, затем загрузите его сюда.</p>
+                  <input class="audio-file-input" id="audio-file" type="file" accept=".mp3,audio/mpeg" aria-label="Выбрать MP3-файл">
+                  <label class="action audio-upload-button" for="audio-file">↑ Загрузить MP3</label>
+                </div>
+                <audio id="audio-player" controls preload="metadata" src="https://cdn9.sefon.pro/prev/LfLo8NCm_W3YIkDwpFJmwQ/1790658308/1066/%D0%B1%D0%BB%D0%B8%D0%BA%D0%B8%20%D0%BD%D0%B0%20%D0%B2%D0%B8%D0%BD%D0%B8%D0%BB%D0%B5%20-%20%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D1%8F%D1%8F%20%D0%B3%D0%BB%D0%B0%D0%B2%D0%B0.%20%D0%A4%D0%BE%D0%BD%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%BC%D1%83%D0%B7%D1%8B%D0%BA%D0%B0%2C%20%D1%81%D0%BF%D0%BE%D0%BA%D0%BE%D0%B9%D0%BD%D1%8B%D0%B9%20Lo-Fi%2C%20%D0%BC%D1%83%D0%B7%D1%8B%D0%BA%D0%B0%20%D0%B4%D0%BB%D1%8F%20%D0%BA%D0%BE%D0%BD%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D1%86%D0%B8%D0%B8%20%28192kbps%29.mp3"></audio>
+                <p class="status" id="audio-status" role="status" aria-live="polite">Трек загружается. Если он недоступен, выберите аудиофайл с компьютера.</p>
+                <div class="audio-controls">
+                  <label class="field-label" for="volume-control">Громкость: <output id="volume-value">50%</output></label>
+                  <input id="volume-control" type="range" min="0" max="100" value="50" aria-label="Громкость аудиофайла">
+                </div>
+              </div>
+              <div class="recognition-panel">
+                <div class="prediction" aria-live="polite">
+                  <span><b id="prediction-label">Ожидание жеста</b><br><span class="small muted" id="action-label">Сначала подключите модель</span></span>
+                  <strong id="confidence">—</strong>
+                </div>
+                <div class="meter" role="progressbar" aria-label="Уверенность модели" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <div class="meter-fill" id="confidence-meter"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <p class="status panel-status" id="camera-status" role="status" aria-live="polite">Камера включается только после нажатия кнопки.</p>
+          <div class="camera-help">
+            <span class="small muted">Для работы камеры вне Google Sites скачайте панель и откройте её отдельно:</span>
+          </div>
+        </div>
+        <p class="small muted space">Камере нужен доступ через HTTPS или localhost. Громкость меняется у аудио на странице, не у компьютера.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-labelledby="s5">
+      <div class="container">
+        <span class="eyebrow">Оценивание · Максимум 10 баллов</span>
+        <h2 id="s5">Дескриптор к практической работе <span class="accent-text">«AI-панель»</span></h2>
+        <p class="lead">Оцени выполненные действия на слайде 3. За каждый выполненный критерий начисляются указанные баллы.</p>
+        <div class="rubric space">
+          <div class="rubric-row">
+            <strong>2 балла</strong>
+            <span>Подключает опубликованную модель Teachable Machine по ссылке и получает список классов.</span>
+          </div>
+          <div class="rubric-row">
+            <strong>2 балла</strong>
+            <span>Назначает классы всем шести командам и нейтральному жесту; настраивает порог уверенности.</span>
+          </div>
+          <div class="rubric-row">
+            <strong>2 балла</strong>
+            <span>Запускает камеру, включает аудио (или выбирает свой файл) и регулирует громкость.</span>
+          </div>
+          <div class="rubric-row">
+            <strong>3 балла</strong>
+            <span>Проверяет распознавание жестами всех команд: пуск, пауза, громкость вверх и вниз, перемотка вперёд и назад.</span>
+          </div>
+          <div class="rubric-row">
+            <strong>1 балл</strong>
+            <span>Использует нейтральный жест между командами и останавливает камеру после проверки.</span>
+          </div>
+        </div>
+        <div class="callout"><b>Итого: 10 баллов.</b> Максимальный балл ставится, если все критерии выполнены и команды срабатывают корректно.</div>
+      </div>
+    </section>
+
+    <section class="slide" aria-labelledby="s6">
+      <div class="container">
+        <span class="eyebrow">Практика · Управление игрой позами</span>
+        <div class="panel-heading dino-heading">
+          <div>
+            <h2 id="s6">Динозаврик: <span class="accent-text">игра под управлением ИИ</span></h2>
+            <p>Обучите модель позам и управляйте раннером перед камерой.</p>
+          </div>
+          <button class="action panel-download" id="download-dino-slide" type="button">Скачать слайд 5 и открыть отдельно ↗</button>
+        </div>
+        <div class="glass workbench dino-workbench">
+          <div class="dino-layout dino-top-layout">
+            <section class="dino-training">
+              <h3>1. Обучите модель в Teachable Machine</h3>
+              <p>Создайте Image Project и пять классов: <b>старт</b>, <b>стоп</b>, <b>прыжок</b>, <b>нагнуться</b> и <b>нейтральная поза</b>. Соберите разные примеры каждой позы, обучите модель и опубликуйте её.</p>
+              <ol class="steps">
+                <li>Для «прыжка» и «нагнуться» соберите примеры соответствующих поз; для старта и стопа назначьте удобные разные позы.</li>
+                <li>Выберите <b>Экспорт модели → Загрузить мою модель</b> и скопируйте ссылку на опубликованную модель.</li>
+                <li>Вставьте ссылку ниже, сопоставьте классы командам и запустите камеру и игру.</li>
+              </ol>
+              <p class="space"><a class="action" href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener noreferrer">Открыть Teachable Machine ↗</a></p>
+            </section>
+            <section class="panel-section" aria-labelledby="dino-mapping-title">
+              <h3 id="dino-mapping-title">4. Назначьте классы командам</h3>
+              <div class="mapping-grid panel-mapping" aria-label="Назначение классов позам">
+                <div class="field"><label for="dino-map-start">▶ Старт</label><select id="dino-map-start" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="dino-map-stop">⏸ Стоп</label><select id="dino-map-stop" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="dino-map-jump">⬆ Прыжок</label><select id="dino-map-jump" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="dino-map-duck">⬇ Нагнуться</label><select id="dino-map-duck" disabled><option value="">Сначала подключите модель</option></select></div>
+                <div class="field"><label for="dino-map-neutral">✋ Нейтральная поза</label><select id="dino-map-neutral" disabled><option value="">Сначала подключите модель</option></select></div>
+              </div>
+              <div class="threshold-row">
+                <label for="dino-threshold"><b>Порог уверенности:</b> <output id="dino-threshold-value">80%</output></label>
+                <input id="dino-threshold" type="range" min="50" max="99" value="80" disabled>
+              </div>
+            </section>
+          </div>
+          <form class="workbench-form" id="dino-model-form">
+            <div class="field">
+              <label for="dino-model-url">3. Ссылка на опубликованную модель</label>
+              <input id="dino-model-url" name="dino-model-url" type="url" inputmode="url" placeholder="https://teachablemachine.withgoogle.com/models/..." autocomplete="url" required>
+            </div>
+            <button class="action" id="dino-load-model" type="submit">Подключить модель</button>
+          </form>
+          <p class="status panel-status" id="dino-model-status" role="status" aria-live="polite">Сначала подключите модель Teachable Machine.</p>
+          <div class="dino-layout dino-bottom-layout">
+            <section class="panel-section audio-panel" aria-label="Камера и распознавание поз">
+              <h3>5. Запустите камеру</h3>
+              <div class="camera-frame dino-camera" id="dino-webcam-container"><span>Видео с камеры появится здесь</span></div>
+              <div class="audio-controls camera-actions">
+                <button class="action" id="dino-camera-button" type="button" disabled>Запустить камеру</button>
+                <button class="secondary-btn" id="dino-stop-camera" type="button" disabled>Остановить камеру</button>
+              </div>
+              <p class="status dino-status" id="dino-camera-status" role="status" aria-live="polite">Для камеры нужен доступ через HTTPS или localhost.</p>
+              <div class="prediction" aria-live="polite">
+                <span><b id="dino-prediction-label">Ожидание позы</b><br><span class="small muted" id="dino-action-label">Сначала подключите модель</span></span>
+                <strong id="dino-confidence">—</strong>
+              </div>
+            </section>
+            <section class="panel-section dino-game-panel" aria-label="Игра Динозаврик">
+              <h3>2. Запустите игру</h3>
+              <p class="small muted">Старт — начать или перезапустить; стоп — пауза; прыжок и наклон помогают обходить препятствия.</p>
+              <canvas class="dino-game" id="dino-game" width="720" height="220" aria-label="Игра-раннер с динозавриком. Используйте жесты или кнопки управления."></canvas>
+              <div class="dino-score"><span id="dino-game-status" aria-live="polite">Нажмите «Старт» или покажите жест старта.</span><span>Счёт: <output id="dino-score">0</output></span></div>
+              <div class="audio-controls">
+                <button class="action" id="dino-start" type="button">Старт / заново</button>
+                <button class="secondary-btn" id="dino-stop" type="button">Стоп</button>
+                <button class="secondary-btn" id="dino-jump" type="button">Прыжок</button>
+                <button class="secondary-btn" id="dino-duck" type="button">Нагнуться</button>
+              </div>
+            </section>
+          </div>
+          <div class="camera-help">
+            <span class="small muted">Если сайт блокирует камеру во встроенном окне, откройте эту практику отдельно:</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script>
+    'use strict';
+
+    const slides = [...document.querySelectorAll('.slide')];
+    const dotsNav = document.getElementById('dotsNav');
+    const progress = document.getElementById('progress');
+    const counter = document.getElementById('counter');
+    const prevButton = document.getElementById('prevBtn');
+    const nextButton = document.getElementById('nextBtn');
+    const modelForm = document.getElementById('model-form');
+    const modelStatus = document.getElementById('model-status');
+    const cameraStatus = document.getElementById('camera-status');
+    const downloadSlideButton = document.getElementById('download-slide');
+    const loadModelButton = document.getElementById('load-model');
+    const cameraButton = document.getElementById('camera-button');
+    const stopButton = document.getElementById('stop-button');
+    const webcamContainer = document.getElementById('webcam-container');
+    const threshold = document.getElementById('threshold');
+    const thresholdValue = document.getElementById('threshold-value');
+    const predictionLabel = document.getElementById('prediction-label');
+    const actionLabel = document.getElementById('action-label');
+    const confidence = document.getElementById('confidence');
+    const confidenceMeter = document.getElementById('confidence-meter');
+    const confidenceProgress = document.querySelector('.meter[role="progressbar"]');
+    const audioPlayer = document.getElementById('audio-player');
+    const audioStatus = document.getElementById('audio-status');
+    const volumeControl = document.getElementById('volume-control');
+    const volumeValue = document.getElementById('volume-value');
+    const audioFile = document.getElementById('audio-file');
+    const dinoModelForm = document.getElementById('dino-model-form');
+    const dinoModelStatus = document.getElementById('dino-model-status');
+    const dinoLoadModelButton = document.getElementById('dino-load-model');
+    const dinoCameraButton = document.getElementById('dino-camera-button');
+    const dinoStopCameraButton = document.getElementById('dino-stop-camera');
+    const dinoWebcamContainer = document.getElementById('dino-webcam-container');
+    const dinoThreshold = document.getElementById('dino-threshold');
+    const dinoThresholdValue = document.getElementById('dino-threshold-value');
+    const dinoPredictionLabel = document.getElementById('dino-prediction-label');
+    const dinoActionLabel = document.getElementById('dino-action-label');
+    const dinoConfidence = document.getElementById('dino-confidence');
+    const dinoGameCanvas = document.getElementById('dino-game');
+    const dinoGameContext = dinoGameCanvas.getContext('2d');
+    const dinoGameStatus = document.getElementById('dino-game-status');
+    const dinoScoreOutput = document.getElementById('dino-score');
+    const downloadDinoSlideButton = document.getElementById('download-dino-slide');
+    const mappingSelects = {
+      up: document.getElementById('map-up'),
+      down: document.getElementById('map-down'),
+      play: document.getElementById('map-play'),
+      pause: document.getElementById('map-pause'),
+      forward: document.getElementById('map-forward'),
+      back: document.getElementById('map-back'),
+      neutral: document.getElementById('map-neutral')
+    };
+    const dinoMappingSelects = {
+      start: document.getElementById('dino-map-start'),
+      stop: document.getElementById('dino-map-stop'),
+      jump: document.getElementById('dino-map-jump'),
+      duck: document.getElementById('dino-map-duck'),
+      neutral: document.getElementById('dino-map-neutral')
+    };
+
+    let currentSlide = 0;
+    let model = null;
+    let cameraStream = null;
+    let cameraVideo = null;
+    let cameraStartPending = false;
+    let cameraRequestId = 0;
+    let inferenceRunning = false;
+    let lastActionClass = null;
+    let currentAudioUrl = null;
+    let dinoModel = null;
+    let dinoCameraStream = null;
+    let dinoCameraVideo = null;
+    let dinoCameraStartPending = false;
+    let dinoCameraRequestId = 0;
+    let dinoInferenceRunning = false;
+    let lastDinoActionClass = null;
+    let dinoAnimationFrame = null;
+    let dinoLastFrame = 0;
+    let dinoGameState = 'ready';
+    let dinoScore = 0;
+    let dinoObstacleX = dinoGameCanvas.width - 70;
+    let dinoJumpUntil = 0;
+    let dinoDuckUntil = 0;
+    const defaultAudioUrl = audioPlayer.getAttribute('src');
+
+    function setStatus(element, message, kind) {
+      element.textContent = message;
+      element.dataset.kind = kind || '';
+    }
+
+    function isCameraAllowedByFramePolicy() {
+      const policy = document.permissionsPolicy || document.featurePolicy;
+      return !policy || typeof policy.allowsFeature !== 'function' || policy.allowsFeature('camera');
+    }
+
+    function downloadAndOpenSlide(slideNumber) {
+      const isDinoSlide = slideNumber === 5;
+      const exportStatus = isDinoSlide ? document.getElementById('dino-camera-status') : cameraStatus;
+      const exportMappingSelects = isDinoSlide ? dinoMappingSelects : mappingSelects;
+      let standaloneWindow = null;
+      let openError = '';
+      try {
+        standaloneWindow = window.open('about:blank', '_blank');
+      } catch (error) {
+        openError = error instanceof Error ? error.message : String(error);
+      }
+      const exportedDocument = document.documentElement.cloneNode(true);
+      exportedDocument.querySelector('title').textContent = isDinoSlide
+        ? 'Игра Динозаврик под управлением жестами · Урок 5'
+        : 'AI-панель управления жестами · Урок 5';
+      const modelUrlSelector = isDinoSlide ? '#dino-model-url' : '#model-url';
+      const modelUrlInput = exportedDocument.querySelector(modelUrlSelector);
+      modelUrlInput.setAttribute('value', document.querySelector(modelUrlSelector).value);
+
+      const exportedMappingSelector = isDinoSlide ? '.dino-layout .mapping-grid select' : '.panel-content .mapping-grid select';
+      exportedDocument.querySelectorAll(exportedMappingSelector).forEach((select, index) => {
+        const selectedValue = Object.values(exportMappingSelects)[index].value;
+        [...select.options].forEach(option => {
+          if (option.value === selectedValue) option.setAttribute('selected', '');
+          else option.removeAttribute('selected');
+        });
+      });
+
+      const exportStyles = document.createElement('style');
+      exportStyles.textContent = `
+        body { height: auto; min-height: 100vh; overflow: auto; }
+        .slide:not(:nth-of-type(${slideNumber})) { display: none !important; }
+        main > .slide:nth-of-type(${slideNumber}) {
+          position: relative; display: flex !important; min-height: 100vh;
+          overflow: visible; padding-bottom: 38px;
+        }
+        #network-bg { position: fixed; }
+        .progress-bar, .dots-nav, .nav-controls { display: none !important; }
+      `;
+      exportedDocument.querySelector('head').append(exportStyles);
+
+      const exportedHtml = `<!DOCTYPE html>\n${exportedDocument.outerHTML.replace(
+        /const match = \/\^#\(\[1-6\]\)\$\/\.exec\(location\.hash\);\s*setSlide\(match \? Number\(match\[1\]\) - 1 : 0\);/,
+        `const match = /^#([1-6])$/.exec(location.hash); setSlide(match ? Number(match[1]) - 1 : ${slideNumber - 1});`
+      )}`;
+      const fileUrl = URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html;charset=utf-8' }));
+      const downloadLink = document.createElement('a');
+      downloadLink.href = fileUrl;
+      downloadLink.download = isDinoSlide ? 'Урок 5 - слайд 5.html' : 'Урок 5 - слайд 3.html';
+      document.body.append(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+
+      window.setTimeout(() => URL.revokeObjectURL(fileUrl), 60000);
+      if (standaloneWindow) {
+        try {
+          standaloneWindow.location.href = fileUrl;
+          setStatus(exportStatus, `Слайд ${slideNumber} скачан и открыт отдельно. Разрешите камеру в новой вкладке.`, 'success');
+        } catch (error) {
+          setStatus(exportStatus, `Файл скачан, но браузер не открыл новую вкладку: ${error instanceof Error ? error.message : String(error)}. Откройте файл из загрузок.`, 'error');
+        }
+      } else {
+        const reason = openError ? ` (${openError})` : '';
+        const fileName = isDinoSlide ? 'Урок 5 - слайд 5.html' : 'Урок 5 - слайд 3.html';
+        setStatus(exportStatus, `Слайд скачан${reason}. Откройте файл «${fileName}» из загрузок браузера.`, 'success');
+      }
+    }
+
+    function setSlide(index) {
+      if (index < 0 || index >= slides.length) return;
+      if (currentSlide !== index) {
+        if (inferenceRunning || cameraStartPending) stopCamera();
+        if (dinoInferenceRunning || dinoCameraStartPending) stopDinoCamera();
+        if (currentSlide === 4 && dinoGameState === 'running') pauseDinoGame();
+      }
+      currentSlide = index;
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle('active', slideIndex === currentSlide);
+        slide.setAttribute('aria-hidden', String(slideIndex !== currentSlide));
+        slide.querySelectorAll('video').forEach(video => {
+          if (slideIndex === currentSlide) video.play().catch(() => {});
+          else video.pause();
+        });
+      });
+      [...dotsNav.children].forEach((dot, dotIndex) => {
+        dot.classList.toggle('active', dotIndex === currentSlide);
+        if (dotIndex === currentSlide) dot.setAttribute('aria-current', 'step');
+        else dot.removeAttribute('aria-current');
+      });
+      counter.textContent = `${currentSlide + 1} / ${slides.length}`;
+      progress.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+      prevButton.disabled = currentSlide === 0;
+      nextButton.disabled = currentSlide === slides.length - 1;
+      slides[currentSlide].scrollTop = 0;
+      history.replaceState(null, '', `#${currentSlide + 1}`);
+    }
+
+    slides.forEach((slide, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'dot-nav dot';
+      const title = slides[index].querySelector('h1, h2').textContent.trim();
+      dot.title = `Слайд ${index + 1}: ${title}`;
+      dot.setAttribute('aria-label', dot.title);
+      dot.addEventListener('click', () => setSlide(index));
+      dotsNav.append(dot);
+    });
+
+    document.getElementById('startBtn').addEventListener('click', () => setSlide(1));
+    prevButton.addEventListener('click', () => setSlide(currentSlide - 1));
+    nextButton.addEventListener('click', () => setSlide(currentSlide + 1));
+
+    function goToHash() {
+      const match = /^#([1-6])$/.exec(location.hash);
+      setSlide(match ? Number(match[1]) - 1 : 0);
+    }
+
+    window.addEventListener('hashchange', goToHash);
+
+    document.addEventListener('keydown', event => {
+      if (event.target.closest('input, textarea, select, button, a, summary, video, [contenteditable]') || event.altKey || event.ctrlKey || event.metaKey) return;
+      const destinations = {
+        ArrowRight: currentSlide + 1,
+        PageDown: currentSlide + 1,
+        ArrowLeft: currentSlide - 1,
+        PageUp: currentSlide - 1,
+        ' ': currentSlide + 1,
+        Home: 0,
+        End: slides.length - 1
+      };
+      if (Object.hasOwn(destinations, event.key)) {
+        event.preventDefault();
+        setSlide(destinations[event.key]);
+      }
+      if (event.key.toLowerCase() === 'f') {
+        document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
+      }
+    });
+
+    const canvas = document.getElementById('network-bg');
+    const ctx = canvas.getContext('2d');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let particles = [];
+    let animationFrame = null;
+
+    function initParticles() {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
+      particles = Array.from({ length: 35 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - .5) * .9,
+        vy: (Math.random() - .5) * .9,
+        radius: Math.random() * 1.5 + 1
+      }));
+      drawBackground(false);
+    }
+
+    function drawBackground(move) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((particle, index) => {
+        if (move) {
+          const motionScale = reducedMotion.matches ? .35 : 1;
+          particle.x += particle.vx * motionScale;
+          particle.y += particle.vy * motionScale;
+          if (particle.x < -30) particle.x = canvas.width + 30;
+          if (particle.x > canvas.width + 30) particle.x = -30;
+          if (particle.y < -30) particle.y = canvas.height + 30;
+          if (particle.y > canvas.height + 30) particle.y = -30;
+        }
+        particles.slice(index + 1).forEach(other => {
+          const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
+          if (distance < 190) {
+            ctx.strokeStyle = `rgba(244, 63, 94, ${.12 * (1 - distance / 190)})`;
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.stroke();
+          }
+        });
+        ctx.fillStyle = 'rgba(244, 63, 94, .2)';
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function animate() {
+      animationFrame = null;
+      if (document.hidden) return;
+      drawBackground(true);
+      animationFrame = requestAnimationFrame(animate);
+    }
+
+    function updateAnimation() {
+      if (animationFrame !== null) cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+      if (!document.hidden) animate();
+      else drawBackground(false);
+    }
+
+    window.addEventListener('resize', initParticles);
+    document.addEventListener('visibilitychange', updateAnimation);
+    reducedMotion.addEventListener('change', updateAnimation);
+
+    function updateThreshold() {
+      const value = Number(threshold.value);
+      thresholdValue.value = `${value}%`;
+      thresholdValue.textContent = `${value}%`;
+    }
+
+    function updateVolume() {
+      const value = Number(volumeControl.value);
+      audioPlayer.volume = value / 100;
+      volumeValue.value = `${value}%`;
+      volumeValue.textContent = `${value}%`;
+    }
+
+    function setPrediction(label, score) {
+      const percentage = Math.round(score * 100);
+      predictionLabel.textContent = label;
+      confidence.textContent = `${percentage}%`;
+      confidenceMeter.style.width = `${percentage}%`;
+      confidenceProgress.setAttribute('aria-valuenow', String(percentage));
+    }
+
+    function guessLabel(labels, words) {
+      return labels.find(label => words.some(word => label.toLocaleLowerCase('ru').includes(word))) || '';
+    }
+
+    function fillMappingOptions(labels) {
+      const defaults = {
+        up: guessLabel(labels, ['громкость +', 'громкость плюс', 'увелич', 'volume up', 'volume plus']),
+        down: guessLabel(labels, ['громкость −', 'громкость -', 'громкость минус', 'уменьш', 'volume down', 'volume minus']),
+        play: guessLabel(labels, ['пуск', 'старт', 'воспроизвести', 'play', 'start']),
+        pause: guessLabel(labels, ['пауза', 'pause', 'stop']),
+        forward: guessLabel(labels, ['вперёд', 'вперед', 'след', 'перемотка впер', 'forward', 'next']),
+        back: guessLabel(labels, ['назад', 'предыдущ', 'перемотка назад', 'back', 'previous']),
+        neutral: guessLabel(labels, ['нейтр', 'ничего', 'nothing', 'neutral'])
+      };
+      Object.entries(mappingSelects).forEach(([key, select]) => {
+        select.replaceChildren();
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Выберите класс';
+        select.append(placeholder);
+        labels.forEach(label => {
+          const option = document.createElement('option');
+          option.value = label;
+          option.textContent = label;
+          select.append(option);
+        });
+        select.disabled = false;
+        select.value = defaults[key];
+      });
+      threshold.disabled = false;
+    }
+
+    function readModelBaseUrl(rawValue) {
+      let url;
+      try {
+        url = new URL(rawValue.trim());
+      } catch {
+        throw new Error('Введите корректный URL опубликованной модели.');
+      }
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+        throw new Error('Адрес модели должен начинаться с http:// или https://.');
+      }
+      if (url.pathname.endsWith('model.json')) {
+        url.pathname = url.pathname.slice(0, -'model.json'.length);
+      }
+      if (!url.pathname.endsWith('/')) url.pathname += '/';
+      url.search = '';
+      url.hash = '';
+      return url.href;
+    }
+
+    function addCacheBuster(url, value) {
+      const cacheBustedUrl = new URL(url);
+      cacheBustedUrl.searchParams.set('_lesson_refresh', value);
+      return cacheBustedUrl.href;
+    }
+
+    function guessDinoLabel(labels, words) {
+      return labels.find(label => words.some(word => label.toLocaleLowerCase('ru').includes(word))) || '';
+    }
+
+    function fillDinoMappingOptions(labels) {
+      const defaults = {
+        start: guessDinoLabel(labels, ['старт', 'начать', 'пуск', 'start', 'play']),
+        stop: guessDinoLabel(labels, ['стоп', 'пауза', 'останов', 'stop', 'pause']),
+        jump: guessDinoLabel(labels, ['прыж', 'jump']),
+        duck: guessDinoLabel(labels, ['нагнуться', 'нагиб', 'наклон', 'присесть', 'duck', 'crouch']),
+        neutral: guessDinoLabel(labels, ['нейтр', 'ничего', 'neutral', 'nothing'])
+      };
+      Object.entries(dinoMappingSelects).forEach(([key, select]) => {
+        select.replaceChildren(new Option('Выберите класс', ''));
+        labels.forEach(label => select.append(new Option(label, label)));
+        select.disabled = false;
+        select.value = defaults[key];
+      });
+      dinoThreshold.disabled = false;
+    }
+
+    function updateDinoThreshold() {
+      const value = Number(dinoThreshold.value);
+      dinoThresholdValue.value = `${value}%`;
+      dinoThresholdValue.textContent = `${value}%`;
+    }
+
+    function setDinoPrediction(label, score) {
+      dinoPredictionLabel.textContent = label;
+      dinoConfidence.textContent = `${Math.round(score * 100)}%`;
+    }
+
+    function drawDinoScene() {
+      const { width, height } = dinoGameCanvas;
+      const groundY = height - 34;
+      const now = performance.now();
+      const ducking = now < dinoDuckUntil;
+      const jumping = now < dinoJumpUntil;
+      const playerX = 76;
+      const playerHeight = ducking ? 25 : 52;
+      const playerY = groundY - playerHeight - (jumping ? 58 : 0);
+
+      dinoGameContext.clearRect(0, 0, width, height);
+      dinoGameContext.fillStyle = '#f8fafc';
+      dinoGameContext.fillRect(0, 0, width, height);
+      dinoGameContext.fillStyle = '#e2e8f0';
+      dinoGameContext.beginPath();
+      dinoGameContext.arc(width - 96, 48, 23, 0, Math.PI * 2);
+      dinoGameContext.fill();
+      dinoGameContext.strokeStyle = '#64748b';
+      dinoGameContext.lineWidth = 3;
+      dinoGameContext.beginPath();
+      dinoGameContext.moveTo(0, groundY);
+      dinoGameContext.lineTo(width, groundY);
+      dinoGameContext.stroke();
+      dinoGameContext.fillStyle = '#334155';
+      dinoGameContext.fillRect(playerX + (ducking ? 5 : 8), playerY, ducking ? 43 : 35, playerHeight);
+      dinoGameContext.fillRect(playerX + (ducking ? 30 : 26), playerY - (ducking ? 1 : 12), 18, ducking ? 16 : 20);
+      dinoGameContext.fillStyle = '#f8fafc';
+      dinoGameContext.fillRect(playerX + 37, playerY - (ducking ? -3 : 5), 4, 4);
+      dinoGameContext.fillStyle = '#15803d';
+      dinoGameContext.fillRect(dinoObstacleX, groundY - 38, 13, 38);
+      dinoGameContext.fillRect(dinoObstacleX - 6, groundY - 25, 9, 6);
+      dinoGameContext.fillRect(dinoObstacleX + 10, groundY - 32, 9, 6);
+    }
+
+    function finishDinoGame() {
+      dinoGameState = 'over';
+      dinoGameStatus.textContent = 'Столкновение! Покажите «старт» или нажмите кнопку, чтобы сыграть ещё.';
+      dinoAnimationFrame = null;
+      drawDinoScene();
+    }
+
+    function runDinoGameFrame(timestamp) {
+      if (dinoGameState !== 'running') {
+        dinoAnimationFrame = null;
+        return;
+      }
+      const elapsed = Math.min((timestamp - dinoLastFrame) / 1000, .05);
+      dinoLastFrame = timestamp;
+      dinoObstacleX -= 300 * elapsed;
+      if (dinoObstacleX < -24) {
+        dinoObstacleX = dinoGameCanvas.width + 80 + Math.random() * 180;
+        dinoScore += 10;
+        dinoScoreOutput.value = String(dinoScore);
+        dinoScoreOutput.textContent = String(dinoScore);
+      }
+      const playerRight = 76 + (timestamp < dinoDuckUntil ? 53 : 43);
+      if (dinoObstacleX < playerRight && dinoObstacleX + 20 > 76
+        && timestamp >= dinoJumpUntil && timestamp >= dinoDuckUntil) {
+        finishDinoGame();
+        return;
+      }
+      drawDinoScene();
+      dinoAnimationFrame = requestAnimationFrame(runDinoGameFrame);
+    }
+
+    function startDinoGame(restart = false) {
+      if (dinoGameState === 'paused' && !restart) {
+        dinoGameState = 'running';
+        dinoGameStatus.textContent = 'Игра продолжается — перепрыгивайте или пригибайтесь перед препятствиями.';
+        dinoLastFrame = performance.now();
+        dinoAnimationFrame = requestAnimationFrame(runDinoGameFrame);
+        return;
+      }
+      if (dinoAnimationFrame !== null) cancelAnimationFrame(dinoAnimationFrame);
+      dinoAnimationFrame = null;
+      dinoScore = 0;
+      dinoScoreOutput.value = '0';
+      dinoScoreOutput.textContent = '0';
+      dinoObstacleX = dinoGameCanvas.width - 70;
+      dinoJumpUntil = 0;
+      dinoDuckUntil = 0;
+      dinoGameState = 'running';
+      dinoGameStatus.textContent = 'Игра идёт — перепрыгивайте или пригибайтесь перед препятствиями.';
+      dinoLastFrame = performance.now();
+      drawDinoScene();
+      dinoAnimationFrame = requestAnimationFrame(runDinoGameFrame);
+    }
+
+    function pauseDinoGame() {
+      if (dinoGameState !== 'running') return;
+      dinoGameState = 'paused';
+      if (dinoAnimationFrame !== null) cancelAnimationFrame(dinoAnimationFrame);
+      dinoAnimationFrame = null;
+      dinoGameStatus.textContent = 'Игра на паузе. Покажите «старт», чтобы продолжить.';
+      drawDinoScene();
+    }
+
+    function jumpDino() {
+      if (dinoGameState !== 'running') {
+        dinoGameStatus.textContent = 'Сначала запустите игру жестом «старт» или кнопкой.';
+        return;
+      }
+      dinoJumpUntil = performance.now() + 680;
+      dinoDuckUntil = 0;
+      dinoGameStatus.textContent = 'Прыжок!';
+    }
+
+    function duckDino() {
+      if (dinoGameState !== 'running') {
+        dinoGameStatus.textContent = 'Сначала запустите игру жестом «старт» или кнопкой.';
+        return;
+      }
+      dinoDuckUntil = performance.now() + 720;
+      dinoJumpUntil = 0;
+      dinoGameStatus.textContent = 'Динозаврик пригнулся.';
+    }
+
+    function runDinoAction(action) {
+      if (action === 'start') {
+        startDinoGame();
+        dinoActionLabel.textContent = 'Игра запущена или перезапущена';
+      } else if (action === 'stop') {
+        pauseDinoGame();
+        dinoActionLabel.textContent = 'Игра приостановлена';
+      } else if (action === 'jump') {
+        jumpDino();
+        dinoActionLabel.textContent = 'Команда: прыжок';
+      } else if (action === 'duck') {
+        duckDino();
+        dinoActionLabel.textContent = 'Команда: нагнуться';
+      }
+    }
+
+    async function loadDinoModel(event) {
+      event.preventDefault();
+      if (!window.tmImage || !window.tf) {
+        setStatus(dinoModelStatus, 'Не удалось загрузить библиотеки модели. Проверьте подключение к интернету и обновите страницу.', 'error');
+        return;
+      }
+      if (dinoInferenceRunning || dinoCameraStartPending) stopDinoCamera();
+      dinoModel = null;
+      let loadedTensorflowModel = null;
+      dinoLoadModelButton.disabled = true;
+      dinoCameraButton.disabled = true;
+      Object.values(dinoMappingSelects).forEach(select => {
+        select.disabled = true;
+        select.replaceChildren(new Option('Загрузка модели…', ''));
+      });
+      dinoThreshold.disabled = true;
+      setStatus(dinoModelStatus, 'Загружаю модель…', 'working');
+      try {
+        const baseUrl = readModelBaseUrl(document.getElementById('dino-model-url').value);
+        const refreshKey = `${Date.now()}-${crypto.randomUUID()}`;
+        const [tensorflowModel, metadataResponse] = await Promise.all([
+          window.tf.loadLayersModel(addCacheBuster(`${baseUrl}model.json`, refreshKey), { requestInit: { cache: 'no-store' } }),
+          fetch(addCacheBuster(`${baseUrl}metadata.json`, refreshKey), { cache: 'no-store' })
+        ]);
+        loadedTensorflowModel = tensorflowModel;
+        if (!metadataResponse.ok) throw new Error(`Не удалось загрузить metadata.json (HTTP ${metadataResponse.status}).`);
+        const metadata = await metadataResponse.json();
+        const labels = metadata.labels;
+        if (!Array.isArray(labels) || !labels.every(label => typeof label === 'string')) {
+          throw new Error('В metadata.json отсутствует список названий классов.');
+        }
+        if (!labels.length) throw new Error('В опубликованной модели не найдены классы.');
+        const outputCount = tensorflowModel.outputs[0]?.shape[1];
+        if (outputCount !== labels.length) {
+          throw new Error(`Модель выдаёт ${outputCount ?? 'неизвестное число'} классов, а metadata.json содержит ${labels.length}. Опубликуйте модель заново в Teachable Machine и подключите новую ссылку.`);
+        }
+        dinoModel = new window.tmImage.CustomMobileNet(tensorflowModel, metadata);
+        loadedTensorflowModel = null;
+        fillDinoMappingOptions(labels);
+        lastDinoActionClass = null;
+        dinoCameraButton.disabled = false;
+        setStatus(dinoModelStatus, `Модель подключена · классов: ${labels.length}. Назначьте команды и запустите камеру.`, 'success');
+      } catch (error) {
+        if (loadedTensorflowModel) loadedTensorflowModel.dispose();
+        dinoModel = null;
+        Object.values(dinoMappingSelects).forEach(select => {
+          select.disabled = true;
+          select.replaceChildren(new Option('Не удалось загрузить модель', ''));
+        });
+        dinoThreshold.disabled = true;
+        setStatus(dinoModelStatus, `Не удалось загрузить модель: ${error instanceof Error ? error.message : String(error)}`, 'error');
+      } finally {
+        dinoLoadModelButton.disabled = false;
+      }
+    }
+
+    async function startDinoCamera() {
+      if (!dinoModel) {
+        setStatus(document.getElementById('dino-camera-status'), 'Сначала подключите модель.', 'error');
+        return;
+      }
+      if (!isCameraAllowedByFramePolicy()) {
+        setStatus(document.getElementById('dino-camera-status'), 'Встроенная страница блокирует камеру. Скачайте слайд 5, откройте его отдельно и разрешите камеру.', 'error');
+        return;
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setStatus(document.getElementById('dino-camera-status'), 'Для камеры нужен HTTPS или localhost. Если урок встроен в сайт, скачайте слайд 5 и откройте его отдельно.', 'error');
+        return;
+      }
+      dinoCameraButton.disabled = true;
+      dinoCameraStartPending = true;
+      const requestId = ++dinoCameraRequestId;
+      setStatus(document.getElementById('dino-camera-status'), 'Разрешите доступ к камере в запросе браузера…', 'working');
+      try {
+        dinoCameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        if (requestId !== dinoCameraRequestId) {
+          dinoCameraStream.getTracks().forEach(track => track.stop());
+          dinoCameraStream = null;
+          return;
+        }
+        dinoCameraVideo = document.createElement('video');
+        dinoCameraVideo.autoplay = true;
+        dinoCameraVideo.muted = true;
+        dinoCameraVideo.playsInline = true;
+        dinoCameraVideo.setAttribute('aria-label', 'Изображение с камеры для распознавания поз');
+        dinoCameraVideo.srcObject = dinoCameraStream;
+        dinoWebcamContainer.replaceChildren(dinoCameraVideo);
+        await dinoCameraVideo.play();
+        await new Promise((resolve, reject) => {
+          if (dinoCameraVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            resolve();
+            return;
+          }
+          dinoCameraVideo.addEventListener('loadeddata', resolve, { once: true });
+          dinoCameraVideo.addEventListener('error', () => reject(new Error('Не удалось получить изображение с камеры.')), { once: true });
+        });
+        if (requestId !== dinoCameraRequestId) {
+          stopDinoCamera();
+          return;
+        }
+        dinoInferenceRunning = true;
+        dinoStopCameraButton.disabled = false;
+        setStatus(document.getElementById('dino-camera-status'), 'Камера работает. Покажите позу и дождитесь распознавания.', 'success');
+        runDinoPrediction();
+      } catch (error) {
+        stopDinoCamera();
+        const name = error instanceof DOMException ? error.name : '';
+        const message = name === 'NotAllowedError' || name === 'SecurityError'
+          ? 'Браузер не выдал доступ к камере. Разрешите камеру или откройте скачанный слайд отдельно.'
+          : name === 'NotFoundError'
+            ? 'Камера не найдена. Подключите камеру и проверьте, что она доступна системе.'
+            : name === 'NotReadableError'
+              ? 'Камера занята другим приложением. Закройте его и попробуйте снова.'
+              : `Не удалось запустить камеру: ${error instanceof Error ? error.message : String(error)}`;
+        setStatus(document.getElementById('dino-camera-status'), message, 'error');
+      } finally {
+        if (requestId === dinoCameraRequestId) {
+          dinoCameraStartPending = false;
+          dinoCameraButton.disabled = !dinoModel || dinoInferenceRunning;
+        }
+      }
+    }
+
+    async function applyDinoPrediction() {
+      if (!dinoModel || !dinoCameraVideo || !dinoInferenceRunning) return;
+      const predictions = await dinoModel.predict(dinoCameraVideo);
+      const best = predictions.reduce((top, item) => item.probability > top.probability ? item : top);
+      setDinoPrediction(best.className, best.probability);
+      if (best.probability < Number(dinoThreshold.value) / 100) {
+        dinoActionLabel.textContent = 'Уверенность ниже порога — команды нет';
+        lastDinoActionClass = null;
+        return;
+      }
+      if (best.className === dinoMappingSelects.neutral.value) {
+        dinoActionLabel.textContent = 'Нейтральная поза — команды нет';
+        lastDinoActionClass = null;
+        return;
+      }
+      const actions = Object.entries(dinoMappingSelects)
+        .filter(([key, select]) => key !== 'neutral' && select.value === best.className)
+        .map(([key]) => key);
+      if (actions.length > 1) {
+        dinoActionLabel.textContent = 'Класс назначен нескольким командам — выберите разные классы';
+        lastDinoActionClass = null;
+        return;
+      }
+      if (!actions.length) {
+        dinoActionLabel.textContent = 'Жест распознан; назначьте этому классу команду';
+        lastDinoActionClass = null;
+        return;
+      }
+      if (lastDinoActionClass === best.className) {
+        dinoActionLabel.textContent = 'Команда уже выполнена; покажите нейтральную позу для повтора';
+        return;
+      }
+      runDinoAction(actions[0]);
+      lastDinoActionClass = best.className;
+    }
+
+    async function runDinoPrediction() {
+      if (!dinoInferenceRunning) return;
+      try {
+        await applyDinoPrediction();
+      } catch (error) {
+        stopDinoCamera();
+        setStatus(document.getElementById('dino-camera-status'), `Ошибка распознавания: ${error instanceof Error ? error.message : String(error)}`, 'error');
+        return;
+      }
+      if (dinoInferenceRunning) window.setTimeout(runDinoPrediction, 180);
+    }
+
+    function stopDinoCamera() {
+      dinoCameraRequestId += 1;
+      dinoCameraStartPending = false;
+      dinoInferenceRunning = false;
+      if (dinoCameraVideo) {
+        dinoCameraVideo.pause();
+        dinoCameraVideo.srcObject = null;
+        dinoCameraVideo = null;
+      }
+      if (dinoCameraStream) {
+        dinoCameraStream.getTracks().forEach(track => track.stop());
+        dinoCameraStream = null;
+      }
+      dinoWebcamContainer.replaceChildren(document.createTextNode('Камера остановлена'));
+      dinoCameraButton.disabled = !dinoModel;
+      dinoStopCameraButton.disabled = true;
+      lastDinoActionClass = null;
+    }
+
+    async function loadModel(event) {
+      event.preventDefault();
+      if (!window.tmImage || !window.tf) {
+        setStatus(modelStatus, 'Не удалось загрузить библиотеки модели. Проверьте подключение к интернету и обновите страницу.', 'error');
+        return;
+      }
+      if (inferenceRunning || cameraStartPending) stopCamera();
+      model = null;
+      let loadedTensorflowModel = null;
+      loadModelButton.disabled = true;
+      cameraButton.disabled = true;
+      Object.values(mappingSelects).forEach(select => {
+        select.disabled = true;
+        select.replaceChildren(new Option('Загрузка модели…', ''));
+      });
+      threshold.disabled = true;
+      setStatus(modelStatus, 'Загружаю модель…', 'working');
+      try {
+        const baseUrl = readModelBaseUrl(document.getElementById('model-url').value);
+        const refreshKey = `${Date.now()}-${crypto.randomUUID()}`;
+        const modelUrl = addCacheBuster(`${baseUrl}model.json`, refreshKey);
+        const metadataUrl = addCacheBuster(`${baseUrl}metadata.json`, refreshKey);
+        const [tensorflowModel, metadataResponse] = await Promise.all([
+          window.tf.loadLayersModel(modelUrl, { requestInit: { cache: 'no-store' } }),
+          fetch(metadataUrl, { cache: 'no-store' })
+        ]);
+        loadedTensorflowModel = tensorflowModel;
+        if (!metadataResponse.ok) {
+          throw new Error(`Не удалось загрузить metadata.json (HTTP ${metadataResponse.status}).`);
+        }
+        const metadata = await metadataResponse.json();
+        const labels = metadata.labels;
+        if (!Array.isArray(labels) || !labels.every(label => typeof label === 'string')) {
+          throw new Error('В metadata.json отсутствует список названий классов.');
+        }
+        if (!labels.length) throw new Error('В опубликованной модели не найдены классы.');
+        const outputCount = tensorflowModel.outputs[0]?.shape[1];
+        if (outputCount !== labels.length) {
+          throw new Error(`Модель выдаёт ${outputCount ?? 'неизвестное число'} классов, а metadata.json содержит ${labels.length}. Опубликуйте модель заново в Teachable Machine и подключите новую ссылку.`);
+        }
+        const loadedModel = new window.tmImage.CustomMobileNet(tensorflowModel, metadata);
+        model = loadedModel;
+        loadedTensorflowModel = null;
+        fillMappingOptions(labels);
+        lastActionClass = null;
+        cameraButton.disabled = false;
+        setStatus(
+          modelStatus,
+          `Модель подключена · классов: ${labels.length}. Камера доступна; назначьте команды для нужных классов.`,
+          'success'
+        );
+      } catch (error) {
+        if (loadedTensorflowModel) loadedTensorflowModel.dispose();
+        model = null;
+        Object.values(mappingSelects).forEach(select => {
+          select.disabled = true;
+          select.replaceChildren(new Option('Не удалось загрузить модель', ''));
+        });
+        threshold.disabled = true;
+        setStatus(modelStatus, `Не удалось загрузить модель: ${error instanceof Error ? error.message : String(error)}`, 'error');
+      } finally {
+        loadModelButton.disabled = false;
+      }
+    }
+
+    async function startCamera() {
+      if (!model) {
+        setStatus(cameraStatus, 'Сначала подключите модель.', 'error');
+        return;
+      }
+      if (!isCameraAllowedByFramePolicy()) {
+        setStatus(cameraStatus, 'Google Sites блокирует камеру во встроенном окне. Нажмите «Открыть урок отдельно» ниже и разрешите камеру на открывшейся странице.', 'error');
+        return;
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setStatus(cameraStatus, 'Для камеры нужен HTTPS или localhost. Если урок открыт в Google Sites, нажмите «Открыть урок отдельно».', 'error');
+        return;
+      }
+      cameraButton.disabled = true;
+      cameraStartPending = true;
+      const requestId = ++cameraRequestId;
+      setStatus(cameraStatus, 'Разрешите доступ к камере в запросе браузера…', 'working');
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          }
+        });
+        if (requestId !== cameraRequestId) {
+          cameraStream.getTracks().forEach(track => track.stop());
+          cameraStream = null;
+          return;
+        }
+        cameraVideo = document.createElement('video');
+        cameraVideo.autoplay = true;
+        cameraVideo.muted = true;
+        cameraVideo.playsInline = true;
+        cameraVideo.setAttribute('aria-label', 'Изображение с камеры для распознавания жестов');
+        cameraVideo.srcObject = cameraStream;
+        webcamContainer.replaceChildren(cameraVideo);
+        await cameraVideo.play();
+        await new Promise((resolve, reject) => {
+          if (cameraVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            resolve();
+            return;
+          }
+          cameraVideo.addEventListener('loadeddata', resolve, { once: true });
+          cameraVideo.addEventListener('error', () => reject(new Error('Не удалось получить изображение с камеры.')), { once: true });
+        });
+        if (requestId !== cameraRequestId) {
+          stopCamera();
+          return;
+        }
+        inferenceRunning = true;
+        stopButton.disabled = false;
+        setStatus(cameraStatus, 'Камера работает. Покажите жест и дождитесь распознавания.', 'success');
+        runPrediction();
+      } catch (error) {
+        stopCamera();
+        const name = error instanceof DOMException ? error.name : '';
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const permissionDenied = name === 'NotAllowedError'
+          || name === 'SecurityError'
+          || /denied|permission|could not open your camera/i.test(errorMessage);
+        const message = permissionDenied
+          ? 'Браузер не выдал доступ к камере. Если урок встроен в Google Sites, нажмите «Открыть урок отдельно», разрешите камеру и попробуйте снова.'
+          : name === 'NotFoundError'
+            ? 'Камера не найдена. Подключите камеру и проверьте, что она доступна системе.'
+            : name === 'NotReadableError'
+              ? 'Камера занята другим приложением. Закройте его и попробуйте снова.'
+              : `Не удалось запустить камеру. Проверьте разрешение браузера и доступность камеры. ${errorMessage}`;
+        setStatus(cameraStatus, message, 'error');
+      } finally {
+        if (requestId === cameraRequestId) {
+          cameraStartPending = false;
+          cameraButton.disabled = !model || inferenceRunning;
+        }
+      }
+    }
+
+    function mappedAction(className) {
+      const actions = Object.entries(mappingSelects)
+        .filter(([key, select]) => key !== 'neutral' && select.value === className)
+        .map(([key]) => key);
+      return actions.length === 1 ? actions[0] : actions.length > 1 ? 'ambiguous' : '';
+    }
+
+    async function applyPrediction() {
+      if (!model || !cameraVideo || !inferenceRunning) return;
+      const predictions = await model.predict(cameraVideo);
+      const best = predictions.reduce((top, item) => item.probability > top.probability ? item : top);
+      const score = best.probability;
+      setPrediction(best.className, score);
+
+      if (score < Number(threshold.value) / 100) {
+        actionLabel.textContent = 'Уверенность ниже порога — команды нет';
+        lastActionClass = null;
+        return;
+      }
+      if (best.className === mappingSelects.neutral.value) {
+        actionLabel.textContent = 'Нейтральный класс — команды нет';
+        lastActionClass = null;
+        return;
+      }
+      const action = mappedAction(best.className);
+      if (action === 'ambiguous') {
+        actionLabel.textContent = 'Этот класс назначен нескольким командам; выберите для каждой команды свой класс';
+        lastActionClass = null;
+        return;
+      }
+      if (!action) {
+        actionLabel.textContent = 'Жест распознан; назначьте этому классу команду';
+        lastActionClass = null;
+        return;
+      }
+      if (lastActionClass === best.className) {
+        actionLabel.textContent = 'Команда уже выполнена; покажите нейтральный жест для повтора';
+        return;
+      }
+
+      if (action === 'up') {
+        volumeControl.value = String(Math.min(100, Number(volumeControl.value) + 10));
+        updateVolume();
+        actionLabel.textContent = 'Громкость аудиофайла увеличена на 10%';
+      } else if (action === 'down') {
+        volumeControl.value = String(Math.max(0, Number(volumeControl.value) - 10));
+        updateVolume();
+        actionLabel.textContent = 'Громкость аудиофайла уменьшена на 10%';
+      } else if (action === 'forward' || action === 'back') {
+        if (!audioPlayer.src || audioPlayer.error) {
+          actionLabel.textContent = 'Выберите аудиофайл для перемотки';
+        } else if (!Number.isFinite(audioPlayer.duration)) {
+          actionLabel.textContent = 'Дождитесь загрузки аудиофайла';
+        } else {
+          const direction = action === 'forward' ? 1 : -1;
+          const targetTime = Math.max(0, Math.min(audioPlayer.duration, audioPlayer.currentTime + direction * 10));
+          audioPlayer.currentTime = targetTime;
+          actionLabel.textContent = action === 'forward' ? 'Перемотка вперёд на 10 секунд' : 'Перемотка назад на 10 секунд';
+        }
+      } else if (action === 'play') {
+        if (!audioPlayer.src || audioPlayer.error) {
+          actionLabel.textContent = 'Не удалось загрузить музыку. Выберите аудиофайл.';
+        } else if (audioPlayer.paused) {
+          try {
+            await audioPlayer.play();
+            actionLabel.textContent = 'Аудио воспроизводится';
+          } catch (error) {
+            if (error instanceof DOMException && error.name === 'NotAllowedError') {
+              actionLabel.textContent = 'Сначала нажмите ▶ на аудиоплеере, чтобы разрешить воспроизведение';
+            } else {
+              throw error;
+            }
+          }
+        } else {
+          actionLabel.textContent = 'Музыка уже воспроизводится';
+        }
+      } else if (action === 'pause') {
+        if (audioPlayer.error) {
+          actionLabel.textContent = 'Не удалось загрузить музыку. Выберите аудиофайл.';
+          lastActionClass = best.className;
+          return;
+        }
+        if (!audioPlayer.paused) {
+          audioPlayer.pause();
+          actionLabel.textContent = 'Музыка приостановлена';
+        } else {
+          actionLabel.textContent = 'Музыка уже на паузе';
+        }
+      }
+      lastActionClass = best.className;
+    }
+
+    async function runPrediction() {
+      if (!inferenceRunning) return;
+      try {
+        await applyPrediction();
+      } catch (error) {
+        stopCamera();
+        setStatus(cameraStatus, `Ошибка распознавания: ${error instanceof Error ? error.message : String(error)}`, 'error');
+        return;
+      }
+      if (inferenceRunning) window.setTimeout(runPrediction, 180);
+    }
+
+    function stopCamera() {
+      cameraRequestId += 1;
+      cameraStartPending = false;
+      inferenceRunning = false;
+      if (cameraVideo) {
+        cameraVideo.pause();
+        cameraVideo.srcObject = null;
+        cameraVideo = null;
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      webcamContainer.replaceChildren(document.createTextNode('Камера остановлена'));
+      cameraButton.disabled = !model;
+      stopButton.disabled = true;
+      lastActionClass = null;
+    }
+
+    modelForm.addEventListener('submit', loadModel);
+    downloadSlideButton.addEventListener('click', () => downloadAndOpenSlide(3));
+    dinoModelForm.addEventListener('submit', loadDinoModel);
+    downloadDinoSlideButton.addEventListener('click', () => downloadAndOpenSlide(5));
+    cameraButton.addEventListener('click', startCamera);
+    dinoCameraButton.addEventListener('click', startDinoCamera);
+    document.getElementById('dino-stop-camera').addEventListener('click', () => {
+      stopDinoCamera();
+      setStatus(document.getElementById('dino-camera-status'), 'Камера остановлена.', '');
+    });
+    document.getElementById('dino-start').addEventListener('click', () => startDinoGame(true));
+    document.getElementById('dino-stop').addEventListener('click', pauseDinoGame);
+    document.getElementById('dino-jump').addEventListener('click', jumpDino);
+    document.getElementById('dino-duck').addEventListener('click', duckDino);
+    stopButton.addEventListener('click', () => {
+      stopCamera();
+      setStatus(cameraStatus, 'Камера остановлена.', '');
+    });
+    threshold.addEventListener('input', updateThreshold);
+    dinoThreshold.addEventListener('input', updateDinoThreshold);
+    volumeControl.addEventListener('input', updateVolume);
+
+    audioFile.addEventListener('change', () => {
+      const file = audioFile.files && audioFile.files[0];
+      if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+      currentAudioUrl = null;
+      audioPlayer.pause();
+      if (!file) {
+        audioPlayer.src = defaultAudioUrl;
+        audioPlayer.load();
+        return;
+      }
+      currentAudioUrl = URL.createObjectURL(file);
+      audioPlayer.src = currentAudioUrl;
+      audioPlayer.load();
+      setStatus(audioStatus, `Выбран файл: ${file.name}.`, 'success');
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      setStatus(audioStatus, 'Музыка готова. Нажмите ▶ в плеере, затем проверяйте жесты.', 'success');
+    });
+    audioPlayer.addEventListener('error', () => {
+      setStatus(audioStatus, 'Источник музыки недоступен. Выберите аудиофайл с компьютера.', 'error');
+    });
+
+    window.addEventListener('pagehide', () => {
+      stopCamera();
+      stopDinoCamera();
+      if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+      if (dinoAnimationFrame !== null) cancelAnimationFrame(dinoAnimationFrame);
+    });
+
+    updateThreshold();
+    updateDinoThreshold();
+    updateVolume();
+    drawDinoScene();
+    initParticles();
+    updateAnimation();
+    goToHash();
+  </script>
+</body>
+</html>
