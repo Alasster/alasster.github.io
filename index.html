@@ -1,1216 +1,1855 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1. Введение </title>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-<style>
-  :root {
-    --bg: #f5f3ef;
-    --surface: #ffffff;
-    --surface2: #f0ede8;
-    --accent: #3d7fff;
-    --accent2: #ff6b35;
-    --accent3: #22c55e;
-    --text: #1a1a2e;
-    --text2: #4a4a6a;
-    --text3: #8888aa;
-    --border: #e2ddd6;
-    --snake: #ffd700;
-    --code-bg: #f8f6f0;
-    --code-text: #383a42;
-    --code-green: #50a14f;
-    --code-blue: #4078f2;
-    --code-yellow: #986801;
-    --code-red: #e45649;
-    --code-comment: #a0a1a7;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
-    --divider-w: 70%;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>WWW.ALASSTER.SITE — Учебный сайт по информатике | Кадыржанов Жанас Кайыржанович</title>
+  <meta name="description" content="Учебный сайт по информатике для учеников 5-11 классов. Кадыржанов Жанас Кайыржанович. Нейросети, ИИ, Python, алгоритмы и сети.">
+  <meta name="author" content="Кадыржанов Жанас Кайыржанович">
+  <meta name="theme-color" content="#4F46E5">
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%236366F1'/><stop offset='100%' stop-color='%2306B6D4'/></linearGradient></defs><rect width='100' height='100' rx='28' fill='url(%23g)'/><path d='M30 65 L48 32 L58 50 L68 35 L76 65 Z' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/><circle cx='48' cy='32' r='4' fill='%23FBBF24'/><circle cx='76' cy='65' r='4' fill='%2334D399'/></svg>" type="image/svg+xml">
 
-  body {
-    font-family: 'Geologica', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100dvh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  /* ── TOP BAR ── */
-  .topbar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    z-index: 10;
-  }
-  .topbar-logo {
-    display: flex; align-items: center; gap: 8px;
-    font-weight: 900; font-size: 18px; color: var(--accent);
-    letter-spacing: -0.5px;
-  }
-  .topbar-logo span { color: var(--accent2); }
-  .topbar-badge {
-    background: linear-gradient(135deg, #3d7fff22, #3d7fff11);
-    border: 1px solid #3d7fff44;
-    color: var(--accent);
-    font-size: 11px; font-weight: 600;
-    padding: 3px 10px; border-radius: 20px;
-  }
-  .topbar-progress {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .progress-label { font-size: 12px; color: var(--text3); font-weight: 500; }
-  .progress-dots { display: flex; gap: 5px; }
-  .progress-dots .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--border); transition: all .3s;
-  }
-  .progress-dots .dot.active { background: var(--accent); }
-  .progress-dots .dot.done { background: var(--accent3); }
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  /* ── LAYOUT ── */
-  .layout {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-  }
+  <!-- Three.js for 3D Motion Elements -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  /* ── LEFT PANEL ── */
-  .left-panel {
-    flex: 0 0 65%;
-    min-width: 320px;
-    max-width: calc(100% - 280px);
-    overflow-y: auto;
-    background: var(--bg);
-    scroll-behavior: smooth;
-  }
+  <style>
+    /* ==========================================================================
+       LIQUID GLASS & VISION-OS AIRY DESIGN SYSTEM
+       ========================================================================== */
+    :root {
+      --bg: #F6F8FC;
+      --glass-surface: rgba(255, 255, 255, 0.65);
+      --glass-surface-hover: rgba(255, 255, 255, 0.82);
+      --glass-border: rgba(255, 255, 255, 0.85);
+      --glass-border-subtle: rgba(226, 232, 240, 0.7);
+      
+      --primary: #4F46E5;
+      --primary-light: rgba(79, 70, 229, 0.08);
+      --primary-glow: rgba(99, 102, 241, 0.35);
 
-  /* ── DIVIDER ── */
-  .divider {
-    width: 6px;
-    background: var(--border);
-    cursor: col-resize;
-    flex-shrink: 0;
-    position: relative;
-    transition: background .2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .divider:hover, .divider.dragging {
-    background: var(--accent);
-  }
-  .divider::after {
-    content: '⋮';
-    color: var(--text3);
-    font-size: 16px;
-    line-height: 1;
-    position: absolute;
-    left: 50%; transform: translateX(-50%);
-  }
-  .divider:hover::after, .divider.dragging::after { color: white; }
+      --teal: #0D9488;
+      --teal-light: rgba(13, 148, 136, 0.08);
 
-  /* ── RIGHT PANEL ── */
-  .right-panel {
-    flex: 1;
-    min-width: 260px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: var(--surface);
-  }
+      --amber: #D97706;
+      --amber-light: rgba(217, 119, 6, 0.08);
 
-  .right-header {
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #f0ede8;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .right-header-title {
-    font-size: 13px; font-weight: 600; color: var(--text);
-    display: flex; align-items: center; gap: 8px;
-    flex: 1;
-  }
-  .rh-actions { display: flex; gap: 6px; align-items: center; }
-  .rh-btn {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 8px; padding: 5px 10px;
-    font-size: 12px; font-weight: 600; cursor: pointer;
-    font-family: 'Geologica', sans-serif; color: var(--text2);
-    transition: all .15s;
-  }
-  .rh-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .rh-btn.run-btn {
-    background: var(--accent); border-color: var(--accent);
-    color: white; padding: 5px 14px;
-  }
-  .rh-btn.run-btn:hover { background: #2d6fee; }
-  .rh-btn.stop-btn {
-    background: #e45649; border-color: #e45649;
-    color: white; padding: 5px 14px;
-  }
-  .rh-btn.stop-btn:hover { background: #c73d30; }
+      --text: #0F172A;
+      --text-muted: #64748B;
 
-  .live-badge {
-    background: #22c55e; color: white;
-    font-size: 9px; font-weight: 700;
-    padding: 2px 7px; border-radius: 10px;
-    letter-spacing: 0.5px;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
 
-  /* ── COMPILER LAYOUT ── */
-  .compiler-wrap {
-    flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  }
+      --radius-sm: 10px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --radius-full: 9999px;
 
-  /* ── EDITOR AREA ── */
-  .editor-area {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    border-bottom: 2px solid var(--border);
-    background: #fafaf8;
-    min-height: 0;
-  }
+      /* Glass Shadows */
+      --glass-shadow: 
+        0 16px 36px -10px rgba(99, 102, 241, 0.08),
+        0 0 1px 1px rgba(255, 255, 255, 0.9) inset,
+        0 4px 16px rgba(15, 23, 42, 0.03);
 
-  .editor-gutter {
-    width: 44px;
-    flex-shrink: 0;
-    background: #f0ede8;
-    border-right: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
-    font-variant-ligatures: none;
-    font-feature-settings: "liga" 0, "calt" 0;
-    font-size: var(--editor-font-size, 13px);
-    line-height: 1.65;
-    color: #bbb8b0;
-    text-align: right;
-    padding: 14px 6px 14px 0;
-    overflow: hidden;
-    pointer-events: none;
-    user-select: none;
-  }
-  .editor-gutter div {
-    height: var(--editor-line-height, 21.45px);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
+      --glass-shadow-hover: 
+        0 24px 50px -12px rgba(99, 102, 241, 0.22),
+        0 0 1px 1px rgba(255, 255, 255, 1) inset,
+        0 8px 24px rgba(15, 23, 42, 0.05);
+    }
 
-  /* ── FONT SIZE DROPDOWN ── */
-  .font-size-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .font-size-btn {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 8px; padding: 5px 10px;
-    font-size: 12px; font-weight: 600; cursor: pointer;
-    font-family: 'Geologica', sans-serif; color: var(--text2);
-    transition: all .15s;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .font-size-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .font-size-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    z-index: 100;
-    display: none;
-    min-width: 120px;
-  }
-  .font-size-dropdown.open { display: block; }
-  .font-size-opt {
-    display: block; width: 100%;
-    padding: 8px 14px;
-    font-size: 12px; font-weight: 600;
-    font-family: 'Geologica', sans-serif;
-    color: var(--text2); background: none; border: none;
-    cursor: pointer; text-align: left;
-    transition: background .15s;
-  }
-  .font-size-opt:hover { background: #3d7fff10; color: var(--accent); }
-  .font-size-opt.active { color: var(--accent); background: #3d7fff08; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
 
-  /* ── SYNTAX HIGHLIGHT OVERLAY ── */
-  .editor-wrap {
-    flex: 1;
-    position: relative;
-    display: flex;
-    overflow: hidden;
-    min-height: 0;
-    height: 100%;
-    background: #fafaf8;
-  }
-  .editor-highlight {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-variant-ligatures: none;
-    font-feature-settings: "liga" 0, "calt" 0;
-    font-size: var(--editor-font-size, 13px);
-    line-height: 1.65;
-    color: #383a42;
-    background: #fafaf8;
-    padding: 14px;
-    tab-size: 4;
-    white-space: pre;
-    overflow: hidden;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-  }
-  .editor-highlight .code-line {
-    display: block;
-    min-height: var(--editor-line-height, 21.45px);
-  }
-  .editor-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    resize: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-variant-ligatures: none;
-    font-feature-settings: "liga" 0, "calt" 0;
-    font-size: var(--editor-font-size, 13px);
-    line-height: 1.65;
-    color: transparent;
-    background: transparent;
-    padding: 14px;
-    tab-size: 4;
-    white-space: pre;
-    overflow: auto;
-    caret-color: #383a42;
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    -webkit-text-fill-color: transparent;
-  }
-  .editor-input::selection {
-    background: rgba(61, 127, 255, 0.22);
-    -webkit-text-fill-color: transparent;
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  /* Syntax token colors — light theme (One Light palette) */
-  .tk-kw    { color: #a626a4; }  /* keywords: purple */
-  .tk-bi    { color: #0184bc; }  /* builtins: blue */
-  .tk-str   { color: #50a14f; }  /* strings: green */
-  .tk-num   { color: #986801; }  /* numbers: amber */
-  .tk-op    { color: #4078f2; }  /* operators: blue */
-  .tk-cm    { color: #a0a1a7; font-style: italic; }  /* comments: grey */
-  .tk-paren { color: #383a42; font-weight: 600; }    /* brackets: bold dark */
-  .tk-bool  { color: #e45649; }  /* True/False/None: red */
-  .tk-self  { color: #e45649; }  /* self: red */
+    body {
+      min-height: 100vh;
+      font-family: var(--font-main);
+      color: var(--text);
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 90% 15%, rgba(6, 182, 212, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.07) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-  /* ── OUTPUT ── */
-  .output-area {
-    height: 40%;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    background: #fafaf8;
-    overflow: hidden;
-  }
-  .output-header {
-    padding: 7px 14px;
-    font-size: 11px; font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; color: var(--text3);
-    background: #f0ede8; border-bottom: 1px solid var(--border);
-    border-top: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .output-status {
-    font-size: 11px; font-weight: 600;
-    letter-spacing: 0; text-transform: none;
-  }
-  .output-status.ok { color: var(--accent3); }
-  .output-status.err { color: #e45649; }
-  .output-status.running { color: var(--accent); }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-  .output-body {
-    flex: 1; overflow-y: auto; padding: 0;
-    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
-    line-height: 1.7; color: var(--text);
-    background: #fafaf8;
-    display: flex; flex-direction: column; gap: 0;
-  }
+    /* Ambient animated orbs behind glass */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(80px);
+      z-index: 0;
+      opacity: 0.55;
+      animation: orbFloat 20s infinite alternate ease-in-out;
+    }
+    .orb-1 {
+      width: 550px;
+      height: 550px;
+      top: -120px;
+      left: -100px;
+      background: radial-gradient(circle, rgba(165, 180, 252, 0.7) 0%, transparent 70%);
+    }
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      top: 35%;
+      right: -120px;
+      background: radial-gradient(circle, rgba(153, 246, 228, 0.6) 0%, transparent 70%);
+      animation-delay: -6s;
+    }
+    .orb-3 {
+      width: 450px;
+      height: 450px;
+      bottom: -100px;
+      left: 15%;
+      background: radial-gradient(circle, rgba(254, 215, 170, 0.55) 0%, transparent 70%);
+      animation-delay: -12s;
+    }
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 50px) scale(1.08); }
+      100% { transform: translate(-30px, -40px) scale(0.95); }
+    }
 
-  .out-line { display: block; white-space: pre-wrap; color: #383a42; padding: 0 14px; }
-  .out-line:first-child { padding-top: 10px; }
-  .out-hint { color: var(--text3); font-style: italic; font-family: 'Geologica', sans-serif; font-size: 12px; padding: 10px 14px; }
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
 
-  /* Input prompt */
-  .out-input-line {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    margin: 2px 0;
-    padding: 4px 14px;
-    background: #eef3ff;
-    border-left: 3px solid var(--accent);
-  }
-  .out-input-prompt {
-    color: var(--accent);
-    font-weight: 600;
-    white-space: pre;
-    flex-shrink: 0;
-  }
-  .out-input-field {
-    border: 1.5px solid var(--accent);
-    outline: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
-    background: #ffffff;
-    color: #1a1a2e;
-    padding: 3px 8px;
-    min-width: 140px;
-    flex: 1;
-    border-radius: 6px;
-    box-shadow: 0 0 0 3px #3d7fff18;
-  }
-  .out-input-field:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px #3d7fff30;
-  }
-  .out-input-done {
-    color: var(--accent3);
-    font-weight: 600;
-    white-space: pre;
-  }
+    /* ==========================================================================
+       AIRY FROSTED GLASS (VISION-OS STYLE)
+       ========================================================================== */
+    .glass-card {
+      background: var(--glass-surface);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--glass-shadow);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .glass-card:hover {
+      background: var(--glass-surface-hover);
+      box-shadow: var(--glass-shadow-hover);
+      transform: translateY(-6px);
+      border-color: rgba(255, 255, 255, 1);
+    }
 
-  /* Error block */
-  .out-error-block {
-    background: #fff5f5;
-    border-left: 3px solid #e45649;
-    padding: 10px 14px;
-    margin: 4px 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-  }
-  .out-error-type {
-    color: #e45649;
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-  .out-error-location {
-    color: #986801;
-    font-size: 11px;
-    margin-bottom: 6px;
-  }
-  .out-error-msg {
-    color: #c0392b;
-    white-space: pre-wrap;
-    margin-bottom: 8px;
-  }
-  .out-error-tip {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    border-radius: 6px;
-    padding: 7px 10px;
-    font-family: 'Geologica', sans-serif;
-    font-size: 12px;
-    color: #6d4c00;
-    line-height: 1.5;
-  }
-  .out-error-tip-label {
-    font-weight: 700;
-    display: block;
-    margin-bottom: 2px;
-    color: #92400e;
-  }
+    /* ==========================================================================
+       ANIMATED CONTOUR / BORDER BEAM EFFECT (AIRY LUMINESCENCE)
+       ========================================================================== */
+    .beam-card {
+      position: relative;
+      border-radius: var(--radius-xl);
+      padding: 2px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: var(--glass-shadow);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .beam-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent,
+        transparent 280deg,
+        #6366F1 320deg,
+        #06B6D4 345deg,
+        #A855F7 360deg
+      );
+      animation: rotateContour 6s linear infinite;
+      opacity: 0.75;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .beam-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--glass-shadow-hover);
+    }
+    .beam-card:hover::before {
+      animation-duration: 3s;
+      opacity: 1;
+    }
 
-  /* ── LEFT CONTENT ── */
-  .lesson-content {
-    padding: 32px 36px 60px;
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-  }
+    .beam-inner-content {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: calc(var(--radius-xl) - 2px);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+    }
 
-  .lesson-hero {
-    margin-bottom: 40px;
-    animation: fadeUp .6s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    @keyframes rotateContour {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-  .lesson-num {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 12px;
-  }
-  .lesson-num::before {
-    content: ''; width: 20px; height: 2px; background: var(--accent); border-radius: 2px;
-  }
+    /* Vector selection corners (Figma / UI handles) */
+    .figma-point {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #FFFFFF;
+      border: 2px solid #6366F1;
+      border-radius: 2px;
+      z-index: 2;
+      opacity: 0.6;
+      transition: all 0.25s ease;
+    }
+    .point-tl { top: -4px; left: -4px; }
+    .point-tr { top: -4px; right: -4px; }
+    .point-bl { bottom: -4px; left: -4px; }
+    .point-br { bottom: -4px; right: -4px; }
+    .beam-card:hover .figma-point {
+      opacity: 1;
+      transform: scale(1.25);
+      border-color: #06B6D4;
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+    }
 
-  .lesson-title {
-    font-size: clamp(26px, 4vw, 38px);
-    font-weight: 900;
-    line-height: 1.15;
-    letter-spacing: -1px;
-    margin-bottom: 14px;
-    color: var(--text);
-  }
-  .lesson-title span { color: var(--accent); }
+    /* ==========================================================================
+       AIRY PILL NAVIGATION BAR (FIXED: NO OVERFLOW, NO WRAPPING)
+       ========================================================================== */
+    .nav-wrapper {
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-full);
+      padding: 8px 16px 8px 20px;
+      box-shadow: 
+        0 10px 30px -5px rgba(99, 102, 241, 0.08),
+        0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
 
-  .lesson-desc {
-    font-size: 15px;
-    line-height: 1.7;
-    color: var(--text2);
-    max-width: 600px;
-  }
+    .brand-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .brand-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #4F46E5, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .brand-title-text {
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      color: #0F172A;
+      white-space: nowrap;
+    }
 
-  .snake-mascot {
-    font-size: 56px;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,.12));
-    animation: float 4s ease-in-out infinite;
-    display: inline-block;
-    margin-bottom: 16px;
-  }
-  @keyframes float {
-    0%,100%{ transform: translateY(0) rotate(-3deg); }
-    50%{ transform: translateY(-10px) rotate(3deg); }
-  }
+    /* Fixed Navigation Links (white-space: nowrap prevents vertical wrapping!) */
+    .nav-links-menu {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+      flex-shrink: 1;
+    }
+    .nav-links-menu li {
+      white-space: nowrap;
+    }
+    .nav-pill-link {
+      padding: 7px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-pill-link:hover {
+      color: var(--primary);
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
 
-  .subtopic-nav {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-bottom: 36px;
-    animation: fadeUp .6s .1s ease both;
-  }
-  .subtopic-btn {
-    padding: 7px 14px; border: 1.5px solid var(--border);
-    background: var(--surface); border-radius: 20px;
-    font-size: 12px; font-weight: 600; color: var(--text2);
-    cursor: pointer; transition: all .2s;
-    font-family: 'Geologica', sans-serif;
-  }
-  .subtopic-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .subtopic-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .nav-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .nav-portal-btn {
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--primary);
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .nav-portal-btn:hover {
+      background: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+      transform: translateY(-1px);
+    }
 
-  .section { margin-bottom: 48px; animation: fadeUp .5s ease both; }
-  .section-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
-  .section-icon {
-    width: 44px; height: 44px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-  }
-  .section-icon.blue { background: #3d7fff18; }
-  .section-icon.orange { background: #ff6b3518; }
-  .section-icon.green { background: #22c55e18; }
-  .section-icon.red { background: #ef444418; }
-  
-  .section-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
-  .section-title { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.3; }
+    .mobile-burger-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--text);
+      cursor: pointer;
+      padding: 6px;
+    }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 22px 24px; margin-bottom: 14px;
-    transition: box-shadow .2s, transform .2s;
-  }
-  .card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-  .card p { font-size: 14px; line-height: 1.75; color: var(--text2); }
-  .card p + p { margin-top: 10px; }
-  .card strong { color: var(--text); font-weight: 700; }
-  .card.highlight { border-color: #3d7fff33; background: linear-gradient(135deg, #3d7fff08, #ffffff); }
-  .card.highlight-orange { border-color: #ff6b3533; background: linear-gradient(135deg, #ff6b3508, #ffffff); }
-  .card.highlight-green { border-color: #22c55e33; background: linear-gradient(135deg, #22c55e08, #ffffff); }
+    /* ==========================================================================
+       HERO SECTION WITH 3D CANVAS & AIRY GLASS
+       ========================================================================== */
+    .hero-section {
+      padding: 30px 0 50px;
+      position: relative;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: center;
+    }
 
-  .code-block { background: var(--code-bg); border-radius: 12px; overflow: hidden; margin: 14px 0; border: 1px solid #ddd9d0; }
-  .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #edeae3; border-bottom: 1px solid #ddd9d0; }
-  .code-block-lang { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-  .copy-btn { font-size: 11px; font-weight: 600; color: #999; background: none; border: none; cursor: pointer; padding: 2px 8px; border-radius: 6px; transition: all .2s; font-family: 'Geologica', sans-serif; }
-  .copy-btn:hover { background: #ddd9d0; color: var(--text); }
-  .copy-btn.copied { color: var(--code-green); }
-  .code-block pre { padding: 18px 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: var(--code-text); overflow-x: auto; }
+    .badge-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      box-shadow: var(--glass-shadow);
+      margin-bottom: 20px;
+    }
+    .pulse-dot-green {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+      animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
 
-  .ck { color: var(--code-blue); }
-  .cf { color: #cba6f7; }
-  .cs { color: var(--code-yellow); }
-  .cc { color: var(--code-comment); font-style: italic; }
-  .ce { color: var(--code-red); }
-  .cn { color: #fab387; }
+    .hero-heading {
+      font-size: clamp(2.3rem, 4.5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      color: #0F172A;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
 
-  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
-  .compare-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
-  .compare-item-title { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
-  .compare-item p { font-size: 13px; line-height: 1.65; color: var(--text2); }
+    .domain-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--primary);
+      margin-bottom: 22px;
+      box-shadow: var(--glass-shadow);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .domain-badge-wrap:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.18);
+    }
+    .copy-chip-btn {
+      font-size: 0.72rem;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-  .steps { list-style: none; margin: 14px 0; }
-  .steps li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; font-size: 14px; line-height: 1.65; color: var(--text2); transition: all .2s; }
-  .steps li:hover { border-color: var(--accent); background: #3d7fff05; }
-  .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: white; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .hero-bio {
+      font-size: 1.08rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+    .hero-bio strong {
+      color: var(--text);
+    }
 
-  .ic { background: #3d7fff18; color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; padding: 2px 7px; border-radius: 6px; border: 1px solid #3d7fff22; }
+    .hero-buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
 
-  .error-anatomy { background: #fff8f8; border: 1.5px solid #fccaca; border-radius: 12px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: #383a42; margin: 14px 0; position: relative; }
-  .error-line-1 { color: #e45649; font-weight: 600; }
-  .error-line-2 { color: #986801; }
-  .error-line-3 { color: #383a42; }
-  .error-line-4 { color: #e45649; font-weight: 700; }
-  .error-annotation { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-  .ann-item { display: flex; align-items: flex-start; gap: 10px; font-family: 'Geologica', sans-serif; font-size: 13px; color: var(--text2); }
-  .ann-dot { width: 8px; height: 8px; border-radius: 50%; background: #e45649; margin-top: 5px; flex-shrink: 0; }
-  .ann-dot.yellow { background: #986801; }
-  .ann-dot.white { background: #383a42; }
+    .btn-glass-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: var(--radius-full);
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #4F46E5, #6366F1);
+      color: #FFFFFF;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-glass-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(79, 70, 229, 0.45);
+    }
 
-  .try-card { background: linear-gradient(135deg, #3d7fff, #6366f1); border-radius: 16px; padding: 22px 24px; color: white; display: flex; align-items: center; gap: 16px; margin-top: 16px; cursor: pointer; transition: transform .2s, box-shadow .2s; border: none; width: 100%; font-family: 'Geologica', sans-serif; text-align: left; }
-  .try-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #3d7fff44; }
-  .try-icon { font-size: 32px; flex-shrink: 0; }
-  .try-text-title { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
-  .try-text-sub { font-size: 12px; opacity: .8; }
-  .try-arrow { margin-left: auto; font-size: 20px; opacity: .7; }
+    .btn-glass-soft {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 24px;
+      border-radius: var(--radius-full);
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      color: var(--text);
+      box-shadow: var(--glass-shadow);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .btn-glass-soft:hover {
+      background: #FFFFFF;
+      color: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--glass-shadow-hover);
+    }
 
-  .quiz-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-top: 16px; }
-  .quiz-q { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
-  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
-  .quiz-opt { padding: 11px 16px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 13px; font-family: 'Geologica', sans-serif; background: var(--bg); color: var(--text2); text-align: left; transition: all .2s; }
-  .quiz-opt:hover { border-color: var(--accent); color: var(--accent); background: #3d7fff08; }
-  .quiz-opt.correct { border-color: var(--accent3); background: #22c55e12; color: var(--accent3); }
-  .quiz-opt.wrong { border-color: #ef4444; background: #ef444412; color: #ef4444; }
-  .quiz-feedback { margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 10px; display: none; line-height: 1.6; }
-  .quiz-feedback.show { display: block; }
-  .quiz-feedback.ok { background: #22c55e12; color: #16a34a; border: 1px solid #22c55e33; }
-  .quiz-feedback.no { background: #ef444412; color: #dc2626; border: 1px solid #ef444433; }
+    /* ==========================================================================
+       3D MOTION STAGE & INTERACTIVE CANVAS (THREE.JS)
+       ========================================================================== */
+    .hero-3d-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 420px;
+    }
+    #three-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+      z-index: 2;
+      border-radius: var(--radius-2xl);
+    }
 
-  .section-divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 40px 0; }
+    .hero-glass-overlay {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 420px;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .hero-glass-overlay * {
+      pointer-events: auto;
+    }
 
-  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin: 14px 0; }
-  .tool-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--surface); cursor: pointer; transition: all .2s; text-decoration: none; }
-  .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-  .tool-icon { font-size: 24px; margin-bottom: 6px; }
-  .tool-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-  .tool-desc { font-size: 11px; color: var(--text3); }
+    /* Floating 3D Micro-Card (Audio / Waveform as in reference) */
+    .glass-voice-box {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: floatMotion3D 6s ease-in-out infinite alternate;
+    }
+    .voice-play-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #C7D2FE, #E0E7FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4F46E5;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+    .wave-bars-container {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex: 1;
+      height: 26px;
+    }
+    .bar-line {
+      width: 3.5px;
+      background: #CBD5E1;
+      border-radius: 2px;
+      animation: wavePulse 1.4s ease-in-out infinite alternate;
+    }
+    .bar-line:nth-child(2) { height: 60%; animation-delay: 0.1s; }
+    .bar-line:nth-child(3) { height: 90%; animation-delay: 0.2s; background: #6366F1; }
+    .bar-line:nth-child(4) { height: 40%; animation-delay: 0.3s; }
+    .bar-line:nth-child(5) { height: 75%; animation-delay: 0.4s; background: #06B6D4; }
+    .bar-line:nth-child(6) { height: 100%; animation-delay: 0.5s; background: #6366F1; }
+    .bar-line:nth-child(7) { height: 50%; animation-delay: 0.6s; }
+    .bar-line:nth-child(8) { height: 85%; animation-delay: 0.7s; }
+    .bar-line:nth-child(9) { height: 35%; animation-delay: 0.8s; }
 
-  @media (max-width: 768px) {
-    body { overflow: auto; }
-    .layout { flex-direction: column; height: auto; overflow: visible; }
-    .left-panel { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: unset; overflow: visible; height: auto; }
-    .divider { display: none; }
-    .right-panel { width: 100% !important; min-width: unset; min-height: 550px; height: auto; flex-shrink: 0; }
-    .lesson-content { padding: 24px 20px 48px; }
-    .compare-grid { grid-template-columns: 1fr; }
-    .tools-grid { grid-template-columns: 1fr 1fr; }
-  }
+    @keyframes wavePulse {
+      0% { transform: scaleY(0.35); }
+      100% { transform: scaleY(1.25); }
+    }
+    @keyframes floatMotion3D {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-12px) rotate(1deg); }
+    }
 
-  .left-panel::-webkit-scrollbar { width: 5px; }
-  .left-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-  .output-body::-webkit-scrollbar { width: 5px; }
-  .output-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-  .editor-input::-webkit-scrollbar { width: 5px; height: 5px; }
-  .editor-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    /* Floating Stats Bar */
+    .glass-stats-bar {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: floatMotion3D 7s ease-in-out infinite alternate-reverse;
+    }
+    .stats-item-digit {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #0F172A;
+      line-height: 1;
+    }
+    .stats-item-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
 
-  .section:nth-child(1) { animation-delay: .05s; }
-  .section:nth-child(2) { animation-delay: .1s; }
-  .section:nth-child(3) { animation-delay: .15s; }
-  .section:nth-child(4) { animation-delay: .2s; }
+    /* ==========================================================================
+       USER'S GOOGLE SITE IMAGE SHOWCASE (FROSTED GLASS FRAME)
+       ========================================================================== */
+    .portal-banner-section {
+      margin: 15px 0 45px;
+    }
+    .portal-glass-banner {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-2xl);
+      padding: 24px 30px;
+      box-shadow: var(--glass-shadow);
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 30px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .portal-img-frame {
+      width: 100%;
+      height: 220px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: linear-gradient(135deg, #EEF2FF, #E0F2FE);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      position: relative;
+    }
+    .portal-img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .portal-img-frame:hover img {
+      transform: scale(1.05);
+    }
+    .portal-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .portal-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 8px;
+    }
+    .portal-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
 
-  /* ── PYODIDE STATUS ── */
-  .py-status {
-    font-size: 10px; font-weight: 700;
-    padding: 2px 8px; border-radius: 10px;
-    background: #eee; color: #888;
-    margin-left: 6px;
-  }
-  .py-status.ready { background: #dcfce7; color: #166534; }
-</style>
+    /* ==========================================================================
+       NATIONAL MOTTO BANNER (ТУҒАН ЖЕР)
+       ========================================================================== */
+    .motto-wrapper {
+      margin: 10px 0 45px;
+    }
+    .motto-glass-pill {
+      background: linear-gradient(135deg, rgba(255, 251, 235, 0.75) 0%, rgba(254, 243, 199, 0.75) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(253, 230, 138, 0.85);
+      border-radius: var(--radius-xl);
+      padding: 22px 30px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 8px 24px rgba(234, 179, 8, 0.12);
+    }
+    .motto-sun-circle {
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+    }
+    .motto-kz {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #78350F;
+      line-height: 1.3;
+    }
+    .motto-ru {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: #92400E;
+    }
+
+    /* ==========================================================================
+       CURRICULUM CARDS GRID (6 CLASSES WITH ANIMATED CONTOUR BEAMS)
+       ========================================================================== */
+    .section-header-wrap {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .pill-chip-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .section-main-title {
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0F172A;
+      margin-bottom: 8px;
+    }
+    .section-main-sub {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .grades-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+      margin-bottom: 50px;
+    }
+
+    .grade-card-content {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .grade-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .grade-icon-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+    .icon-c-indigo { background: #EEF2FF; color: #4F46E5; }
+    .icon-c-teal { background: #CCFBF1; color: #0D9488; }
+    .icon-c-amber { background: #FEF3C7; color: #D97706; }
+    .icon-c-cyan { background: #E0F2FE; color: #0284C7; }
+    .icon-c-emerald { background: #D1FAE5; color: #059669; }
+    .icon-c-purple { background: #EDE9FE; color: #7C3AED; }
+
+    .grade-chip-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .grade-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 8px;
+    }
+    .grade-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+      min-height: 42px;
+    }
+
+    .grade-meta-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      padding: 12px 0;
+      border-top: 1px dashed rgba(203, 213, 225, 0.8);
+      margin-bottom: 14px;
+    }
+    .grade-count-number {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .grade-actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .btn-action-list {
+      padding: 10px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(79, 70, 229, 0.08);
+      color: var(--primary);
+      font-size: 0.86rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-action-list:hover {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-action-start {
+      padding: 10px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--glass-border-subtle);
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-action-start:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #FFFFFF;
+    }
+
+    /* ==========================================================================
+       MODAL DRAWER: LESSONS LIST
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-glass-container {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-2xl);
+      max-width: 640px;
+      width: 100%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.2);
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+    .modal-backdrop.active .modal-glass-container {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header-bar {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .modal-heading-text {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0F172A;
+    }
+    .btn-close-modal {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: #FFFFFF;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+    .btn-close-modal:hover {
+      background: #FEE2E2;
+      color: #EF4444;
+      transform: rotate(90deg);
+    }
+
+    .modal-lessons-scroll {
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .lesson-row-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+    .lesson-row-card:hover {
+      background: #FFFFFF;
+      border-color: var(--primary);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+    .lesson-badge-id {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lesson-title-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #0F172A;
+      flex: 1;
+    }
+    .btn-launch-lesson {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(79, 70, 229, 0.08);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-launch-lesson:hover {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+
+    /* ==========================================================================
+       FOOTER (CLEAN & AIRY)
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      padding: 36px 0 24px;
+      margin-top: 40px;
+    }
+    .footer-flex-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-author-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .footer-author-text strong {
+      color: var(--text);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1100px) {
+      .nav-links-menu {
+        gap: 2px;
+      }
+      .nav-pill-link {
+        padding: 6px 9px;
+        font-size: 0.82rem;
+      }
+      .portal-glass-banner {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .grades-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .nav-links-menu {
+        display: none;
+      }
+      .mobile-burger-btn {
+        display: block;
+      }
+      .grades-grid {
+        grid-template-columns: 1fr;
+      }
+      .motto-glass-pill {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="topbar-logo">🐍 Py<span>thon</span></div>
-  <div class="topbar-badge">Урок 1111111111111111111111111111111</div>
-  <div class="topbar-progress">
-    
-  </div>
-</div>
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
 
-<!-- LAYOUT -->
-<div class="layout" id="layout">
-
-  <!-- LEFT: THEORY -->
-  <div class="left-panel" id="leftPanel">
-    <div class="lesson-content">
-
-      <div class="lesson-hero">
-        <div class="snake-mascot">🐍</div>
-        <div class="lesson-num">Модуль 1</div>
-        <h1 class="lesson-title">Введение в <span>Python</span></h1>
-      </div>
-
-      <!-- SECTION 1 -->
-      <div class="section" id="s1">
-        <div class="section-header">
-          <div class="section-icon blue">💡</div>
-          <div class="section-meta">
-            <div class="section-tag">Тема 1</div>
-            <div class="section-title">Что такое программирование и Python</div>
+  <!-- ==========================================================================
+       AIRY PILL NAVIGATION BAR
+       ========================================================================== -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <!-- Logo -->
+        <a href="index.html" class="brand-logo-group">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
           </div>
-        </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
 
-        <div class="card highlight">
-          <p><strong>Программирование</strong> — это способ общаться с компьютером. Ты пишешь чёткие инструкции, а компьютер их выполняет.</p>
-          <p>Представь рецепт торта: ты пишешь шаги, а повар (компьютер) их делает. Язык программирования — это способ записать эти шаги так, чтобы компьютер понял.</p>
-        </div>
-
-        <div class="compare-grid">
-          <div class="compare-item">
-            <div class="compare-item-title">🐍 Python</div>
-            <p>Читается почти как английский текст. Идеален для старта и для серьёзных проектов.</p>
-          </div>
-          <div class="compare-item">
-            <div class="compare-item-title">⚙️ Другие языки</div>
-            <p>C++, Java — мощные, но с громоздким синтаксисом. Python проще раз в пять.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <p><strong>Где используется Python?</strong></p>
-          <p>🤖 ИИ &nbsp;·&nbsp; 🌐 Веб-сайты &nbsp;·&nbsp; 📊 Анализ данных &nbsp;·&nbsp; 🎮 Игры &nbsp;·&nbsp; 🔬 Наука &nbsp;·&nbsp; 🤖 Автоматизация</p>
-        </div>
-
-        <div class="quiz-card">
-          <div class="quiz-q">🎯 Быстрая проверка: Python — это...</div>
-          <div class="quiz-opts">
-            <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Операционная система</button>
-            <button class="quiz-opt" onclick="quiz(this,'correct','q1')">Язык программирования</button>
-            <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Веб-браузер</button>
-          </div>
-          <div class="quiz-feedback" id="q1-feedback"></div>
-        </div>
-      </div>
-
-      <div class="section-divider"></div>
-
-      <!-- SECTION 2 -->
-      <div class="section" id="s2">
-        <div class="section-header">
-          <div class="section-icon orange">⚙️</div>
-          <div class="section-meta">
-            <div class="section-tag">Тема 2</div>
-            <div class="section-title">Установка Python и онлайн-компиляторы</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <p>Есть два пути начать: <strong>установить Python</strong> на компьютер или использовать <strong>онлайн-компилятор</strong> прямо в браузере без установки.</p>
-        </div>
-
-        <ul class="steps">
-          <li>
-            <span class="step-num">1</span>
-            <span>Зайди на <strong>python.org</strong> → нажми «Download Python» → скачай последнюю версию</span>
-          </li>
+        <!-- Desktop Navigation Items (white-space: nowrap) -->
+        <ul class="nav-links-menu">
+          <li><a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="nav-pill-link" title="Оригинальный сайт"><i class="fa-solid fa-house"></i> Главная страница</a></li>
+          <li><a href="#c11" class="nav-pill-link">11 класс</a></li>
+          <li><a href="#c10emn" class="nav-pill-link">10 ЕМН</a></li>
+          <li><a href="#c10ogn" class="nav-pill-link">10 ОГН</a></li>
+          <li><a href="#c9" class="nav-pill-link">9 класс</a></li>
+          <li><a href="#c8" class="nav-pill-link">8 класс</a></li>
+          <li><a href="#cextra" class="nav-pill-link">Дополнительно</a></li>
         </ul>
 
-        <div class="card highlight-orange">
-          <p><strong>⚡ Не хочешь ничего устанавливать?</strong> Используй онлайн-компиляторы — работают сразу, в браузере. Компилятор справа готов к работе прямо сейчас!</p>
+        <!-- Right Action Button -->
+        <div class="nav-right-actions">
+          <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="nav-portal-btn">
+            <span>WWW.ALASSTER.SITE</span>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+          <button class="mobile-burger-btn" onclick="toggleNavMenu()" aria-label="Меню">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       HERO SECTION WITH 3D MOTION STAGE
+       ========================================================================== -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <!-- Left Content -->
+      <div>
+        <div class="badge-chip">
+          <span class="pulse-dot-green"></span>
+          <span>Учебный сайт по информатике</span>
         </div>
 
-        <div class="tools-grid">
-          <a class="tool-card" href="https://replit.com" target="_blank">
-            <div class="tool-icon">🔄</div>
-            <div class="tool-name">Replit</div>
-            <div class="tool-desc">Полная среда онлайн</div>
+        <h1 class="hero-heading">
+          Добро пожаловать!<br>
+          <span class="gradient-text">Информатика 5 - 11 классы</span>
+        </h1>
+
+        <!-- Domain Chip with Copy -->
+        <div class="domain-badge-wrap" onclick="copyDomainToClipboard()" title="Скопировать адрес сайта">
+          <i class="fa-solid fa-globe"></i>
+          <span>WWW.ALASSTER.SITE</span>
+          <button class="copy-chip-btn" id="copy-btn-el">Копировать</button>
+        </div>
+
+        <p class="hero-bio">
+          Я — <strong>Кадыржанов Жанас Кайыржанович</strong>, учитель информатики для учеников <strong>5 - 11 классов</strong>.<br>
+          Цель сайта — помочь вам освоить информатику легко и интересно. Материалы доступны в любое время с любого устройства.
+        </p>
+
+        <div class="hero-buttons-row">
+          <a href="#curriculum" class="btn-glass-primary">
+            <i class="fa-solid fa-book-open"></i> Выбрать класс
           </a>
-          <a class="tool-card" href="https://trinket.io" target="_blank">
-            <div class="tool-icon">💎</div>
-            <div class="tool-name">Trinket</div>
-            <div class="tool-desc">Простой и быстрый</div>
+          <a href="свалка/python online.html" target="_blank" class="btn-glass-soft">
+            <i class="fa-brands fa-python" style="color: #4F46E5;"></i> Python Web IDE
           </a>
-          <a class="tool-card" href="https://www.online-python.com" target="_blank">
-            <div class="tool-icon">🌐</div>
-            <div class="tool-name">Online Python</div>
-            <div class="tool-desc">Минималистичный</div>
-          </a>
-          <a class="tool-card" href="https://colab.google" target="_blank">
-            <div class="tool-icon">📓</div>
-            <div class="tool-name">Google Colab</div>
-            <div class="tool-desc">Для проектов</div>
+          <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="btn-glass-soft">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Главная страница
           </a>
         </div>
       </div>
 
-      <div class="section-divider"></div>
+      <!-- Right 3D Motion Stage -->
+      <div class="hero-3d-stage" id="stage-3d-container">
+        <!-- Interactive 3D WebGL Canvas -->
+        <canvas id="three-canvas"></canvas>
 
-      <!-- SECTION 3 -->
-      <div class="section" id="s3">
-        <div class="section-header">
-          <div class="section-icon green">👋</div>
-          <div class="section-meta">
-            <div class="section-tag">Тема 3</div>
-            <div class="section-title">Первая программа: print("Hello, world!")</div>
+        <!-- Floating Glass Micro-Widgets -->
+        <div class="hero-glass-overlay">
+          <!-- Voice Message / Audio Wave Widget -->
+          <div class="glass-voice-box">
+            <div class="voice-play-icon">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.85rem; font-weight: 700; color: #0F172A;">Интерактивный урок</div>
+              <div class="wave-bars-container">
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+                <span class="bar-line"></span>
+              </div>
+            </div>
+            <span style="font-size: 0.75rem; font-weight: 800; background: #FEE2E2; color: #E11D48; padding: 4px 10px; border-radius: 9999px;">3D Motion</span>
+          </div>
+
+          <!-- Glass Stats Bar -->
+          <div class="glass-stats-bar">
+            <div>
+              <div class="stats-item-digit" style="color: #4F46E5;">40+</div>
+              <div class="stats-item-desc">Уроков с практикой</div>
+            </div>
+            <div>
+              <div class="stats-item-digit" style="color: #0D9488;">5–11</div>
+              <div class="stats-item-desc">Классы обучения</div>
+            </div>
+            <div>
+              <div class="stats-item-digit" style="color: #D97706;">24/7</div>
+              <div class="stats-item-desc">Любое устройство</div>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="card highlight-green">
-          <p>Функция <span class="ic">print()</span> — главный инструмент для вывода текста на экран. Именно с неё начинается знакомство с любым языком программирования.</p>
+  <!-- ==========================================================================
+       PORTAL SHOWCASE (USER GOOGLE SITE IMAGE EMBEDDED IN AIRY GLASS)
+       ========================================================================== -->
+  <section class="container portal-banner-section">
+    <div class="portal-glass-banner">
+      <div class="portal-img-frame">
+        <img 
+          src="https://sites.google.com/u/0/sitesv-images-rt/AMxu72tTuwaOhye2dessxTP3WA4mwYg-8d1APmpypI8NQvDISLzT3oRw3SADHTAydnTivDbbrBkOhkpfS2ZGcYP4m4gnMy6nVrLfWnmiiRi56MwuIm4RLJUWGSZFlEI-EJzI9RrWaBiyGTWhHRkAuShumgVx60CacOpw8xim79FDoDfQ1LRhLxN7hHU9gmj4SS4=w16383" 
+          alt="Образовательный ресурс WWW.ALASSTER.SITE"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          onerror="this.onerror=null; this.src='Дизайн/soon-design-c055fbe1e4e93970.webp';">
+      </div>
+      <div>
+        <span class="portal-tag"><i class="fa-solid fa-graduation-cap"></i> Официальный ресурс</span>
+        <h2 class="portal-title">Единый образовательный портал</h2>
+        <p class="portal-desc">
+          Электронная платформа по информатике учителя <strong>Кадыржанова Жанаса Кайыржановича</strong>.
+          Все темы систематизированы по четвертям и направлениям (ЕМН и ОГН). Занимайтесь в комфортном ритме на любых смартфонах, планшетах и компьютерах!
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="#curriculum" class="btn-glass-primary" style="padding: 10px 22px; font-size: 0.88rem;">
+            <i class="fa-solid fa-layer-group"></i> Изучить программы
+          </a>
+          <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" class="btn-glass-soft" style="padding: 10px 20px; font-size: 0.88rem;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Site
+          </a>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="code-block">
-          <div class="code-block-header">
-            <span class="code-block-lang">Python</span>
-            <button class="copy-btn" onclick="copyCode(this, 'code1')">Копировать</button>
-          </div>
-          <pre id="code1"><span class="cc"># Моя первая программа</span>
-<span class="cf">print</span>(<span class="cs">"Hello, World!"</span>)
-<span class="cf">print</span>(<span class="cs">"Привет, Python!"</span>)
-<span class="cf">print</span>(<span class="cn">42</span>)          <span class="cc"># числа без кавычек</span>
-<span class="cf">print</span>(<span class="cn">3.14</span>)       <span class="cc"># дробные числа тоже</span></pre>
-        </div>
+  <!-- ==========================================================================
+       MOTTO BANNER (ТУҒАН ЖЕР)
+       ========================================================================== -->
+  <div class="container motto-wrapper">
+    <div class="motto-glass-pill">
+      <div class="motto-sun-circle">
+        <i class="fa-solid fa-sun"></i>
+      </div>
+      <div>
+        <div class="motto-kz">«Туған жердей жер болмас, туған елдей ел болмас»</div>
+        <div class="motto-ru">«Нет земли лучше родной, нет народа лучше родного»</div>
+      </div>
+    </div>
+  </div>
 
-        <div class="card">
-          <p><strong>Разбор по деталям:</strong></p>
-          <p>• <span class="ic">#</span> — начинается комментарий, Python его игнорирует. Это пометки для себя.</p>
-          <p>• Текст в <span class="ic">"кавычках"</span> — это строка (слова, символы)</p>
-          <p>• Числа пишутся <strong>без кавычек</strong>: <span class="ic">42</span> это число, <span class="ic">"42"</span> — текст</p>
-          <p>• Каждый <span class="ic">print()</span> выводит новую строку</p>
-        </div>
+  <!-- ==========================================================================
+       CURRICULUM SECTION (6 CLASSES WITH ANIMATED BORDER CONTOURS & 3D TILT)
+       ========================================================================== -->
+  <section class="container" id="curriculum">
+    <div class="section-header-wrap">
+      <span class="pill-chip-tag"><i class="fa-solid fa-layer-group"></i> Программа</span>
+      <h2 class="section-main-title">Учебные модули по классам</h2>
+      <p class="section-main-sub">Выберите ваш класс для просмотра уроков 1 четверти и практических материалов</p>
+    </div>
 
-        <button class="try-card" onclick="document.getElementById('codeEditor').focus()">
-          <span class="try-icon">▶️</span>
+    <div class="grades-grid">
+
+      <!-- 11 КЛАСС -->
+      <div class="beam-card tilt-card" id="c11">
+        <span class="figma-point point-tl"></span>
+        <span class="figma-point point-tr"></span>
+        <span class="figma-point point-bl"></span>
+        <span class="figma-point point-br"></span>
+        <div class="beam-inner-content grade-card-content">
           <div>
-            <div class="try-text-title">Попробуй сам!</div>
-            <div class="try-text-sub">Напиши print("Привет!") в компиляторе справа →</div>
+            <div class="grade-top-bar">
+              <div class="grade-icon-avatar icon-c-indigo"><i class="fa-solid fa-brain"></i></div>
+              <span class="grade-chip-badge" style="background: #EEF2FF; color: #4F46E5;">1 Четверть</span>
+            </div>
+            <h3 class="grade-title">11 класс</h3>
+            <p class="grade-desc">Искусственные нейронные сети, классификация задач ИИ и управление жестами.</p>
           </div>
-          <span class="try-arrow">→</span>
+          <div>
+            <div class="grade-meta-info">
+              <span>Тематика: Нейросети</span>
+              <span class="grade-count-number">6 уроков</span>
+            </div>
+            <div class="grade-actions-row">
+              <button class="btn-action-list" onclick="showClassModal('c11')">
+                <i class="fa-solid fa-list"></i> Все уроки
+              </button>
+              <a href="11 класс/1 четверть/1 урок.html" class="btn-action-start">
+                Урок 1 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 ЕМН -->
+      <div class="beam-card tilt-card" id="c10emn">
+        <span class="figma-point point-tl"></span>
+        <span class="figma-point point-tr"></span>
+        <span class="figma-point point-bl"></span>
+        <span class="figma-point point-br"></span>
+        <div class="beam-inner-content grade-card-content">
+          <div>
+            <div class="grade-top-bar">
+              <div class="grade-icon-avatar icon-c-teal"><i class="fa-solid fa-chart-line"></i></div>
+              <span class="grade-chip-badge" style="background: #CCFBF1; color: #0D9488;">ЕМН Профиль</span>
+            </div>
+            <h3 class="grade-title">10 класс ЕМН</h3>
+            <p class="grade-desc">Машинное обучение, перцептрон в Excel, модели МО и алгоритм k-NN.</p>
+          </div>
+          <div>
+            <div class="grade-meta-info">
+              <span>Тематика: Machine Learning</span>
+              <span class="grade-count-number">9 уроков</span>
+            </div>
+            <div class="grade-actions-row">
+              <button class="btn-action-list" onclick="showClassModal('c10emn')">
+                <i class="fa-solid fa-list"></i> Все уроки
+              </button>
+              <a href="10 ЕМН/1 четверть/1 -2 урок.html" class="btn-action-start">
+                Урок 1 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 ОГН -->
+      <div class="beam-card tilt-card" id="c10ogn">
+        <span class="figma-point point-tl"></span>
+        <span class="figma-point point-tr"></span>
+        <span class="figma-point point-bl"></span>
+        <span class="figma-point point-br"></span>
+        <div class="beam-inner-content grade-card-content">
+          <div>
+            <div class="grade-top-bar">
+              <div class="grade-icon-avatar icon-c-amber"><i class="fa-solid fa-users"></i></div>
+              <span class="grade-chip-badge" style="background: #FEF3C7; color: #D97706;">ОГН Профиль</span>
+            </div>
+            <h3 class="grade-title">10 класс ОГН</h3>
+            <p class="grade-desc">История ИИ, понятия машинного обучения, модели МО и проектная мастерская.</p>
+          </div>
+          <div>
+            <div class="grade-meta-info">
+              <span>Тематика: Инфотехнологии</span>
+              <span class="grade-count-number">6 уроков</span>
+            </div>
+            <div class="grade-actions-row">
+              <button class="btn-action-list" onclick="showClassModal('c10ogn')">
+                <i class="fa-solid fa-list"></i> Все уроки
+              </button>
+              <a href="10 ОГН/1 четверть/1 урок.html" class="btn-action-start">
+                Урок 1 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 КЛАСС -->
+      <div class="beam-card tilt-card" id="c9">
+        <span class="figma-point point-tl"></span>
+        <span class="figma-point point-tr"></span>
+        <span class="figma-point point-bl"></span>
+        <span class="figma-point point-br"></span>
+        <div class="beam-inner-content grade-card-content">
+          <div>
+            <div class="grade-top-bar">
+              <div class="grade-icon-avatar icon-c-cyan"><i class="fa-solid fa-network-wired"></i></div>
+              <span class="grade-chip-badge" style="background: #E0F2FE; color: #0284C7;">1 Четверть</span>
+            </div>
+            <h3 class="grade-title">9 класс</h3>
+            <p class="grade-desc">Этика ИИ, IP-адреса компьютеров, маска подсети, протоколы и доменная система DNS.</p>
+          </div>
+          <div>
+            <div class="grade-meta-info">
+              <span>Тематика: Сети & IP</span>
+              <span class="grade-count-number">6 уроков</span>
+            </div>
+            <div class="grade-actions-row">
+              <button class="btn-action-list" onclick="showClassModal('c9')">
+                <i class="fa-solid fa-list"></i> Все уроки
+              </button>
+              <a href="9 класс/1 четверть/1 урок.html" class="btn-action-start">
+                Урок 1 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 КЛАСС -->
+      <div class="beam-card tilt-card" id="c8">
+        <span class="figma-point point-tl"></span>
+        <span class="figma-point point-tr"></span>
+        <span class="figma-point point-bl"></span>
+        <span class="figma-point point-br"></span>
+        <div class="beam-inner-content grade-card-content">
+          <div>
+            <div class="grade-top-bar">
+              <div class="grade-icon-avatar icon-c-emerald"><i class="fa-solid fa-microchip"></i></div>
+              <span class="grade-chip-badge" style="background: #D1FAE5; color: #059669;">1 Четверть</span>
+            </div>
+            <h3 class="grade-title">8 класс</h3>
+            <p class="grade-desc">Измерение информации, архитектура процессора, компьютерные сети и кибербезопасность.</p>
+          </div>
+          <div>
+            <div class="grade-meta-info">
+              <span>Тематика: Базовая информатика</span>
+              <span class="grade-count-number">7 уроков</span>
+            </div>
+            <div class="grade-actions-row">
+              <button class="btn-action-list" onclick="showClassModal('c8')">
+                <i class="fa-solid fa-list"></i> Все уроки
+              </button>
+              <a href="8 класс/1 четверть/2 урок.html" class="btn-action-start">
+                Урок 2 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ДОПОЛНИТЕЛЬНО -->
+      <div class="beam-card tilt-card" id="cextra">
+        <span class="figma-point point-tl"></span>
+        <span class="figma-point point-tr"></span>
+        <span class="figma-point point-bl"></span>
+        <span class="figma-point point-br"></span>
+        <div class="beam-inner-content grade-card-content">
+          <div>
+            <div class="grade-top-bar">
+              <div class="grade-icon-avatar icon-c-purple"><i class="fa-brands fa-python"></i></div>
+              <span class="grade-chip-badge" style="background: #EDE9FE; color: #7C3AED;">Практикум</span>
+            </div>
+            <h3 class="grade-title">Дополнительно</h3>
+            <p class="grade-desc">Курс Python с нуля (15 модулей), онлайн компилятор в браузере и мастерская ИИ.</p>
+          </div>
+          <div>
+            <div class="grade-meta-info">
+              <span>Тематика: Python & Инструменты</span>
+              <span class="grade-count-number">20 уроков</span>
+            </div>
+            <div class="grade-actions-row">
+              <button class="btn-action-list" onclick="showClassModal('cextra')">
+                <i class="fa-solid fa-list"></i> Каталог
+              </button>
+              <a href="Python основы/1.Основа.html" class="btn-action-start">
+                Python 1 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       MODAL DRAWER: LESSONS LIST
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-backdrop-el" onclick="hideClassModal(event)">
+    <div class="modal-glass-container" onclick="event.stopPropagation()">
+      <div class="modal-header-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <i class="fa-solid fa-book-bookmark" style="color: var(--primary);"></i>
+          <h3 class="modal-heading-text" id="modal-heading-el">11 класс</h3>
+        </div>
+        <button class="btn-close-modal" onclick="hideClassModal()" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
         </button>
-
-        <div class="quiz-card" style="margin-top:20px">
-          <div class="quiz-q">🎯 Как вывести число 100 на экран?</div>
-          <div class="quiz-opts">
-            <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">print("сто")</button>
-            <button class="quiz-opt" onclick="quiz(this,'correct','q2')">print(100)</button>
-            <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">show(100)</button>
-          </div>
-          <div class="quiz-feedback" id="q2-feedback"></div>
-        </div>
       </div>
 
-      <div class="section-divider"></div>
-
-      <!-- SECTION 4 -->
-      <div class="section" id="s4">
-        <div class="section-header">
-          <div class="section-icon red">🐛</div>
-          <div class="section-meta">
-            <div class="section-tag">Тема 4</div>
-            <div class="section-title">Ошибки в программе и как их читать</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <p><strong>Ошибки — это нормально!</strong> Даже опытные программисты делают их каждый день. Python сообщает об ошибке точно и честно — главное, научиться читать сообщение.</p>
-        </div>
-
-        <div class="code-block" style="margin-bottom:4px">
-          <div class="code-block-header">
-            <span class="code-block-lang">Python — с ошибкой</span>
-            <button class="copy-btn" onclick="copyCode(this, 'code2')">Копировать</button>
-          </div>
-          <pre id="code2"><span class="cf">print</span>(<span class="cs">"Hello World"</span>   <span class="cc"># забыли закрыть скобку</span></pre>
-        </div>
-
-        <div class="error-anatomy">
-          <div class="error-line-1">  File "main.py", line 1</div>
-          <div class="error-line-2">    print("Hello World"</div>
-          <div class="error-line-3">                       ^</div>
-          <div class="error-line-4">SyntaxError: '(' was never closed</div>
-          <div class="error-annotation">
-            <div class="ann-item"><span class="ann-dot"></span><span>Файл и <strong>номер строки</strong> — именно там ошибка</span></div>
-            <div class="ann-item"><span class="ann-dot yellow"></span><span>Строка с ошибкой — Python её показывает</span></div>
-            <div class="ann-item"><span class="ann-dot white"></span><span>Стрелка <strong>^</strong> указывает на проблемное место</span></div>
-            <div class="ann-item"><span class="ann-dot"></span><span><strong>SyntaxError</strong> — тип ошибки: нарушен синтаксис языка</span></div>
-          </div>
-        </div>
-
-        <div class="compare-grid">
-          <div class="compare-item">
-            <div class="compare-item-title">🔴 SyntaxError</div>
-            <p>Нарушен синтаксис: забытая скобка, кавычка, двоеточие</p>
-          </div>
-          <div class="compare-item">
-            <div class="compare-item-title">🟡 NameError</div>
-            <p>Используешь переменную, которая не была создана</p>
-          </div>
-          <div class="compare-item">
-            <div class="compare-item-title">🟠 TypeError</div>
-            <p>Пытаешься сложить число и текст — несовместимые типы</p>
-          </div>
-          <div class="compare-item">
-            <div class="compare-item-title">🔵 IndentationError</div>
-            <p>Неверные отступы — в Python отступы обязательны</p>
-          </div>
-        </div>
-
-        <div class="card highlight">
-          <p><strong>Главное правило:</strong> не бойся ошибок. Читай сообщение сверху вниз: <strong>тип ошибки → строка → описание</strong>. Если непонятно — скопируй текст ошибки и загугли!</p>
-        </div>
-
-        <div class="quiz-card">
-          <div class="quiz-q">🎯 Python выдал SyntaxError. Что это значит?</div>
-          <div class="quiz-opts">
-            <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">Программа запустилась с ошибкой</button>
-            <button class="quiz-opt" onclick="quiz(this,'correct','q3')">Нарушен синтаксис — скобка, кавычка и т.п.</button>
-            <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">Нет интернета</button>
-          </div>
-          <div class="quiz-feedback" id="q3-feedback"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- DIVIDER -->
-  <div class="divider" id="divider"></div>
-
-  <!-- RIGHT: COMPILER -->
-  <div class="right-panel" id="rightPanel">
-    <div class="right-header">
-      <div class="right-header-title">
-        🐍 Python — встроенный компилятор
-        <span class="live-badge">LIVE</span>
-        <span id="pyStatus" class="py-status">Загрузка анализатора...</span>
-      </div>
-      <div class="rh-actions">
-        <!-- Font size picker -->
-        <div class="font-size-wrap" id="fontSizeWrap">
-          <button class="font-size-btn" onclick="toggleFontMenu()" id="fontSizeLabel">Аа 13px ▾</button>
-          <div class="font-size-dropdown" id="fontSizeMenu">
-            <button class="font-size-opt" onclick="setFontSize(11)">Аа 11px — мелкий</button>
-            <button class="font-size-opt active" onclick="setFontSize(13)">Аа 13px — обычный</button>
-            <button class="font-size-opt" onclick="setFontSize(15)">Аа 15px — крупный</button>
-            <button class="font-size-opt" onclick="setFontSize(17)">Аа 17px — большой</button>
-            <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
-          </div>
-        </div>
-        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()">▶ Запустить</button>
-      </div>
-    </div>
-    <div class="compiler-wrap">
-      <div class="editor-area">
-        <div class="editor-gutter" id="gutter"></div>
-        <div class="editor-wrap">
-          <div class="editor-highlight" id="editorHighlight" aria-hidden="true"></div>
-          <textarea class="editor-input" id="codeEditor" spellcheck="false" autocorrect="off" autocapitalize="off"
-            oninput="onEditorInput()"
-            onkeydown="handleKeyDown(event)"
-            onscroll="syncScroll()"># Моя первая программа
-print("Hello, World!")
-
-</textarea>
-        </div>
-      </div>
-      <div class="output-area">
-        <div class="output-header">
-          <span>Вывод</span>
-          <span class="output-status" id="outputStatus"></span>
-        </div>
-        <div class="output-body" id="output">
-          <span class="out-hint">Нажми ▶ Запустить чтобы увидеть результат</span>
-        </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list">
+        <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
 
-</div>
+  <!-- ==========================================================================
+       FOOTER
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-flex-row">
+      <div>
+        <a href="index.html" style="font-weight: 800; font-size: 1.1rem; color: #0F172A;">ALASSTER.SITE</a>
+        <div class="footer-author-text" style="margin-top: 4px;">
+          Учитель информатики: <strong>Кадыржанов Жанас Кайыржанович</strong> • для учеников 5 - 11 классов
+        </div>
+      </div>
+      <div style="font-size: 0.88rem; color: var(--text-muted);">
+        <a href="https://sites.google.com/view/alasster/%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F-%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0?authuser=0" target="_blank" style="color: var(--primary); font-weight: 700;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> WWW.ALASSTER.SITE
+        </a>
+      </div>
+    </div>
+  </footer>
 
-<script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
-<script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
+  <!-- ==========================================================================
+       JAVASCRIPT: THREE.JS 3D MOTION & INTERACTIONS
+       ========================================================================== -->
+  <script>
+    /* Complete Curriculum Data */
+    const LESSONS_DATABASE = {
+      c11: {
+        title: "11 класс • Нейронные сети и ИИ",
+        lessons: [
+          { num: 1, title: "Искусственные нейронные сети", path: "11 класс/1 четверть/1 урок.html" },
+          { num: 2, title: "Задачи нейронных сетей", path: "11 класс/1 четверть/2 урок.html" },
+          { num: 3, title: "Классификация задач ИИ", path: "11 класс/1 четверть/3 урок.html" },
+          { num: 4, title: "Классификация задач ИИ — практика", path: "11 класс/1 четверть/4 урок.html" },
+          { num: 5, title: "Управление приложением жестами", path: "11 класс/1 четверть/5 урок.html" },
+          { num: 6, title: "Основы моделирования нейронных сетей", path: "11 класс/1 четверть/6 урок.html" }
+        ]
+      },
+      c10emn: {
+        title: "10 класс ЕМН • Машинное обучение",
+        lessons: [
+          { num: "1-2", title: "История развития искусственного интеллекта", path: "10 ЕМН/1 четверть/1 -2 урок.html" },
+          { num: 3, title: "Основные понятия машинного обучения", path: "10 ЕМН/1 четверть/3 урок.html" },
+          { num: 4, title: "Практика: понятия машинного обучения", path: "10 ЕМН/1 четверть/4 урок.html" },
+          { num: 5, title: "Перцептрон и его назначение", path: "10 ЕМН/1 четверть/5 урок.html" },
+          { num: 6, title: "Практика: перцептрон в Excel", path: "10 ЕМН/1 четверть/6 урок.html" },
+          { num: 7, title: "Практика: однослойный перцептрон в Excel", path: "10 ЕМН/1 четверть/7 урок.html" },
+          { num: 8, title: "Модели машинного обучения", path: "10 ЕМН/1 четверть/8 урок.html" },
+          { num: 9, title: "Управление приложением жестами", path: "10 ЕМН/1 четверть/9 урок.html" },
+          { num: 10, title: "Алгоритмы МО: k-NN (Ближайшие соседи)", path: "10 ЕМН/1 четверть/10 урок.html" }
+        ]
+      },
+      c10ogn: {
+        title: "10 класс ОГН • Информационные технологии",
+        lessons: [
+          { num: 1, title: "История развития искусственного интеллекта", path: "10 ОГН/1 четверть/1 урок.html" },
+          { num: 2, title: "Основные понятия машинного обучения", path: "10 ОГН/1 четверть/2 урок.html" },
+          { num: 3, title: "Модели машинного обучения", path: "10 ОГН/1 четверть/3 урок.html" },
+          { num: 4, title: "Проектная мастерская: презентация о МО", path: "10 ОГН/1 четверть/4 урок.html" },
+          { num: 5, title: "Перцептрон и его назначение", path: "10 ОГН/1 четверть/5 урок.html" },
+          { num: 6, title: "Практика: перцептрон в Excel", path: "10 ОГН/1 четверть/6 урок.html" }
+        ]
+      },
+      c9: {
+        title: "9 класс • Компьютерные сети",
+        lessons: [
+          { num: 1, title: "Социальные и этические аспекты ИИ", path: "9 класс/1 четверть/1 урок.html" },
+          { num: 2, title: "IP-адрес компьютера", path: "9 класс/1 четверть/2 урок.html" },
+          { num: 3, title: "IP-адрес и сетевые протоколы", path: "9 класс/1 четверть/3 урок.html" },
+          { num: 4, title: "IP-адрес. Маска подсети", path: "9 класс/1 четверть/4 урок.html" },
+          { num: 5, title: "Доменная система имён (DNS)", path: "9 класс/1 четверть/5 урок.html" },
+          { num: 6, title: "Определение пропускной способности сети", path: "9 класс/1 четверть/6 урок.html" }
+        ]
+      },
+      c8: {
+        title: "8 класс • Архитектура и безопасность",
+        lessons: [
+          { num: 2, title: "Алфавитный подход к измерению информации", path: "8 класс/1 четверть/2 урок.html" },
+          { num: 3, title: "Процессор — мозг компьютера", path: "8 класс/1 четверть/3 урок.html" },
+          { num: 4, title: "Компьютерные сети: Пропускная способность", path: "8 класс/1 четверть/4 урок.html" },
+          { num: 5, title: "Практические задания по компьютерным сетям", path: "8 класс/1 четверть/5 Урок.html" },
+          { num: 6, title: "Негативные аспекты работы на компьютере", path: "8 класс/1 четверть/6 урок.html" },
+          { num: 7, title: "Безопасность в интернете", path: "8 класс/1 четверть/7 урок.html" },
+          { num: 8, title: "Мошенничество в интернете", path: "8 класс/1 четверть/8 урок.html" }
+        ]
+      },
+      cextra: {
+        title: "Дополнительно • Python Практикум",
+        lessons: [
+          { num: 1, title: "Python: Введение и Основы", path: "Python основы/1.Основа.html" },
+          { num: 2, title: "Python: Вывод данных (print)", path: "Python основы/2.print.html" },
+          { num: 3, title: "Python: Переменные и память", path: "Python основы/3.Переменные.html" },
+          { num: 4, title: "Python: Типы данных", path: "Python основы/4.Типы.html" },
+          { num: 5, title: "Python: Ввод данных (input)", path: "Python основы/5.Input.html" },
+          { num: 6, title: "Python: Математические операции", path: "Python основы/6.Математика.html" },
+          { num: 7, title: "Python: Логические выражения", path: "Python основы/7.Логика.html" },
+          { num: 8, title: "Python: Условные конструкции", path: "Python основы/8.Условия.html" },
+          { num: 9, title: "Python: Цикл for", path: "Python основы/9.For.html" },
+          { num: 10, title: "Python: Цикл while", path: "Python основы/10.While.html" },
+          { num: 11, title: "Python: Списки (List)", path: "Python основы/11.Списки.html" },
+          { num: 12, title: "Python: Работа со списками", path: "Python основы/12.Работа со списками.html" },
+          { num: 13, title: "Python: Строки (Strings)", path: "Python основы/13.Строки.html" },
+          { num: 14, title: "Python: Функции (def)", path: "Python основы/14.Функции.html" },
+          { num: 15, title: "Python: Работа с файлами", path: "Python основы/15.Файлы.html" },
+          { num: "IDE", title: "Онлайн компилятор Python (Web IDE)", path: "свалка/python online.html" }
+        ]
+      }
+    };
 
-<script>
-// ── DIVIDER (RESIZE) ──
-const layout = document.getElementById('layout');
-const leftPanel = document.getElementById('leftPanel');
-const divider = document.getElementById('divider');
+    function showClassModal(id) {
+      const data = LESSONS_DATABASE[id];
+      if (!data) return;
 
-let isDragging = false, rafId = null, pendingX = 0;
-function applyResize() {
-    const lw = layout.getBoundingClientRect().width;
-    const newW = Math.min(Math.max(pendingX, 320), lw - 280);
-    leftPanel.style.flexBasis = newW + 'px';
-    rafId = null;
-}
-function onMove(clientX) {
-    if (!isDragging) return;
-    pendingX = clientX;
-    if (!rafId) rafId = requestAnimationFrame(applyResize);
-}
-divider.addEventListener('mousedown', e => {
-    isDragging = true; divider.classList.add('dragging');
-    document.body.style.userSelect = 'none'; document.body.style.cursor = 'col-resize';
-    e.preventDefault();
-});
-window.addEventListener('mousemove', e => { if (isDragging) onMove(e.clientX); });
-window.addEventListener('mouseup', () => {
-    if (!isDragging) return; isDragging = false;
-    divider.classList.remove('dragging'); document.body.style.userSelect = ''; document.body.style.cursor = '';
-});
+      document.getElementById('modal-heading-el').textContent = data.title;
+      const list = document.getElementById('modal-lessons-list');
+      list.innerHTML = '';
 
-// ── FONT SIZE ──
-let currentFontSize = 13;
-function setFontSize(size) {
-    currentFontSize = size;
-    document.documentElement.style.setProperty('--editor-font-size', size + 'px');
-    document.documentElement.style.setProperty('--editor-line-height', (size * 1.65) + 'px');
-    const elements = ['codeEditor', 'editorHighlight', 'output'];
-    elements.forEach(id => document.getElementById(id).style.fontSize = size + 'px');
-    document.getElementById('fontSizeLabel').textContent = `Аа ${size}px ▾`;
-    document.querySelectorAll('.font-size-opt').forEach(o => o.classList.toggle('active', o.textContent.includes(size + 'px')));
-    closeFontMenu(); updateGutter(); highlight(); syncScroll();
-}
-function toggleFontMenu() { document.getElementById('fontSizeMenu').classList.toggle('open'); }
-function closeFontMenu() { document.getElementById('fontSizeMenu').classList.remove('open'); }
-document.addEventListener('click', e => { if (!document.getElementById('fontSizeWrap').contains(e.target)) closeFontMenu(); });
+      data.lessons.forEach(l => {
+        const row = document.createElement('div');
+        row.className = 'lesson-row-card';
+        row.innerHTML = `
+          <div class="lesson-badge-id">${l.num}</div>
+          <div class="lesson-title-label">${l.title}</div>
+          <a href="${encodeURI(l.path)}" class="btn-launch-lesson">
+            <span>Открыть</span> <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        `;
+        list.appendChild(row);
+      });
 
-// ── GUTTER & HIGHLIGHT ──
-function updateGutter() {
-    const ta = document.getElementById('codeEditor');
-    const g = document.getElementById('gutter');
-    if (!ta || !g) return;
-    const lines = ta.value.split('\n').length;
-    g.innerHTML = Array.from({length: lines}, (_, i) => `<div>${i + 1}</div>`).join('');
-}
-function syncScroll() {
-    const ta = document.getElementById('codeEditor');
-    const hl = document.getElementById('editorHighlight');
-    const g = document.getElementById('gutter');
-    if (!ta) return;
-    if (hl) { hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; }
-    if (g) g.scrollTop = ta.scrollTop;
-}
-function escHtml(s) { if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function highlight() {
-    const ta = document.getElementById('codeEditor');
-    const hl = document.getElementById('editorHighlight');
-    if (!ta || !hl) return;
-    hl.innerHTML = ta.value
-        .split('\n')
-        .map(line => `<span class="code-line">${tokenizeLine(line)}</span>`)
-        .join('');
-}
-function tokenizeLine(line) {
-    let out = ''; let i = 0; const len = line.length;
-    while (i < len) {
-        if (line[i] === '#') { out += `<span class="tk-cm">${escHtml(line.slice(i))}</span>`; break; }
-        if (line[i] === '"' || line[i] === "'") {
-            const q = line[i]; let j = i + 1;
-            while (j < len && line[j] !== q) { if (line[j] === '\\') j++; j++; }
-            j = Math.min(j + 1, len); out += `<span class="tk-str">${escHtml(line.slice(i, j))}</span>`;
-            i = j; continue;
-        }
-        if (/[0-9]/.test(line[i])) {
-            let j = i; while (j < len && /[0-9.]/.test(line[j])) j++;
-            out += `<span class="tk-num">${escHtml(line.slice(i, j))}</span>`; i = j; continue;
-        }
-        if (/[a-zA-Zа-яА-ЯёЁ_]/.test(line[i])) {
-            let j = i; while (j < len && /[a-zA-Zа-яА-ЯёЁ0-9_]/.test(line[j])) j++;
-            const word = line.slice(i, j);
-            const keywords = ['False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
-            const builtins = ['abs','all','any','bin','bool','bytearray','bytes','callable','chr','classmethod','compile','complex','delattr','dict','dir','divmod','enumerate','eval','exec','filter','float','format','frozenset','getattr','globals','hasattr','hash','help','hex','id','input','int','isinstance','issubclass','iter','len','list','locals','map','max','memoryview','min','next','object','oct','open','ord','pow','print','property','range','repr','reversed','round','set','setattr','slice','sorted','staticmethod','str','sum','super','tuple','type','vars','zip'];
-            let cls = keywords.includes(word) ? 'tk-kw' : builtins.includes(word) ? 'tk-bi' : (['True','False','None'].includes(word) ? 'tk-bool' : (word === 'self' ? 'tk-self' : null));
-            out += cls ? `<span class="${cls}">${escHtml(word)}</span>` : escHtml(word); i = j; continue;
-        }
-        if ('()[]{}'.includes(line[i])) { out += `<span class="tk-paren">${escHtml(line[i])}</span>`; i++; continue; }
-        if ('=+-*/<>!&|^~%@'.includes(line[i])) { out += `<span class="tk-op">${escHtml(line[i])}</span>`; i++; continue; }
-        out += escHtml(line[i]); i++;
+      document.getElementById('modal-backdrop-el').classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
-    return out || '&nbsp;';
-}
 
-function onEditorInput() { updateGutter(); highlight(); syncScroll(); }
-function handleKeyDown(e) {
-    const ta = e.target;
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); toggleRunStop(); return; }
-    if (e.key === 'Tab') {
-        e.preventDefault(); const s = ta.selectionStart, end = ta.selectionEnd;
-        ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(end);
-        ta.selectionStart = ta.selectionEnd = s + 4; onEditorInput(); return;
+    function hideClassModal() {
+      document.getElementById('modal-backdrop-el').classList.remove('active');
+      document.body.style.overflow = '';
     }
-    if (e.key === 'Enter') {
-        e.preventDefault(); const pos = ta.selectionStart; const before = ta.value.substring(0, pos);
-        const after = ta.value.substring(ta.selectionEnd); const lines = before.split('\n');
-        const currentLine = lines[lines.length - 1]; let indent = (currentLine.match(/^(\s*)/) || [""])[0];
-        if (currentLine.trimEnd().endsWith(':')) indent += '    ';
-        const insertion = '\n' + indent; ta.value = before + insertion + after;
-        ta.selectionStart = ta.selectionEnd = pos + insertion.length; onEditorInput(); return;
-    }
-}
 
-// ── EXECUTION LOGIC (smart compiler with Pyodide analysis) ──
-let pyodide = null;
-
-async function initPyodide() {
-    const statusEl = document.getElementById('pyStatus');
-    try {
-        pyodide = await loadPyodide();
-        if (statusEl) { statusEl.textContent = "Анализатор: активен"; statusEl.className = "py-status ready"; }
-    } catch (e) {
-        if (statusEl) { statusEl.textContent = "Анализатор: сбой"; }
-    }
-}
-initPyodide();
-
-function getFinalHint(errStr, code) {
-    const full = errStr.toLowerCase();
-    if (full.includes("eol while scanning string literal")) return "Подсказка: строка не закрыта кавычкой (\" или ') в начале или конце";
-    if (full.includes("unterminated string literal")) return "Подсказка: строка не закрыта кавычкой (\" или ') в начале или конце";
-    if (full.includes("unexpected eof while parsing")) return "Подсказка: скорее всего не закрыта скобка, блок или выражение";
-    if (full.includes("unmatched ')'")) return "Подсказка: лишняя или отсутствующая скобка — проверь пары скобок";
-    if (full.includes("expected ':'")) return "Подсказка: Отсутствует ':'";
-    if (full.includes("module 'random' has no attribute 'randit'")) return "Подсказка: У модуля 'random' нет атрибута 'randIT'";
-    if (full.includes("invalid decimal literal")) return "Подсказка: в имени переменной или функции есть недопустимый символ";
-    if (full.includes("invalid character")) return "Подсказка: в имени переменной или функции есть недопустимый символ";
-    if (full.includes("was never closed")) return "Подсказка: скорее всего не закрыта открытая скобка или лишняя";
-    if (full.includes("expected an indented block")) return "Подсказка: после if/for/while/def должен быть отступ (4 пробела или tab)";
-    if (full.includes("unexpected indent")) return "Подсказка: перед строчкой лишний отступы (пробелы)";
-    if (full.includes("unindent does not match any outer indentation level")) return "Подсказка: неправильные отступы, разный уровень пробелов";
-    if (full.includes("is not defined")) {
-        const match = errStr.match(/name '(.*?)' is not defined/);
-        const varName = match ? match[1] : "переменная";
-        return `Подсказка: переменная {${varName}} не создана или написана с ошибкой`;
-    }
-    if (full.includes("unsupported operand type(s) for +") || (full.includes("typeerror") && full.includes("str") && full.includes("int"))) return "Подсказка: математика или сравнения с  разными типами (например число и строка) невозвможна, проверь типы данных";
-    if (full.includes("'nonetype' does not support indexing")) return "Подсказка: переменная равна None, но к ней обращаются как к списку";
-    if (full.includes("'int' object is not iterable")) return "Подсказка: число нельзя использовать в цикле for как список";
-    if (full.includes("object has no attribute")) {
-        const match = errStr.match(/'(.*?)' object has no attribute '(.*?)'/);
-        return `Подсказка: у объекта ${match ? match[1] : ''} нет такого метода (например ${match ? match[2] : 'append'} у числа)`;
-    }
-    if (full.includes("invalid literal for int()")) return "Подсказка: попытка преобразовать строку в число";
-    if (full.includes("division by zero")) return "Подсказка: деление на ноль невозможно";
-    if (full.includes("list index out of range")) return "Подсказка: Такого элемента или индекса нет в списке";
-    if (full.includes("keyerror")) return "Подсказка: такого ключа нет в словаре";
-    if (full.includes("cannot import name")) return "Подсказка: модуль есть, но нужный объект не найден";
-    if (full.includes("is not yet implemented")) return "Подсказка: модуль есть, но компилятор не умеет с ним работать";
-    if (full.includes("no module named")) return "Подсказка: модуль не установлен или написан неправильно";
-    if (full.includes("no such file or directory")) return "Подсказка: файл не найден по указанному пути";
-    if (full.includes("permission denied")) return "Подсказка: нет доступа к файлу или папке";
-    if (full.includes("oserror")) return "Подсказка: ошибка системы (файл, диск, путь или устройство)";
-    if (full.includes("maximum recursion depth exceeded")) return "Подсказка: рекурсия не остановилась — нет базового условия или слишком глубокий вызов";
-    if (full.includes("stopiteration")) return "Подсказка: итератор закончился (больше элементов нет)";
-    if (full.includes("assertionerror")) return "Подсказка: условие assert оказалось ложным";
-    if (full.includes("memoryerror")) return "Подсказка: программе не хватает памяти";
-    if (full.includes("overflowerror")) return "Подсказка: число слишком большое для вычислений";
-    if (full.includes("eof when reading a line")) return "Подсказка: ввод input закончился без данных";
-    if (full.includes("invalid syntax")) return "Подсказка: ошибка синтаксиса — проверь правильность написания кода (скобки, двоеточия, ключевые слова)";
-    return "Подсказка: Проверь опечатки, скобки, кавычки или двоеточия.";
-}
-
-function cleanErr(err) {
-    if (err.includes('File "<stdin>"')) return err.split('File "<stdin>", ').pop();
-    if (err.includes('File "<exec>"')) return err.split('File "<exec>"').pop();
-    return err;
-}
-
-function showErrorBox(msg, hint) {
-    const outEl = document.getElementById('output');
-    const status = document.getElementById('outputStatus');
-    const box = document.createElement('div');
-    box.className = 'out-error-block';
-    box.innerHTML = `<div class="out-error-type">⚠ Ошибка</div><div class="out-error-msg">${escHtml(cleanErr(msg))}</div><div class="out-error-tip"><span class="out-error-tip-label">💡 Как исправить:</span>${hint}</div>`;
-    outEl.appendChild(box);
-    status.textContent = '✗ Ошибка'; status.className = 'output-status err';
-}
-
-async function runCode() {
-    const code = document.getElementById('codeEditor').value;
-    const outEl = document.getElementById('output');
-    const status = document.getElementById('outputStatus');
-    const btn = document.getElementById('runStopBtn');
-
-    outEl.innerHTML = ''; status.textContent = '⏳ выполняется…'; status.className = 'output-status running';
-    if (btn) { btn.textContent = '▶ Запустить'; btn.className = 'rh-btn run-btn'; }
-
-    Sk.configure({
-        output: (t) => {
-            let lastLine = outEl.lastElementChild;
-            if (lastLine && lastLine.classList.contains('out-line') && !lastLine.textContent.endsWith('\n')) {
-                lastLine.textContent += t;
-            } else {
-                const s = document.createElement('span'); s.className = 'out-line'; s.textContent = t; outEl.appendChild(s);
-            }
-            outEl.scrollTop = outEl.scrollHeight;
-        },
-        read: (x) => { if (!Sk.builtinFiles || !Sk.builtinFiles["files"][x]) throw "File not found"; return Sk.builtinFiles["files"][x]; },
-        inputfun: (prompt) => new Promise((resolve) => {
-            const div = document.createElement('div'); div.className = 'out-input-line';
-            div.innerHTML = `<span class="out-input-prompt">${prompt}</span><input type="text" class="out-input-field">`;
-            outEl.appendChild(div); const inp = div.querySelector('input'); inp.focus();
-            inp.onkeydown = (e) => { if (e.key === 'Enter') {
-                const val = inp.value;
-                div.innerHTML = `<span class="out-input-prompt">${prompt}</span><span class="out-input-done">${val}</span>`;
-                resolve(val);
-            }};
-        }),
-        inputfunTakesPrompt: true,
-        execLimit: 10000,
-        yieldLimit: 100
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideClassModal();
     });
 
-    try {
-        await Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, code, true));
-        status.textContent = '✓ выполнено'; status.className = 'output-status ok';
-    } catch (e) {
-        let finalErr = e.toString();
-        if (pyodide) {
-            try { pyodide.runPython(`compile(${JSON.stringify(code)}, '<stdin>', 'exec')`); }
-            catch (pyErr) { finalErr = pyErr.toString(); }
-        }
-        const hint = getFinalHint(finalErr, code);
-        showErrorBox(finalErr, hint);
+    function copyDomainToClipboard() {
+      navigator.clipboard.writeText('WWW.ALASSTER.SITE').then(() => {
+        const btn = document.getElementById('copy-btn-el');
+        btn.textContent = 'Скопировано!';
+        btn.style.background = '#10B981';
+        btn.style.color = '#FFFFFF';
+        setTimeout(() => {
+          btn.textContent = 'Копировать';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 2000);
+      });
     }
-    outEl.scrollTop = outEl.scrollHeight;
-}
 
-function toggleRunStop() { runCode(); }
+    function toggleNavMenu() {
+      const menu = document.querySelector('.nav-links-menu');
+      if (menu.style.display === 'flex') {
+        menu.style.display = 'none';
+      } else {
+        menu.style.display = 'flex';
+        menu.style.flexDirection = 'column';
+        menu.style.position = 'absolute';
+        menu.style.top = '65px';
+        menu.style.left = '16px';
+        menu.style.right = '16px';
+        menu.style.background = 'rgba(255,255,255,0.92)';
+        menu.style.backdropFilter = 'blur(24px)';
+        menu.style.borderRadius = '24px';
+        menu.style.padding = '16px';
+        menu.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+        menu.style.border = '1px solid rgba(255,255,255,0.9)';
+      }
+    }
 
-function loadLogicExample() {
-    document.getElementById('codeEditor').value = "x = 10\ny = 5\n\nif x > y:\n    print('X больше Y')\nelse:\n    print('X не больше Y')\n\n# Пример c end\nprint('Загрузка', end='... ')\nprint('Готово!')";
-    onEditorInput();
-}
+    /* ==========================================================================
+       THREE.JS 3D MOTION OBJECTS (FLOATING GLASS SHAPES IN HERO)
+       ========================================================================== */
+    (function initThreeScene() {
+      const container = document.getElementById('stage-3d-container');
+      const canvas = document.getElementById('three-canvas');
+      if (!container || !canvas || typeof THREE === 'undefined') return;
 
-function quiz(btn, type, qid) {
-    const q = btn.closest('.quiz-card'); q.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
-    btn.classList.add(type);
-    const fb = document.getElementById(qid + '-feedback');
-    fb.textContent = type === 'correct' ? '✅ Верно!' : '❌ Не совсем.';
-    fb.className = 'quiz-feedback show ' + (type === 'correct' ? 'ok' : 'no');
-}
+      const scene = new THREE.Scene();
 
-updateGutter(); highlight();
-</script>
+      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.z = 7;
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Lighting: subtle ambient + two colored directional lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+      scene.add(ambientLight);
+
+      const light1 = new THREE.PointLight(0x6366F1, 2.5, 50);
+      light1.position.set(5, 5, 5);
+      scene.add(light1);
+
+      const light2 = new THREE.PointLight(0x06B6D4, 2.2, 50);
+      light2.position.set(-5, -5, 3);
+      scene.add(light2);
+
+      const light3 = new THREE.PointLight(0xF59E0B, 1.5, 30);
+      light3.position.set(0, 4, -2);
+      scene.add(light3);
+
+      // 3D Glass Objects
+      const group = new THREE.Group();
+      scene.add(group);
+
+      // 1. Central Translucent Torus Knot
+      const torusGeo = new THREE.TorusKnotGeometry(1.2, 0.35, 120, 16);
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xEEF2FF,
+        emissive: 0x4F46E5,
+        emissiveIntensity: 0.15,
+        metalness: 0.1,
+        roughness: 0.15,
+        transmission: 0.6,
+        transparent: true,
+        opacity: 0.88,
+        reflectivity: 0.9,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1
+      });
+      const torusKnot = new THREE.Mesh(torusGeo, glassMat);
+      torusKnot.position.set(0.2, 0.1, 0);
+      group.add(torusKnot);
+
+      // 2. Floating Glass Icosahedron (Neural AI node)
+      const icoGeo = new THREE.IcosahedronGeometry(0.55, 0);
+      const icoMat = new THREE.MeshPhysicalMaterial({
+        color: 0x06B6D4,
+        emissive: 0x06B6D4,
+        emissiveIntensity: 0.25,
+        roughness: 0.2,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.75,
+        wireframe: false
+      });
+      const ico = new THREE.Mesh(icoGeo, icoMat);
+      ico.position.set(-2.2, 1.3, 0.5);
+      group.add(ico);
+
+      // 3. Floating Glass Octahedron
+      const octGeo = new THREE.OctahedronGeometry(0.48, 0);
+      const octMat = new THREE.MeshPhysicalMaterial({
+        color: 0xA855F7,
+        emissive: 0xA855F7,
+        emissiveIntensity: 0.2,
+        roughness: 0.2,
+        transparent: true,
+        opacity: 0.8
+      });
+      const oct = new THREE.Mesh(octGeo, octMat);
+      oct.position.set(2.3, -1.2, 0.4);
+      group.add(oct);
+
+      // Mouse Parallax
+      let mouseX = 0, mouseY = 0;
+      let targetX = 0, targetY = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseY = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+      });
+
+      // Window Resize
+      function onWindowResize() {
+        if (!container) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+      window.addEventListener('resize', onWindowResize);
+
+      // Render Loop
+      let clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const elapsedTime = clock.getElapsedTime();
+
+        // Smooth rotation
+        torusKnot.rotation.x = elapsedTime * 0.4;
+        torusKnot.rotation.y = elapsedTime * 0.5;
+
+        ico.rotation.x = elapsedTime * 0.6;
+        ico.rotation.y = elapsedTime * 0.8;
+        ico.position.y = 1.3 + Math.sin(elapsedTime * 1.5) * 0.15;
+
+        oct.rotation.x = -elapsedTime * 0.5;
+        oct.rotation.y = elapsedTime * 0.7;
+        oct.position.y = -1.2 + Math.cos(elapsedTime * 1.8) * 0.12;
+
+        // Subtle mouse parallax
+        targetX += (mouseX - targetX) * 0.05;
+        targetY += (mouseY - targetY) * 0.05;
+        group.rotation.y = targetX * 0.4;
+        group.rotation.x = -targetY * 0.4;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+
+    /* 3D Perspective Card Tilt on Mousemove */
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -6;
+          const rotateY = ((x - centerX) / centerX) * 6;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
+        });
+      });
+    }
+  </script>
 </body>
 </html>
