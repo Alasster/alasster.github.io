@@ -22,7 +22,7 @@
   <!-- Local Three.js keeps the original animation available without a CDN. -->
   <script src="скрипты/three.min.js"></script>
 
-  <link rel="stylesheet" href="стили/styles.css?v=1.2">
+  <link rel="stylesheet" href="стили/styles.css?v=1.5">
 </head>
 <body>
 
@@ -42,7 +42,7 @@
           <div class="brand-icon-box">
             <i class="fa-solid fa-graduation-cap"></i>
           </div>
-          <span class="brand-title-text">ALASSTER.SITE</span>
+          <span class="brand-title-text">ALASSTER.GITHUB.IO</span>
         </a>
 
         <!-- Desktop Navigation Items (white-space: nowrap) -->
@@ -81,10 +81,10 @@
             <span class="teacher-monogram" aria-hidden="true">ЖК</span>
             <div>
               <p class="teacher-role">Ваш учитель информатики</p>
-              <h2 class="teacher-name">Кадыржанов Жанас<br>Кайыржанович</h2>
+              <h2 class="teacher-name">Кадыржанов Жанас Кайыржанович</h2>
             </div>
           </div>
-          <p class="teacher-description">Школа-гимназия № 22</p>
+          
         </div>
 
 
@@ -132,164 +132,24 @@
        MOTTO BANNER (ТУҒАН ЖЕР)
        ========================================================================== -->
   <div class="container motto-wrapper">
-    <div class="motto-glass-pill">
-      <div class="motto-quote-badge" aria-hidden="true">
-        <i class="fa-solid fa-quote-left"></i>
-      </div>
-      <div class="motto-text">
-        <p class="motto-label">Адал азамат · Цитата</p>
-        <blockquote class="motto-kz" lang="kk">«Туған жердей жер болмас, туған елдей ел болмас»</blockquote>
-        <div class="motto-ru">«Нет земли лучше родной, нет народа лучше родного»</div>
-      </div>
-      <div class="motto-quote-badge" aria-hidden="true">
-        <i class="fa-solid fa-quote-right"></i>
+    <div class="motto-contour-card">
+      <div class="motto-glass-pill">
+        <div class="motto-quote-badge" aria-hidden="true">
+          <i class="fa-solid fa-quote-left"></i>
+        </div>
+        <div class="motto-text">
+          <p class="motto-label" id="motto-label-el">Адал азамат · Цитата</p>
+          <blockquote class="motto-kz" id="motto-kz-el" lang="kk">«Туған жердей жер болмас, туған елдей ел болмас.»</blockquote>
+          <div class="motto-ru" id="motto-ru-el">«Нет земли лучше родной, нет народа лучше родного.»</div>
+        </div>
+        <div class="motto-quote-badge" aria-hidden="true">
+          <i class="fa-solid fa-quote-right"></i>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ==========================================================================
-       CURRICULUM SECTION (6 CLASSES WITH ANIMATED BORDER CONTOURS & 3D TILT)
-       ========================================================================== -->
-  <section class="container" id="curriculum">
-    <div class="section-header-wrap">
-      <span class="pill-chip-tag"><i class="fa-solid fa-layer-group"></i> Программа</span>
-      <h2 class="section-main-title">Учебные модули по классам</h2>
-    </div>
 
-    <div class="grades-grid">
-
-      <!-- 11 КЛАСС -->
-      <div class="beam-card tilt-card" id="c11">
-        <span class="figma-point point-tl"></span>
-        <span class="figma-point point-tr"></span>
-        <span class="figma-point point-bl"></span>
-        <span class="figma-point point-br"></span>
-        <div class="beam-inner-content grade-card-content">
-          <div>
-            <div class="grade-top-bar">
-              <div class="grade-icon-avatar icon-c-indigo"><i class="fa-solid fa-brain"></i></div>
-              <span class="grade-chip-badge badge-indigo">1 Четверть</span>
-            </div>
-            <h3 class="grade-title">11 класс</h3>
-            <p class="grade-desc">Искусственные нейронные сети, классификация задач ИИ и управление жестами.</p>
-          </div>
-          <div>
-            <div class="grade-meta-info">
-              <span>Тематика: Нейросети</span>
-              <span class="grade-count-number">6 уроков</span>
-            </div>
-            <div class="grade-actions-row">
-              <button class="btn-action-list" data-class-id="c11">
-                <i class="fa-solid fa-list"></i> Все уроки
-              </button>
-              <a href="11 класс/1 четверть/1 урок.html" class="btn-action-start">
-                Урок 1 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 10 ЕМН -->
-      <div class="beam-card tilt-card" id="c10emn">
-        <span class="figma-point point-tl"></span>
-        <span class="figma-point point-tr"></span>
-        <span class="figma-point point-bl"></span>
-        <span class="figma-point point-br"></span>
-        <div class="beam-inner-content grade-card-content">
-          <div>
-            <div class="grade-top-bar">
-              <div class="grade-icon-avatar icon-c-teal"><i class="fa-solid fa-chart-line"></i></div>
-              <span class="grade-chip-badge badge-teal">ЕМН Профиль</span>
-            </div>
-            <h3 class="grade-title">10 класс ЕМН</h3>
-            <p class="grade-desc">Машинное обучение, перцептрон в Excel, модели МО и алгоритм k-NN.</p>
-          </div>
-          <div>
-            <div class="grade-meta-info">
-              <span>Тематика: Machine Learning</span>
-              <span class="grade-count-number">9 уроков</span>
-            </div>
-            <div class="grade-actions-row">
-              <button class="btn-action-list" data-class-id="c10emn">
-                <i class="fa-solid fa-list"></i> Все уроки
-              </button>
-              <a href="10 ЕМН/1 четверть/1 -2 урок.html" class="btn-action-start">
-                Урок 1 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 10 ОГН -->
-      <div class="beam-card tilt-card" id="c10ogn">
-        <span class="figma-point point-tl"></span>
-        <span class="figma-point point-tr"></span>
-        <span class="figma-point point-bl"></span>
-        <span class="figma-point point-br"></span>
-        <div class="beam-inner-content grade-card-content">
-          <div>
-            <div class="grade-top-bar">
-              <div class="grade-icon-avatar icon-c-amber"><i class="fa-solid fa-users"></i></div>
-              <span class="grade-chip-badge badge-amber">ОГН Профиль</span>
-            </div>
-            <h3 class="grade-title">10 класс ОГН</h3>
-            <p class="grade-desc">История ИИ, понятия машинного обучения, модели МО и проектная мастерская.</p>
-          </div>
-          <div>
-            <div class="grade-meta-info">
-              <span>Тематика: Инфотехнологии</span>
-              <span class="grade-count-number">6 уроков</span>
-            </div>
-            <div class="grade-actions-row">
-              <button class="btn-action-list" data-class-id="c10ogn">
-                <i class="fa-solid fa-list"></i> Все уроки
-              </button>
-              <a href="10 ОГН/1 четверть/1 урок.html" class="btn-action-start">
-                Урок 1 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 9 КЛАСС -->
-      <div class="beam-card tilt-card" id="c9">
-        <span class="figma-point point-tl"></span>
-        <span class="figma-point point-tr"></span>
-        <span class="figma-point point-bl"></span>
-        <span class="figma-point point-br"></span>
-        <div class="beam-inner-content grade-card-content">
-          <div>
-            <div class="grade-top-bar">
-              <div class="grade-icon-avatar icon-c-cyan"><i class="fa-solid fa-network-wired"></i></div>
-              <span class="grade-chip-badge badge-cyan">1 Четверть</span>
-            </div>
-            <h3 class="grade-title">9 класс</h3>
-            <p class="grade-desc">Этика ИИ, IP-адреса компьютеров, маска подсети, протоколы и доменная система DNS.</p>
-          </div>
-          <div>
-            <div class="grade-meta-info">
-              <span>Тематика: Сети & IP</span>
-              <span class="grade-count-number">6 уроков</span>
-            </div>
-            <div class="grade-actions-row">
-              <button class="btn-action-list" data-class-id="c9">
-                <i class="fa-solid fa-list"></i> Все уроки
-              </button>
-              <a href="9 класс/1 четверть/1 урок.html" class="btn-action-start">
-                Урок 1 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
-    </div>
-  </section>
 
   <!-- ==========================================================================
        MODAL DRAWER: LESSONS LIST
@@ -318,6 +178,6 @@
   <!-- ==========================================================================
        JAVASCRIPT: THREE.JS 3D MOTION & INTERACTIONS
        ========================================================================== -->
-  <script src="скрипты/script.js?v=1.2"></script>
+  <script src="скрипты/script.js?v=1.3"></script>
 </body>
 </html>
