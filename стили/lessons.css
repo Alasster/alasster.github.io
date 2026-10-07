@@ -1,15 +1,8 @@
 /* ==========================================================================
-   ALASSTER.SITE — UNIFIED LESSON STYLESHEET (ALL LESSONS 9-11)
-   Vision-OS Design System + Scoped Lesson Specific Styles
-   ========================================================================== */
-
-
-/* ==========================================================================
    ALASSTER.SITE — UNIFIED LESSON DESIGN SYSTEM (LIQUID GLASS & VISION-OS)
    Shared across all lessons in grades 9, 10 ЕМН, 10 ОГН, 11
    ========================================================================== */
 
-/* Fonts & Base Setup */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -66,7 +59,7 @@ html {
   height: 100%;
 }
 
-body {
+body.lesson-page {
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -124,30 +117,29 @@ body {
 }
 
 /* ==========================================================================
-   TOP AIRY PILL NAVBAR (UNIFIED ACROSS ALL LESSONS)
+   TOP AIRY PILL NAVBAR (IDENTICAL TO index.html)
    ========================================================================== */
 .nav-wrapper {
-  position: fixed;
+  padding: 16px 0;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 0;
   z-index: 1000;
-  pointer-events: none;
+  width: 100%;
 }
-.nav-wrapper .nav-container {
+.nav-wrapper .container {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 0 20px;
-  pointer-events: auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1000;
 }
 .navbar {
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-full);
-  padding: 7px 14px 7px 16px;
+  padding: 8px 16px 8px 20px;
   box-shadow:
     0 10px 30px -5px rgba(99, 102, 241, 0.08),
     0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
@@ -155,118 +147,127 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  width: 100%;
+  min-height: 60px;
 }
 
-/* Logo on left */
+/* Brand Logo (Matching index.html) */
 .brand-logo-group {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
   text-decoration: none;
   color: var(--text);
-  flex-shrink: 0;
   transition: opacity 0.2s ease;
 }
 .brand-logo-group:hover {
   opacity: 0.85;
 }
 .brand-icon-box {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  background: linear-gradient(135deg, #4F46E5, #6366F1);
-  color: white;
-  display: grid;
-  place-items: center;
-  font-size: 0.95rem;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #4F46E5, #06B6D4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 .brand-title-text {
   font-weight: 800;
-  font-size: 0.92rem;
-  letter-spacing: -0.01em;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: #0F172A;
+  white-space: nowrap;
   font-family: var(--font-main);
 }
 
-/* Center Badge: [Класс] • [Тема] */
+/* Center Lesson Badge (Clean Typography without capsule container) */
 .nav-lesson-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 4px;
+  gap: 9px;
+  padding: 0;
   background: transparent !important;
   border: none !important;
-  border-radius: 0 !important;
   box-shadow: none !important;
-  max-width: 580px;
+  border-radius: 0 !important;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
 }
 .nav-badge-class {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: var(--primary);
+  color: #4F46E5;
   background: transparent !important;
   padding: 0 !important;
   border-radius: 0 !important;
-  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .nav-badge-num {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #64748B;
   background: transparent !important;
   padding: 0 !important;
   border-radius: 0 !important;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .nav-badge-divider {
   color: #94A3B8;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   user-select: none;
+  flex-shrink: 0;
 }
 .nav-badge-topic {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  color: var(--text);
+  color: #0F172A;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 420px;
+  max-width: 480px;
 }
 
-/* Right Classes Button */
+/* Right Classes Menu Button */
 .nav-right-actions {
   display: flex;
   align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 .classes-menu-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: var(--radius-full);
   background: rgba(79, 70, 229, 0.08);
-  color: var(--primary);
+  color: #4F46E5;
   border: 1px solid rgba(79, 70, 229, 0.18);
   font-weight: 700;
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: var(--font-main);
+  white-space: nowrap;
 }
 .classes-menu-btn:hover {
-  background: var(--primary);
+  background: #4F46E5;
   color: #FFFFFF;
   box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
-  transform: translateY(-1px);
 }
 
 /* ==========================================================================
    CLASSES MODAL DRAWER
    ========================================================================== */
-body.modal-open {
-  overflow: hidden !important;
-}
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -288,100 +289,93 @@ body.modal-open {
   visibility: visible;
   pointer-events: auto;
 }
-.modal-backdrop.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition-delay: 0s;
+body.modal-open {
+  overflow: hidden !important;
 }
+
 .modal-glass-container {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.22);
   width: 100%;
-  max-width: 740px;
-  max-height: min(84dvh, 850px);
+  max-width: 640px;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  background: linear-gradient(140deg, rgba(250, 251, 255, 0.98), rgba(240, 246, 255, 0.96) 55%, rgba(240, 253, 253, 0.96));
-  box-shadow:
-    0 32px 90px -20px rgba(49, 46, 129, 0.28),
-    0 0 0 5px rgba(255, 255, 255, 0.2);
-  transform: translateY(24px) scale(0.96);
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.modal-backdrop.active .modal-glass-container {
-  transform: translateY(0) scale(1);
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
 .modal-header-bar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 24px 28px 18px;
-  border-bottom: 1px solid var(--glass-border-subtle);
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 .modal-eyebrow {
-  color: var(--primary);
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 4px;
+  color: var(--primary);
+  margin-bottom: 3px;
 }
 .modal-heading-text {
-  font-size: 1.45rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text);
   margin: 0;
 }
 .btn-close-modal {
-  display: grid;
-  place-items: center;
-  flex: 0 0 38px;
   width: 38px;
   height: 38px;
-  border: 1px solid white;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: white;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
   color: var(--text-muted);
-  font-size: 1.4rem;
-  line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .btn-close-modal:hover {
-  color: var(--primary);
-  background: white;
+  background: #F1F5F9;
+  color: var(--text);
   transform: rotate(90deg);
 }
+
 .modal-classes-nav {
   display: flex;
-  align-items: center;
   gap: 8px;
-  padding: 12px 28px;
-  border-bottom: 1px solid var(--glass-border-subtle);
+  padding: 12px 24px;
+  background: rgba(248, 250, 252, 0.85);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   overflow-x: auto;
   scrollbar-width: none;
 }
-.modal-classes-nav::-webkit-scrollbar {
-  display: none;
-}
+.modal-classes-nav::-webkit-scrollbar { display: none; }
 .class-tab-pill {
-  padding: 8px 16px;
+  padding: 7px 16px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--glass-border-subtle);
-  color: var(--text);
-  font-weight: 700;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: white;
+  color: var(--text-muted);
   font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 .class-tab-pill:hover {
-  background: white;
   color: var(--primary);
   border-color: rgba(79, 70, 229, 0.3);
 }
@@ -389,30 +383,22 @@ body.modal-open {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 .tab-home-link {
   margin-left: auto;
-  background: rgba(79, 70, 229, 0.06);
-  color: var(--primary);
-  border-color: rgba(79, 70, 229, 0.15);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
-.tab-home-link:hover {
-  background: var(--primary);
-  color: white;
-}
+
 .modal-lessons-scroll {
+  padding: 16px 24px 24px;
   overflow-y: auto;
-  padding: 20px 28px 28px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: #C7D2FE transparent;
 }
 .lesson-row-card {
   display: flex;
@@ -497,7 +483,7 @@ body.modal-open {
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 88px 60px 100px !important;
+  padding: 104px 60px 100px !important;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -505,18 +491,12 @@ body.modal-open {
   display: none;
 }
 .slide.active {
-  display: flex;
+  display: flex !important;
   animation: slideFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes slideFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .container,
@@ -532,24 +512,25 @@ body.modal-open {
    ========================================================================== */
 .dots,
 #dots,
-#dotsNav {
-  position: fixed;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 900;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 8px 5px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: var(--radius-full);
+#dotsNav,
+.dots-nav {
+  position: fixed !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 900 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 8px 6px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  border-radius: var(--radius-full) !important;
   box-shadow:
     0 10px 30px -5px rgba(99, 102, 241, 0.1),
-    0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+    0 0 1px 1px rgba(255, 255, 255, 0.8) inset !important;
 }
 .dot,
 .dotbutton,
@@ -557,11 +538,11 @@ body.modal-open {
   position: relative;
   width: 28px;
   height: 28px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
   cursor: pointer;
   padding: 0;
   transition: transform 0.2s ease;
@@ -572,7 +553,7 @@ body.modal-open {
   content: '';
   width: 10px;
   height: 10px;
-  border: 2px solid rgba(99, 102, 241, 0.35);
+  border: 2px solid rgba(99, 102, 241, 0.4);
   border-radius: 50%;
   background: white;
   transition: all 0.22s ease;
@@ -589,9 +570,9 @@ body.modal-open {
 .dot-nav.active::before {
   width: 14px;
   height: 14px;
-  background: var(--primary);
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18) !important;
 }
 .dot::after,
 .dotbutton::after,
@@ -633,43 +614,45 @@ body.modal-open {
 .slide-next,
 .action.advance,
 [data-next] {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 22px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #4F46E5, #6366F1);
+  padding: 12px 24px !important;
+  border-radius: var(--radius-full) !important;
+  background: linear-gradient(135deg, #4F46E5, #6366F1) !important;
   color: #FFFFFF !important;
-  font-size: 0.92rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  text-decoration: none;
-  font-family: var(--font-main);
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28) !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  text-decoration: none !important;
+  font-family: var(--font-main) !important;
 }
 .start-btn:hover,
 .slide-next:hover,
 .action.advance:hover,
 [data-next]:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 8px 22px rgba(79, 70, 229, 0.4) !important;
 }
 
-/* Legacy mobile-controls override */
+/* ==========================================================================
+   MOBILE BOTTOM ARROW NAVIGATION
+   ========================================================================== */
+.legacy-mobile-controls,
 .mobile-controls {
   display: none !important;
 }
-
 .nav-controls,
 .mobile-nav-bar {
-  position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 950;
+  position: fixed !important;
+  bottom: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 950 !important;
   display: none;
   align-items: center;
   gap: 12px;
@@ -706,41 +689,17 @@ body.modal-open {
 }
 
 /* ==========================================================================
-   UNIFIED GLASS PANELS, CARDS & TYPOGRAPHY
-   ========================================================================== */
-.panel,
-.paper,
-.goal-box,
-.glass,
-.card {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.95) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--glass-shadow) !important;
-}
-
-.eyebrow,
-.tag,
-.stepchip,
-.chip {
-  font-family: var(--font-main);
-  border-radius: var(--radius-full);
-}
-
-/* ==========================================================================
-   RESPONSIVE ADJUSTMENTS
+   RESPONSIVE DESIGN
    ========================================================================== */
 @media (max-width: 860px) {
-  body {
+  body.lesson-page {
     overflow-y: auto !important;
   }
   .slide {
     position: relative !important;
     inset: auto !important;
     min-height: 100vh;
-    padding: 78px 18px 90px !important;
+    padding: 92px 18px 90px !important;
     align-items: flex-start !important;
   }
   .nav-controls,
@@ -749,9 +708,10 @@ body.modal-open {
   }
   .dots,
   #dots,
-  #dotsNav {
-    right: 4px;
-    padding: 6px 3px;
+  #dotsNav,
+  .dots-nav {
+    right: 4px !important;
+    padding: 6px 3px !important;
   }
   .dot,
   .dotbutton,
@@ -765,42 +725,36 @@ body.modal-open {
     display: none !important;
   }
   .nav-lesson-badge {
-    max-width: 340px;
+    max-width: 320px;
     gap: 6px;
   }
-  .nav-badge-class {
-    font-size: 0.75rem;
-  }
+  .nav-badge-class,
   .nav-badge-num {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
   }
   .nav-badge-topic {
-    font-size: 0.8rem;
-    max-width: 160px;
+    font-size: 0.82rem;
+    max-width: 140px;
   }
   .classes-menu-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    gap: 6px;
-  }
-  .brand-title-text {
-    font-size: 0.85rem;
-  }
-  .brand-icon-box {
-    width: 30px;
-    height: 30px;
+    padding: 7px 14px;
+    font-size: 0.82rem;
   }
 }
 
 @media (max-width: 520px) {
-  .nav-wrapper .nav-container {
+  .nav-wrapper {
+    padding: 10px 0;
+  }
+  .nav-wrapper .container {
     padding: 0 10px;
   }
   .navbar {
-    padding: 5px 10px 5px 12px;
+    padding: 6px 12px;
+    min-height: 52px;
   }
   .nav-lesson-badge {
-    max-width: 210px;
+    max-width: 180px;
     gap: 4px;
   }
   .nav-badge-class,
@@ -808,22 +762,42 @@ body.modal-open {
     font-size: 0.72rem;
   }
   .nav-badge-topic {
-    max-width: 85px;
-    font-size: 0.76rem;
+    max-width: 75px;
+    font-size: 0.75rem;
   }
   .brand-title-text {
     display: none;
   }
-  .menu-btn-text {
+  .brand-icon-box {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
+  .classes-menu-btn {
+    padding: 6px 12px;
     font-size: 0.78rem;
   }
 }
 
 
 
-/* --------------------------------------------------------------------------
-   LESSON 9-1 (9 класс - 1 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 9-1: 9 класс - 1 урок (Социальные и этические аспекты ИИ)
+   ========================================================================== */
+.lesson-9-1 {
+--bg: #fff8ec;
+            --ink: #3f3028;
+            --muted: #79675d;
+            --line: rgba(92, 63, 46, 0.14);
+            --panel: rgba(255, 255, 255, 0.9);
+            --indigo: #b95132;
+            --teal: #789473;
+            --rose: #b95132;
+            --amber: #ee9b55;
+            --green: #789473;
+            --shadow: 0 18px 48px rgba(105, 70, 45, 0.12);
+}
+
 body.lesson-9-1 {
 min-height: 100vh;
             overflow: hidden;
@@ -1492,10 +1466,14 @@ bottom: 14px;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 9-2 (9 класс - 2 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-9-2, body.lesson-9-2 {
+/* ==========================================================================
+   LESSON 9-2: 9 класс - 2 урок (IP-адрес компьютера)
+   ========================================================================== */
+.lesson-9-2 {
+--bg:#fff8ec;--paper:rgba(255,255,255,.9);--ink:#3f3028;--muted:#79675d;--clay:#d86f4b;--orange:#ee9b55;--peach:#f8c9a9;--sage:#789473;--sage2:#e7f0df;--line:rgba(92,63,46,.14);--shadow:0 18px 48px rgba(105,70,45,.12)
+}
+
+.lesson-9-2, body.lesson-9-2 {
 margin:0;min-height:100%
 }
 
@@ -2284,10 +2262,14 @@ display:none
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 9-3 (9 класс - 3 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-9-3, body.lesson-9-3 {
+/* ==========================================================================
+   LESSON 9-3: 9 класс - 3 урок (IP-адрес и сетевые протоколы)
+   ========================================================================== */
+.lesson-9-3 {
+--ink:#3f3028;--muted:#69584e;--clay:#b95132;--orange:#ee9b55;--sage:#789473;--line:#e7d8c9;--shadow:0 18px 48px #69462d17
+}
+
+.lesson-9-3, body.lesson-9-3 {
 margin:0;height:100%
 }
 
@@ -2846,10 +2828,20 @@ height:55px
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 9-4 (9 класс - 4 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-9-4, body.lesson-9-4 {
+/* ==========================================================================
+   LESSON 9-4: 9 класс - 4 урок (IP-адрес. Маска подсети)
+   ========================================================================== */
+.lesson-9-4 {
+--ink:#3f3028;
+        --muted:#69584e;
+        --clay:#b95132;
+        --orange:#ee9b55;
+        --sage:#789473;
+        --line:#e7d8c9;
+        --shadow:0 18px 48px #69462d17
+}
+
+.lesson-9-4, body.lesson-9-4 {
 margin:0;
         height:100%
 }
@@ -3597,10 +3589,20 @@ box-shadow:none
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 9-5 (9 класс - 5 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-9-5, body.lesson-9-5 {
+/* ==========================================================================
+   LESSON 9-5: 9 класс - 5 урок (Доменная система имён (DNS))
+   ========================================================================== */
+.lesson-9-5 {
+--ink:#3f3028;
+        --muted:#69584e;
+        --clay:#b95132;
+        --orange:#ee9b55;
+        --sage:#789473;
+        --line:#e7d8c9;
+        --shadow:0 18px 48px #69462d17
+}
+
+.lesson-9-5, body.lesson-9-5 {
 margin:0;
         height:100%
 }
@@ -4978,10 +4980,20 @@ padding:6px;font-size:.82rem
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 9-6 (9 класс - 6 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-9-6, body.lesson-9-6 {
+/* ==========================================================================
+   LESSON 9-6: 9 класс - 6 урок (Определение пропускной способности сети)
+   ========================================================================== */
+.lesson-9-6 {
+--ink: #3f3028;
+      --muted: #69584e;
+      --clay: #b95132;
+      --orange: #ee9b55;
+      --sage: #789473;
+      --line: #e7d8c9;
+      --shadow: 0 18px 48px #69462d17;
+}
+
+.lesson-9-6, body.lesson-9-6 {
 margin: 0;
       height: 100%;
 }
@@ -6064,9 +6076,24 @@ display: block !important;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-1-2 (10 ЕМН - 1–2 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 10EMN-1-2: 10 ЕМН - 1–2 урок (История развития искусственного интеллекта)
+   ========================================================================== */
+.lesson-10emn-1-2 {
+--bg: #f7f2ff;
+            --ink: #2e2040;
+            --muted: #65557b;
+            --line: rgba(90, 62, 140, 0.12);
+            --panel: rgba(255, 255, 255, 0.94);
+            --blue: #7c4dff;
+            --cyan: #5eead4;
+            --green: #51c4a6;
+            --amber: #ff9e68;
+            --red: #e778a7;
+            --violet: #c084fc;
+            --shadow: 0 18px 50px rgba(90, 62, 140, 0.12);
+}
+
 body.lesson-10emn-1-2 {
 min-height: 100vh;
             overflow: hidden;
@@ -6845,10 +6872,14 @@ width: 11px;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-3 (10 ЕМН - 3 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-3, body.lesson-10emn-3 {
+/* ==========================================================================
+   LESSON 10EMN-3: 10 ЕМН - 3 урок (Основные понятия машинного обучения)
+   ========================================================================== */
+.lesson-10emn-3 {
+--cream:#edf3ff;--paper:rgba(255,255,255,.9);--ink:#1f2a44;--muted:#58678d;--coral:#5f7ce6;--orange:#8bb8ff;--butter:#f9d78b;--sage:#6bb3a7;--sage2:#e9f9f3;--rose:#e4ebff;--plum:#3d4f8a;--line:rgba(61,79,138,.13);--shadow:0 18px 48px rgba(73,96,170,.14)
+}
+
+.lesson-10emn-3, body.lesson-10emn-3 {
 margin:0;min-height:100%
 }
 
@@ -7598,6 +7629,10 @@ opacity:1;transform:translateY(-50%) translateX(0)
 width:11px;height:27px;background:var(--coral)
 }
 
+.lesson-10emn-3 {
+--cream:#f7f2ff;--paper:#fffdfd;--ink:#2e2040;--muted:#65557b;--coral:#7c4dff;--orange:#ff9e68;--butter:#f8d57e;--sage:#51c4a6;--sage2:#ecfff7;--rose:#f1d9ff;--plum:#4c3270;--line:#e9dcff;--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
 body.lesson-10emn-3 {
 color:var(--ink);background:radial-gradient(circle at 9% 10%,#f1e7ff 0,transparent 28%),radial-gradient(circle at 92% 85%,#dffaf2 0,transparent 30%),linear-gradient(135deg,#fffafc,#f1f3ff)
 }
@@ -7651,10 +7686,14 @@ from{transform:translate3d(-18px,-12px) scale(.94)}to{transform:translate3d(105p
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-4 (10 ЕМН - 4 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-4, body.lesson-10emn-4 {
+/* ==========================================================================
+   LESSON 10EMN-4: 10 ЕМН - 4 урок (Практика: понятия машинного обучения)
+   ========================================================================== */
+.lesson-10emn-4 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.94);--ink:#2e2040;--muted:#65557b;--coral:#7c4dff;--orange:#ff9e68;--butter:#f8d57e;--sage:#51c4a6;--sage2:#ecfff7;--rose:#f1d9ff;--plum:#4c3270;--line:rgba(90,62,140,.12);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10emn-4, body.lesson-10emn-4 {
 margin:0;min-height:100%
 }
 
@@ -8095,10 +8134,14 @@ width:11px;height:27px;background:var(--coral)
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-5 (10 ЕМН - 5 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-5, body.lesson-10emn-5 {
+/* ==========================================================================
+   LESSON 10EMN-5: 10 ЕМН - 5 урок (Перцептрон и его назначение)
+   ========================================================================== */
+.lesson-10emn-5 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10emn-5, body.lesson-10emn-5 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -9005,10 +9048,14 @@ fill:#fff;stroke:#9472e9;stroke-width:3
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-6 (10 ЕМН - 6 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-6, body.lesson-10emn-6 {
+/* ==========================================================================
+   LESSON 10EMN-6: 10 ЕМН - 6 урок (Практика: перцептрон в Excel)
+   ========================================================================== */
+.lesson-10emn-6 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10emn-6, body.lesson-10emn-6 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -9687,10 +9734,14 @@ width:11px;height:27px;background:var(--violet)
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-7 (10 ЕМН - 7 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-7, body.lesson-10emn-7 {
+/* ==========================================================================
+   LESSON 10EMN-7: 10 ЕМН - 7 урок (Практика: однослойный перцептрон в Excel)
+   ========================================================================== */
+.lesson-10emn-7 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10emn-7, body.lesson-10emn-7 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -10095,10 +10146,14 @@ display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;border
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-8 (10 ЕМН - 8 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-8, body.lesson-10emn-8 {
+/* ==========================================================================
+   LESSON 10EMN-8: 10 ЕМН - 8 урок (Модели машинного обучения)
+   ========================================================================== */
+.lesson-10emn-8 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10emn-8, body.lesson-10emn-8 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -10526,6 +10581,10 @@ scrollbar-width:thin;scrollbar-color:var(--violet) #f4ebff
 .lesson-10emn-8 .diagram-zoom {
 display:inline-flex;align-items:center;margin:0 0 10px;padding:8px 11px;border:1px solid #d7c7ff;border-radius:12px;background:#fff;color:var(--violet);font:700 .85rem "Segoe UI",Arial,sans-serif;cursor:pointer
 }
+}
+
+.lesson-10emn-8 {
+--mint-dark:#227d63;--orange-dark:#ad5928
 }
 
 .lesson-10emn-8 .goalitem b.goal-code {
@@ -11841,9 +11900,22 @@ animation:none!important
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-9 (10 ЕМН - 9 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 10EMN-9: 10 ЕМН - 9 урок (Управление приложением жестами)
+   ========================================================================== */
+.lesson-10emn-9 {
+--bg: #f8fafc;
+      --panel: rgba(255, 255, 255, .82);
+      --panel-border: rgba(148, 163, 184, .25);
+      --text: #1e293b;
+      --muted: #526176;
+      --accent: #6366f1;
+      --violet: #8b5cf6;
+      --rose: #e83560;
+      --success: #087f5b;
+      --error: #b42342;
+}
+
 body.lesson-10emn-9 {
 height: 100vh;
       overflow: hidden;
@@ -12649,7 +12721,20 @@ backdrop-filter: none;
 }
 }
 
-body.lesson-10emn-9, body.lesson-10emn-9 {
+.lesson-10emn-9 {
+--bg: #f7f2ff;
+      --panel: rgba(255, 255, 255, .95);
+      --panel-border: rgba(90, 62, 140, .13);
+      --text: #2e2040;
+      --muted: #65557b;
+      --accent: #7c4dff;
+      --violet: #7c4dff;
+      --rose: #7c4dff;
+      --success: #227d63;
+      --error: #b9475e;
+}
+
+.lesson-10emn-9, body.lesson-10emn-9 {
 min-height: 100%; font-family: "Segoe UI", Arial, sans-serif; font-size: 16px; color: var(--text);
 }
 
@@ -12880,10 +12965,28 @@ transition: none;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10EMN-10 (10 ЕМН - 10 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10emn-10, body.lesson-10emn-10 {
+/* ==========================================================================
+   LESSON 10EMN-10: 10 ЕМН - 10 урок (Алгоритмы МО: k-NN (Ближайшие соседи))
+   ========================================================================== */
+.lesson-10emn-10 {
+--bg:#f7f2ff;
+  --paper:rgba(255,255,255,.94);
+  --ink:#2e2040;
+  --muted:#65557b;
+  --coral:#7c4dff;
+  --orange:#ff9e68;
+  --butter:#f8d57e;
+  --sage:#51c4a6;
+  --sage2:#ecfff7;
+  --rose:#f1d9ff;
+  --plum:#4c3270;
+  --line:rgba(90,62,140,.12);
+  --shadow:0 18px 50px rgba(90,62,140,.12);
+  --mint-dark:#227d63;
+  --orange-dark:#ad5928;
+}
+
+.lesson-10emn-10, body.lesson-10emn-10 {
 margin:0;min-height:100%
 }
 
@@ -13769,9 +13872,24 @@ opacity:.55;cursor:not-allowed
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10OGN-1 (10 ОГН - 1 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 10OGN-1: 10 ОГН - 1 урок (История развития искусственного интеллекта)
+   ========================================================================== */
+.lesson-10ogn-1 {
+--bg: #f5f7fb;
+            --ink: #121826;
+            --muted: #5d6b82;
+            --line: rgba(18, 24, 38, 0.1);
+            --panel: rgba(255, 255, 255, 0.92);
+            --blue: #2563eb;
+            --cyan: #0891b2;
+            --green: #16a34a;
+            --amber: #d97706;
+            --red: #dc2626;
+            --violet: #7c3aed;
+            --shadow: 0 18px 48px rgba(18, 24, 38, 0.1);
+}
+
 body.lesson-10ogn-1 {
 min-height: 100vh;
             overflow: hidden;
@@ -14505,6 +14623,10 @@ bottom: 25px; display:flex;
 }
 }
 
+.lesson-10ogn-1 {
+--bg:#f7f9fc;--ink:#172033;--muted:#617087;--line:#dce4ef;--panel:#ffffffed;--blue:#2563eb;--cyan:#0891b2;--violet:#7c3aed;--green:#16a34a;--amber:#d97706;--shadow:0 18px 50px #17203318
+}
+
 body.lesson-10ogn-1 {
 color:var(--ink);background:radial-gradient(circle at 9% 10%,#dbeafe 0,transparent 28%),radial-gradient(circle at 92% 85%,#dcfce7 0,transparent 30%),linear-gradient(135deg,#f8fbff,#eef3f9)
 }
@@ -14590,10 +14712,14 @@ opacity:.55
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10OGN-2 (10 ОГН - 2 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10ogn-2, body.lesson-10ogn-2 {
+/* ==========================================================================
+   LESSON 10OGN-2: 10 ОГН - 2 урок (Основные понятия машинного обучения)
+   ========================================================================== */
+.lesson-10ogn-2 {
+--cream:#fff8eb;--paper:rgba(255,255,255,.9);--ink:#3b2c2a;--muted:#78645e;--coral:#d96b55;--orange:#ef9b5c;--butter:#f5cf72;--sage:#7d9b78;--sage2:#e5efdf;--rose:#f2d4cf;--plum:#714657;--line:rgba(86,58,49,.13);--shadow:0 18px 48px rgba(96,63,48,.12)
+}
+
+.lesson-10ogn-2, body.lesson-10ogn-2 {
 margin:0;min-height:100%
 }
 
@@ -15287,6 +15413,10 @@ opacity:.55;cursor:not-allowed
 }
 }
 
+.lesson-10ogn-2 {
+--cream:#f7f9fc;--paper:#ffffffed;--ink:#172033;--muted:#617087;--coral:#2563eb;--orange:#0891b2;--butter:#7c3aed;--sage:#16a34a;--sage2:#ecfdf5;--rose:#dbeafe;--plum:#172033;--line:#dce4ef;--shadow:0 18px 50px #17203318
+}
+
 body.lesson-10ogn-2 {
 color:var(--ink);background:radial-gradient(circle at 9% 10%,#dbeafe 0,transparent 28%),radial-gradient(circle at 92% 85%,#dcfce7 0,transparent 30%),linear-gradient(135deg,#f8fbff,#eef3f9)
 }
@@ -15340,10 +15470,14 @@ from{transform:translate3d(-18px,-12px) scale(.94)}to{transform:translate3d(105p
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10OGN-3 (10 ОГН - 3 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10ogn-3, body.lesson-10ogn-3 {
+/* ==========================================================================
+   LESSON 10OGN-3: 10 ОГН - 3 урок (Модели машинного обучения)
+   ========================================================================== */
+.lesson-10ogn-3 {
+--bg:#f7f9fc;--paper:#ffffffed;--ink:#172033;--muted:#617087;--line:#dce4ef;--blue:#2563eb;--cyan:#0891b2;--violet:#7c3aed;--green:#16a34a;--amber:#d97706;--red:#dc2626;--shadow:0 18px 50px #17203318
+}
+
+.lesson-10ogn-3, body.lesson-10ogn-3 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -16114,10 +16248,14 @@ padding:20px
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10OGN-4 (10 ОГН - 4 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10ogn-4, body.lesson-10ogn-4 {
+/* ==========================================================================
+   LESSON 10OGN-4: 10 ОГН - 4 урок (Проектная мастерская: презентация о МО)
+   ========================================================================== */
+.lesson-10ogn-4 {
+--bg:#f7f9fc;--paper:#ffffffed;--ink:#172033;--muted:#617087;--blue:#2563eb;--cyan:#0891b2;--violet:#7c3aed;--green:#16a34a;--amber:#d97706;--red:#dc2626;--line:#dce4ef;--shadow:0 18px 50px #17203318
+}
+
+.lesson-10ogn-4, body.lesson-10ogn-4 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -16654,10 +16792,14 @@ grid-template-columns:repeat(3,1fr)
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10OGN-5 (10 ОГН - 5 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10ogn-5, body.lesson-10ogn-5 {
+/* ==========================================================================
+   LESSON 10OGN-5: 10 ОГН - 5 урок (Перцептрон и его назначение)
+   ========================================================================== */
+.lesson-10ogn-5 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10ogn-5, body.lesson-10ogn-5 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -17679,7 +17821,11 @@ fill:none;stroke:#b295f3;stroke-width:3;stroke-linecap:round;stroke-dasharray:6 
 fill:#fff;stroke:#9472e9;stroke-width:3
 }
 
-body.lesson-10ogn-5, body.lesson-10ogn-5 {
+.lesson-10ogn-5 {
+--paper:#ffffffed;--ink:#172033;--muted:#617087;--violet:#2563eb;--orange:#d97706;--mint:#16a34a;--line:#dce4ef;--shadow:0 18px 50px #17203318
+}
+
+.lesson-10ogn-5, body.lesson-10ogn-5 {
 color:var(--ink)
 }
 
@@ -17908,10 +18054,14 @@ display:flex;top:38px;right:21px;left:auto;bottom:auto;gap:8px;transform:none
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 10OGN-6 (10 ОГН - 6 урок)
-   -------------------------------------------------------------------------- */
-body.lesson-10ogn-6, body.lesson-10ogn-6 {
+/* ==========================================================================
+   LESSON 10OGN-6: 10 ОГН - 6 урок (Практика: перцептрон в Excel)
+   ========================================================================== */
+.lesson-10ogn-6 {
+--bg:#f7f2ff;--paper:rgba(255,255,255,.95);--ink:#2e2040;--muted:#65557b;--violet:#7c4dff;--orange:#ff9e68;--mint:#51c4a6;--rose:#f1d9ff;--line:rgba(90,62,140,.13);--shadow:0 18px 50px rgba(90,62,140,.12)
+}
+
+.lesson-10ogn-6, body.lesson-10ogn-6 {
 margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)
 }
 
@@ -18589,7 +18739,11 @@ opacity:1;transform:translateY(-50%) translateX(0)
 width:11px;height:27px;background:var(--violet)
 }
 
-body.lesson-10ogn-6, body.lesson-10ogn-6 {
+.lesson-10ogn-6 {
+--paper:#ffffffed;--ink:#172033;--muted:#617087;--violet:#2563eb;--orange:#d97706;--mint:#16a34a;--line:#dce4ef;--shadow:0 18px 50px #17203318
+}
+
+.lesson-10ogn-6, body.lesson-10ogn-6 {
 color:var(--ink)
 }
 
@@ -18838,9 +18992,23 @@ display:flex;top:38px;right:21px;left:auto;bottom:auto;gap:8px;transform:none
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 11-1 (11 класс - 1 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 11-1: 11 класс - 1 урок (Искусственные нейронные сети)
+   ========================================================================== */
+.lesson-11-1 {
+--bg: #f8fafc;
+            --panel: rgba(255, 255, 255, 0.7);
+            --panel-border: rgba(148, 163, 184, 0.2);
+            --text: #1e293b;
+            --muted: #64748b;
+            --accent: #6366f1; 
+            --accent-light: #a5b4fc;
+            --success: #10b981;
+            --violet: #8b5cf6;
+            --amber: #f59e0b;
+            --code-bg: #f1f5f9;
+}
+
 body.lesson-11-1 {
 min-height: 100vh;
             overflow: hidden;
@@ -19574,9 +19742,24 @@ padding: 24px;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 11-2 (11 класс - 2 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 11-2: 11 класс - 2 урок (Задачи нейронных сетей)
+   ========================================================================== */
+.lesson-11-2 {
+--bg: #f8fafc;
+            --panel: rgba(255, 255, 255, 0.7);
+            --panel-border: rgba(148, 163, 184, 0.2);
+            --text: #1e293b;
+            --muted: #64748b;
+            --accent: #6366f1;
+            --accent-light: #a5b4fc;
+            --success: #10b981;
+            --violet: #8b5cf6;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --code-bg: #f1f5f9;
+}
+
 body.lesson-11-2 {
 min-height: 100vh;
             overflow: hidden;
@@ -19751,9 +19934,13 @@ max-width: calc(100% - 120px);
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 11-3 (11 класс - 3 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 11-3: 11 класс - 3 урок (Классификация задач ИИ)
+   ========================================================================== */
+.lesson-11-3 {
+--bg:#f8fafc;--panel:rgba(255,255,255,.8);--panel-border:rgba(148,163,184,.25);--text:#1e293b;--muted:#526176;--accent:#6366f1;--violet:#8b5cf6;--rose:#e83560;--success:#087f5b
+}
+
 body.lesson-11-3 {
 height:100vh;overflow:hidden;color:var(--text);background:radial-gradient(circle at 10% 10%,rgba(99,102,241,.07),transparent 35%),var(--bg);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.55
 }
@@ -20051,9 +20238,21 @@ backdrop-filter:none
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 11-4 (11 класс - 4 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 11-4: 11 класс - 4 урок (Классификация задач ИИ — практика)
+   ========================================================================== */
+.lesson-11-4 {
+--bg: #f8fafc;
+        --panel: rgba(255, 255, 255, .8);
+        --panel-border: rgba(148, 163, 184, .25);
+        --text: #1e293b;
+        --muted: #526176;
+        --accent: #6366f1;
+        --violet: #8b5cf6;
+        --rose: #e83560;
+        --success: #087f5b;
+}
+
 body.lesson-11-4 {
 height: 100vh;
         overflow: hidden;
@@ -20538,9 +20737,22 @@ overflow: visible;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 11-5 (11 класс - 5 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 11-5: 11 класс - 5 урок (Управление приложением жестами)
+   ========================================================================== */
+.lesson-11-5 {
+--bg: #f8fafc;
+      --panel: rgba(255, 255, 255, .82);
+      --panel-border: rgba(148, 163, 184, .25);
+      --text: #1e293b;
+      --muted: #526176;
+      --accent: #6366f1;
+      --violet: #8b5cf6;
+      --rose: #e83560;
+      --success: #087f5b;
+      --error: #b42342;
+}
+
 body.lesson-11-5 {
 height: 100vh;
       overflow: hidden;
@@ -21392,9 +21604,22 @@ backdrop-filter: none;
 }
 
 
-/* --------------------------------------------------------------------------
-   LESSON 11-6 (11 класс - 6 урок)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LESSON 11-6: 11 класс - 6 урок (Основы моделирования нейронных сетей)
+   ========================================================================== */
+.lesson-11-6 {
+--bg: #f8fafc;
+        --panel: rgba(255, 255, 255, .85);
+        --panel-border: rgba(148, 163, 184, .25);
+        --text: #1e293b;
+        --muted: #526176;
+        --accent: #6366f1;
+        --violet: #8b5cf6;
+        --rose: #e83560;
+        --success: #087f5b;
+        --warn: #d97706;
+}
+
 body.lesson-11-6 {
 height: 100vh;
         overflow: hidden;

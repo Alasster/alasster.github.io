@@ -1,12 +1,10 @@
 /* ==========================================================================
    ALASSTER.SITE — UNIFIED LESSON CONTROLLER (ALL LESSONS 9-11)
-   Manages Top Navbar, Classes Modal Drawer, Mobile Nav Controls & Lesson Logic
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  /* 1. CURRICULUM DATABASE */
   const LESSONS_DATABASE = {
     c9: {
       name: "9 класс",
@@ -61,7 +59,6 @@
     }
   };
 
-  /* 2. DETECT CURRENT CLASS */
   function detectCurrentClass() {
     const path = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
     if (path.includes('10 ЕМН')) return 'c10emn';
@@ -71,7 +68,6 @@
     return 'c9';
   }
 
-  /* 3. CLASSES MODAL CONTROLLER */
   let activeTabId = detectCurrentClass();
 
   function renderModalLessons(classId) {
@@ -153,14 +149,12 @@
       });
     });
 
-    // Initial active tab sync
     tabs.forEach(t => {
       if (t.dataset.classId === activeTabId) t.classList.add('active');
       else t.classList.remove('active');
     });
   }
 
-  /* 4. MOBILE CONTROLS DELEGATOR & STATE SYNC */
   function updateMobileButtonsState() {
     const slides = document.querySelectorAll('.slide');
     if (!slides.length) return;
@@ -222,10 +216,9 @@
     updateMobileButtonsState();
   }
 
-  /* 5. LESSON SPECIFIC LOGIC REGISTRY */
   const LESSON_SCRIPTS = {};
 
-  /* Lesson 9-1 (9 класс - 1 урок) */
+  /* --- LESSON 9-1 (9 класс - 1 урок) --- */
   LESSON_SCRIPTS['9-1'] = function() {
 let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -587,7 +580,7 @@ let currentSlide = 0;
         drawNetwork();
   };
 
-  /* Lesson 9-2 (9 класс - 2 урок) */
+  /* --- LESSON 9-2 (9 класс - 2 урок) --- */
   LESSON_SCRIPTS['9-2'] = function() {
 const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress");let current=0;
 slides.forEach((slide,index)=>{const dot=document.createElement("button");const heading=slide.querySelector("h1,h2");const eyebrow=slide.querySelector(".eyebrow");let title=eyebrow?eyebrow.innerText.trim().replace(/\s+/g," "):"";if(title.includes("·"))title=title.split("·").slice(1).join("·").trim();if(!title||title==="9 класс"||title.toLowerCase().includes("урок"))title=heading?heading.innerText.trim().replace(/\s+/g," "):`Слайд ${index+1}`;if(title.length>32)title=title.slice(0,32).trim()+"…";dot.type="button";dot.className="dotbutton";dot.dataset.tooltip=`Слайд ${index+1}: ${title}`;dot.setAttribute("aria-label",`Слайд ${index+1}: ${title}`);dot.onclick=()=>show(index);document.getElementById("dots").append(dot)});
@@ -631,7 +624,7 @@ reset.onclick=()=>{document.querySelectorAll("#ipquiz .task").forEach(t=>t.class
 startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1))||1)-1)));
   };
 
-  /* Lesson 9-3 (9 класс - 3 урок) */
+  /* --- LESSON 9-3 (9 класс - 3 урок) --- */
   LESSON_SCRIPTS['9-3'] = function() {
 (()=>{const all=[...document.querySelectorAll('.slide')];all[0].querySelector('.bigicon').className='bigicon pc-icons';all[0].querySelector('.bigicon').innerHTML='<span>💻</span><span>🖥️</span>';
 const r=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),shuffle=a=>a.sort(()=>Math.random()-.5),ip=()=>[r(100,223),r(100,223),r(100,223),r(100,223)].join('.');
@@ -663,7 +656,7 @@ const quiz=[['Какой протокол указывает адрес полу
 document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySelectorAll('.build').forEach(b=>{const value=b.parts.map(x=>x.textContent).join(''),partsReady=b.parts.length===b.querySelectorAll('.piece').length,octets=value.split('.'),ok=partsReady&&octets.length===4&&octets.every(x=>/^(0|[1-9]\d{0,2})$/.test(x)&&Number(x)<=255);score+=+ok;b.classList.toggle('correct',ok);b.classList.toggle('wrong',!ok);b.querySelector('.buildstatus').textContent=(value||'Адрес ещё не собран')+(ok?' ✓':' — проверь порядок фрагментов и октеты')});const result=document.getElementById('buildScore');result.className='result '+(score===3?'good':'bad');result.textContent=`Верно: ${score} из 3. `+(score===3?'Все собранные записи — корректные IPv4-адреса.':'У IP-адреса четыре октета от 0 до 255; используй все фрагменты.')};
   };
 
-  /* Lesson 9-4 (9 класс - 4 урок) */
+  /* --- LESSON 9-4 (9 класс - 4 урок) --- */
   LESSON_SCRIPTS['9-4'] = function() {
 'use strict';
       const $=id=>document.getElementById(id),slides=[...document.querySelectorAll('.slide')];
@@ -1054,7 +1047,7 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
       show((parseInt(location.hash.slice(1))||1)-1);
   };
 
-  /* Lesson 9-5 (9 класс - 5 урок) */
+  /* --- LESSON 9-5 (9 класс - 5 урок) --- */
   LESSON_SCRIPTS['9-5'] = function() {
 (function(){
   'use strict';
@@ -1337,7 +1330,7 @@ $('protocolNext').onclick=()=>{if(!protocolAnswered)return;if(protocolIndex===pr
 show((parseInt(location.hash.slice(1))||1)-1);
   };
 
-  /* Lesson 9-6 (9 класс - 6 урок) */
+  /* --- LESSON 9-6 (9 класс - 6 урок) --- */
   LESSON_SCRIPTS['9-6'] = function() {
 'use strict';
     const $ = id => document.getElementById(id);
@@ -2148,7 +2141,7 @@ show((parseInt(location.hash.slice(1))||1)-1);
     show((parseInt(location.hash.slice(1)) || 1) - 1);
   };
 
-  /* Lesson 10emn-1-2 (10 ЕМН - 1–2 урок) */
+  /* --- LESSON 10emn-1-2 (10 ЕМН - 1–2 урок) --- */
   LESSON_SCRIPTS['10emn-1-2'] = function() {
 let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -2523,7 +2516,7 @@ let currentSlide = 0;
         drawNetwork();
   };
 
-  /* Lesson 10emn-3 (10 ЕМН - 3 урок) */
+  /* --- LESSON 10emn-3 (10 ЕМН - 3 урок) --- */
   LESSON_SCRIPTS['10emn-3'] = function() {
 const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress"),dotsNav=document.getElementById("dotsNav");let current=0;
 const dotLabels=["Старт","Повторение","Смена подхода","Карта понятий","Данные","Признаки","Обучение","Модель","Прогноз","Итог","Завершение"];
@@ -2590,7 +2583,7 @@ initParticles(); drawNetwork();
 startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1))||1)-1)));
   };
 
-  /* Lesson 10emn-4 (10 ЕМН - 4 урок) */
+  /* --- LESSON 10emn-4 (10 ЕМН - 4 урок) --- */
   LESSON_SCRIPTS['10emn-4'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav');
 const dotLabels=['01 · Начало','02 · Как это работает','03 · Задание','04 · Дискриптор'];
@@ -2609,7 +2602,7 @@ function drawNetwork(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeS
 window.addEventListener('resize',initParticles);initParticles();drawNetwork();show(0);
   };
 
-  /* Lesson 10emn-5 (10 ЕМН - 5 урок) */
+  /* --- LESSON 10emn-5 (10 ЕМН - 5 урок) --- */
   LESSON_SCRIPTS['10emn-5'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Старт','02 · История','03 · Структура','04 · Взвешенная сумма','05 · Функция активации','06 · Ограничения','07 · Практика','08 · Оценивание'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
@@ -2619,7 +2612,7 @@ document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badg
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
-  /* Lesson 10emn-6 (10 ЕМН - 6 урок) */
+  /* --- LESSON 10emn-6 (10 ЕМН - 6 урок) --- */
   LESSON_SCRIPTS['10emn-6'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Старт','02 · Повторение','03 · Практика','04 · Excel','05 · Итог и дескрипторы'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
@@ -2639,7 +2632,7 @@ const status=document.getElementById('recallStatus');document.getElementById('ch
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
-  /* Lesson 10emn-7 (10 ЕМН - 7 урок) */
+  /* --- LESSON 10emn-7 (10 ЕМН - 7 урок) --- */
   LESSON_SCRIPTS['10emn-7'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Титул','02 · Задание','03 · Итог'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
@@ -2650,7 +2643,7 @@ document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includ
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
-  /* Lesson 10emn-8 (10 ЕМН - 8 урок) */
+  /* --- LESSON 10emn-8 (10 ЕМН - 8 урок) --- */
   LESSON_SCRIPTS['10emn-8'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=["01 · Титул", "02 · Что такое МО", "03 · Три парадигмы", "04 · С учителем", "05 · Без учителя", "06 · С подкреплением", "07 · Сравнение", "08 · Задание", "09 · Дескриптор"];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
@@ -2783,7 +2776,7 @@ const raceWorld=(()=>{
 })();
   };
 
-  /* Lesson 10emn-9 (10 ЕМН - 9 урок) */
+  /* --- LESSON 10emn-9 (10 ЕМН - 9 урок) --- */
   LESSON_SCRIPTS['10emn-9'] = function() {
 'use strict';
 
@@ -3848,7 +3841,7 @@ const raceWorld=(()=>{
     goToHash();
   };
 
-  /* Lesson 10emn-10 (10 ЕМН - 10 урок) */
+  /* --- LESSON 10emn-10 (10 ЕМН - 10 урок) --- */
   LESSON_SCRIPTS['10emn-10'] = function() {
 const slides = [...document.querySelectorAll(".slide")];
 const bar = document.getElementById("progress");
@@ -4223,7 +4216,7 @@ setTimeout(() => {
 }, 300);
   };
 
-  /* Lesson 10ogn-1 (10 ОГН - 1 урок) */
+  /* --- LESSON 10ogn-1 (10 ОГН - 1 урок) --- */
   LESSON_SCRIPTS['10ogn-1'] = function() {
 let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -4595,7 +4588,7 @@ let currentSlide = 0;
         drawNetwork();
   };
 
-  /* Lesson 10ogn-2 (10 ОГН - 2 урок) */
+  /* --- LESSON 10ogn-2 (10 ОГН - 2 урок) --- */
   LESSON_SCRIPTS['10ogn-2'] = function() {
 const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress"),dotsNav=document.getElementById("dotsNav");let current=0;
 const dotLabels=["Старт","Повторение","Смена подхода","Карта понятий","Данные","Признаки","Обучение","Модель","Прогноз","Итог","Завершение"];
@@ -4630,7 +4623,7 @@ resetMission.onclick=()=>{document.querySelectorAll(".task").forEach(x=>x.classL
 startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1))||1)-1)));
   };
 
-  /* Lesson 10ogn-3 (10 ОГН - 3 урок) */
+  /* --- LESSON 10ogn-3 (10 ОГН - 3 урок) --- */
   LESSON_SCRIPTS['10ogn-3'] = function() {
 const slides=[...document.querySelectorAll(".slide")],progress=document.getElementById("progress"),dots=document.getElementById("dots");let current=0;
 const dotLabels=["Старт","Вход в тему","Три парадигмы","С учителем","Без учителя","С подкреплением","Сравнение","Практика","Оценивание"];
@@ -4649,7 +4642,7 @@ function animateSpheres(time){movingSpheres.forEach(({element,index})=>{const ph
 requestAnimationFrame(animateSpheres);
   };
 
-  /* Lesson 10ogn-4 (10 ОГН - 4 урок) */
+  /* --- LESSON 10ogn-4 (10 ОГН - 4 урок) --- */
   LESSON_SCRIPTS['10ogn-4'] = function() {
 const slides=[...document.querySelectorAll('.slide')],dots=document.getElementById('dots'),progress=document.getElementById('progress');let current=0;
 const labels=['1 · Старт','2 · Результат','3 · Темы','4 · Содержание','5 · Дескриптор','6 · Итог'];
@@ -4660,7 +4653,7 @@ function step(n){show(current===slides.length-1&&n>0?0:current+n)}document.getEl
 window.addEventListener('resize',alignNext);document.querySelectorAll('#topics .choice').forEach(button=>button.onclick=()=>{document.querySelectorAll('#topics .choice').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');document.getElementById('topicResponse').textContent='Выбрано: '+button.querySelector('strong').textContent+' Теперь сформулируйте главный вопрос одним предложением.'});
   };
 
-  /* Lesson 10ogn-5 (10 ОГН - 5 урок) */
+  /* --- LESSON 10ogn-5 (10 ОГН - 5 урок) --- */
   LESSON_SCRIPTS['10ogn-5'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),slideNext=document.getElementById('slideNext'),dotLabels=['01 · Старт','02 · Машинное обучение','03 · Структура','04 · Взвешенная сумма','05 · Функция активации','06 · Ограничения','07 · Практика','08 · Оценивание'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
@@ -4670,7 +4663,7 @@ document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badg
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
-  /* Lesson 10ogn-6 (10 ОГН - 6 урок) */
+  /* --- LESSON 10ogn-6 (10 ОГН - 6 урок) --- */
   LESSON_SCRIPTS['10ogn-6'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),slideNext=document.getElementById('slideNext'),dotLabels=['01 · Старт','02 · Повторение','03 · Практика','04 · Excel','05 · Итог и дескрипторы'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
@@ -4766,7 +4759,7 @@ Object.values(trays).forEach(shuffle);
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
-  /* Lesson 11-1 (11 класс - 1 урок) */
+  /* --- LESSON 11-1 (11 класс - 1 урок) --- */
   LESSON_SCRIPTS['11-1'] = function() {
 let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -4917,7 +4910,7 @@ let currentSlide = 0;
         });
   };
 
-  /* Lesson 11-2 (11 класс - 2 урок) */
+  /* --- LESSON 11-2 (11 класс - 2 урок) --- */
   LESSON_SCRIPTS['11-2'] = function() {
 let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -5010,7 +5003,7 @@ let currentSlide = 0;
         });
   };
 
-  /* Lesson 11-3 (11 класс - 3 урок) */
+  /* --- LESSON 11-3 (11 класс - 3 урок) --- */
   LESSON_SCRIPTS['11-3'] = function() {
 'use strict';
 let currentSlide=0;
@@ -5037,7 +5030,7 @@ function drawBackground(move){ctx.clearRect(0,0,canvas.width,canvas.height);part
 function animate(){if(!document.hidden)drawBackground(true);requestAnimationFrame(animate);}window.addEventListener('resize',initParticles);initParticles();animate();updateUI();
   };
 
-  /* Lesson 11-4 (11 класс - 4 урок) */
+  /* --- LESSON 11-4 (11 класс - 4 урок) --- */
   LESSON_SCRIPTS['11-4'] = function() {
 'use strict';
 
@@ -5179,7 +5172,7 @@ function animate(){if(!document.hidden)drawBackground(true);requestAnimationFram
       goToHash();
   };
 
-  /* Lesson 11-5 (11 класс - 5 урок) */
+  /* --- LESSON 11-5 (11 класс - 5 урок) --- */
   LESSON_SCRIPTS['11-5'] = function() {
 'use strict';
 
@@ -6240,7 +6233,7 @@ function animate(){if(!document.hidden)drawBackground(true);requestAnimationFram
     goToHash();
   };
 
-  /* Lesson 11-6 (11 класс - 6 урок) */
+  /* --- LESSON 11-6 (11 класс - 6 урок) --- */
   LESSON_SCRIPTS['11-6'] = function() {
 const slides = [...document.querySelectorAll('.slide')];
       const dotsNav = document.getElementById('dotsNav');
@@ -6544,20 +6537,17 @@ const slides = [...document.querySelectorAll('.slide')];
       goToHash();
   };
 
-  /* 6. INITIALIZATION RUNNER */
   function runCurrentLesson() {
     initClassesModal();
     initMobileControls();
 
-    // Identify current lesson from body class: lesson-{id}
-    const bodyClass = document.body.className || '';
-    const match = bodyClass.match(/lesson-([\w-]+)/);
-    let runner = null;
+    // Find current lesson ID via data-lesson-id attribute on body
+    const lessonId = document.body.dataset.lessonId ||
+                     (document.body.className.match(/\blesson-([a-zA-Z0-9_-]+)\b/) || [])[1];
 
-    if (match && LESSON_SCRIPTS[match[1]]) {
-      runner = LESSON_SCRIPTS[match[1]];
-    } else {
-      // Fallback: match from URL
+    let runner = lessonId && LESSON_SCRIPTS[lessonId] ? LESSON_SCRIPTS[lessonId] : null;
+
+    if (!runner) {
       const path = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
       for (const [key, fn] of Object.entries(LESSON_SCRIPTS)) {
         if (path.includes(key)) {
@@ -6571,8 +6561,10 @@ const slides = [...document.querySelectorAll('.slide')];
       try {
         runner();
       } catch (err) {
-        console.error('Error executing lesson script:', err);
+        console.error('Error running lesson script:', err);
       }
+    } else {
+      console.warn('No lesson runner found for:', lessonId);
     }
   }
 
