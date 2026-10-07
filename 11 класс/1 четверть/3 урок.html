@@ -4,14 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Урок 3: Классификация задач ИИ — 11 класс</title>
-<style>
-:root{--bg:#f8fafc;--panel:rgba(255,255,255,.8);--panel-border:rgba(148,163,184,.25);--text:#1e293b;--muted:#526176;--accent:#6366f1;--violet:#8b5cf6;--rose:#e83560;--success:#087f5b}
-*{box-sizing:border-box;margin:0;padding:0}body{height:100vh;overflow:hidden;color:var(--text);background:radial-gradient(circle at 10% 10%,rgba(99,102,241,.07),transparent 35%),var(--bg);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.55}#network-bg{position:fixed;inset:0;pointer-events:none;z-index:0}.progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--rose),var(--violet));z-index:50;transition:width .3s}.slide{position:absolute;inset:0;display:none;align-items:flex-start;justify-content:center;padding:38px 65px 108px;overflow-y:auto}.slide.active{display:flex;animation:fadeIn .35s ease-out}.container{width:min(1100px,100%);margin:auto 0;position:relative}@keyframes fadeIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}.eyebrow{display:inline-block;padding:6px 12px;background:var(--rose);color:white;border-radius:6px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px}h1{font-size:clamp(2.5rem,5vw,4rem);line-height:1.12;margin-bottom:24px;font-weight:800}h2{font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.18;margin-bottom:18px}h3{font-size:1.15rem;margin-bottom:10px}.accent-text{background:linear-gradient(135deg,var(--rose),var(--violet));background-clip:text;-webkit-background-clip:text;color:transparent}.lead{font-size:1.2rem;max-width:880px}.muted{color:var(--muted)}.glass,.task-card{background:var(--panel);border:1px solid var(--panel-border);padding:25px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.03)}.glass{backdrop-filter:blur(12px)}.task-card{background:white}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}.stack{display:grid;gap:14px}.tag{display:inline-block;font-weight:800;color:#6240b2;background:#f0ebff;border-radius:9px;padding:5px 12px;margin-bottom:14px;font-size:.9rem}.callout{border-left:4px solid var(--rose);background:#fff0f4;padding:16px 20px;border-radius:0 12px 12px 0;margin-top:22px}.example{background:#f1f5f9;border-radius:12px;padding:16px;margin-top:16px}.example strong{display:block;margin-bottom:5px}.big-code{font-size:3.1rem;font-weight:800;line-height:1.2;color:var(--violet);margin-bottom:14px}.pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.pill{padding:7px 14px;border:1px solid var(--panel-border);border-radius:100px;background:white;font-size:.95rem}.start-btn,.check-btn{border:0;border-radius:100px;background:linear-gradient(135deg,var(--rose),var(--violet));color:white;padding:13px 24px;font:inherit;font-weight:700;cursor:pointer}.start-btn{margin-top:28px}.check-btn{font-size:1rem;margin-top:18px}.nav-controls{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:15px;z-index:100;background:rgba(248,250,252,.95);padding:8px;border-radius:100px}.nav-btn{width:46px;height:46px;border-radius:50%;border:0;background:white;color:var(--text);box-shadow:0 4px 12px #0001;cursor:pointer;font-size:1.5rem}.nav-btn:disabled{opacity:.35;cursor:default}.nav-btn:hover:not(:disabled){background:var(--rose);color:white}#counter{font-size:.95rem;min-width:66px;text-align:center;font-variant-numeric:tabular-nums}.dots-nav{position:fixed;right:15px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;z-index:120}.dot-nav{width:28px;height:28px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center}.dot-nav:before{content:"";width:9px;height:9px;background:#bbc5d3;border-radius:50%}.dot-nav.active:before{background:var(--rose);transform:scale(1.4)}button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:4px}select,textarea{font:inherit;font-size:1rem;color:var(--text);background:white;border:1px solid #94a3b8;border-radius:8px;padding:10px;width:100%}textarea{min-height:90px;resize:vertical;margin-top:8px}label{display:block}.match-row{display:grid;grid-template-columns:1.3fr 1fr;gap:6px 20px;align-items:center;padding:12px 0;border-bottom:1px solid #e2e8f0}.feedback{font-size:.94rem;grid-column:1/-1}.feedback:empty{display:none}.correct{color:#087448}.incorrect{color:#b42342}.result{margin-top:12px;font-weight:700}.step-number{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#f0ebff;color:#6240b2;font-weight:800;margin-right:9px}.table-wrap{overflow:auto;margin-top:22px}table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;font-size:1rem}th,td{text-align:left;padding:13px 16px;border-bottom:1px solid #e2e8f0}th{background:#f0ebff;color:#53349b}.small{font-size:.95rem}.space{margin-top:18px}
-section.slide:nth-of-type(n+5){display:none!important}@media(max-width:850px){.slide{padding:25px 38px 30px 20px}.grid-2,.grid-3{grid-template-columns:1fr}.match-row{grid-template-columns:1fr}body{font-size:17px}.glass,.task-card{padding:20px}.dots-nav{right:3px}.container{margin:0}.nav-controls{top:12px;right:20px;bottom:auto;left:auto;transform:none;gap:8px}.eyebrow{max-width:calc(100% - 180px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}h1{font-size:2.6rem}}@media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}}@media print{body{height:auto;overflow:visible;background:white}.slide,.slide.active{display:block;position:relative;padding:25px;break-after:page;overflow:visible}.nav-controls,.dots-nav,.progress-bar,#network-bg,.start-btn,.check-btn{display:none}.container{margin:0}.glass{backdrop-filter:none}}
-</style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../стили/lessons.css?v=2.0">
 </head>
-<body>
-<canvas id="network-bg" aria-hidden="true"></canvas><div class="progress-bar" id="progress"></div>
+<body class="lesson-page lesson-11-3">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+
+  <!-- Airy Pill Navigation Bar -->
+  <div class="nav-wrapper">
+    <div class="nav-container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">11 класс</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">3 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Классификация задач ИИ</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <canvas id="network-bg" aria-hidden="true"></canvas><div class="progress-bar" id="progress"></div>
 <nav class="dots-nav" id="dotsNav" aria-label="Выбор слайда"></nav>
 <nav class="nav-controls" aria-label="Навигация по уроку"><button class="nav-btn" id="prevBtn" aria-label="Предыдущий слайд">‹</button><span id="counter" aria-live="polite"></span><button class="nav-btn" id="nextBtn" aria-label="Следующий слайд">›</button></nav>
 
@@ -128,30 +183,8 @@ section.slide:nth-of-type(n+5){display:none!important}@media(max-width:850px){.s
 <p class="space muted">Сегодня — различаем технологии и их роли. Далее по теме — более сложные сочетания технологий и выбор решения под условия задачи.</p>
 </div></section>
 
-<script>
-'use strict';
-let currentSlide=0;
-const slides=[...document.querySelectorAll('.slide')].slice(0,4);
-const titles=[...document.querySelectorAll('h1,h2')].map(h=>h.textContent);
-const dotsNav=document.getElementById('dotsNav');
-slides.forEach((slide,i)=>{const dot=document.createElement('button');dot.type='button';dot.className='dot-nav';dot.setAttribute('aria-label',`Слайд ${i+1}: ${titles[i]}`);dot.addEventListener('click',()=>goToSlide(i));dotsNav.appendChild(dot);});
-function updateUI(){slides.forEach((slide,i)=>{slide.classList.toggle('active',i===currentSlide);slide.setAttribute('aria-hidden',String(i!==currentSlide));});[...dotsNav.children].forEach((dot,i)=>{dot.classList.toggle('active',i===currentSlide);if(i===currentSlide)dot.setAttribute('aria-current','step');else dot.removeAttribute('aria-current');});document.getElementById('progress').style.width=`${(currentSlide+1)/slides.length*100}%`;document.getElementById('counter').textContent=`${currentSlide+1} / ${slides.length}`;document.getElementById('prevBtn').disabled=currentSlide===0;document.getElementById('nextBtn').disabled=currentSlide===slides.length-1;}
-function goToSlide(i){currentSlide=Math.max(0,Math.min(slides.length-1,i));updateUI();slides[currentSlide].scrollTop=0;}
-function changeSlide(dir){goToSlide(currentSlide+dir);}
-document.getElementById('prevBtn').addEventListener('click',()=>changeSlide(-1));document.getElementById('nextBtn').addEventListener('click',()=>changeSlide(1));
-document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select,button')||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowRight'){e.preventDefault();changeSlide(1);}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1);}if(e.key==='Home')goToSlide(0);if(e.key==='End')goToSlide(slides.length-1);});
-const options=[['','Выберите технологию'],['cv','CV — компьютерное зрение'],['nlp','NLP — обработка языка'],['gen','GenAI — генеративный ИИ'],['stt','STT — распознавание речи'],['tts','TTS — синтез речи']];
-function fillOptions(select){options.forEach(([value,label])=>select.add(new Option(label,value)));}
-const matchData=[['Логистика: камера находит вмятины на коробках.','cv','Система анализирует изображение упаковки.'],['Торговля: система определяет тему письменной жалобы.','nlp','Система анализирует смысл текста.'],['Дизайн: сервис создаёт эскиз логотипа по описанию.','gen','Система создаёт новое изображение.'],['Медиа: сервис записывает интервью текстом из аудио.','stt','Вход — речь, выход — текст.'],['Транспорт: помощник читает вслух готовое уведомление.','tts','Вход — текст, выход — речь.']];
-const decompData=[['1. Превращает голос клиента в текст.','stt','Этот шаг записывает произнесённые слова.'],['2. Определяет, что клиент хочет заблокировать карту.','nlp','Этот шаг определяет намерение по тексту.'],['3. Произносит готовую инструкцию.','tts','Этот шаг озвучивает текст ответа.']];
-function createPractice(hostId,formId,resultId,data){const host=document.getElementById(hostId);data.forEach(([prompt],i)=>{const row=document.createElement('div');row.className='match-row';const label=document.createElement('label');label.htmlFor=`${hostId}-${i}`;label.textContent=prompt;const select=document.createElement('select');select.id=label.htmlFor;fillOptions(select);const feedback=document.createElement('p');feedback.className='feedback';feedback.id=`${select.id}-feedback`;select.setAttribute('aria-describedby',feedback.id);row.append(label,select,feedback);host.appendChild(row);select.addEventListener('change',()=>{feedback.textContent='';feedback.className='feedback';select.removeAttribute('aria-invalid');document.getElementById(resultId).textContent='';});});document.getElementById(formId).addEventListener('submit',e=>{e.preventDefault();let correct=0,filled=0;[...host.children].forEach((row,i)=>{const select=row.querySelector('select'),feedback=row.querySelector('.feedback');const ok=select.value===data[i][1];if(select.value)filled++;if(ok)correct++;feedback.className=`feedback ${ok?'correct':'incorrect'}`;feedback.textContent=!select.value?'Выбери технологию.':ok?`Верно. ${data[i][2]}`:'Пока неверно. Сравни входные данные и требуемый результат; попробуй ещё раз.';select.setAttribute('aria-invalid',String(!ok));});document.getElementById(resultId).textContent=filled<data.length?`Заполнено ${filled} из ${data.length}. Верно: ${correct}.`:`Верно: ${correct} из ${data.length}. ${correct===data.length?'Теперь объясни выбор своими словами.':'Исправь отмеченные ответы и проверь снова.'}`;});}
-createPractice('matchItems','matching','matchResult',matchData);createPractice('decompItems','decomposition','decompResult',decompData);fillOptions(document.getElementById('exitTech'));
-document.getElementById('exitTech').addEventListener('change',()=>{document.getElementById('exitResult').textContent='';});
-document.getElementById('exitCheck').addEventListener('click',()=>{const value=document.getElementById('exitTech').value;const result=document.getElementById('exitResult');result.className=`result ${value==='cv'?'correct':'incorrect'}`;result.textContent=!value?'Сначала выбери технологию.':value==='cv'?'Верно: CV анализирует изображение и находит повреждения. Назови сферу применения.':'Подумай: сервис анализирует готовое фото или создаёт новый контент? Попробуй ещё раз.';});
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let particles=[];
-function initParticles(){canvas.width=innerWidth;canvas.height=innerHeight;particles=Array.from({length:35},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.9,vy:(Math.random()-.5)*.9,radius:Math.random()*1.5+1}));drawBackground(false);}
-function drawBackground(move){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach((p,i)=>{if(move){p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=canvas.width+30;if(p.x>canvas.width+30)p.x=-30;if(p.y<-30)p.y=canvas.height+30;if(p.y>canvas.height+30)p.y=-30;}particles.slice(i+1).forEach(q=>{const distance=Math.hypot(p.x-q.x,p.y-q.y);if(distance<190){ctx.strokeStyle=`rgba(244,63,94,${.12*(1-distance/190)})`;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}});ctx.fillStyle='rgba(244,63,94,.2)';ctx.beginPath();ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);ctx.fill();});}
-function animate(){if(!document.hidden)drawBackground(true);requestAnimationFrame(animate);}window.addEventListener('resize',initParticles);initParticles();animate();updateUI();
-</script>
+
+
+        <script src="../../скрипты/lessons.js?v=2.0"></script>
 </body>
 </html>

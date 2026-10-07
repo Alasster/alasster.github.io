@@ -3,45 +3,70 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f2ff">
 <title>10 класс — Основные понятия машинного обучения</title>
-<style>
-:root{--cream:#edf3ff;--paper:rgba(255,255,255,.9);--ink:#1f2a44;--muted:#58678d;--coral:#5f7ce6;--orange:#8bb8ff;--butter:#f9d78b;--sage:#6bb3a7;--sage2:#e9f9f3;--rose:#e4ebff;--plum:#3d4f8a;--line:rgba(61,79,138,.13);--shadow:0 18px 48px rgba(73,96,170,.14)}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{overflow:hidden;color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;background:radial-gradient(circle at 10% 12%,#dfe9ff 0,transparent 27%),radial-gradient(circle at 88% 83%,#eafaf5 0,transparent 30%),linear-gradient(135deg,#f5f8ff,#edf4ff)}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:radial-gradient(#8ca0d3 .7px,transparent .7px);background-size:19px 19px}#network-bg{position:fixed;inset:0;z-index:0;pointer-events:none;display:block}.bg-spheres{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}.bg-sphere{position:absolute;border-radius:50%;filter:blur(34px);opacity:.36;mix-blend-mode:multiply;animation:float-sphere 18s ease-in-out infinite alternate}.bg-sphere:nth-child(1){width:190px;height:190px;left:7%;top:17%;background:#8b5cf6}.bg-sphere:nth-child(2){width:130px;height:130px;right:12%;top:12%;background:#f472b6;animation-delay:-5s}.bg-sphere:nth-child(3){width:250px;height:250px;right:19%;bottom:-80px;background:#c084fc;animation-delay:-9s}.bg-sphere:nth-child(4){width:95px;height:95px;left:37%;bottom:12%;background:#5eead4;animation-delay:-13s}@keyframes float-sphere{from{transform:translate3d(-18px,-12px) scale(.94)}to{transform:translate3d(105px,68px) scale(1.12)}}button,input{font:inherit}button{color:inherit}.progress{position:fixed;z-index:99;top:0;left:0;height:6px;background:linear-gradient(90deg,var(--coral),var(--orange),var(--butter));transition:.3s}
-.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;overflow-y:auto;padding:40px 58px 102px;scrollbar-width:none}.slide::-webkit-scrollbar{display:none}.slide.active{display:flex;animation:enter .45s ease}@keyframes enter{from{opacity:0;transform:translateY(14px)}}.wrap{width:min(1160px,100%);margin:auto}.narrow{width:min(960px,100%);margin:auto}.hero{display:grid;grid-template-columns:1.08fr .92fr;gap:34px;align-items:center}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid #c9d8ff;border-radius:99px;background:#ffffff99;color:#4564c9;font-size:.82rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{margin-bottom:20px;font-size:clamp(3rem,6vw,5.3rem);line-height:.98;letter-spacing:-.055em}h2{margin-bottom:12px;font-size:clamp(2rem,4vw,3.15rem);line-height:1.08;letter-spacing:-.035em}h3{margin-bottom:8px;font-size:1.15rem}p,li{color:var(--muted);font-size:1.02rem;line-height:1.5}strong{color:var(--ink)}.accent{color:var(--coral)}.lead{font-size:1.2rem}.sub{margin-bottom:20px}.mono{font-family:Consolas,monospace}
-.paper{background:var(--paper);border:1px solid #ffffffde;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}.pad{padding:27px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}.grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px}
-.card{position:relative;padding:21px;overflow:hidden;background:#ffffffbd;border:1px solid var(--line);border-radius:19px}.card:after{content:"";position:absolute;right:-29px;bottom:-34px;width:86px;height:86px;border-radius:50%;background:var(--rose);opacity:.45}.icon{display:grid;place-items:center;width:46px;height:46px;margin-bottom:13px;border-radius:14px;background:#eaf1ff;font-size:1.35rem}.tag{display:inline-flex;padding:5px 10px;border-radius:99px;background:#eaf1ff;color:#3d5dc9;font-size:.78rem;font-weight:850}
-.brain{position:relative;min-height:360px;padding:29px;overflow:hidden}.brain:before,.brain:after{content:"";position:absolute;border-radius:50%}.brain:before{width:270px;height:270px;right:38px;top:38px;background:linear-gradient(145deg,#8bb8ff,#5f7ce6);box-shadow:inset 12px 12px 30px #ffffff38,0 22px 44px rgba(71,92,180,.2)}.brain:after{width:210px;height:210px;right:68px;top:68px;border:2px dashed #fff9}.neuron{position:absolute;z-index:2;display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:#fff;color:var(--coral);box-shadow:0 8px 20px rgba(57,87,180,.2);font-weight:900}.n1{right:148px;top:72px}.n2{right:72px;top:151px}.n3{right:190px;top:190px}.n4{right:120px;top:263px}.brain-label{position:absolute;z-index:3;left:28px;bottom:28px;padding:14px 18px;border-radius:15px;background:#fffdf0;box-shadow:0 9px 25px rgba(68,82,129,.14);font-weight:800}.hero-art{display:block;width:100%;border-radius:25px;box-shadow:var(--shadow)}
-.goal{display:grid;gap:12px;margin-top:20px}.goalitem{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border-radius:14px;background:#ffffffb9}.goalitem b{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:10px;color:white;background:var(--coral)}
-.quizbox{padding:28px;margin-top:20px}.quiztop{display:flex;justify-content:space-between;gap:14px;margin-bottom:18px}.pill{padding:7px 11px;border-radius:99px;background:#eaf1ff;color:#3d5dc9;font-weight:850}.quizq{font-size:1.4rem;line-height:1.3}.quizoptions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:17px}.quizoption{padding:14px;cursor:pointer;text-align:left;border:2px solid transparent;border-radius:14px;background:#f5f8ff;transition:.2s}.quizoption:hover{border-color:var(--orange);transform:translateY(-2px)}.quizoption.correct{border-color:var(--sage);background:#edf9f5}.quizoption.wrong{border-color:#d7877c;background:#fff1ef}.quizfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:15px}.feedback{color:var(--muted);font-weight:750}.action{padding:11px 17px;cursor:pointer;border:0;border-radius:13px;color:white;background:var(--coral);font-weight:850;box-shadow:0 8px 18px rgba(95,124,230,.28)}.action.secondary{color:var(--ink);background:#e6ebff;box-shadow:none}
-.versus{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:stretch;margin-top:23px}.versus .paper{padding:28px}.vs{align-self:center;display:grid;place-items:center;width:54px;height:54px;border-radius:50%;color:white;background:var(--coral);font-weight:900}.rulelist{display:grid;gap:9px;margin-top:13px}.rule{padding:11px 13px;border-radius:12px;background:#fff8ef;color:var(--muted)}.definition{margin-top:18px;padding:17px 21px;border-left:5px solid var(--coral);border-radius:0 15px 15px 0;background:#f6f9ff;font-size:1.08rem;line-height:1.48}
-.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}.pipe{position:relative;min-height:185px;padding:18px 14px;cursor:pointer;text-align:left;border:2px solid transparent;border-radius:18px;background:#ffffffc7;transition:.2s}.pipe:hover,.pipe.active{transform:translateY(-5px);border-color:var(--coral)}.pipe:not(:last-child):after{content:"→";position:absolute;z-index:3;right:-18px;top:75px;color:var(--coral);font-size:1.35rem;font-weight:900}.pipe small{display:block;margin-bottom:10px;color:var(--coral);font-weight:900}.pipe i{display:block;margin-bottom:11px;font-style:normal;font-size:2rem}.pipe p{font-size:.92rem}.pipeinfo{min-height:58px;margin-top:15px;padding:14px 17px;border-radius:14px;background:#eaf1ff;color:var(--muted)}
-.table{overflow:hidden}.trow{display:grid;grid-template-columns:1.1fr repeat(3,1fr);border-bottom:1px solid var(--line)}.trow:last-child{border:0}.trow>div{padding:13px}.thead{background:#eaf1ff;font-weight:850}.feature{color:var(--coral);font-weight:850}.labelcell{background:#edf9f5;color:#3f6d63;font-weight:850}.callout{padding:17px;border-radius:15px;background:var(--sage2)}
-.trainer{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:19px}.chart{position:relative;min-height:290px;padding:22px;background:linear-gradient(#ffffffc9,#ffffffc9),repeating-linear-gradient(0deg,transparent 0 44px,#7b5e5012 44px 45px),repeating-linear-gradient(90deg,transparent 0 58px,#7b5e5012 58px 59px)}.point{position:absolute;width:15px;height:15px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 5px #d96b5523}.model-line{position:absolute;left:14%;bottom:20%;width:73%;height:5px;border-radius:9px;background:var(--plum);transform:rotate(-21deg);transform-origin:left center;transition:1s}.chart.untrained .model-line{transform:rotate(16deg);background:#c6aa9d}.errorbadge{position:absolute;right:18px;top:17px;padding:8px 11px;border-radius:99px;background:#fff;color:var(--plum);font-weight:850}.trainsteps{display:grid;gap:10px}.trainstep{padding:14px;border:1px solid var(--line);border-radius:14px;background:#ffffffb8}.trainstep.active{border-color:var(--sage);background:var(--sage2)}
-.fruitlab{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px;margin-top:20px}.fruit{display:grid;place-items:center;min-height:280px;text-align:center}.fruiticon{font-size:6rem}.sliders{display:grid;gap:16px}.sliderline label{display:flex;justify-content:space-between;font-weight:800}.sliderline input{width:100%;accent-color:var(--coral)}.prediction{padding:17px;border-radius:15px;background:#fff0e3;font-size:1.2rem;font-weight:900;text-align:center}.processflow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}.flowstep{position:relative;min-height:230px;padding:22px;border-radius:20px;background:#ffffffc7;border:1px solid var(--line)}.flowstep:not(:last-child):after{content:"→";position:absolute;right:-24px;top:91px;z-index:2;color:var(--coral);font-size:2rem;font-weight:900}.flowstep small{display:inline-grid;place-items:center;width:34px;height:34px;margin-bottom:12px;border-radius:10px;color:#fff;background:var(--coral);font-weight:900}.flowstep .example{margin-top:12px;padding:11px;border-radius:12px;background:#fff8ef;color:var(--muted);font-size:.92rem}.modelbox{margin-top:17px;padding:16px;border-radius:15px;background:var(--sage2);color:#4d6749;font-weight:850}.qualitygrid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start;margin-top:18px}.qualitypic{width:100%;display:block;border-radius:18px;background:#fff}.zoomable-image{padding:0;cursor:zoom-in;border:0;border-radius:18px;background:transparent}.zoomable-image:focus-visible{outline:3px solid var(--coral);outline-offset:4px}.image-modal{width:min(1100px,92vw);max-width:none;padding:0;border:0;border-radius:18px;background:transparent;overflow:visible}.image-modal::backdrop{background:#1d1510cc}.image-modal img{display:block;max-width:100%;max-height:86vh;margin:auto;border-radius:18px;box-shadow:0 18px 60px #0008}.image-modal button{position:absolute;top:-14px;right:-14px;width:38px;height:38px;cursor:pointer;border:0;border-radius:50%;color:#fff;background:var(--plum);font-size:1.45rem;line-height:1}.qualitynotes{display:grid;gap:10px}.qualitynote{padding:13px 15px;border-radius:14px;background:#ffffffc7;border:1px solid var(--line)}.qualitynote strong{display:block;margin-bottom:4px}
-.split{display:grid;grid-template-columns:7fr 3fr;gap:8px;margin:21px 0}.trainpart,.testpart{padding:22px;border-radius:16px;text-align:center;font-weight:850}.trainpart{background:#f8d9c8}.testpart{background:var(--sage2)}.warning{padding:17px;border:1px solid #e6b582;border-radius:15px;background:#fff5dc}
-.typecard{min-height:250px}.typecard .example{margin-top:13px;padding:11px;border-radius:12px;background:#fff8ef;font-size:.92rem;color:var(--muted)}
-.missionhead{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:15px}.score{padding:10px 14px;border-radius:99px;background:#fff0e3;color:#a64c39;font-weight:900}.tasks{display:grid;gap:9px}.task{padding:14px 17px;background:#ffffffc7;border:2px solid transparent;border-radius:16px}.task.correct{border-color:var(--sage);background:#f2f8ee}.task.wrong{border-color:#d98775;background:#fff2ee}.tasktop{display:flex;gap:10px}.points{flex:none;padding:4px 8px;border-radius:8px;color:white;background:var(--coral);font-size:.75rem;font-weight:900}.choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.choice{padding:8px 11px;cursor:pointer;border:1px solid var(--line);border-radius:10px;background:#fffaf4}.choice:hover{border-color:var(--orange)}.choice.selected{color:white;background:var(--coral)}.missiontools{display:flex;gap:9px;align-items:center;margin-top:13px}
-.rubric{overflow:hidden}.rrow{display:grid;grid-template-columns:88px 1fr;border-bottom:1px solid var(--line)}.rrow:last-child{border:0}.rrow>div{padding:13px 16px}.rscore{display:grid;place-items:center;color:var(--coral);background:#fff2e6;font-weight:900}.summary{display:grid;gap:10px}.sum{display:flex;gap:12px;align-items:center;padding:13px;border-radius:14px;background:#ffffffb8}.sum span{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:10px;background:var(--sage2)}
-.nav{display:grid;place-items:center;width:41px;height:41px;cursor:pointer;border:0;border-radius:12px;background:#f2e2d2}.nav:disabled{opacity:.35}.counter{min-width:62px;text-align:center;color:var(--muted);font-weight:850}.hint{position:fixed;z-index:80;left:27px;bottom:27px;color:#3f302877;font-size:.81rem}.dots{position:fixed;z-index:91;right:24px;top:50%;display:grid;gap:9px;transform:translateY(-50%);padding:10px 8px;border:1px solid #ffffffc9;border-radius:99px;background:#fffaf1d8;box-shadow:0 10px 28px #6d482e18}.dot{position:relative;width:13px;height:13px;padding:0;cursor:pointer;border:2px solid #d8bca8;border-radius:50%;background:#fff8ef;transition:.2s}.dot::after{content:attr(data-label);position:absolute;right:23px;top:50%;width:max-content;max-width:190px;padding:7px 10px;border-radius:9px;background:#3b2c2aef;color:#fff;font-size:.78rem;font-weight:750;opacity:0;pointer-events:none;transform:translateY(-50%) translateX(5px);transition:.18s ease}.dot:hover::after,.dot:focus-visible::after{opacity:1;transform:translateY(-50%) translateX(0)}.dot:hover{border-color:var(--coral);transform:scale(1.16)}.dot.active{border-color:var(--coral);background:var(--coral);box-shadow:0 0 0 5px #d96b5520}.slide-next{position:fixed;z-index:80;left:50%;bottom:72px;transform:translateX(-50%);padding:12px 22px;cursor:pointer;border:0;border-radius:14px;color:white;background:var(--coral);font-weight:900;box-shadow:0 10px 22px #d96b5530}.slide-next:hover{transform:translateX(-50%) translateY(-2px)}
-.mobile-controls{display:none}
-@media(max-width:900px){.slide{align-items:flex-start;padding:27px 21px 112px}.hero,.trainer,.fruitlab,.qualitygrid{grid-template-columns:1fr}.grid3,.processflow{grid-template-columns:1fr 1fr}.pipeline{grid-template-columns:repeat(3,1fr)}.pipe:after,.flowstep:after{display:none}}@media(max-width:640px){.grid2,.grid3,.quizoptions,.versus,.processflow{grid-template-columns:1fr}.vs{margin:auto}.pipeline{grid-template-columns:1fr}.trow{grid-template-columns:1fr 1fr}.hint{display:none}.dots{right:8px}.slide-next{bottom:24px}}
-@media(max-width:640px){.slide-next{display:none}.mobile-controls{position:fixed;z-index:100;top:38px;right:21px;left:auto;bottom:auto;display:flex;gap:8px;transform:none}.mobile-controls button{display:grid;place-items:center;width:42px;height:42px;padding:0;cursor:pointer;border:0;border-radius:11px;background:#9bbaf4;color:#2563eb;font-size:1.15rem;box-shadow:0 8px 18px #17203318}.mobile-controls button:last-child{background:#2563eb;color:#fff}.mobile-controls button:disabled{opacity:.55;cursor:not-allowed}}
- .dots{position:fixed;z-index:100;top:50%;right:22px;display:grid;gap:9px;transform:translateY(-50%);align-content:center;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}.dot{position:relative;width:11px;height:11px;padding:0;border:0;border-radius:99px;background:#d6c9ea;box-shadow:0 3px 10px rgba(76,50,112,.12);cursor:pointer;transition:.2s}.dot:after{content:attr(title);position:absolute;right:24px;top:50%;padding:7px 10px;border-radius:10px;background:#2e2040;color:#fff;font-size:.76rem;font-weight:750;white-space:nowrap;opacity:0;pointer-events:none;transform:translateY(-50%) translateX(5px);transition:.2s}.dot:hover:after,.dot:focus-visible:after{opacity:1;transform:translateY(-50%) translateX(0)}.dot.active{width:11px;height:27px;background:var(--coral)}
-</style>
-<style>
-/* Unified visual language with lesson 3 */
-:root{--cream:#f7f2ff;--paper:#fffdfd;--ink:#2e2040;--muted:#65557b;--coral:#7c4dff;--orange:#ff9e68;--butter:#f8d57e;--sage:#51c4a6;--sage2:#ecfff7;--rose:#f1d9ff;--plum:#4c3270;--line:#e9dcff;--shadow:0 18px 50px rgba(90,62,140,.12)}
-body{color:var(--ink);background:radial-gradient(circle at 9% 10%,#f1e7ff 0,transparent 28%),radial-gradient(circle at 92% 85%,#dffaf2 0,transparent 30%),linear-gradient(135deg,#fffafc,#f1f3ff)}
-body:before{opacity:.32;background-image:radial-gradient(#8d7db0 .7px,transparent .7px);background-size:20px 20px}
-.paper,.card,.quizbox,.qualitynote,.flowstep,.pipe,.task{border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
-.eyebrow,.pill,.tag{border-color:#d7c7ff;background:#f4ebff;color:var(--coral)}
-.accent,.feature{color:var(--coral)}
-.action,.slide-next{background:var(--coral);box-shadow:0 8px 18px rgba(124,77,255,.26)}
-.bg-spheres{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}.bg-sphere{position:absolute;border-radius:50%;filter:blur(34px);opacity:.38;mix-blend-mode:multiply;animation:float-sphere 18s ease-in-out infinite alternate}.bg-sphere:nth-child(1){width:190px;height:190px;left:7%;top:17%;background:#8b5cf6}.bg-sphere:nth-child(2){width:130px;height:130px;right:12%;top:12%;background:#f472b6;animation-delay:-5s}.bg-sphere:nth-child(3){width:250px;height:250px;right:19%;bottom:-80px;background:#c084fc;animation-delay:-9s}.bg-sphere:nth-child(4){width:95px;height:95px;left:37%;bottom:12%;background:#5eead4;animation-delay:-13s}@keyframes float-sphere{from{transform:translate3d(-18px,-12px) scale(.94)}to{transform:translate3d(105px,68px) scale(1.12)}}
-</style>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../стили/lessons.css?v=2.0">
 </head>
-<body><canvas id="network-bg" aria-hidden="true"></canvas><div class="bg-spheres" aria-hidden="true"><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span></div><div class="progress" id="progress"></div><nav class="dots" id="dotsNav" aria-label="Навигация по слайдам"></nav><main>
+<body class="lesson-page lesson-10emn-3">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+
+  <!-- Airy Pill Navigation Bar -->
+  <div class="nav-wrapper">
+    <div class="nav-container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">10 ЕМН</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">3 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Основные понятия машинного обучения</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <canvas id="network-bg" aria-hidden="true"></canvas><div class="bg-spheres" aria-hidden="true"><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span></div><div class="progress" id="progress"></div><nav class="dots" id="dotsNav" aria-label="Навигация по слайдам"></nav><main>
 <section class="slide active"><div class="wrap hero"><div><span class="eyebrow">🧠 10 класс ЕМН · урок 3</span><h1>Основные понятия<br><span class="accent">машинного обучения</span></h1><p class="lead">Как компьютер учится на примерах, превращает данные в модель и делает прогноз для нового объекта.</p><div class="goal"><div class="goalitem"><b>✓</b><div><strong>Цель урока</strong><br><span style="color:var(--muted)">Объяснять понятия: модель, обучение, обучающие данные, признаки и прогнозирование.</span></div></div></div></div><img class="hero-art" src="https://st5.depositphotos.com/2379655/81514/v/450/depositphotos_815142092-stock-illustration-robot-making-errors-hallucinating-vector.jpg " alt="Схема: данные, модель, прогноз"></div></section>
 
 <section class="slide"><div class="narrow"><span class="eyebrow">01 · Вспоминаем</span><h2>Тест по прошлой теме</h2><p class="sub">6 вопросов об истории развития ИИ. Вопросы и ответы перемешиваются при каждом запуске.</p><div class="paper quizbox"><div class="quiztop"><span class="pill" id="recallCount">Вопрос 1 / 6</span><span class="pill" id="recallScore">Верно: 0</span></div><h3 class="quizq" id="recallQuestion"></h3><div class="quizoptions" id="recallOptions"></div><div class="quizfoot"><span class="feedback" id="recallFeedback">Выберите наиболее точный ответ.</span><button class="action" id="recallNext" hidden>Следующий →</button></div></div></div></section>
@@ -81,68 +106,10 @@ body:before{opacity:.32;background-image:radial-gradient(#8d7db0 .7px,transparen
 <div class="mobile-controls" aria-label="Мобильная навигация"><button type="button" id="mobilePrev" aria-label="Предыдущий слайд">←</button><button type="button" id="mobileNext" aria-label="Следующий слайд">→</button></div>
 <dialog class="image-modal" id="imageModal" aria-label="Увеличенное изображение"><button type="button" aria-label="Закрыть">×</button><img src="decision-boundary.png" alt=""></dialog>
 <div class="hint">← → листать · F — полный экран</div>
-<script>
-const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress"),dotsNav=document.getElementById("dotsNav");let current=0;
-const dotLabels=["Старт","Повторение","Смена подхода","Карта понятий","Данные","Признаки","Обучение","Модель","Прогноз","Итог","Завершение"];
-const imageModal=document.getElementById("imageModal");document.querySelector(".zoomable-image").onclick=()=>imageModal.showModal();imageModal.querySelector("button").onclick=()=>imageModal.close();imageModal.onclick=e=>{if(e.target===imageModal)imageModal.close()};
-slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=n===slides.length-1?"В начало":"Далее →";nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
-const dots=[...document.querySelectorAll(".dot")];
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
-mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
-function toggleFullScreen(){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}
-document.addEventListener("keydown",e=>{if(imageModal.open)return;const typing=["INPUT","TEXTAREA"].includes(document.activeElement.tagName);if(!typing&&["ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==="f")toggleFullScreen()});
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-const recallBank=[
-{q:"Какое событие 1956 года закрепило название «искусственный интеллект»?",a:"Дартмутский семинар",w:["Создание первого смартфона","Появление интернета","Запуск ChatGPT"]},
-{q:"Что проверяет тест Тьюринга?",a:"Можно ли в диалоге отличить ответы машины от ответов человека",w:["Скорость вычислений компьютера","Объём памяти программы","Умеет ли робот самостоятельно двигаться"]},
-{q:"Что называют «зимой искусственного интеллекта»?",a:"Период снижения интереса и финансирования из-за несбывшихся ожиданий",w:["Запрет компьютеров в холодное время года","Этап, когда ИИ работал только с прогнозом погоды","Период полного исчезновения исследований ИИ"]},
-{q:"Почему данные стали одним из двигателей современного ИИ?",a:"Большие наборы примеров позволяют моделям находить сложные закономерности",w:["Данные полностью заменили алгоритмы","Чем больше файлов, тем любой ответ автоматически вернее","Данные нужны только для хранения результатов"]},
-{q:"Как вычислительные мощности повлияли на развитие ИИ?",a:"Позволили быстрее обучать более сложные модели",w:["Сделали обучающие данные ненужными","Автоматически устранили все ошибки моделей","Заменили необходимость в алгоритмах"]},
-{q:"Почему системы вроде ChatGPT стали возможны именно сейчас?",a:"Совместились большие данные, новые алгоритмы и мощные вычисления",w:["Появилось одно универсальное правило для всех вопросов","Компьютеры научились работать без обучения","Причиной стало только увеличение скорости интернета"]}
-];
-let recallOrder=[],recallIndex=0,recallPoints=0,recallLocked=false;
-function renderRecall(){const item=recallOrder[recallIndex];recallLocked=false;recallCount.textContent="Вопрос "+(recallIndex+1)+" / 6";recallScore.textContent="Верно: "+recallPoints;recallQuestion.textContent=item.q;recallFeedback.textContent="Выберите наиболее точный ответ.";recallNext.hidden=true;recallOptions.innerHTML="";shuffle([item.a,...item.w]).forEach(text=>{const b=document.createElement("button");b.className="quizoption";b.textContent=text;b.onclick=()=>answerRecall(b,item);recallOptions.appendChild(b)})}
-function answerRecall(button,item){if(recallLocked)return;recallLocked=true;const ok=button.textContent===item.a;if(ok)recallPoints++;document.querySelectorAll(".quizoption").forEach(b=>{b.disabled=true;if(b.textContent===item.a)b.classList.add("correct")});if(!ok)button.classList.add("wrong");recallScore.textContent="Верно: "+recallPoints;recallFeedback.textContent=ok?"Верно!":"Зелёным отмечен точный ответ.";recallNext.hidden=false;recallNext.textContent=recallIndex===5?"Завершить тест":"Следующий →"}
-function finishRecall(){recallCount.textContent="Тест завершён";recallScore.textContent="Результат: "+recallPoints+" / 6";recallQuestion.textContent=recallPoints>=5?"История ИИ усвоена — двигаемся дальше!":recallPoints>=3?"Неплохо. Обсудите ошибки перед новой темой.":"Повторите ключевые этапы развития ИИ.";recallOptions.innerHTML="";recallFeedback.textContent="";recallNext.hidden=false;recallNext.textContent="Пройти ещё раз ↻";recallNext.onclick=startRecall}
-function nextRecall(){if(recallIndex<5){recallIndex++;renderRecall()}else finishRecall()}
-function startRecall(){recallOrder=shuffle([...recallBank]);recallIndex=0;recallPoints=0;recallNext.onclick=nextRecall;renderRecall()}
-document.querySelectorAll(".pipe").forEach(pipe=>pipe.onclick=()=>{document.querySelectorAll(".pipe").forEach(x=>x.classList.remove("active"));pipe.classList.add("active");pipeInfo.textContent=pipe.dataset.info});
-let trained=false;
-trainModel.onclick=()=>{trained=!trained;trainChart.classList.toggle("untrained",!trained);[step1,step2,step3].forEach(x=>x.classList.remove("active"));if(trained){step3.classList.add("active");errorBadge.textContent="Ошибка: уменьшилась";trainModel.textContent="Сбросить обучение"}else{step1.classList.add("active");errorBadge.textContent="Ошибка: большая";trainModel.textContent="Обучить модель"}};
-document.querySelectorAll(".task .choice").forEach(choice=>choice.onclick=()=>{choice.closest(".choices").querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));choice.classList.add("selected");choice.closest(".task").classList.remove("correct","wrong")});
-checkMission.onclick=()=>{let score=0,answered=0;document.querySelectorAll(".task").forEach(task=>{const selected=task.querySelector(".selected");task.classList.remove("correct","wrong");if(!selected)return;answered++;const ok=selected.dataset.value===task.dataset.answer;task.classList.add(ok?"correct":"wrong");if(ok)score+=2});missionScore.textContent="Результат: "+score+" / 10";missionFeedback.textContent=answered<5?"Ответьте ещё на "+(5-answered)+" задан.":score>=9?"Отлично: понятия связаны верно!":score>=7?"Хорошо. Проверьте одну неточность.":score>=5?"Основа есть — повторите конвейер.":"Вернитесь к объяснению и попробуйте снова."};
-resetMission.onclick=()=>{document.querySelectorAll(".task").forEach(x=>x.classList.remove("correct","wrong"));document.querySelectorAll(".task .choice").forEach(x=>x.classList.remove("selected"));missionScore.textContent="Результат: — / 10";missionFeedback.textContent=""};
 
-const canvas=document.getElementById('network-bg');
-const ctx=canvas.getContext('2d');
-let particles=[];
-function initParticles(){
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-  particles=Array.from({length:54},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.34,vy:(Math.random()-.5)*.34,r:1.4+Math.random()*2.2}));
-}
-function drawNetwork(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='rgba(124, 77, 255, 0.10)';
-  ctx.fillStyle='rgba(94, 234, 212, 0.18)';
-  particles.forEach((point,index)=>{
-point.x += point.vx; point.y += point.vy;
-if(point.x < 0 || point.x > canvas.width) point.vx *= -1;
-if(point.y < 0 || point.y > canvas.height) point.vy *= -1;
-ctx.beginPath(); ctx.arc(point.x, point.y, point.r, 0, Math.PI * 2); ctx.fill();
-for(let next=index+1; next<particles.length; next++){
-  const other=particles[next];
-  const distance=Math.hypot(point.x-other.x, point.y-other.y);
-  if(distance < 150){
-    ctx.globalAlpha = 1 - distance / 150;
-    ctx.beginPath(); ctx.moveTo(point.x, point.y); ctx.lineTo(other.x, other.y); ctx.stroke();
-    ctx.globalAlpha=1;
-  }
-}
-  });
-  requestAnimationFrame(drawNetwork);
-}
-window.addEventListener('resize', initParticles);
-initParticles(); drawNetwork();
-startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1))||1)-1)));
-</script></body></html>
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+        <script src="../../скрипты/lessons.js?v=2.0"></script>
+</body></html>

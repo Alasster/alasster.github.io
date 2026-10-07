@@ -4,290 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Урок 4: Классификация задач ИИ — практика · 11 класс</title>
-    <style>
-      :root {
-        --bg: #f8fafc;
-        --panel: rgba(255, 255, 255, .8);
-        --panel-border: rgba(148, 163, 184, .25);
-        --text: #1e293b;
-        --muted: #526176;
-        --accent: #6366f1;
-        --violet: #8b5cf6;
-        --rose: #e83560;
-        --success: #087f5b;
-      }
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../стили/lessons.css?v=2.0">
+</head>
+  <body class="lesson-page lesson-11-4">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+  <!-- Airy Pill Navigation Bar -->
+  <div class="nav-wrapper">
+    <div class="nav-container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
 
-      body {
-        height: 100vh;
-        overflow: hidden;
-        color: var(--text);
-        background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, .07), transparent 35%), var(--bg);
-        font-family: Inter, "Segoe UI", Arial, sans-serif;
-        font-size: 18px;
-        line-height: 1.55;
-      }
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">11 класс</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">4 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Классификация задач ИИ — практика</span>
+        </div>
 
-      #network-bg {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-      }
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
 
-      .progress-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--rose), var(--violet));
-        z-index: 50;
-        transition: width .3s;
-      }
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
 
-      .slide {
-        position: absolute;
-        inset: 0;
-        display: none;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 38px 65px 108px;
-        overflow-y: auto;
-      }
-
-      .slide.active {
-        display: flex;
-        animation: fadeIn .35s ease-out;
-      }
-
-      .container {
-        width: min(1100px, 100%);
-        margin: auto 0;
-        position: relative;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(12px); }
-        to { opacity: 1; transform: none; }
-      }
-
-      .eyebrow {
-        display: inline-block;
-        padding: 6px 12px;
-        background: var(--rose);
-        color: white;
-        border-radius: 6px;
-        font-size: .78rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 18px;
-      }
-
-      h1 {
-        font-size: clamp(2.5rem, 5vw, 4rem);
-        line-height: 1.12;
-        margin-bottom: 24px;
-        font-weight: 800;
-      }
-
-      h2 {
-        font-size: clamp(1.8rem, 3.2vw, 2.6rem);
-        line-height: 1.18;
-        margin-bottom: 18px;
-      }
-
-      h3 { font-size: 1.15rem; margin-bottom: 10px; }
-      .space { margin-top: 18px; }
-      .small { font-size: .95rem; }
-      .muted { color: var(--muted); }
-      .lead { font-size: 1.2rem; max-width: 950px; }
-
-      .accent-text {
-        background: linear-gradient(135deg, var(--rose), var(--violet));
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-      }
-
-      .glass, .task-card {
-        background: var(--panel);
-        border: 1px solid var(--panel-border);
-        padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, .03);
-        min-width: 0;
-      }
-
-      .glass { backdrop-filter: blur(12px); }
-      .task-card { background: white; }
-      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px; }
-      .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
-
-      .tag {
-        display: inline-block;
-        font-weight: 800;
-        color: #6240b2;
-        background: #f0ebff;
-        border-radius: 9px;
-        padding: 5px 12px;
-        margin-bottom: 14px;
-        font-size: .9rem;
-      }
-
-      .callout {
-        border-left: 4px solid var(--rose);
-        background: #fff0f4;
-        padding: 16px 20px;
-        border-radius: 0 12px 12px 0;
-        margin-top: 22px;
-      }
-
-      .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-      .pill { padding: 7px 14px; border: 1px solid var(--panel-border); border-radius: 100px; background: white; font-size: .95rem; }
-
-      .start-btn, .action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
-        border-radius: 100px;
-        background: linear-gradient(135deg, var(--rose), var(--violet));
-        color: white;
-        padding: 13px 24px;
-        font: inherit;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        min-height: 46px;
-      }
-
-      .start-btn { margin-top: 28px; }
-      a { color: #6240b2; text-underline-offset: 3px; }
-      button:focus-visible, a:focus-visible, video:focus-visible, summary:focus-visible {
-        outline: 3px solid var(--accent);
-        outline-offset: 4px;
-      }
-
-      .table-wrap { overflow-x: auto; margin-top: 22px; border: 1px solid var(--panel-border); border-radius: 12px; }
-      table { width: 100%; border-collapse: collapse; background: white; font-size: 1rem; }
-      th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
-      th { background: #f0ebff; color: #53349b; }
-      tbody tr:last-child td { border-bottom: 0; }
-      .technology { width: 25%; }
-      td:first-child small { display: block; color: var(--muted); margin-top: 3px; }
-      .conclusion-card { padding: 18px; }
-      .conclusion-card h3 { font-size: 1.05rem; }
-      .conclusion-card p { font-size: 1rem; }
-
-      .task-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-        gap: 0;
-        align-items: stretch;
-        overflow: hidden;
-      }
-
-      .glass.task-layout { padding: 0; }
-      .task-layout > .glass, .task-layout > .task-card {
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
-      }
-
-      .task-main { display: flex; flex-direction: column; justify-content: center; padding: 32px; }
-      .task-main p + p { margin-top: 14px; }
-      .task-cta { margin-top: 20px; }
-      .task-layout .demo { display: flex; flex-direction: column; justify-content: center; padding: 0; }
-      .demo video { display: block; width: 100%; height: 100%; min-height: 360px; background: #f0ebff; object-fit: contain; }
-      .demo figcaption { color: var(--muted); font-size: .85rem; margin: 10px 5px 0; }
-      .topic-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-      .topic { background: #f5f3ff; border: 1px solid #e5defa; border-radius: 12px; padding: 14px; font-size: 1rem; }
-      .topic b { display: block; margin-bottom: 4px; }
-      .topic small { display: block; color: var(--muted); margin-top: 4px; }
-      .workflow { padding-left: 24px; font-size: 1rem; }
-      .workflow li + li { margin-top: 7px; }
-      .workflow-details summary { cursor: pointer; font-size: 1.15rem; font-weight: 700; }
-      .workflow-details[open] summary { margin-bottom: 14px; }
-
-      .final-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); gap: 22px; align-items: start; }
-      .rubric { display: grid; gap: 10px; }
-      .rubric-row { display: grid; grid-template-columns: 86px minmax(0, 1fr); align-items: start; gap: 16px; padding: 16px 18px; background: white; border: 1px solid var(--panel-border); border-radius: 12px; font-size: 1rem; }
-      .rubric-row > strong { background: #f0ebff; color: #6240b2; padding: 5px 8px; text-align: center; border-radius: 8px; white-space: nowrap; }
-      .rubric-row.required { border-color: #d8b4fe; background: #faf7ff; }
-      .summary-list { padding-left: 22px; font-size: 1rem; }
-      .summary-list li + li { margin-top: 12px; }
-      .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-      .tags .tag { margin: 0; }
-
-      .nav-controls { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: none; align-items: center; gap: 15px; z-index: 100; background: rgba(248, 250, 252, .95); padding: 8px; border-radius: 100px; }
-      .nav-btn { width: 46px; height: 46px; border-radius: 50%; border: 0; background: white; color: var(--text); box-shadow: 0 4px 12px #0001; cursor: pointer; font-size: 1.5rem; }
-      .nav-btn:disabled { opacity: .35; cursor: default; }
-      .nav-btn:hover:not(:disabled) { background: var(--rose); color: white; }
-      #counter { font-size: .95rem; min-width: 66px; text-align: center; font-variant-numeric: tabular-nums; }
-      .dots-nav { position: fixed; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; z-index: 120; }
-      .dot-nav { width: 28px; height: 28px; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
-      .dot-nav::before { content: ""; width: 9px; height: 9px; background: #bbc5d3; border-radius: 50%; }
-      .dot-nav.active::before { background: var(--rose); transform: scale(1.4); }
-
-      @media (max-width: 850px) {
-        .slide { padding: 25px 38px 30px 20px; }
-        .grid-2, .grid-3, .task-layout, .final-layout { grid-template-columns: 1fr; }
-        .topic-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        body { font-size: 17px; }
-        .glass, .task-card { padding: 20px; }
-        .demo video { height: auto; min-height: 0; }
-        .dots-nav { right: 3px; }
-        .container { margin: 0; }
-        .nav-controls {
-          top: 12px;
-          right: 20px;
-          bottom: auto;
-          left: auto;
-          transform: none;
-          gap: 8px;
-        }
-        .eyebrow {
-          max-width: calc(100% - 180px);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        h1 { font-size: 2.6rem; }
-      }
-
-      @media (max-width: 640px) {
-        .nav-controls { display: flex; }
-      }
-
-      @media (max-width: 520px) {
-        .topic-list { grid-template-columns: 1fr; }
-        .rubric-row { grid-template-columns: 1fr; gap: 8px; }
-        .rubric-row > strong { justify-self: start; }
-        th, td { padding: 10px; min-width: 145px; }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        *, *::before { animation: none !important; transition: none !important; }
-      }
-
-      @media print {
-        body { height: auto; overflow: visible; background: white; }
-        .slide, .slide.active { display: block; position: relative; padding: 25px; break-after: page; overflow: visible; }
-        .nav-controls, .dots-nav, .progress-bar, #network-bg, .start-btn, video { display: none; }
-        .container { margin: 0; }
-        .glass { backdrop-filter: none; }
-        .table-wrap { overflow: visible; }
-      }
-    </style>
-  </head>
-  <body>
-    <canvas id="network-bg" aria-hidden="true"></canvas>
+  <canvas id="network-bg" aria-hidden="true"></canvas>
     <div class="progress-bar" id="progress"></div>
     <nav class="dots-nav" id="dotsNav" aria-label="Выбор слайда"></nav>
     <nav class="nav-controls" aria-label="Навигация по уроку">
@@ -469,145 +248,8 @@
       </section>
     </main>
 
-    <script>
-      'use strict';
-
-      const slides = [...document.querySelectorAll('.slide')];
-      const dotsNav = document.getElementById('dotsNav');
-      const progress = document.getElementById('progress');
-      const counter = document.getElementById('counter');
-      const prevButton = document.getElementById('prevBtn');
-      const nextButton = document.getElementById('nextBtn');
-      let currentSlide = 0;
-
-      slides.forEach((slide, index) => {
-        const dot = document.createElement('button');
-        const title = slide.querySelector('h1, h2').textContent;
-        dot.type = 'button';
-        dot.className = 'dot-nav';
-        dot.title = `Слайд ${index + 1}: ${title}`;
-        dot.setAttribute('aria-label', dot.title);
-        dot.addEventListener('click', () => goToSlide(index));
-        dotsNav.append(dot);
-      });
-
-      function goToSlide(index) {
-        currentSlide = Math.max(0, Math.min(slides.length - 1, index));
-        slides.forEach((slide, number) => {
-          const active = number === currentSlide;
-          slide.classList.toggle('active', active);
-          slide.setAttribute('aria-hidden', String(!active));
-          slide.querySelectorAll('video').forEach(video => {
-            if (active) video.play().catch(() => {});
-            else video.pause();
-          });
-        });
-        [...dotsNav.children].forEach((dot, number) => {
-          const active = number === currentSlide;
-          dot.classList.toggle('active', active);
-          if (active) dot.setAttribute('aria-current', 'step');
-          else dot.removeAttribute('aria-current');
-        });
-        progress.style.width = `${(currentSlide + 1) / slides.length * 100}%`;
-        counter.textContent = `${currentSlide + 1} / ${slides.length}`;
-        prevButton.disabled = currentSlide === 0;
-        nextButton.disabled = currentSlide === slides.length - 1;
-        slides[currentSlide].scrollTop = 0;
-        history.replaceState(null, '', `#${currentSlide + 1}`);
-      }
-
-      function goToHash() {
-        const match = /^#([1-4])$/.exec(location.hash);
-        goToSlide(match ? Number(match[1]) - 1 : 0);
-      }
-
-      prevButton.addEventListener('click', () => goToSlide(currentSlide - 1));
-      nextButton.addEventListener('click', () => goToSlide(currentSlide + 1));
-      document.getElementById('startBtn').addEventListener('click', () => goToSlide(1));
-      window.addEventListener('hashchange', goToHash);
-      document.addEventListener('keydown', event => {
-        if (event.target.closest('input, textarea, select, button, a, summary, video, [contenteditable]') || event.altKey || event.ctrlKey || event.metaKey) return;
-        const destinations = {
-          ArrowRight: currentSlide + 1,
-          PageDown: currentSlide + 1,
-          ArrowLeft: currentSlide - 1,
-          PageUp: currentSlide - 1,
-          Home: 0,
-          End: slides.length - 1
-        };
-        if (Object.hasOwn(destinations, event.key)) {
-          event.preventDefault();
-          goToSlide(destinations[event.key]);
-        }
-      });
-
-      const canvas = document.getElementById('network-bg');
-      const ctx = canvas.getContext('2d');
-      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-      let particles = [];
-      let animationFrame = null;
-
-      function initParticles() {
-        canvas.width = innerWidth;
-        canvas.height = innerHeight;
-        particles = Array.from({length: 35}, () => ({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - .5) * .9,
-          vy: (Math.random() - .5) * .9,
-          radius: Math.random() * 1.5 + 1
-        }));
-        drawBackground(false);
-      }
-
-      function drawBackground(move) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach((particle, index) => {
-          if (move) {
-            particle.x += particle.vx;
-            particle.y += particle.vy;
-            if (particle.x < -30) particle.x = canvas.width + 30;
-            if (particle.x > canvas.width + 30) particle.x = -30;
-            if (particle.y < -30) particle.y = canvas.height + 30;
-            if (particle.y > canvas.height + 30) particle.y = -30;
-          }
-          particles.slice(index + 1).forEach(other => {
-            const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
-            if (distance < 190) {
-              ctx.strokeStyle = `rgba(244, 63, 94, ${.12 * (1 - distance / 190)})`;
-              ctx.beginPath();
-              ctx.moveTo(particle.x, particle.y);
-              ctx.lineTo(other.x, other.y);
-              ctx.stroke();
-            }
-          });
-          ctx.fillStyle = 'rgba(244, 63, 94, .2)';
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
-      function animate() {
-        animationFrame = null;
-        if (document.hidden || reducedMotion.matches) return;
-        drawBackground(true);
-        animationFrame = requestAnimationFrame(animate);
-      }
-
-      function updateAnimation() {
-        if (animationFrame !== null) cancelAnimationFrame(animationFrame);
-        animationFrame = null;
-        if (!document.hidden && !reducedMotion.matches) animate();
-        else drawBackground(false);
-      }
-
-      window.addEventListener('resize', initParticles);
-      document.addEventListener('visibilitychange', updateAnimation);
-      reducedMotion.addEventListener('change', updateAnimation);
-      initParticles();
-      updateAnimation();
-      goToHash();
-    </script>
-  </body>
+    
+  
+        <script src="../../скрипты/lessons.js?v=2.0"></script>
+</body>
 </html>

@@ -5,151 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Урок 2: Задачи нейронных сетей</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <style>
-        :root {
-            --bg: #f8fafc;
-            --panel: rgba(255, 255, 255, 0.7);
-            --panel-border: rgba(148, 163, 184, 0.2);
-            --text: #1e293b;
-            --muted: #64748b;
-            --accent: #6366f1;
-            --accent-light: #a5b4fc;
-            --success: #10b981;
-            --violet: #8b5cf6;
-            --amber: #f59e0b;
-            --rose: #f43f5e;
-            --code-bg: #f1f5f9;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; }
-
-        body {
-            min-height: 100vh;
-            overflow: hidden;
-            color: var(--text);
-            background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.05), transparent 30%), #f8fafc;
-            font-family: "Inter", sans-serif;
-        }
-
-        #network-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-        .progress-bar {
-            position: fixed; top: 0; left: 0; z-index: 40; height: 4px; width: 0;
-            background: linear-gradient(90deg, var(--rose), var(--violet));
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .slide {
-            position: absolute; inset: 0; z-index: 1; display: none;
-            align-items: flex-start; justify-content: center;
-            padding: 40px 60px 110px; overflow-y: auto;
-        }
-
-        .slide.active { display: flex; animation: fadeIn 0.6s ease-out; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-
-        .container { width: min(1100px, 100%); z-index: 2; margin: auto 0; }
-
-        .eyebrow {
-            display: inline-block; padding: 6px 12px; background: var(--rose);
-            color: white; border-radius: 6px; font-size: 0.8rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
-        }
-
-        h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; margin-bottom: 20px; }
-        h2 { font-size: 2.2rem; margin-bottom: 20px; color: var(--text); }
-
-        .accent-text { background: linear-gradient(135deg, var(--rose), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .glass {
-            background: var(--panel); backdrop-filter: blur(12px);
-            border: 1px solid var(--panel-border); padding: 30px;
-            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-        }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
-        
-        .task-card {
-            background: white; padding: 30px; border-radius: 20px;
-            border: 1px solid var(--panel-border); transition: all 0.3s ease;
-            position: relative; overflow: hidden;
-        }
-
-        .task-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
-
-        .task-card i { font-size: 2.5rem; margin-bottom: 20px; display: block; }
-        
-        .type-tag {
-            position: absolute; top: 20px; right: 20px;
-            font-size: 0.7rem; font-weight: 700; padding: 4px 10px;
-            border-radius: 20px; background: #f1f5f9; color: var(--muted);
-        }
-
-        /* Визуализация Классификации */
-        .viz-box {
-            height: 150px; background: #f8fafc; border-radius: 12px;
-            margin-top: 15px; position: relative; display: flex; align-items: center; justify-content: center;
-        }
-
-        .dots-classification { display: flex; gap: 10px; }
-        .dot { width: 20px; height: 20px; border-radius: 50%; }
-        .dot.red { background: var(--rose); box-shadow: 0 0 10px var(--rose); }
-        .dot.blue { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-
-        /* Визуализация Регрессии */
-        .regression-line {
-            width: 80%; height: 2px; background: #cbd5e1; position: relative;
-            transform: rotate(-20deg);
-        }
-        .regression-line::after {
-            content: ''; position: absolute; width: 100%; height: 2px;
-            background: var(--violet); top: -10px;
-        }
-
-        /* Навигация */
-        .nav-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
-        .nav-btn {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            background: white; color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            cursor: pointer; display: grid; place-items: center; transition: all 0.2s;
-        }
-        .nav-btn:hover:not(:disabled) { background: var(--rose); color: white; transform: scale(1.1); }
-        
-        .start-btn {
-            width: auto; padding: 0 28px; border-radius: 999px;
-            background: linear-gradient(135deg, var(--rose), var(--violet));
-            color: white; font-weight: 800; cursor: pointer; border: none; height: 54px;
-        }
-
-        .dots-nav { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 120; }
-        .dot-nav { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; cursor: pointer; transition: 0.3s; }
-        .dot-nav.active { background: var(--rose); transform: scale(1.4); }
-
-        @media (max-width: 850px) {
-            .grid-2 { grid-template-columns: 1fr; }
-            .slide { padding: 20px 20px 30px; }
-            .nav-controls {
-                top: 12px;
-                right: 20px;
-                bottom: auto;
-                left: auto;
-                transform: none;
-                gap: 8px;
-            }
-            .eyebrow {
-                max-width: calc(100% - 120px);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        }
-    </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../стили/lessons.css?v=2.0">
 </head>
-<body>
+<body class="lesson-page lesson-11-2">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
 
-    <div class="progress-bar" id="progress"></div>
+  <!-- Airy Pill Navigation Bar -->
+  <div class="nav-wrapper">
+    <div class="nav-container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">11 класс</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">2 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Задачи нейронных сетей</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <div class="progress-bar" id="progress"></div>
     <canvas id="network-bg"></canvas>
     
     <div class="dots-nav" id="dotsNav"></div>
@@ -329,96 +246,8 @@
         </div>
     </section>
 
-    <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-        const dotsNav = document.getElementById('dotsNav');
-        const totalSlides = slides.length;
+    
 
-        // Init Dots
-        slides.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = `dot-nav ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => goToSlide(i);
-            dotsNav.appendChild(dot);
-        });
-
-        function updateUI() {
-            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-            document.querySelectorAll('.dot-nav').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
-        }
-
-        function changeSlide(dir) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + dir));
-            updateUI();
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateUI();
-        }
-
-        function checkAnswer(el, type) {
-            const feedback = document.getElementById('quiz-feedback');
-            el.style.borderColor = 'var(--success)';
-            el.style.background = 'rgba(16, 185, 129, 0.1)';
-            
-            let typeName = "";
-            if(type === 'reg') typeName = "Регрессия (число)";
-            if(type === 'class') typeName = "Классификация (категория)";
-            if(type === 'rec') typeName = "Распознавание (образ)";
-            
-            feedback.innerHTML = `<span style="color: var(--success)">Верно! Это ${typeName}</span>`;
-        }
-
-        // Background particles (same as lesson 1 for consistency)
-        const canvas = document.getElementById('network-bg');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function initParticles() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<40; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3
-                });
-            }
-        }
-
-        function draw() {
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(244, 63, 94, 0.05)';
-            particles.forEach((p, i) => {
-                p.x += p.vx; p.y += p.vy;
-                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                for(let j=i+1; j<particles.length; j++) {
-                    let p2 = particles[j];
-                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                    if(dist < 200) {
-                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-                    }
-                }
-            });
-            requestAnimationFrame(draw);
-        }
-
-        window.addEventListener('resize', initParticles);
-        initParticles();
-        draw();
-
-        document.addEventListener('keydown', (e) => {
-            if(e.key === 'ArrowRight') changeSlide(1);
-            if(e.key === 'ArrowLeft') changeSlide(-1);
-        });
-    </script>
+        <script src="../../скрипты/lessons.js?v=2.0"></script>
 </body>
 </html>
