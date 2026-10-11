@@ -70,6 +70,75 @@
 
   let activeTabId = detectCurrentClass();
 
+  // Dynamic lesson detection & synchronization
+  function syncDynamicLessons() {
+    try {
+      const stored = localStorage.getItem('alasster_dynamic_lessons');
+      if (stored) {
+        const extra = JSON.parse(stored);
+        for (const [cid, list] of Object.entries(extra)) {
+          if (LESSONS_DATABASE[cid]) {
+            list.forEach(item => {
+              if (!LESSONS_DATABASE[cid].lessons.some(l => l.file === item.file)) {
+                LESSONS_DATABASE[cid].lessons.push(item);
+              }
+            });
+          }
+        }
+      }
+    } catch (e) {}
+
+    const currentPath = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
+    const classId = detectCurrentClass();
+    const data = LESSONS_DATABASE[classId];
+    if (data && currentPath.includes('.html')) {
+      const match = currentPath.match(/([^/]+\/[^/]+\/[^/]+\.html)$/i);
+      if (match) {
+        const relativeFile = match[1];
+        const exists = data.lessons.some(l => l.file.toLowerCase() === relativeFile.toLowerCase() || currentPath.endsWith(l.file));
+        if (!exists) {
+          const numMatch = relativeFile.match(/(\d+(?:\s*-\s*\d+)?)\s*урок/i);
+          const num = numMatch ? numMatch[1].replace(/\s+/g, '') : (data.lessons.length + 1);
+          const docTitle = document.querySelector('.nav-badge-topic')?.textContent?.trim() ||
+                           document.querySelector('h1')?.textContent?.trim() ||
+                           `Урок ${num}`;
+          const newLesson = { num, title: docTitle, file: relativeFile };
+          data.lessons.push(newLesson);
+          try {
+            let extra = {};
+            const stored = localStorage.getItem('alasster_dynamic_lessons');
+            if (stored) extra = JSON.parse(stored);
+            if (!extra[classId]) extra[classId] = [];
+            if (!extra[classId].some(l => l.file === relativeFile)) {
+              extra[classId].push(newLesson);
+              localStorage.setItem('alasster_dynamic_lessons', JSON.stringify(extra));
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    Object.values(LESSONS_DATABASE).forEach(group => {
+      group.lessons.sort((a, b) => {
+        const na = parseInt(String(a.num), 10) || 0;
+        const nb = parseInt(String(b.num), 10) || 0;
+        return na - nb;
+      });
+    });
+  }
+
+  function updateDocumentTitle() {
+    const classId = detectCurrentClass();
+    const data = LESSONS_DATABASE[classId];
+    const currentPath = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
+    if (data) {
+      const currentLesson = data.lessons.find(l => currentPath.endsWith(l.file));
+      if (currentLesson) {
+        document.title = `${data.name} · ${currentLesson.num} урок`;
+      }
+    }
+  }
+
   function renderModalLessons(classId) {
     const listEl = document.getElementById('modal-lessons-list');
     if (!listEl) return;
@@ -82,7 +151,7 @@
       const isCurrent = currentPath.endsWith(lesson.file);
       return `
         <a href="../../${lesson.file}" class="lesson-row-card ${isCurrent ? 'current-lesson' : ''}">
-          <div class="lesson-badge-id">№${lesson.num}</div>
+          <div class="lesson-badge-id">${lesson.num}</div>
           <span class="lesson-title-label">${lesson.title}</span>
           ${isCurrent ? '<span class="lesson-current-tag">Текущий</span>' : '<i class="fa-solid fa-arrow-right lesson-arrow-icon"></i>'}
         </a>
@@ -155,65 +224,437 @@
     });
   }
 
-  function updateMobileButtonsState() {
-    const slides = document.querySelectorAll('.slide');
-    if (!slides.length) return;
-    const activeIndex = Array.from(slides).findIndex(s => s.classList.contains('active'));
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+  // ==========================================================================
+  // MASTER UNIVERSAL SLIDE CONTROLLER (ALL PAGES 9-11 & FUTURE LESSONS)
+  // ==========================================================================
+  let globalCurrentSlide = 0;
 
-    if (prevBtn && activeIndex !== -1) {
-      prevBtn.disabled = activeIndex === 0;
+  function getSlides() {
+    return Array.from(document.querySelectorAll('.slide'));
+  }
+
+  function setupNavControls() {
+    let navBar = document.querySelector('.nav-controls');
+    if (!navBar) {
+      navBar = document.createElement('div');
+      navBar.className = 'nav-controls';
+      navBar.innerHTML = `
+        <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fas fa-chevron-left"></i></button>
+        <span id="navSlideCounter" class="nav-counter">1 / 1</span>
+        <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fas fa-chevron-right"></i></button>
+      `;
     }
-    if (nextBtn && activeIndex !== -1) {
-      nextBtn.disabled = activeIndex === slides.length - 1;
+
+    // Always attach to document.body directly (detached from navbar)
+    if (navBar.parentElement !== document.body) {
+      document.body.appendChild(navBar);
     }
   }
 
-  function initMobileControls() {
+  function updateDotsIndicator(container, dots, activeIndex) {
+    const activeDot = dots[activeIndex];
+    if (!container || !activeDot) return;
+
+    let indicator = container.querySelector('.dot-indicator');
+    if (!indicator) {
+      indicator = document.createElement('span');
+      indicator.className = 'dot-indicator';
+      indicator.setAttribute('aria-hidden', 'true');
+      container.appendChild(indicator);
+    }
+
+    const indicatorWidth = 14;
+    const indicatorHeight = 14;
+    const containerRect = container.getBoundingClientRect();
+    const dotRect = activeDot.getBoundingClientRect();
+    const x = dotRect.left - containerRect.left - container.clientLeft +
+      (dotRect.width - indicatorWidth) / 2;
+    const y = dotRect.top - containerRect.top - container.clientTop +
+      (dotRect.height - indicatorHeight) / 2;
+    const previousIndex = Number(indicator.dataset.index);
+    const initialized = indicator.dataset.initialized === 'true';
+
+    indicator.style.width = `${indicatorWidth}px`;
+    indicator.style.height = `${indicatorHeight}px`;
+    indicator.style.setProperty('--dot-indicator-x', `${x}px`);
+    indicator.style.setProperty('--dot-indicator-y', `${y}px`);
+
+    if (initialized && previousIndex !== activeIndex) {
+      indicator.classList.remove('is-moving');
+      void indicator.offsetWidth;
+      indicator.classList.add('is-moving');
+    }
+
+    indicator.dataset.index = String(activeIndex);
+    if (!initialized) {
+      indicator.dataset.initialized = 'true';
+      requestAnimationFrame(() => indicator.classList.add('is-ready'));
+    }
+  }
+
+  function updateGlobalUI() {
+    const slides = getSlides();
+    if (!slides.length) return;
+    const total = slides.length;
+    globalCurrentSlide = Math.max(0, Math.min(total - 1, globalCurrentSlide));
+
+    slides.forEach((slide, idx) => {
+      const isActive = idx === globalCurrentSlide;
+      slide.classList.toggle('active', isActive);
+      slide.setAttribute('aria-hidden', !isActive);
+      if (isActive) slide.scrollTop = 0;
+    });
+
+    const dotsContainer = document.getElementById('dots') ||
+                          document.querySelector('.dots') ||
+                          document.getElementById('dotsNav') ||
+                          document.querySelector('.dots-nav');
+    const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('button')) : [];
+    dots.forEach((dot, idx) => {
+      const isActive = idx === globalCurrentSlide;
+      dot.classList.toggle('active', isActive);
+      if (isActive) dot.setAttribute('aria-current', 'step');
+      else dot.removeAttribute('aria-current');
+    });
+    updateDotsIndicator(dotsContainer, dots, globalCurrentSlide);
+
+    const bar = document.getElementById('progress') || document.querySelector('.progress-bar');
+    if (bar) {
+      bar.style.width = `${((globalCurrentSlide + 1) / total) * 100}%`;
+    }
+
+    setupNavControls();
+
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
+    if (prevBtn) prevBtn.disabled = globalCurrentSlide === 0;
+    if (nextBtn) nextBtn.disabled = globalCurrentSlide === total - 1;
 
-    if (prevBtn && !prevBtn.dataset.navBound) {
-      prevBtn.dataset.navBound = 'true';
-      prevBtn.addEventListener('click', () => {
-        const legacyPrev = document.getElementById('mobilePrev');
-        if (legacyPrev && legacyPrev !== prevBtn && typeof legacyPrev.click === 'function') {
-          legacyPrev.click();
-        } else if (typeof window.changeSlide === 'function') {
-          try { window.changeSlide(-1); } catch (e) {}
-        } else {
-          document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', code: 'ArrowLeft', bubbles: true }));
+    let counter = document.getElementById('navSlideCounter');
+    const navBar = document.querySelector('.nav-controls');
+    if (navBar && !counter) {
+      counter = document.createElement('span');
+      counter.id = 'navSlideCounter';
+      counter.className = 'nav-counter';
+      if (nextBtn) navBar.insertBefore(counter, nextBtn);
+      else navBar.appendChild(counter);
+    }
+    if (counter) {
+      counter.textContent = `${globalCurrentSlide + 1} / ${total}`;
+    }
+
+    try {
+      history.replaceState(null, '', '#' + (globalCurrentSlide + 1));
+    } catch (e) {}
+  }
+
+  function goToSlide(index) {
+    const slides = getSlides();
+    if (!slides.length) return;
+    globalCurrentSlide = Math.max(0, Math.min(slides.length - 1, index));
+    updateGlobalUI();
+  }
+
+  function changeSlide(direction) {
+    const slides = getSlides();
+    if (!slides.length) return;
+    globalCurrentSlide = Math.max(0, Math.min(slides.length - 1, globalCurrentSlide + direction));
+    updateGlobalUI();
+  }
+
+  window.addEventListener('resize', () => {
+    const dotsContainer = document.getElementById('dots') ||
+                          document.querySelector('.dots') ||
+                          document.getElementById('dotsNav') ||
+                          document.querySelector('.dots-nav');
+    if (!dotsContainer) return;
+    updateDotsIndicator(
+      dotsContainer,
+      Array.from(dotsContainer.querySelectorAll('button')),
+      globalCurrentSlide
+    );
+  }, { passive: true });
+
+  window.goToSlide = goToSlide;
+  window.changeSlide = changeSlide;
+  window.updateGlobalUI = updateGlobalUI;
+  window.show = window.goToSlide;
+  window.showSlide = window.goToSlide;
+
+  const LESSON_DOT_TITLES = {
+    '9-1': [
+      'Введение',
+      'Как работает ИИ',
+      'Этика ИИ',
+      'Сферы применения',
+      'Разбор кейса',
+      'Аргументы об ИИ',
+      'Мини-проверка',
+      'Практическая работа',
+      'Итог урока'
+    ],
+    '9-2': [
+      'Введение',
+      'Тест по теме',
+      'Главная идея',
+      'IPv4 — 32 бита',
+      'IPv6 — адресация',
+      'Виды адресов',
+      'Домашняя сеть и NAT',
+      'IP-детектор',
+      'Безопасность',
+      'Практическая работа',
+      'Критерии оценки'
+    ],
+    '9-3': [
+      'Введение',
+      'Сборка IP',
+      'Что такое протокол',
+      'Протоколы в жизни',
+      'Мини-исследование',
+      'Финиш'
+    ],
+    '9-4': [
+      'Введение',
+      'Повторение',
+      'Маска подсети',
+      'Двоичные биты',
+      'Расчёт сети',
+      'Практика',
+      'Итог'
+    ]
+  };
+
+  function initDotsNav() {
+    const slides = getSlides();
+    if (!slides.length) return;
+    let dotsContainer = document.getElementById('dots') || document.querySelector('.dots') || document.getElementById('dotsNav') || document.querySelector('.dots-nav');
+    if (!dotsContainer) {
+      dotsContainer = document.createElement('div');
+      dotsContainer.id = 'dots';
+      dotsContainer.className = 'dots';
+      document.body.appendChild(dotsContainer);
+    }
+
+    // Deduplicate any secondary or rogue dot containers
+    document.querySelectorAll('#dots, .dots, #dotsNav, .dots-nav').forEach(el => {
+      if (el !== dotsContainer) {
+        el.remove();
+      }
+    });
+
+    const currentLessonId = document.body.dataset.lessonId ||
+      (document.body.className.match(/\blesson-([a-zA-Z0-9_-]+)\b/) || [])[1] || '';
+
+    const presetTitles = LESSON_DOT_TITLES[currentLessonId] || null;
+
+    dotsContainer.innerHTML = '';
+    slides.forEach((slide, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = `dot dotbutton ${index === globalCurrentSlide ? 'active' : ''}`;
+
+      let title = '';
+      if (presetTitles && presetTitles[index]) {
+        title = presetTitles[index];
+      }
+
+      if (!title) {
+        const ariaLabel = slide.getAttribute('aria-label');
+        if (ariaLabel && !ariaLabel.toLowerCase().includes('слайд')) {
+          title = ariaLabel.trim();
         }
-        setTimeout(updateMobileButtonsState, 50);
+      }
+
+      if (!title) {
+        const eyebrow = slide.querySelector('.eyebrow');
+        if (eyebrow) {
+          let ebText = (eyebrow.textContent || eyebrow.innerText || '').trim().replace(/\s+/g, ' ');
+          if (ebText.includes('·')) {
+            const parts = ebText.split('·');
+            ebText = parts[parts.length - 1].trim();
+          } else if (ebText.includes('/')) {
+            const parts = ebText.split('/');
+            ebText = parts[parts.length - 1].trim();
+          }
+          ebText = ebText.replace(/^[\d\s\.\/\-—–:🧠🌐💻🔍🧩🎯⚙️🏠✉️🖼️✅📜]+/i, '').trim();
+          if (!/^(9|10|11)\s*класс/i.test(ebText) && !/^\d+\s*урок/i.test(ebText) && ebText.length > 0) {
+            title = ebText;
+          }
+        }
+      }
+
+      if (!title) {
+        const heading = slide.querySelector('h1, h2, h3');
+        if (heading) {
+          let hText = (heading.textContent || heading.innerText || '').trim().replace(/\s+/g, ' ');
+          hText = hText.replace(/^[\d\s\.\/\-—–:🧠🌐💻🔍🧩🎯⚙️🏠✉️🖼️✅📜]+/i, '').trim();
+          if (hText) title = hText;
+        }
+      }
+
+      if (index === 0 && (!title || title.length > 22)) {
+        title = 'Введение';
+      } else if (!title) {
+        title = `Слайд ${index + 1}`;
+      }
+
+      title = title.replace(/\s+/g, ' ').trim();
+      if (title.length > 28) {
+        title = title.slice(0, 26).trim() + '…';
+      }
+
+      dot.setAttribute('data-title', title);
+      dot.setAttribute('data-tooltip', title);
+      dot.setAttribute('aria-label', `Слайд ${index + 1}: ${title}`);
+      dot.setAttribute('title', `Слайд ${index + 1}: ${title}`);
+      dot.onclick = (e) => {
+        e.preventDefault();
+        window.goToSlide(index);
+      };
+      dotsContainer.appendChild(dot);
+    });
+
+  }
+
+  function bindUniversalSlideInputs() {
+    if (document._universalSlideInputsBound) return;
+    document._universalSlideInputsBound = true;
+
+    document.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+
+      const control = target.closest(
+        '#prevBtn, #nextBtn, #slideNext, #mobilePrev, #mobileNext, ' +
+        '.nav-controls .nav-btn, .mobile-nav-bar .mobile-nav-btn, ' +
+        '.slide-nav button, .slide-next'
+      );
+      if (!control || control.disabled) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const isPrevious = control.matches(
+        '#prevBtn, #mobilePrev, [aria-label*="Предыдущ"], [aria-label*="Назад"]'
+      );
+      window.changeSlide(isPrevious ? -1 : 1);
+    }, true);
+
+    document.addEventListener('keydown', (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (event.altKey || event.ctrlKey || event.metaKey ||
+          (target && target.closest('input, textarea, select, [contenteditable="true"]'))) {
+        return;
+      }
+
+      let direction = 0;
+      if (event.key === 'ArrowRight' || event.key === 'PageDown' ||
+          (event.key === ' ' && target && !target.closest('button, a'))) {
+        direction = 1;
+      } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+        direction = -1;
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.goToSlide(0);
+        return;
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.goToSlide(getSlides().length - 1);
+        return;
+      }
+
+      if (!direction) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.changeSlide(direction);
+    }, true);
+  }
+
+  function bindActionButtons() {
+    document.querySelectorAll('.start-btn, [data-next], .action.advance, .slide-next').forEach(btn => {
+      if (!btn.dataset.boundClick) {
+        btn.dataset.boundClick = 'true';
+        if (!btn.getAttribute('onclick')) {
+          btn.addEventListener('click', () => window.changeSlide(1));
+        }
+      }
+    });
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if (prevBtn && !prevBtn.dataset.boundNav) {
+      prevBtn.dataset.boundNav = 'true';
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.changeSlide(-1);
       });
     }
-
-    if (nextBtn && !nextBtn.dataset.navBound) {
-      nextBtn.dataset.navBound = 'true';
-      nextBtn.addEventListener('click', () => {
-        const legacyNext = document.getElementById('mobileNext');
-        if (legacyNext && legacyNext !== nextBtn && typeof legacyNext.click === 'function') {
-          legacyNext.click();
-        } else if (typeof window.changeSlide === 'function') {
-          try { window.changeSlide(1); } catch (e) {}
-        } else {
-          document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true }));
-        }
-        setTimeout(updateMobileButtonsState, 50);
+    if (nextBtn && !nextBtn.dataset.boundNav) {
+      nextBtn.dataset.boundNav = 'true';
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.changeSlide(1);
       });
     }
+  }
 
-    document.addEventListener('keydown', () => setTimeout(updateMobileButtonsState, 60));
-    document.addEventListener('click', () => setTimeout(updateMobileButtonsState, 60));
+  function initUniversalSlideController() {
+    const slides = getSlides();
+    if (!slides.length) return;
 
-    const slides = document.querySelectorAll('.slide');
-    if (slides.length && window.MutationObserver) {
-      const observer = new MutationObserver(() => updateMobileButtonsState());
-      slides.forEach(slide => observer.observe(slide, { attributes: true, attributeFilter: ['class'] }));
+    const hash = window.location.hash.replace('#', '');
+    const slideNum = parseInt(hash, 10);
+    if (!isNaN(slideNum) && slideNum >= 1 && slideNum <= slides.length) {
+      globalCurrentSlide = slideNum - 1;
+    } else {
+      const activeIdx = slides.findIndex(s => s.classList.contains('active'));
+      if (activeIdx !== -1) globalCurrentSlide = activeIdx;
     }
 
-    updateMobileButtonsState();
+    initDotsNav();
+    updateGlobalUI();
+    bindActionButtons();
+    bindUniversalSlideInputs();
+
+    // Hide redundant class and lesson pills on slides (shown already in top nav badge)
+    document.querySelectorAll('.eyebrow, .slide-badge').forEach(el => {
+      const txt = el.textContent.toLowerCase();
+      if (txt.includes('класс') || txt.includes('урок') || el.closest('.hero, .hero-layout') || el.closest('.slide:first-child, .slide:first-of-type')) {
+        el.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      const slideNum = parseInt(hash, 10);
+      if (!isNaN(slideNum) && slideNum >= 1 && slideNum <= slides.length) {
+        const target = slideNum - 1;
+        if (target !== globalCurrentSlide) {
+          globalCurrentSlide = target;
+          updateGlobalUI();
+        }
+      }
+    });
+
+    if (!window._historyStateHooked) {
+      window._historyStateHooked = true;
+      const origReplace = history.replaceState.bind(history);
+      history.replaceState = function(state, unused, url) {
+        origReplace(state, unused, url);
+        if (url && typeof url === 'string' && url.includes('#')) {
+          const num = parseInt(url.split('#')[1], 10);
+          if (!isNaN(num) && num >= 1 && num <= slides.length) {
+            const target = num - 1;
+            if (target !== globalCurrentSlide) {
+              globalCurrentSlide = target;
+              updateGlobalUI();
+            }
+          }
+        }
+      };
+    }
   }
 
   const LESSON_SCRIPTS = {};
@@ -248,52 +689,27 @@ let currentSlide = 0;
             'Итог урока'
         ];
 
-        slides.forEach((_, index) => {
-            const dot = document.createElement('button');
-            dot.type = 'button';
-            dot.className = `dot ${index === 0 ? 'active' : ''}`;
-            const heading = slides[index].querySelector('h1, h2');
-            const title = dotTitles[index] || (heading ? heading.innerText.trim().replace(/\s+/g, ' ') : `Слайд ${index + 1}`);
-            dot.setAttribute('aria-label', `Слайд ${index + 1}: ${title}`);
-            dot.setAttribute('title', `Слайд ${index + 1}: ${title}`);
-            dot.onclick = () => goToSlide(index);
-            dotsContainer.appendChild(dot);
-        });
-
         slides.forEach((slide, index) => {
             if (index === 0 || index === totalSlides - 1) return;
             const container = slide.querySelector('.container');
+            if (!container) return;
             const actionRow = document.createElement('div');
             const button = document.createElement('button');
             actionRow.className = 'slide-action-row';
             button.className = 'start-btn';
             button.type = 'button';
             button.innerHTML = `${nextButtonLabels[index] || 'Дальше'} <i class="fas fa-arrow-right"></i>`;
-            button.onclick = () => changeSlide(1);
+            button.onclick = () => window.changeSlide(1);
             actionRow.appendChild(button);
             container.appendChild(actionRow);
         });
 
-        function updateUI() {
-            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
-            document.querySelectorAll('.dot').forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-                if (index === currentSlide) dot.setAttribute('aria-current', 'step');
-                else dot.removeAttribute('aria-current');
-            });
-            document.getElementById('progress').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
-        }
-
+        function updateUI() {}
         function changeSlide(direction) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
-            updateUI();
+            window.changeSlide(direction);
         }
-
         function goToSlide(index) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, index));
-            updateUI();
+            window.goToSlide(index);
         }
 
         const cases = {
@@ -582,15 +998,15 @@ let currentSlide = 0;
 
   /* --- LESSON 9-2 (9 класс - 2 урок) --- */
   LESSON_SCRIPTS['9-2'] = function() {
-const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress");let current=0;
-slides.forEach((slide,index)=>{const dot=document.createElement("button");const heading=slide.querySelector("h1,h2");const eyebrow=slide.querySelector(".eyebrow");let title=eyebrow?eyebrow.innerText.trim().replace(/\s+/g," "):"";if(title.includes("·"))title=title.split("·").slice(1).join("·").trim();if(!title||title==="9 класс"||title.toLowerCase().includes("урок"))title=heading?heading.innerText.trim().replace(/\s+/g," "):`Слайд ${index+1}`;if(title.length>32)title=title.slice(0,32).trim()+"…";dot.type="button";dot.className="dotbutton";dot.dataset.tooltip=`Слайд ${index+1}: ${title}`;dot.setAttribute("aria-label",`Слайд ${index+1}: ${title}`);dot.onclick=()=>show(index);document.getElementById("dots").append(dot)});
+const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress");
+function show(i) {
+  window.goToSlide(i);
+}
 const heroOctets=[...document.querySelectorAll(".ipbig span")];
 function flipMarkup(newValue,oldValue){return '<i class="ip-half flip-top"><em>'+newValue+'</em></i><i class="ip-half flip-bottom"><em>'+newValue+'</em></i><i class="flip-leaf"><em>'+oldValue+'</em></i>'}
 function randomizeHeroIp(){heroOctets.forEach((octet,index)=>{const oldValue=octet.dataset.value||octet.textContent.trim(),newValue=Math.floor(Math.random()*256);octet.dataset.value=newValue;octet.innerHTML=flipMarkup(newValue,oldValue);octet.style.setProperty("--flip-delay",(index*90)+"ms");octet.classList.remove("refresh");void octet.offsetWidth;octet.classList.add("refresh")})}
 randomizeHeroIp();
 setInterval(randomizeHeroIp,2200);
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>{s.classList.toggle("active",n===current);s.setAttribute("aria-hidden",n!==current)});document.querySelectorAll(".dotbutton").forEach((dot,n)=>{if(n===current)dot.setAttribute("aria-current","step");else dot.removeAttribute("aria-current")});slides[current].scrollTop=0;bar.style.width=((current+1)/slides.length*100)+"%";history.replaceState(null,"","#"+(current+1))}
-document.addEventListener("keydown",e=>{const typing=["INPUT","TEXTAREA"].includes(document.activeElement.tagName);if(!typing&&["ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(current-1)}});
 document.querySelectorAll(".myth").forEach(x=>x.onclick=()=>x.classList.toggle("open"));
 const recallBank=[
 {q:"Что называют искусственным интеллектом?",a:"Системы, которые распознают, прогнозируют и решают интеллектуальные задачи",w:["Любую программу, которая строго выполняет заранее записанные команды","Только нейронную сеть, способную разговаривать с человеком","Физического робота независимо от возможностей его программы"]},
@@ -621,7 +1037,7 @@ resetBuild.onclick=clearBuilds;
 document.querySelectorAll(".task .choice").forEach(x=>x.onclick=()=>{x.closest(".choices").querySelectorAll(".choice").forEach(y=>y.classList.remove("selected"));x.classList.add("selected");x.closest(".task").classList.remove("correct","wrong")});
 check.onclick=()=>{let pts=0,answered=0;document.querySelectorAll("#ipquiz .task").forEach(t=>{const x=t.querySelector(".selected");t.classList.remove("correct","wrong");if(!x)return;answered++;const ok=x.dataset.value===t.dataset.answer;t.classList.add(ok?"correct":"wrong");if(ok)pts++});feedback.textContent=answered<5?"Ответьте ещё на "+(5-answered)+" задан. Сейчас: "+pts+" / 5":"Вопросы: "+pts+" / 5"};
 reset.onclick=()=>{document.querySelectorAll("#ipquiz .task").forEach(t=>t.classList.remove("correct","wrong"));document.querySelectorAll("#ipquiz .choice").forEach(x=>x.classList.remove("selected"));feedback.textContent=""};
-startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1))||1)-1)));
+startRecall();
   };
 
   /* --- LESSON 9-3 (9 класс - 3 урок) --- */
@@ -4761,18 +5177,8 @@ const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');l
 
   /* --- LESSON 11-1 (11 класс - 1 урок) --- */
   LESSON_SCRIPTS['11-1'] = function() {
-let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
-        const dotsContainer = document.getElementById('dots');
         const totalSlides = slides.length;
-
-        // Create dots
-        slides.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = `dot ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => goToSlide(i);
-            dotsContainer.appendChild(dot);
-        });
 
         const nextButtonLabels = [
             '',
@@ -4789,20 +5195,21 @@ let currentSlide = 0;
 
             const container = slide.querySelector('.container');
             if (!container) return;
+            if (container.querySelector('.slide-action-row, .start-btn, .slide-next')) return;
 
             const actionRow = document.createElement('div');
             actionRow.className = 'slide-action-row';
 
             const button = document.createElement('button');
-            button.className = 'nav-btn start-btn slide-next-btn';
+            button.className = 'start-btn slide-next-btn ui-btn-tint';
             button.type = 'button';
             button.innerHTML = `${nextButtonLabels[i] || 'Дальше'} <i class="fas fa-arrow-right"></i>`;
             button.onclick = () => {
                 if (i === totalSlides - 1) {
-                    goToSlide(0);
+                    window.goToSlide(0);
                     return;
                 }
-                changeSlide(1);
+                window.changeSlide(1);
             };
 
             actionRow.appendChild(button);
@@ -4810,21 +5217,15 @@ let currentSlide = 0;
         });
 
         function updateUI() {
-            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            if (typeof window.updateGlobalUI === 'function') window.updateGlobalUI();
         }
 
         function changeSlide(dir) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + dir));
-            updateUI();
+            window.changeSlide(dir);
         }
 
         function goToSlide(index) {
-            currentSlide = index;
-            updateUI();
+            window.goToSlide(index);
         }
 
         // Output probabilities on the architecture slide
@@ -4912,35 +5313,16 @@ let currentSlide = 0;
 
   /* --- LESSON 11-2 (11 класс - 2 урок) --- */
   LESSON_SCRIPTS['11-2'] = function() {
-let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-        const dotsNav = document.getElementById('dotsNav');
-        const totalSlides = slides.length;
-
-        // Init Dots
-        slides.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = `dot-nav ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => goToSlide(i);
-            dotsNav.appendChild(dot);
-        });
-
         function updateUI() {
-            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-            document.querySelectorAll('.dot-nav').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            if (typeof window.updateGlobalUI === 'function') window.updateGlobalUI();
         }
 
         function changeSlide(dir) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + dir));
-            updateUI();
+            window.changeSlide(dir);
         }
 
         function goToSlide(index) {
-            currentSlide = index;
-            updateUI();
+            window.goToSlide(index);
         }
 
         function checkAnswer(el, type) {
@@ -6538,8 +6920,10 @@ const slides = [...document.querySelectorAll('.slide')];
   };
 
   function runCurrentLesson() {
+    syncDynamicLessons();
+    updateDocumentTitle();
     initClassesModal();
-    initMobileControls();
+    initUniversalSlideController();
 
     // Find current lesson ID via data-lesson-id attribute on body
     const lessonId = document.body.dataset.lessonId ||
@@ -6563,9 +6947,21 @@ const slides = [...document.querySelectorAll('.slide')];
       } catch (err) {
         console.error('Error running lesson script:', err);
       }
-    } else {
-      console.warn('No lesson runner found for:', lessonId);
     }
+
+    window.goToSlide = goToSlide;
+    window.changeSlide = changeSlide;
+    window.updateGlobalUI = updateGlobalUI;
+    window.show = goToSlide;
+    window.showSlide = goToSlide;
+
+    // Ensure controls, dots, buttons and slide UI are fully bound and deduplicated after any custom script run
+    setTimeout(() => {
+      setupNavControls();
+      initDotsNav();
+      bindActionButtons();
+      updateGlobalUI();
+    }, 60);
   }
 
   if (document.readyState === 'loading') {
