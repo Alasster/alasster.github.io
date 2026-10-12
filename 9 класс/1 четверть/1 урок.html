@@ -6,7 +6,7 @@
     <title>9 класс · 1 урок</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../стили/lessons.css?v=3.6">
+    <link rel="stylesheet" href="../../стили/lessons.css?v=3.9">
 </head>
 <body class="lesson-page lesson-9-1" data-lesson-id="9-1">
   <!-- Ambient glowing blobs behind glass -->
@@ -71,10 +71,10 @@
     <div class="dots" id="dots"></div>
 
     <section class="slide active">
-        <div class="container hero">
-            <div>
+        <div class="container hero lesson-ethics-layout">
+            <div class="lesson-ethics-copy">
                 <span class="eyebrow"><i class="fas fa-scale-balanced"></i> 9 класс · урок 1</span>
-                <h1>Социальный и этический аспекты применения искусственного интеллекта</h1>
+                <h1>Социальный и этический аспекты применения <span class="gradient-text">искусственного интеллекта</span></h1>
                 <p class="lead">Сегодня мы не просто перечисляем сферы применения искусственного интеллекта. Мы учимся анализировать последствия решений ИИ для человека и общества.</p>
                 <div class="chips">
                     <span class="chip"><i class="fas fa-user-shield"></i> ответственность</span>
@@ -83,32 +83,92 @@
                     <span class="chip"><i class="fas fa-brain"></i> критическое мышление</span>
                 </div>
             </div>
-            <div class="goal-box">
-                <h2>К концу урока</h2>
-                <ul>
-                    <li><i class="fas fa-check"></i><span>объяснишь, где ИИ уже влияет на решения вокруг нас;</span></li>
-                    <li><i class="fas fa-check"></i><span>сравнишь плюсы и риски в медицине, образовании, финансах и социальных сетях;</span></li>
-                    <li><i class="fas fa-check"></i><span>сможешь задать правильные вопросы: кто отвечает, справедливо ли это, можно ли понять решение?</span></li>
-                </ul>
+            <div class="lesson-ethics-visual">
+                <svg viewBox="0 0 420 360" role="img" aria-label="Искусственный интеллект в центре, связанный с ответственностью, справедливостью, прозрачностью и анализом данных" focusable="false">
+                    <defs>
+                        <linearGradient id="ethics-glass" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#fff" stop-opacity=".96" />
+                            <stop offset="1" stop-color="#e0e7ff" stop-opacity=".52" />
+                        </linearGradient>
+                        <linearGradient id="ethics-core" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#818cf8" />
+                            <stop offset="1" stop-color="#22d3ee" />
+                        </linearGradient>
+                        <filter id="ethics-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                            <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#4f46e5" flood-opacity=".16" />
+                        </filter>
+                    </defs>
+                    <circle class="ethics-orbit ethics-orbit-a" cx="210" cy="180" r="126" />
+                    <circle class="ethics-orbit ethics-orbit-b" cx="210" cy="180" r="96" />
+                    <path class="ethics-link ethics-link-a" d="M210 180 117 111M210 180l92-69M210 180l94 93M210 180l-94 94" />
+                    <g class="ethics-core" filter="url(#ethics-shadow)">
+                        <circle cx="210" cy="180" r="55" fill="url(#ethics-core)" />
+                        <path d="M210 154c-5-8-16-8-21-1-8-1-14 6-12 14-7 5-7 15-1 20-3 8 3 16 11 17 4 8 13 9 20 4l3-4v-46Zm0 0c5-8 16-8 21-1 8-1 14 6 12 14 7 5 7 15 1 20 3 8-3 16-11 17-4 8-13 9-20 4l-3-4v-46Z" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" />
+                        <path d="M210 161v41m-1-30c-7 1-11 5-11 11m12 7c-6-1-9 1-11 5m12-17c7 1 11 5 11 11m-12 7c6-1 9 1 11 5" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" />
+                    </g>
+                    <g class="ethics-node ethics-node-a" filter="url(#ethics-shadow)">
+                        <circle cx="112" cy="106" r="34" fill="url(#ethics-glass)" stroke="#fff" stroke-width="2" />
+                        <path d="m112 85 17 7v14c0 12-7 21-17 26-10-5-17-14-17-26V92l17-7Z" fill="none" stroke="#4f46e5" stroke-linejoin="round" stroke-width="3.5" />
+                        <path d="m104 106 6 6 11-12" fill="none" stroke="#0d9488" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+                    </g>
+                    <g class="ethics-node ethics-node-b" filter="url(#ethics-shadow)">
+                        <circle cx="308" cy="106" r="34" fill="url(#ethics-glass)" stroke="#fff" stroke-width="2" />
+                        <circle cx="298" cy="101" r="7" fill="none" stroke="#4f46e5" stroke-width="3" />
+                        <circle cx="318" cy="101" r="7" fill="none" stroke="#4f46e5" stroke-width="3" />
+                        <path d="M286 122c1-8 6-12 12-12m28 12c-1-8-6-12-12-12m-26 1c3 7 10 11 20 11s17-4 20-11" fill="none" stroke="#0d9488" stroke-linecap="round" stroke-width="3" />
+                    </g>
+                    <g class="ethics-node ethics-node-c" filter="url(#ethics-shadow)">
+                        <circle cx="308" cy="277" r="34" fill="url(#ethics-glass)" stroke="#fff" stroke-width="2" />
+                        <path d="M286 277s8-14 22-14 22 14 22 14-8 14-22 14-22-14-22-14Z" fill="none" stroke="#4f46e5" stroke-linejoin="round" stroke-width="3.5" />
+                        <circle cx="308" cy="277" r="6" fill="none" stroke="#0d9488" stroke-width="3.5" />
+                    </g>
+                    <g class="ethics-node ethics-node-d" filter="url(#ethics-shadow)">
+                        <circle cx="112" cy="277" r="34" fill="url(#ethics-glass)" stroke="#fff" stroke-width="2" />
+                        <path d="M92 292h40m-34-6v-15h11v15m4 0v-25h11v25" fill="none" stroke="#4f46e5" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+                        <path d="m97 264 9-7 8 4 11-10" fill="none" stroke="#0d9488" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+                    </g>
+                    <circle class="ethics-spark ethics-spark-a" cx="208" cy="38" r="4" />
+                    <circle class="ethics-spark ethics-spark-b" cx="372" cy="188" r="3" />
+                    <circle class="ethics-spark ethics-spark-c" cx="54" cy="193" r="3.5" />
+                </svg>
                 <button class="start-btn" onclick="changeSlide(1)">Начать разбор <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
     </section>
 
-    <section class="slide">
+    <section class="slide lesson-9-1-ai-future">
         <div class="container">
-            <h2>Что меняется, когда решение принимает алгоритм?</h2>
-            <p>ИИ работает не как магия, а как система, которая находит закономерности в данных и предлагает прогноз, рекомендацию или действие.</p>
-            <div class="flow">
-                <div class="flow-step"><small>01</small><h3>Данные</h3><p>Анкеты, фото, оценки, покупки, лайки, медицинские снимки.</p></div>
-                <div class="flow-step"><small>02</small><h3>Модель</h3><p>Алгоритм ищет связи: что обычно связано с успехом, риском или интересом.</p></div>
-                <div class="flow-step"><small>03</small><h3>Решение</h3><p>Система выдает диагноз, рекомендацию, рейтинг, отказ или предупреждение.</p></div>
-                <div class="flow-step"><small>04</small><h3>Последствие</h3><p>Человек получает помощь, ограничение, шанс или несправедливую ошибку.</p></div>
-                <div class="flow-step"><small>05</small><h3>Ответ</h3><p>Общество решает: какие правила, проверки и права нужны.</p></div>
+            <header class="ai-future-heading">
+                <h2>Что такое ИИ — и как он меняет нашу жизнь?</h2>
+            </header>
+            <div class="definition ai-future-definition">
+                <h3><i class="fas fa-brain"></i> Что такое искусственный интеллект?</h3>
+                <p><strong>Искусственный интеллект</strong> — это технологии, которые учатся находить закономерности в данных, создавать новое и помогать решать задачи. Он не думает как человек: он действует на основе примеров и заданных человеком целей.</p>
             </div>
-            <div class="scenario">
-                <h3><i class="fas fa-triangle-exclamation"></i> Главная мысль</h3>
-                <p>ИИ может ошибаться быстрее и масштабнее человека. Поэтому важно оценивать не только точность, но и последствия: кому стало лучше, кому хуже, кто может оспорить решение.</p>
+            <div class="ai-future-cards">
+                <article class="ai-future-card ai-today-card">
+                    <div class="ai-future-art">
+                        <img src="https://i.ibb.co/qM2kMCZ2/Chat-GPT-13-2026-00-26-03.png" alt="Пример применения искусственного интеллекта сегодня" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ai-future-card-copy">
+                        <span class="ai-future-label">УЖЕ СЕГОДНЯ</span>
+                        <h3>ИИ рядом с нами</h3>
+                        <p>Советует музыку и видео, прокладывает маршрут, переводит речь, помогает искать информацию и распознавать фото.</p>
+                    </div>
+                </article>
+                <article class="ai-future-card ai-tomorrow-card">
+                    <div class="ai-future-art">
+                        <img src="https://i.ibb.co/XZt5YLbG/bank-1024x660.webp" alt="Возможное применение искусственного интеллекта в будущем" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ai-future-card-copy">
+                        <span class="ai-future-label">ВОЗМОЖНОЕ БУДУЩЕЕ</span>
+                        <h3>Больше возможностей — больше ответственности</h3>
+                        <p>ИИ может помогать врачам замечать болезни раньше, подбирать обучение и делать транспорт безопаснее. Но важные решения должны оставаться под контролем людей.</p>
+                    </div>
+                </article>
+            </div>
+            <div class="ai-future-bottom">
+                <p><i class="fas fa-user-shield"></i> ИИ предлагает и помогает — человек проверяет, выбирает и отвечает за последствия.</p>
             </div>
         </div>
     </section>
