@@ -4519,3 +4519,171 @@ body.lesson-9-1 .ai-future-bottom > p i {
     animation-iteration-count: 1 !important;
   }
 }
+
+body.lesson-page .further-reading {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: clamp(4px, 1vh, 12px);
+}
+
+body.lesson-page .further-reading-heading {
+  margin-bottom: 14px;
+}
+
+body.lesson-page .further-reading-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  color: #4f46e5;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body.lesson-page .further-reading-eyebrow i {
+  color: #0891b2;
+}
+
+body.lesson-page .further-reading-heading h2 {
+  margin: 0 0 4px;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+body.lesson-page .further-reading-heading p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+body.lesson-page .further-reading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body.lesson-page .further-reading-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    0 10px 28px rgba(78, 92, 130, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  color: inherit;
+  text-decoration: none;
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  transition:
+    transform 0.24s cubic-bezier(0.2, 0.75, 0.25, 1),
+    background-color 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+body.lesson-page .further-reading-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #22d3ee, #a78bfa);
+  content: "";
+  opacity: 0.72;
+  transform: scaleX(0.18);
+  transform-origin: left;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+body.lesson-page .further-reading-card:hover,
+body.lesson-page .further-reading-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(165, 180, 252, 0.8);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 16px 34px rgba(79, 70, 229, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+
+body.lesson-page .further-reading-card:hover::before,
+body.lesson-page .further-reading-card:focus-visible::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+body.lesson-page .further-reading-number {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  color: rgba(79, 70, 229, 0.24);
+  font: 800 1.25rem/1 var(--font-mono);
+}
+
+body.lesson-page .further-reading-source {
+  margin-bottom: 7px;
+  color: #4f46e5;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+body.lesson-page .further-reading-card h3 {
+  max-width: calc(100% - 20px);
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+body.lesson-page .further-reading-card p {
+  flex: 1;
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+body.lesson-page .further-reading-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #4338ca;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+body.lesson-page .further-reading-link i {
+  font-size: 0.7em;
+  transition: transform 0.2s ease;
+}
+
+body.lesson-page .further-reading-card:hover .further-reading-link i,
+body.lesson-page .further-reading-card:focus-visible .further-reading-link i {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 760px) {
+  body.lesson-page .further-reading-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  body.lesson-page .further-reading-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.lesson-page .further-reading-card {
+    padding: 15px 16px;
+  }
+}
