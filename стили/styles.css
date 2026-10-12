@@ -1394,6 +1394,7 @@ body:not(.lesson-page) .motto-contour-card {
 
   body:not(.lesson-page) .mobile-burger-btn {
     --mobile-menu-roll-distance: 28px;
+    --mobile-menu-content-gap: 8px;
   }
 
   body:not(.lesson-page) .brand-title-text {
@@ -1438,9 +1439,13 @@ body:not(.lesson-page) .motto-contour-card {
 
   body:not(.lesson-page) .menu-toggle-icon {
     position: absolute;
-    right: 12px;
+    right: 6px;
     width: 18px;
     height: 14px;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn:not(.has-interacted) .menu-toggle-icon {
+    right: 11px;
   }
 
   body:not(.lesson-page) .mobile-burger-btn:not(.has-interacted) .menu-toggle-icon::before {
@@ -1461,6 +1466,14 @@ body:not(.lesson-page) .motto-contour-card {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn.has-interacted .menu-toggle-icon {
+    right: 6px;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn.has-interacted .menu-toggle-label {
+    left: 10px;
   }
 
   body:not(.lesson-page) .mobile-burger-btn.has-interacted .menu-toggle-label {
@@ -1532,6 +1545,7 @@ body:not(.lesson-page) .motto-contour-card {
 @media (max-width: 360px) {
   body:not(.lesson-page) .mobile-burger-btn {
     --mobile-menu-roll-distance: 0px;
+    --mobile-menu-content-gap: 8px;
   }
 
   body:not(.lesson-page) .brand-logo-group {
