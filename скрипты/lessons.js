@@ -272,6 +272,8 @@
     const y = dotRect.top - containerRect.top - container.clientTop +
       (dotRect.height - indicatorHeight) / 2;
     const previousIndex = Number(indicator.dataset.index);
+    const previousX = Number(indicator.dataset.x);
+    const previousY = Number(indicator.dataset.y);
     const initialized = indicator.dataset.initialized === 'true';
 
     indicator.style.width = `${indicatorWidth}px`;
@@ -280,12 +282,15 @@
     indicator.style.setProperty('--dot-indicator-y', `${y}px`);
 
     if (initialized && previousIndex !== activeIndex) {
+      indicator.classList.toggle('is-horizontal', Math.abs(x - previousX) > Math.abs(y - previousY));
       indicator.classList.remove('is-moving');
       void indicator.offsetWidth;
       indicator.classList.add('is-moving');
     }
 
     indicator.dataset.index = String(activeIndex);
+    indicator.dataset.x = String(x);
+    indicator.dataset.y = String(y);
     if (!initialized) {
       indicator.dataset.initialized = 'true';
       requestAnimationFrame(() => indicator.classList.add('is-ready'));
@@ -507,7 +512,6 @@
       dot.setAttribute('data-title', title);
       dot.setAttribute('data-tooltip', title);
       dot.setAttribute('aria-label', `Слайд ${index + 1}: ${title}`);
-      dot.setAttribute('title', `Слайд ${index + 1}: ${title}`);
       dot.onclick = (e) => {
         e.preventDefault();
         window.goToSlide(index);
@@ -576,7 +580,7 @@
     document.querySelectorAll('.start-btn, [data-next], .action.advance, .slide-next').forEach(btn => {
       if (!btn.dataset.boundClick) {
         btn.dataset.boundClick = 'true';
-        if (!btn.getAttribute('onclick')) {
+        if (!btn.onclick && !btn.getAttribute('onclick')) {
           btn.addEventListener('click', () => window.changeSlide(1));
         }
       }

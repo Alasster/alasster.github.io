@@ -849,7 +849,7 @@ a {
 .dots .dot[aria-current="step"],
 #dots .dotbutton[aria-current="step"],
 .dots .dotbutton[aria-current="step"] {
-  background: rgba(79, 70, 229, 0.12);
+  background: transparent;
 }
 
 /* Tooltip on dot hover */
@@ -3365,7 +3365,7 @@ body.lesson-page .dot-indicator {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 0;
+  z-index: 1;
   display: block;
   width: 14px;
   height: 14px;
@@ -3426,6 +3426,23 @@ body.lesson-page .dots-nav .dotbutton[aria-current="step"]::before {
   box-shadow: none !important;
 }
 
+body.lesson-page .dots button,
+body.lesson-page #dots button,
+body.lesson-page #dotsNav button,
+body.lesson-page .dots-nav button {
+  z-index: 2;
+}
+
+body.lesson-page .dot-indicator.is-moving.is-horizontal::before {
+  animation-name: dot-indicator-liquid-horizontal;
+}
+
+@keyframes dot-indicator-liquid-horizontal {
+  0%, 100% { transform: scale(1); }
+  32% { transform: scaleX(1.65) scaleY(0.78); }
+  64% { transform: scaleX(0.9) scaleY(1.12); }
+}
+
 @media (max-width: 860px) {
   body.lesson-page .dot-indicator::before {
     background: linear-gradient(135deg, #6366F1, #4338CA);
@@ -3438,6 +3455,10 @@ body.lesson-page .dots-nav .dotbutton[aria-current="step"]::before {
   }
 
   body.lesson-page .dot-indicator.is-moving::before {
+    animation: none;
+  }
+
+  body.lesson-page .dot-indicator.is-moving.is-horizontal::before {
     animation: none;
   }
 }
@@ -3755,6 +3776,13 @@ body.lesson-page .dots-nav button[aria-current="step"] {
   .dots-nav::-webkit-scrollbar {
     display: none;
   }
+
+  #dots button::after,
+  .dots button::after,
+  #dotsNav button::after,
+  .dots-nav button::after {
+    display: none !important;
+  }
 }
 
 @media (min-width: 861px) and (max-width: 1100px) {
@@ -4020,4 +4048,102 @@ body.lesson-page .dots-nav .dotbutton[aria-current="step"]::before {
     background: linear-gradient(90deg, #6366F1, #4338CA) !important;
     box-shadow: 0 2px 8px rgba(79, 70, 229, 0.42) !important;
   }
+}
+
+@media screen {
+body.lesson-page :is(
+  .card,
+  .panel,
+  .glass,
+  .glass-card,
+  .paper,
+  .box,
+  .goal,
+  .goal-box,
+  .concept-card,
+  .topic-card,
+  .feature-card,
+  .task-card,
+  .conclusion-card,
+  .workbench,
+  .case-content,
+  .quiz,
+  .quiz-box,
+  .quizbox,
+  .recallquiz,
+  .formula-card,
+  .answer,
+  .rubric-row,
+  .gesture-card,
+  .scenario,
+  .callout,
+  .definition,
+  .compare,
+  .vs,
+  .versus,
+  .info-box
+) {
+  background: rgba(255, 255, 255, 0.46) !important;
+  border-color: rgba(255, 255, 255, 0.86);
+  box-shadow:
+    0 16px 40px rgba(78, 92, 130, 0.07),
+    0 1px 0 rgba(255, 255, 255, 0.82) inset;
+  backdrop-filter: blur(42px) saturate(140%);
+  -webkit-backdrop-filter: blur(42px) saturate(140%);
+}
+
+body.lesson-page :is(
+  .card,
+  .panel,
+  .glass,
+  .glass-card,
+  .concept-card,
+  .topic-card,
+  .feature-card,
+  .task-card
+):hover {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border-color: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 20px 42px rgba(78, 92, 130, 0.11),
+    0 1px 0 rgba(255, 255, 255, 0.98) inset;
+}
+
+body.lesson-page .card-featured {
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.5), rgba(245, 247, 255, 0.54)) !important;
+}
+
+body.lesson-page .recalloption:not(.correct):not(.wrong) {
+  background: rgba(255, 255, 255, 0.44);
+  border-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(30px) saturate(140%);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+}
+
+body.lesson-page .recalloption:hover:not(:disabled):not(.correct):not(.wrong),
+body.lesson-page .recalloption:focus-visible:not(.correct):not(.wrong) {
+  background: rgba(255, 255, 255, 0.58);
+}
+
+body.lesson-page :is(.pill, .chip, .tag) {
+  background: rgba(255, 255, 255, 0.42);
+  border-color: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(30px) saturate(140%);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+}
+
+body.lesson-page :is(.pill, .chip, .tag):hover {
+  background: rgba(255, 255, 255, 0.58);
+}
+
+body.lesson-page :is(.quiz-option, .choice, .option, .quizoptions button, .choices button):not(.correct):not(.wrong):not(.active):not(.selected) {
+  background: rgba(255, 255, 255, 0.44);
+  border-color: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(30px) saturate(140%);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+}
+
+body.lesson-page :is(.quiz-option, .choice, .option, .quizoptions button, .choices button):hover:not(.correct):not(.wrong):not(.active):not(.selected) {
+  background: rgba(255, 255, 255, 0.58);
+}
 }
