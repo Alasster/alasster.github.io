@@ -1479,6 +1479,7 @@ body:not(.lesson-page) .motto-contour-card {
   from {
     width: 40px;
     height: 40px;
+    min-height: 40px;
     margin-left: 58px;
     border-radius: 50%;
     background: rgba(79, 70, 229, .2);
@@ -1490,6 +1491,7 @@ body:not(.lesson-page) .motto-contour-card {
   72% {
     width: 40px;
     height: 40px;
+    min-height: 40px;
     margin-left: 58px;
     border-radius: 50%;
     background: rgba(79, 70, 229, .2);
@@ -1499,6 +1501,7 @@ body:not(.lesson-page) .motto-contour-card {
   to {
     width: 98px;
     height: 44px;
+    min-height: 44px;
     margin-left: 0;
     border-radius: var(--radius-full);
     background: var(--primary-light);
