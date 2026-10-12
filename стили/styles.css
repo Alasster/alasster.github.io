@@ -261,6 +261,7 @@ a {
   position: relative;
   width: 38px;
   height: 38px;
+  scale: 1;
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
@@ -268,6 +269,7 @@ a {
   align-items: center;
   justify-content: center;
   color: #4F46E5;
+  transition: scale .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s cubic-bezier(.22, 1, .36, 1);
   box-shadow:
     0 4px 14px rgba(79, 70, 229, 0.12),
     0 0 1px 1px rgba(255, 255, 255, 0.76) inset;
@@ -283,6 +285,7 @@ a {
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.8));
+  transition: filter .3s cubic-bezier(.22, 1, .36, 1);
 }
 .brand-title-text {
   font-weight: 800;
@@ -290,6 +293,26 @@ a {
   letter-spacing: -0.02em;
   color: #0F172A;
   white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body:not(.lesson-page) .brand-logo-group {
+    cursor: pointer;
+  }
+
+  body:not(.lesson-page) .brand-logo-group:hover .brand-icon-box,
+  body:not(.lesson-page) .brand-logo-group:focus-visible .brand-icon-box {
+    scale: 1.1;
+    box-shadow:
+      0 0 0 4px rgba(79, 70, 229, .1),
+      0 7px 18px rgba(79, 70, 229, .22),
+      0 0 1px 1px rgba(255, 255, 255, .82) inset;
+  }
+
+  body:not(.lesson-page) .brand-logo-group:hover .brand-book-icon,
+  body:not(.lesson-page) .brand-logo-group:focus-visible .brand-book-icon {
+    filter: drop-shadow(0 0 4px rgba(79, 70, 229, .48));
+  }
 }
 
 /* Fixed Navigation Links (white-space: nowrap prevents vertical wrapping!) */
@@ -1347,13 +1370,192 @@ body:not(.lesson-page) .motto-contour-card {
 }
 
 @media (max-width: 860px) {
+  body:not(.lesson-page) .navbar {
+    padding-right: 12px;
+  }
+
+  body:not(.lesson-page) .brand-icon-box {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    animation: landing-mobile-book-roll 3.2s .12s cubic-bezier(.42, 0, .58, 1) both;
+  }
+
+  body:not(.lesson-page) .brand-logo-group {
+    --mobile-book-start-offset: 73px;
+  }
+
   body:not(.lesson-page) .nav-right-actions {
     animation: none;
     opacity: 1;
+    width: 98px;
+    justify-content: flex-end;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn {
+    --mobile-menu-roll-distance: 28px;
+  }
+
+  body:not(.lesson-page) .brand-title-text {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: landing-mobile-brand-sequence 1.2s 3.32s cubic-bezier(.4, 0, .2, 1) both;
+  }
+
+  body:not(.lesson-page) .brand-title-domain {
+    position: absolute;
+    left: 100%;
+    bottom: 0;
+    display: inline-block;
+    white-space: nowrap;
+    animation: landing-domain-reveal .65s 4.05s cubic-bezier(.2, .7, .2, 1) both;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn {
+    box-sizing: border-box;
+    position: relative;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 98px;
+    height: 44px;
+    min-height: 44px;
+    margin-left: auto;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    animation: landing-mobile-menu-arrive 1.25s 2s cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  body:not(.lesson-page) .menu-toggle-label {
+    position: absolute;
+    left: 12px;
+    opacity: 0;
+    transform: translateX(-5px);
+    animation: landing-mobile-menu-label .4s 4.15s cubic-bezier(.22, 1, .36, 1) both;
+  }
+
+  body:not(.lesson-page) .menu-toggle-icon {
+    position: absolute;
+    right: 12px;
+    width: 18px;
+    height: 14px;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn:not(.has-interacted) .menu-toggle-icon::before {
+    animation: landing-mobile-menu-bar-top .35s 4.15s cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn:not(.has-interacted) .menu-toggle-icon::after {
+    animation: landing-mobile-menu-bar-bottom .35s 4.15s cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn.has-interacted {
+    width: 98px;
+    height: 44px;
+    margin-left: 0;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    box-shadow: none;
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  body:not(.lesson-page) .mobile-burger-btn.has-interacted .menu-toggle-label {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 
   body:not(.lesson-page) .nav-pill-link {
     animation: none;
     opacity: 1;
   }
+}
+
+@keyframes landing-mobile-menu-arrive {
+  from {
+    width: 40px;
+    height: 40px;
+    margin-left: 58px;
+    border-radius: 50%;
+    background: rgba(79, 70, 229, .2);
+    box-shadow: 0 0 0 1px rgba(79, 70, 229, .12), 0 4px 14px rgba(79, 70, 229, .16), inset 0 1px 3px rgba(255, 255, 255, .9);
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--mobile-menu-roll-distance, 18px))) rotate(-360deg) scale(.88);
+  }
+  18% { opacity: 1; }
+  72% {
+    width: 40px;
+    height: 40px;
+    margin-left: 58px;
+    border-radius: 50%;
+    background: rgba(79, 70, 229, .2);
+    box-shadow: 0 0 0 1px rgba(79, 70, 229, .12), 0 4px 14px rgba(79, 70, 229, .16), inset 0 1px 3px rgba(255, 255, 255, .9);
+    transform: translateX(0) rotate(0) scale(1);
+  }
+  to {
+    width: 98px;
+    height: 44px;
+    margin-left: 0;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    box-shadow: none;
+    opacity: 1;
+    transform: translateX(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes landing-mobile-brand-sequence {
+  from { left: 50%; transform: translateX(-50%); }
+  to { left: 53px; transform: translateX(0); }
+}
+
+@keyframes landing-mobile-book-roll {
+  from {
+    left: calc(50% - var(--mobile-book-start-offset, 88px));
+    opacity: 0;
+    transform: translateY(-50%) rotate(0) scale(.88);
+  }
+  to {
+    left: 12px;
+    opacity: 1;
+    transform: translateY(-50%) rotate(-360deg) scale(1);
+  }
+}
+
+@media (max-width: 360px) {
+  body:not(.lesson-page) .mobile-burger-btn {
+    --mobile-menu-roll-distance: 0px;
+  }
+
+  body:not(.lesson-page) .brand-logo-group {
+    --mobile-book-start-offset: 65px;
+  }
+
+  body:not(.lesson-page) .brand-title-text {
+    font-size: .65rem;
+  }
+}
+
+@media (min-width: 541px) and (max-width: 860px) {
+  body:not(.lesson-page) .brand-logo-group {
+    --mobile-book-start-offset: 88px;
+  }
+}
+
+@keyframes landing-mobile-menu-label {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes landing-mobile-menu-bar-top {
+  from { top: 6px; transform: rotate(45deg); }
+  to { top: 3px; transform: rotate(0); }
+}
+
+@keyframes landing-mobile-menu-bar-bottom {
+  from { top: 6px; transform: rotate(-45deg); }
+  to { top: 10px; transform: rotate(0); }
 }

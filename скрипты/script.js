@@ -157,7 +157,9 @@ function closeNavMenu() {
 function toggleNavMenu() {
   const menu = document.querySelector('.nav-links-menu');
   const isOpen = menu.classList.toggle('is-open');
-  document.querySelector('.mobile-burger-btn').setAttribute('aria-expanded', String(isOpen));
+  const toggle = document.querySelector('.mobile-burger-btn');
+  toggle.classList.add('has-interacted');
+  toggle.setAttribute('aria-expanded', String(isOpen));
 }
 
 mobileNav.addEventListener('change', closeNavMenu);
