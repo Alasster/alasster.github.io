@@ -6,7 +6,7 @@
   <title>9 класс · 6 урок</title>
   
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../стили/lessons.css?v=4.0">
+    <link rel="stylesheet" href="../../стили/lessons.css?v=5.2">
 </head>
 <body class="lesson-page lesson-9-6" data-lesson-id="9-6">
   <!-- Ambient glowing blobs behind glass -->
@@ -103,17 +103,17 @@
               <svg viewBox="0 0 440 230" style="width:100%; height:auto; overflow:visible;" aria-label="Схема передачи данных между компьютерами">
                 <defs>
                   <linearGradient id="cableGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#ee9b55" />
-                    <stop offset="50%" stop-color="#b95132" />
-                    <stop offset="100%" stop-color="#789473" />
+                    <stop offset="0%" stop-color="#a855f7" />
+                    <stop offset="50%" stop-color="#7c3aed" />
+                    <stop offset="100%" stop-color="#8b5cf6" />
                   </linearGradient>
                   <filter id="packetGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#b95132" flood-opacity="0.3"/>
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#7c3aed" flood-opacity="0.3"/>
                   </filter>
                 </defs>
 
                 <!-- Волнистая соединительная линия (траектория передачи) -->
-                <path id="waveCableBg" d="M 90,65 C 220,10 180,210 330,165" fill="none" stroke="#ecdac9" stroke-width="12" stroke-linecap="round"/>
+                <path id="waveCableBg" d="M 90,65 C 220,10 180,210 330,165" fill="none" stroke="#ddd6fe" stroke-width="12" stroke-linecap="round"/>
                 <path id="waveCable" d="M 90,65 C 220,10 180,210 330,165" fill="none" stroke="url(#cableGrad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 4"/>
 
                 <!-- Летящие биты по волнистой линии -->
@@ -122,49 +122,49 @@
                     <animateMotion dur="2.4s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
                       <mpath href="#waveCable"/>
                     </animateMotion>
-                    <rect x="-22" y="-11" width="44" height="22" rx="6" fill="#b95132"/>
+                    <rect x="-22" y="-11" width="44" height="22" rx="6" fill="#7c3aed"/>
                     <text x="0" y="4" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="11" font-weight="bold">10110</text>
                   </g>
                   <g>
                     <animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
                       <mpath href="#waveCable"/>
                     </animateMotion>
-                    <rect x="-22" y="-11" width="44" height="22" rx="6" fill="#ee9b55"/>
+                    <rect x="-22" y="-11" width="44" height="22" rx="6" fill="#a855f7"/>
                     <text x="0" y="4" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="11" font-weight="bold">01001</text>
                   </g>
                   <g>
                     <animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
                       <mpath href="#waveCable"/>
                     </animateMotion>
-                    <rect x="-22" y="-11" width="44" height="22" rx="6" fill="#789473"/>
+                    <rect x="-22" y="-11" width="44" height="22" rx="6" fill="#8b5cf6"/>
                     <text x="0" y="4" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="11" font-weight="bold">11100</text>
                   </g>
                 </g>
 
                 <!-- КОМПЬЮТЕР 1: Вверху слева (Отправитель) -->
                 <g transform="translate(15, 20)">
-                  <rect x="0" y="0" width="76" height="54" rx="8" fill="#3f3028" stroke="#5c4a3e" stroke-width="2"/>
-                  <rect x="6" y="6" width="64" height="42" rx="4" fill="#eaf2e5"/>
-                  <circle cx="16" cy="16" r="3" fill="#789473"/>
-                  <rect x="24" y="14" width="36" height="4" rx="2" fill="#789473"/>
-                  <text x="38" y="34" text-anchor="middle" font-family="Consolas, monospace" font-size="10" font-weight="bold" fill="#354d31">ОТПРАВКА</text>
-                  <rect x="32" y="54" width="12" height="10" fill="#8d7c70"/>
-                  <rect x="18" y="64" width="40" height="5" rx="2.5" fill="#6d5e53"/>
-                  <text x="38" y="84" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#3f3028">ПК 1 (Сервер)</text>
-                  <text x="38" y="98" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#69584e">Отправитель</text>
+                  <rect x="0" y="0" width="76" height="54" rx="8" fill="#4c1d95" stroke="#5b21b6" stroke-width="2"/>
+                  <rect x="6" y="6" width="64" height="42" rx="4" fill="#ede9fe"/>
+                  <circle cx="16" cy="16" r="3" fill="#8b5cf6"/>
+                  <rect x="24" y="14" width="36" height="4" rx="2" fill="#8b5cf6"/>
+                  <text x="38" y="34" text-anchor="middle" font-family="Consolas, monospace" font-size="10" font-weight="bold" fill="#5b21b6">ОТПРАВКА</text>
+                  <rect x="32" y="54" width="12" height="10" fill="#8b5cf6"/>
+                  <rect x="18" y="64" width="40" height="5" rx="2.5" fill="#6d28d9"/>
+                  <text x="38" y="84" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#4c1d95">ПК 1 (Сервер)</text>
+                  <text x="38" y="98" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#6d28d9">Отправитель</text>
                 </g>
 
                 <!-- КОМПЬЮТЕР 2: Внизу справа (Получатель) -->
                 <g transform="translate(340, 115)">
-                  <rect x="0" y="0" width="76" height="54" rx="8" fill="#3f3028" stroke="#5c4a3e" stroke-width="2"/>
-                  <rect x="6" y="6" width="64" height="42" rx="4" fill="#fef8ec"/>
-                  <circle cx="16" cy="16" r="3" fill="#ee9b55"/>
-                  <rect x="24" y="14" width="36" height="4" rx="2" fill="#ee9b55"/>
-                  <text x="38" y="34" text-anchor="middle" font-family="Consolas, monospace" font-size="10" font-weight="bold" fill="#b95132">ПРИЁМ OK</text>
-                  <rect x="32" y="54" width="12" height="10" fill="#8d7c70"/>
-                  <rect x="18" y="64" width="40" height="5" rx="2.5" fill="#6d5e53"/>
-                  <text x="38" y="84" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#3f3028">ПК 2 (Клиент)</text>
-                  <text x="38" y="98" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#69584e">Получатель</text>
+                  <rect x="0" y="0" width="76" height="54" rx="8" fill="#4c1d95" stroke="#5b21b6" stroke-width="2"/>
+                  <rect x="6" y="6" width="64" height="42" rx="4" fill="#faf7ff"/>
+                  <circle cx="16" cy="16" r="3" fill="#a855f7"/>
+                  <rect x="24" y="14" width="36" height="4" rx="2" fill="#a855f7"/>
+                  <text x="38" y="34" text-anchor="middle" font-family="Consolas, monospace" font-size="10" font-weight="bold" fill="#7c3aed">ПРИЁМ OK</text>
+                  <rect x="32" y="54" width="12" height="10" fill="#8b5cf6"/>
+                  <rect x="18" y="64" width="40" height="5" rx="2.5" fill="#6d28d9"/>
+                  <text x="38" y="84" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="12" font-weight="bold" fill="#4c1d95">ПК 2 (Клиент)</text>
+                  <text x="38" y="98" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#6d28d9">Получатель</text>
                 </g>
               </svg>
             </div>
@@ -403,7 +403,7 @@
 
         <div style="margin-bottom:12px;">
           <h2>Практическая лаборатория связиста</h2>
-          <p class="tag" style="background:#f1f5e9; color:#496044; font-size:.9rem; padding:8px 14px; margin:0;">Индивидуальная работа · 10 баллов · целые числа</p>
+          <p class="tag" style="background:#f3e8ff; color:#6d28d9; font-size:.9rem; padding:8px 14px; margin:0;">Индивидуальная работа · 10 баллов · целые числа</p>
         </div>
 
         <div class="paper below">
@@ -583,6 +583,6 @@
         <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-            <script src="../../скрипты/lessons.js?v=3.4"></script>
+            <script src="../../скрипты/lessons.js?v=5.2"></script>
 </body>
 </html>

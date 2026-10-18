@@ -1,0 +1,2910 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f0f7ff">
+  <title>10 класс ЕМН — Урок 12. Алгоритмы машинного обучения: линейная регрессия</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=5.2">
+  <style>
+html {
+      margin: 0;
+      min-height: 100%
+    }
+@keyframes float-sphere {
+      from {
+        transform: translate3d(-18px, -12px) scale(.94)
+      }
+
+      to {
+        transform: translate3d(105px, 68px) scale(1.12)
+      }
+    }
+button, input, textarea {
+      font: inherit
+    }
+button {
+      color: inherit
+    }
+@keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+    }
+.hero {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 34px;
+      align-items: center
+    }
+ul, ol {
+      margin-top: 0
+    }
+.accent {
+      color: var(--coral)
+    }
+.sub {
+      margin-bottom: 20px;
+      color: var(--muted)
+    }
+.paper {
+      background: var(--paper);
+      border: 1px solid rgba(255, 255, 255, .9);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+.pad {
+      padding: 26px
+    }
+.grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px
+    }
+.grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px
+    }
+.card {
+      position: relative;
+      padding: 20px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+/* Hero Illustration Animations */
+.hero-art-box {
+      position: relative;
+      padding: 18px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, #fffdfa, #f8f4ee);
+      border: 1px solid #ebd9c8;
+      box-shadow: 0 16px 40px rgba(90, 62, 140, .1);
+    }
+.hero-quote-box {
+      margin-top: 14px;
+      padding: 12px 18px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid #ebd9c8;
+      box-shadow: 0 6px 18px rgba(76, 50, 112, .05);
+      text-align: center;
+    }
+.hero-quote {
+      font-size: 1.05rem;
+      font-weight: 850;
+      color: var(--ink);
+      font-style: italic;
+      letter-spacing: .01em;
+    }
+.hero-quote-sub {
+      font-size: .82rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+@keyframes sun-spin {
+      from {
+        transform: rotate(0deg)
+      }
+
+      to {
+        transform: rotate(360deg)
+      }
+    }
+@keyframes sun-pulse {
+
+      0%,
+      100% {
+        opacity: .3;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .7;
+        transform: scale(1.12)
+      }
+    }
+@keyframes house-breathe {
+
+      0%,
+      100% {
+        transform: scaleY(1)
+      }
+
+      50% {
+        transform: scaleY(.97)
+      }
+    }
+@keyframes girl-turn {
+
+      0%,
+      15% {
+        transform: rotate(0deg)
+      }
+
+      25%,
+      45% {
+        transform: rotate(-18deg)
+      }
+
+      55%,
+      65% {
+        transform: rotate(0deg)
+      }
+
+      75%,
+      95% {
+        transform: rotate(18deg)
+      }
+
+      100% {
+        transform: rotate(0deg)
+      }
+    }
+@keyframes bubble-bob {
+
+      0%,
+      100% {
+        transform: translate(254px, 135px)
+      }
+
+      50% {
+        transform: translate(254px, 129px)
+      }
+    }
+@keyframes note-fly1 {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(.8)
+      }
+
+      40% {
+        opacity: 1
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-18px, -32px) scale(1.15) rotate(-15deg)
+      }
+    }
+@keyframes note-fly2 {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(.8)
+      }
+
+      40% {
+        opacity: 1
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(20px, -36px) scale(1.2) rotate(15deg)
+      }
+    }
+@keyframes ball-bounce {
+
+      0%,
+      100% {
+        transform: translate(0, 0) rotate(0deg);
+        animation-timing-function: ease-out
+      }
+
+      50% {
+        transform: translate(8px, -52px) rotate(180deg);
+        animation-timing-function: ease-in
+      }
+    }
+@keyframes guitar-strum {
+
+      0%,
+      100% {
+        transform: rotate(0deg)
+      }
+
+      50% {
+        transform: rotate(3deg)
+      }
+    }
+.anim-sun {
+      transform-origin: 410px 70px;
+      animation: sun-spin 22s linear infinite
+    }
+.anim-sun-rays {
+      transform-origin: 410px 70px;
+      animation: sun-pulse 3.5s ease-in-out infinite
+    }
+.anim-house {
+      transform-origin: bottom center;
+      animation: house-breathe 4s ease-in-out infinite
+    }
+.anim-girl-head {
+      transform-origin: 266px 225px;
+      animation: girl-turn 4.5s ease-in-out infinite
+    }
+.anim-bubble {
+      animation: bubble-bob 2.5s ease-in-out infinite
+    }
+.anim-note1 {
+      animation: note-fly1 2.2s ease-out infinite
+    }
+.anim-note2 {
+      animation: note-fly2 2.6s ease-out infinite 1.1s
+    }
+.anim-ball {
+      transform-origin: center;
+      animation: ball-bounce 1.6s infinite
+    }
+.anim-guitar {
+      transform-origin: 120px 245px;
+      animation: guitar-strum 1.2s ease-in-out infinite
+    }
+.card:after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      bottom: -34px;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: var(--rose);
+      opacity: .4;
+    }
+.goal {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px
+    }
+.goalitem {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f8fbff;
+      border: 1px solid var(--line);
+    }
+.goalitem b {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      color: #fff;
+      background: var(--coral);
+    }
+.goalitem b.goal-code {
+      width: auto;
+      min-width: 32px;
+      padding: 0 8px;
+      font-size: .74rem;
+    }
+.definition {
+      padding: 16px 20px;
+      margin: 16px 0;
+      border-left: 5px solid var(--coral);
+      border-radius: 0 16px 16px 0;
+      background: #eff6ff;
+      font-size: 1.05rem;
+      line-height: 1.48;
+    }
+.pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 22px
+    }
+.pipe {
+      position: relative;
+      min-height: 175px;
+      padding: 18px 14px;
+      cursor: pointer;
+      text-align: left;
+      border: 2px solid transparent;
+      border-radius: 18px;
+      background: #ffffffc7;
+      box-shadow: var(--shadow);
+      transition: .2s;
+    }
+.pipe:hover, .pipe.active {
+      transform: translateY(-5px);
+      border-color: var(--coral);
+      background: #fff
+    }
+.pipe:not(:last-child):after {
+      content: "→";
+      position: absolute;
+      z-index: 3;
+      right: -18px;
+      top: 72px;
+      color: var(--coral);
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+.pipe small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--coral);
+      font-weight: 900
+    }
+.pipe i {
+      display: block;
+      margin-bottom: 10px;
+      font-style: normal;
+      font-size: 1.8rem
+    }
+.pipe h3 {
+      font-size: 1.02rem;
+      margin-bottom: 4px
+    }
+.pipe p {
+      font-size: .88rem;
+      margin: 0
+    }
+.pipeinfo {
+      min-height: 60px;
+      margin-top: 16px;
+      padding: 15px 18px;
+      border-radius: 15px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: var(--ink);
+      font-weight: 600;
+    }
+/* Number line and KNN visualizer */
+.numline-box {
+      position: relative;
+      padding: 26px 22px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(180deg, #fff, #f0f7ff);
+    }
+.nl-axis {
+      position: relative;
+      height: 48px;
+      margin: 40px 10px 20px;
+      border-bottom: 3px solid var(--plum);
+    }
+.nl-axis:after {
+      content: "";
+      position: absolute;
+      right: -10px;
+      bottom: -7px;
+      border: 8px solid transparent;
+      border-left-color: var(--plum);
+    }
+.nl-tick {
+      position: absolute;
+      bottom: -6px;
+      width: 2px;
+      height: 12px;
+      background: var(--plum);
+      transform: translateX(-50%);
+    }
+.nl-tick-label {
+      position: absolute;
+      top: 18px;
+      transform: translateX(-50%);
+      font-size: .85rem;
+      font-weight: 750;
+      color: var(--muted);
+    }
+.nl-point {
+      position: absolute;
+      bottom: 3px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: .82rem;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, .15);
+      transition: all .3s ease;
+      cursor: default;
+    }
+.nl-point.classA {
+      background: #3b82f6
+    }
+.nl-point.classB {
+      background: #ec4899
+    }
+.nl-point.newX {
+      background: var(--coral);
+      outline: 4px solid rgba(124, 77, 255, .28);
+      outline-offset: 3px;
+    }
+.nl-dist-badge {
+      position: absolute;
+      top: -28px;
+      font-size: .76rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      white-space: nowrap;
+    }
+.badge-tag {
+      display: inline-flex;
+      padding: 4px 9px;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: .78rem;
+    }
+.badge-A {
+      background: #e0edff;
+      color: #2563eb
+    }
+.badge-B {
+      background: #fce7f3;
+      color: #db2777
+    }
+.badge-X {
+      background: #f3e8ff;
+      color: #2563eb
+    }
+/* Table styles */
+.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+    }
+.data-table th, .data-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid #dbeafe;
+      font-size: .92rem;
+    }
+.data-table th {
+      background: #eff6ff;
+      color: var(--coral);
+      font-weight: 850;
+      text-transform: uppercase;
+      font-size: .78rem;
+      letter-spacing: .05em;
+    }
+.data-table tr.highlight {
+      background: #eff6ff;
+      font-weight: 700
+    }
+/* 2D Interactive Plane for Slide 4 */
+.plane-container {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 14px;
+    }
+.plane-box {
+      position: relative;
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      user-select: none;
+    }
+.plane-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: crosshair;
+      background: radial-gradient(circle at 50% 50%, #f5f9ff 0, #ffffff 100%);
+      border-radius: 14px;
+    }
+.plane-info {
+      display: grid;
+      gap: 12px;
+    }
+.plane-stat-card {
+      padding: 14px 16px;
+      border-radius: 15px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+.plane-stat-card h4 {
+      margin: 0 0 6px;
+      font-size: .95rem;
+      color: var(--coral)
+    }
+.plane-stat-card p {
+      margin: 0;
+      font-size: .88rem;
+      line-height: 1.45
+    }
+@media(max-width:900px) {
+  .plane-container {
+        grid-template-columns: 1fr
+      }
+}
+.protected-table {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+.protected-table code {
+      background: #dbeafe;
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--coral);
+      font-family: Consolas, monospace;
+      font-weight: 700;
+    }
+/* Generator & Task styles */
+.gen-card {
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(90, 62, 140, .06);
+    }
+.gen-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 99px;
+      background: #eff6ff;
+      color: var(--coral);
+      font-size: .78rem;
+      font-weight: 850;
+      margin-bottom: 10px;
+    }
+.gen-val {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--coral);
+      margin: 4px 0 10px;
+    }
+.action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      cursor: pointer;
+      border: 0;
+      border-radius: 13px;
+      color: white;
+      background: var(--coral);
+      font-weight: 850;
+      box-shadow: 0 8px 18px rgba(124, 77, 255, .26);
+      transition: .2s;
+      text-decoration: none;
+    }
+.action:hover {
+      transform: translateY(-2px)
+    }
+.action.secondary {
+      background: #eff6ff;
+      color: var(--coral);
+      border: 1px solid #bfdbfe;
+      box-shadow: none
+    }
+/* Rubric and scoring */
+.rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+    }
+.rubric-table th, .rubric-table td {
+      padding: 11px 13px;
+      border-bottom: 1px solid #dbeafe;
+      font-size: .9rem;
+    }
+.rubric-table th {
+      background: #eff6ff;
+      color: var(--coral);
+      font-size: .78rem;
+      font-weight: 850;
+      text-transform: uppercase
+    }
+.score-badge {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 99px;
+      background: #eff6ff;
+      color: var(--mint-dark);
+      font-weight: 850;
+      font-size: .8rem;
+    }
+/* Interactive Simulator */
+.sim-controls {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 14px 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      margin-bottom: 16px;
+    }
+.sim-k-btns {
+      display: flex;
+      gap: 8px
+    }
+.k-btn {
+      padding: 7px 14px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+      background: #fff;
+      color: var(--coral);
+      font-weight: 800;
+      cursor: pointer;
+    }
+.k-btn.active {
+      background: var(--coral);
+      color: #fff
+    }
+/* Nav dots & Mobile */
+.slide-next {
+      position: fixed;
+      z-index: 80;
+      left: 50%;
+      bottom: 32px;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      cursor: pointer;
+      border: 0;
+      border-radius: 14px;
+      color: white;
+      background: var(--coral);
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(124, 77, 255, .3);
+      transition: .2s;
+    }
+.slide-next:hover {
+      transform: translateX(-50%) translateY(-2px)
+    }
+.hint {
+      position: fixed;
+      z-index: 80;
+      left: 27px;
+      bottom: 27px;
+      color: rgba(46, 32, 64, .55);
+      font-size: .81rem
+    }
+@media(max-width:900px) {
+  .hero, .grid2, .pipeline {
+        grid-template-columns: 1fr
+      }
+  .grid3 {
+        grid-template-columns: 1fr
+      }
+  .pipe:not(:last-child):after {
+        display: none
+      }
+}
+@media(max-width:640px) {
+  .slide-next, .hint {
+        display: none
+      }
+}
+.small {
+      font-size: .9rem
+    }
+.muted {
+      color: var(--muted)
+    }
+.slidehead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+.structure-part {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line)
+    }
+.structure-part strong {
+      display: block;
+      font-size: 1.14rem;
+      line-height: 1.4
+    }
+.structure-part p {
+      margin: 8px 0 0
+    }
+.structure-part:last-of-type {
+      border: 0
+    }
+.hero h1 {
+      font-size: clamp(2.4rem, 4.7vw, 4rem);
+      line-height: 1.05
+    }
+.hero .goalitem {
+      line-height: 1.55
+    }
+.hero .goalitem b {
+      margin-top: 4px
+    }
+.lesson-title {
+      display: block;
+      margin-bottom: 14px;
+      font-size: .45em;
+      letter-spacing: -.02em
+    }
+.formula {
+      font-size: 1.5rem;
+      font-weight: 850;
+      color: var(--coral);
+      margin: 12px 0
+    }
+.space {
+      margin-top: 18px
+    }
+.card p:last-child, .paper p:last-child {
+      margin-bottom: 0
+    }
+.cluster-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 18px 0
+    }
+.number {
+      display: grid;
+      place-items: center;
+      min-width: 44px;
+      height: 44px;
+      padding: 0 10px;
+      border-radius: 50%;
+      background: #eee8f7;
+      color: var(--ink);
+      font-weight: 850;
+      border: 2px solid transparent
+    }
+.group-a {
+      background: #e2eeff;
+      color: #1d4ed8;
+      border-color: #bfdbfe
+    }
+.group-b {
+      background: #fff0dc;
+      color: #985013;
+      border-color: #f6d19b
+    }
+.cluster-label {
+      font-weight: 800;
+      margin-right: 12px;
+      font-size: .9rem
+    }
+.lesson-line {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #fff;
+      border-radius: 16px
+    }
+.sim-summary {
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: #eff6ff;
+      line-height: 1.5;
+      min-height: 75px;
+      margin-top: 12px
+    }
+.sim-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 16px
+    }
+button:disabled {
+      opacity: .5;
+      cursor: default;
+      transform: none !important
+    }
+.table-scroll {
+      overflow-x: auto;
+      border-radius: 14px;
+      max-width: 100%
+    }
+.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff
+    }
+.data-table th, .data-table td {
+      padding: 11px 13px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: .94rem
+    }
+.data-table th {
+      background: #eff6ff;
+      color: var(--coral)
+    }
+code {
+      font-family: Consolas, monospace;
+      color: #5b32b0;
+      overflow-wrap: anywhere;
+      font-size: .94em
+    }
+.sheet-steps {
+      padding-left: 23px
+    }
+.sheet-steps li {
+      margin: 8px 0
+    }
+.task-list {
+      display: grid;
+      gap: 10px
+    }
+.task-option {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 14px;
+      padding: 16px 20px;
+      align-items: start
+    }
+.task-option .number {
+      background: #eff6ff;
+      color: var(--coral);
+      border-radius: 13px
+    }
+.task-option h3 {
+      font-size: 1rem;
+      margin-bottom: 5px
+    }
+.task-option p {
+      font-size: .92rem;
+      margin: 0
+    }
+details {
+      margin-top: 10px;
+      font-size: .92rem;
+      line-height: 1.5
+    }
+summary {
+      cursor: pointer;
+      color: var(--coral);
+      font-weight: 750
+    }
+details p {
+      margin: 8px 0 0 !important
+    }
+.slide-counter {
+      position: fixed;
+      right: 28px;
+      bottom: 28px;
+      font-size: .82rem;
+      color: var(--muted);
+      z-index: 80
+    }
+.pipe {
+      min-height: 155px
+    }
+.pipe i {
+      font-size: 1.4rem
+    }
+.controlsrow {
+      flex-wrap: wrap
+    }
+:focus-visible {
+      outline: 3px solid #ad5928;
+      outline-offset: 4px
+    }
+@media(max-width:900px) {
+  .rules-grid {
+        grid-template-columns: 1fr
+      }
+  .sor-scales {
+        grid-template-columns: repeat(2, 1fr)
+      }
+  .hero {
+        gap: 22px
+      }
+}
+@media(max-width:640px) {
+  .slide-counter {
+        left: 22px;
+        right: auto;
+        bottom: 26px
+      }
+  .sor-launch-box {
+        padding: 18px 14px
+      }
+  .sor-launch-btn {
+        padding: 14px 18px;
+        font-size: 1rem
+      }
+  .rule-card {
+        padding: 16px
+      }
+  .goalitem {
+        flex-wrap: wrap
+      }
+  .task-option {
+        grid-template-columns: 36px 1fr;
+        padding: 14px
+      }
+  .task-option .number {
+        min-width: 36px;
+        height: 36px
+      }
+  .paper.pad {
+        padding: 20px
+      }
+}
+@media print {
+  .slide-next, .hint, .slide-counter {
+        display: none
+      }
+  .paper {
+        box-shadow: none
+      }
+}
+/* Styles apply only to the explanation, starting with slide 3. */
+.teach {
+      --blue: #2563eb;
+      --amber: #1d4ed8;
+      --blue-bg: #eaf2ff;
+      --amber-bg: #fff2de
+    }
+.teach h2 {
+      margin: 12px 0 14px;
+      font-size: clamp(1.85rem, 3.35vw, 2.85rem)
+    }
+.teach .intro {
+      font-size: 1.14rem;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      max-width: 960px
+    }
+.teach .scene-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 22px;
+      align-items: stretch
+    }
+.teach .scene {
+      padding: 24px;
+      background: rgba(255, 255, 255, .96);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      min-width: 0
+    }
+.teach .explain {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 15px;
+      padding: 26px;
+      border-radius: 24px;
+      background: #fff;
+      min-width: 0
+    }
+.teach .explain p {
+      margin: 0;
+      font-size: 1.08rem
+    }
+.teach .explain h3 {
+      font-size: 1.3rem;
+      margin: 0
+    }
+.teach .keyline {
+      padding: 16px 20px;
+      background: #f0e8ff;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: var(--ink)
+    }
+.teach .keyline strong {
+      color: #6031c4
+    }
+.teach .takeaway {
+      margin-top: 20px;
+      padding: 15px 20px;
+      border-left: 5px solid var(--sage);
+      border-radius: 0 14px 14px 0;
+      background: #eafff5;
+      font-size: 1.1rem;
+      line-height: 1.5
+    }
+.teach .micro {
+      font-size: .88rem !important;
+      color: var(--muted);
+      line-height: 1.5
+    }
+.teach .blue {
+      color: var(--blue)
+    }
+.teach .amber {
+      color: var(--amber)
+    }
+.teach .large-number {
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--coral)
+    }
+.teach .lesson-visual {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible
+    }
+.teach svg text {
+      font-family: 'Segoe UI', Arial, sans-serif
+    }
+.teach .legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .86rem;
+      margin: 10px 0 2px
+    }
+.teach .legend span {
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+.teach .legend i {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #776985;
+      display: inline-block
+    }
+.teach .legend .flag {
+      border-radius: 2px;
+      transform: rotate(45deg);
+      background: var(--blue)
+    }
+.teach .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px
+    }
+.teach .controls .micro {
+      margin: 0
+    }
+.teach .concept-definition {
+      padding: 20px 26px;
+      font-size: 1.24rem;
+      line-height: 1.5;
+      background: #fff;
+      border-radius: 20px;
+      border-left: 5px solid var(--coral);
+      margin-bottom: 22px
+    }
+.teach .step-cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 13px
+    }
+.teach .step-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 18px 14px 20px;
+      text-align: left;
+      border: 2px solid transparent;
+      border-radius: 21px;
+      background: white;
+      box-shadow: 0 12px 30px #5a3e8c12;
+      cursor: pointer;
+      transition: transform .3s, border-color .3s
+    }
+.teach .step-card:hover {
+      transform: translateY(-5px)
+    }
+.teach .step-card.selected {
+      border-color: var(--coral);
+      background: #f8fbff
+    }
+.teach .step-card .step-n {
+      font-size: .78rem;
+      color: var(--coral);
+      font-weight: 850;
+      letter-spacing: .08em
+    }
+.teach .step-card svg {
+      width: 100%;
+      height: 105px;
+      margin: 8px 0 12px;
+      overflow: visible
+    }
+.teach .step-card h3 {
+      font-size: 1.03rem;
+      line-height: 1.35;
+      margin-bottom: 8px
+    }
+.teach .step-card p {
+      font-size: .91rem;
+      line-height: 1.4;
+      margin: 0
+    }
+.teach .overview-note {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-top: 20px;
+      padding: 18px 22px;
+      background: #dbeafe;
+      border-radius: 18px;
+      min-height: 78px
+    }
+.teach .overview-note b {
+      font-size: 1.8rem;
+      color: var(--coral)
+    }
+.teach .overview-note p {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.05rem
+    }
+.teach.active .step-card .pulse-mark {
+      animation: center-pulse 3s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center
+    }
+.teach.active .step-card .travel-mark {
+      animation: dot-travel 3.6s ease-in-out infinite alternate
+    }
+.teach.active .step-card .dash-mark {
+      stroke-dasharray: 5 5;
+      animation: dash-travel 6s linear infinite
+    }
+.teach.active .step-card .spin-mark {
+      animation: cycle-turn 8s linear infinite;
+      transform-origin: 80px 48px
+    }
+@keyframes center-pulse {
+      50% {
+        transform: scale(1.15);
+        opacity: .7
+      }
+    }
+@keyframes dot-travel {
+      to {
+        transform: translateX(15px)
+      }
+    }
+@keyframes dash-travel {
+      to {
+        stroke-dashoffset: -100
+      }
+    }
+@keyframes cycle-turn {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+.teach .parcel-deck {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 15px 0 22px
+    }
+.teach .parcel {
+      background: #f5f9ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 17px;
+      text-align: center;
+      padding: 15px 8px
+    }
+.teach .parcel svg {
+      display: block;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 10px
+    }
+.teach .parcel b {
+      display: block;
+      font-size: 1.8rem;
+      margin: 7px 0;
+      color: var(--ink)
+    }
+.teach .parcel span {
+      font-size: .82rem;
+      color: var(--muted)
+    }
+.teach .question {
+      font-size: 1.25rem;
+      font-weight: 800;
+      line-height: 1.4;
+      margin-bottom: 15px
+    }
+.teach .answer-block {
+      padding: 18px;
+      border-radius: 16px;
+      background: #eafff5;
+      font-size: 1.07rem;
+      line-height: 1.5
+    }
+.teach .distance-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px
+    }
+.teach .distance-card {
+      border-radius: 17px;
+      padding: 17px;
+      background: var(--blue-bg);
+      border: 2px solid transparent
+    }
+.teach .distance-card:last-child {
+      background: var(--amber-bg)
+    }
+.teach .distance-card.winner {
+      border-color: var(--blue)
+    }
+.teach .distance-card:last-child.winner {
+      border-color: var(--amber)
+    }
+.teach .distance-card p {
+      font-size: .88rem;
+      margin: 0 0 8px
+    }
+.teach .distance-card b {
+      display: block;
+      font-size: 1.7rem;
+      line-height: 1.3
+    }
+.teach .object-choice {
+      min-width: 45px;
+      height: 43px;
+      border-radius: 12px;
+      border: 1px solid #bfdbfe;
+      background: white;
+      color: var(--coral);
+      font-weight: 850;
+      cursor: pointer
+    }
+.teach .object-choice.selected {
+      background: var(--coral);
+      color: white
+    }
+.teach .assign-board {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px
+    }
+.teach .assign-bucket {
+      padding: 17px;
+      background: var(--blue-bg);
+      border-radius: 17px;
+      min-height: 130px
+    }
+.teach .assign-bucket:last-child {
+      background: var(--amber-bg)
+    }
+.teach .assign-bucket h3 {
+      font-size: 1rem
+    }
+.teach .tokens {
+      display: flex;
+      gap: 12px;
+      min-height: 44px;
+      align-items: center
+    }
+.teach .token {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      font-weight: 850;
+      background: var(--blue);
+      color: white
+    }
+.teach .assign-bucket:last-child .token {
+      background: var(--amber)
+    }
+.teach .new-token {
+      animation: token-arrive .55s ease-out
+    }
+@keyframes token-arrive {
+      from {
+        opacity: 0;
+        transform: translateY(-22px) scale(.7)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+.teach .mean-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+.teach .mean-panel {
+      padding: 23px;
+      border-radius: 24px;
+      background: white;
+      box-shadow: var(--shadow);
+      border-top: 5px solid var(--blue);
+      min-width: 0
+    }
+.teach .mean-panel:last-child {
+      border-color: var(--amber)
+    }
+.teach .mean-panel .math {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.4;
+      margin: 15px 0
+    }
+.teach .mean-panel .math small {
+      display: block;
+      font-size: .88rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 6px
+    }
+.teach .center-mover {
+      transition: transform 1.1s cubic-bezier(.25, .8, .25, 1)
+    }
+.teach .mean-panel.moved .center-mover {
+      transform: translateX(90px)
+    }
+.teach .mean-panel:last-child.moved .center-mover {
+      transform: translateX(-90px)
+    }
+.teach .mean-panel .center-old {
+      opacity: .32
+    }
+.teach .mean-panel .center-new-label {
+      opacity: 0;
+      transition: opacity .5s .5s
+    }
+.teach .mean-panel.moved .center-new-label {
+      opacity: 1
+    }
+.teach .mean-panel.moved .center-start-label {
+      opacity: .35
+    }
+.teach .simple-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1rem
+    }
+.teach .simple-table th, .teach .simple-table td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid var(--line)
+    }
+.teach .simple-table th {
+      font-size: .88rem;
+      color: var(--muted);
+      font-weight: 750;
+      background: #f0f7ff
+    }
+.teach .simple-table tr.highlight {
+      background: #dbeafe
+    }
+.teach .simple-table tr.revealed {
+      animation: token-arrive .4s ease-out
+    }
+.teach .check-state {
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: #eff6ff;
+      margin-top: 16px;
+      font-size: 1.08rem;
+      line-height: 1.5;
+      min-height: 90px
+    }
+.teach .example-point {
+      transition: fill .7s, transform .7s
+    }
+.teach .sheet-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+.teach .sheet-tab {
+      padding: 11px 16px;
+      border: 1px solid #bfdbfe;
+      border-radius: 13px;
+      background: white;
+      color: var(--coral);
+      font-weight: 800;
+      cursor: pointer
+    }
+.teach .sheet-tab[aria-selected=true] {
+      background: var(--coral);
+      color: white
+    }
+.teach .sheet-panel[hidden] {
+      display: none
+    }
+.teach .sheet-panel h3 {
+      font-size: 1.25rem
+    }
+.teach .formula-line {
+      display: block;
+      padding: 13px 16px;
+      background: #eff6ff;
+      border-radius: 12px;
+      font-size: 1.04rem;
+      line-height: 1.6;
+      margin: 12px 0;
+      overflow-wrap: anywhere
+    }
+.teach .sheet-mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px
+    }
+.teach .sheet-mini div {
+      padding: 14px;
+      background: #eaf2ff;
+      border-radius: 12px;
+      font-size: 1rem
+    }
+.teach .sheet-mini div:last-child {
+      background: #fff2de
+    }
+.teach .sheet-mini b {
+      display: block;
+      font-size: 1.5rem;
+      margin-top: 6px
+    }
+.teach [hidden] {
+      display: none !important
+    }
+@media(min-width:901px) and (max-height:820px) {
+  .teach h2 {
+        margin: 10px 0 12px;
+        font-size: 2.55rem
+      }
+  .teach .intro {
+        margin-bottom: 18px;
+        font-size: 1.08rem
+      }
+  .teach .scene {
+        padding: 20px
+      }
+  .teach .explain {
+        padding: 22px;
+        gap: 13px
+      }
+  .teach .mean-panel {
+        padding: 20px
+      }
+  .teach .mean-panel svg {
+        max-height: 140px
+      }
+  .teach .takeaway {
+        margin-top: 15px;
+        font-size: 1.02rem;
+        padding: 13px 18px
+      }
+  .teach .sheet-tabs {
+        margin-bottom: 14px
+      }
+  .teach .simple-table th, .teach .simple-table td {
+        padding: 10px
+      }
+  .teach .sheet-mini {
+        margin-top: 14px
+      }
+  .teach .sheet-mini div {
+        padding: 11px
+      }
+  .teach .step-card svg {
+        height: 90px;
+        flex-shrink: 0
+      }
+}
+@media(max-width:900px) {
+  .teach .scene-grid {
+        grid-template-columns: 1fr
+      }
+  .teach .step-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+  .teach .step-card:last-child {
+        grid-column: 1/-1
+      }
+  .teach .step-card svg {
+        height: 80px
+      }
+  .teach .mean-panels {
+        grid-template-columns: 1fr
+      }
+  .teach .intro {
+        font-size: 1.06rem
+      }
+}
+@media(max-width:640px) {
+  .teach .scene, .teach .explain {
+        padding: 19px
+      }
+  .teach .concept-definition {
+        padding: 18px;
+        font-size: 1.1rem
+      }
+  .teach .parcel-deck {
+        grid-template-columns: repeat(2, 1fr)
+      }
+  .teach .step-cards {
+        gap: 10px
+      }
+  .teach .step-card {
+        padding: 14px 11px
+      }
+  .teach .step-card h3 {
+        font-size: .98rem
+      }
+  .teach .step-card p {
+        font-size: .85rem
+      }
+  .teach .distance-card {
+        padding: 12px
+      }
+  .teach .distance-card b {
+        font-size: 1.3rem
+      }
+  .teach .simple-table td, .teach .simple-table th {
+        padding: 10px 7px;
+        font-size: .88rem
+      }
+  .teach .overview-note {
+        padding: 16px
+      }
+  .teach .keyline {
+        font-size: 1rem
+      }
+}
+.reg .hero h1 {
+      font-size: clamp(2.4rem, 4.7vw, 4rem)
+    }
+.reg .graph {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 355px;
+      overflow: visible
+    }
+.reg .graph text {
+      font-family: 'Segoe UI', Arial, sans-serif
+    }
+.reg .graph-key {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 10px;
+      font-size: .86rem;
+      color: var(--muted)
+    }
+.reg .graph-key span {
+      display: flex;
+      gap: 7px;
+      align-items: center
+    }
+.reg .graph-key i {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #2563eb
+    }
+.reg .graph-key .line-key {
+      width: 24px;
+      height: 3px;
+      border-radius: 0;
+      background: #2563eb
+    }
+.reg .graph-key .open-key {
+      background: white;
+      border: 2px solid #1d4ed8
+    }
+.reg .chart-draw {
+      stroke-dasharray: 800;
+      stroke-dashoffset: 800;
+      animation: reg-draw 1.1s ease-out forwards
+    }
+.reg .plot-appear {
+      animation: reg-appear .55s ease-out both;
+      transform-box: fill-box;
+      transform-origin: center
+    }
+.reg .step-card .mini-rise {
+      animation: reg-rise 3s ease-in-out infinite alternate;
+      transform-box: fill-box;
+      transform-origin: center
+    }
+.reg .step-card .mini-path {
+      stroke-dasharray: 9 5;
+      animation: dash-travel 7s linear infinite
+    }
+@keyframes reg-draw {
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+@keyframes reg-appear {
+      from {
+        opacity: 0;
+        transform: scale(.6)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+@keyframes reg-rise {
+      to {
+        transform: translateY(-7px)
+      }
+    }
+.reg .pair-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px
+    }
+.reg .pair-card {
+      background: #fff;
+      border: 2px solid transparent;
+      border-radius: 22px;
+      padding: 18px 12px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: var(--shadow)
+    }
+.reg .pair-card.selected {
+      border-color: var(--coral);
+      background: #faf6ff
+    }
+.reg .pair-card .pair-n {
+      font-size: .8rem;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 16px
+    }
+.reg .pair-card b {
+      display: block;
+      font-size: 1.7rem;
+      line-height: 1.25;
+      color: var(--coral);
+      margin-bottom: 8px
+    }
+.reg .pair-card span:last-child {
+      font-size: .87rem;
+      color: var(--muted)
+    }
+.reg .pair-card svg {
+      height: 65px;
+      width: 100%;
+      margin-bottom: 8px
+    }
+.reg .pair-reading {
+      display: grid;
+      grid-template-columns: 1fr 55px 1fr;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      margin: 20px 0
+    }
+.reg .pair-reading>div {
+      background: #eaf2ff;
+      padding: 22px 12px;
+      border-radius: 20px
+    }
+.reg .pair-reading>div:last-child {
+      background: #dbeafe
+    }
+.reg .pair-reading b {
+      display: block;
+      font-size: 3rem;
+      color: var(--blue)
+    }
+.reg .pair-reading>div:last-child b {
+      color: var(--coral)
+    }
+.reg .pair-reading span {
+      color: var(--muted);
+      font-size: .92rem
+    }
+.reg .pair-reading>strong {
+      font-size: 2rem;
+      color: var(--coral)
+    }
+.reg .formula-big {
+      font-size: clamp(2.1rem, 4vw, 3.3rem);
+      font-weight: 900;
+      letter-spacing: -.035em;
+      color: var(--coral);
+      line-height: 1.2;
+      margin: 15px 0 22px
+    }
+.reg .parameter-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px
+    }
+.reg .parameter-cards>div {
+      padding: 16px;
+      border-radius: 15px;
+      background: #eaf2ff
+    }
+.reg .parameter-cards>div:last-child {
+      background: #fff2de
+    }
+.reg .parameter-cards h3 {
+      font-size: 1.15rem;
+      margin-bottom: 8px
+    }
+.reg .parameter-cards p {
+      font-size: .92rem;
+      margin: 0
+    }
+.reg .range-row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 14px 0
+    }
+.reg .range-row label {
+      font-weight: 800;
+      min-width: 78px
+    }
+.reg input[type=range] {
+      min-width: 120px;
+      flex: 1;
+      accent-color: var(--coral);
+      height: 26px
+    }
+.reg output {
+      font-size: 1.2rem;
+      font-weight: 850;
+      min-width: 36px;
+      color: var(--coral)
+    }
+.reg .answer-math {
+      background: #dbeafe;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 850;
+      line-height: 1.4;
+      color: var(--coral);
+      margin-top: 16px
+    }
+.reg .fit-result {
+      padding: 14px 17px;
+      background: #eafff5;
+      border-radius: 15px;
+      min-height: 82px;
+      line-height: 1.5;
+      font-size: 1rem;
+      margin-top: 14px
+    }
+.reg .model-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 14px 0 20px
+    }
+.reg .model-option {
+      border: 1px solid #bfdbfe;
+      background: #fff;
+      border-radius: 13px;
+      padding: 11px 16px;
+      font-weight: 800;
+      color: var(--coral);
+      cursor: pointer
+    }
+.reg .model-option.selected {
+      background: var(--coral);
+      color: #fff
+    }
+.reg .error-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px
+    }
+.reg .error-numbers>div {
+      padding: 12px 16px;
+      background: #eaf2ff;
+      border-radius: 14px;
+      font-size: .9rem
+    }
+.reg .error-numbers>div:last-child {
+      background: #fff2de
+    }
+.reg .error-numbers b {
+      font-size: 1.65rem;
+      display: block;
+      margin-top: 4px
+    }
+.reg .compare-sum {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px
+    }
+.reg .compare-sum>div {
+      padding: 17px;
+      background: #eafff5;
+      border-radius: 15px
+    }
+.reg .compare-sum>div:last-child {
+      background: #fff2de
+    }
+.reg .compare-sum b {
+      display: block;
+      font-size: 1.9rem;
+      margin-top: 7px;
+      color: var(--mint-dark)
+    }
+.reg .compare-sum>div:last-child b {
+      color: var(--amber)
+    }
+.reg .range-note {
+      padding: 16px 18px;
+      background: #fff2de;
+      border-radius: 16px;
+      line-height: 1.5;
+      font-size: 1.02rem;
+      margin-top: 14px;
+      min-height: 96px
+    }
+.reg .range-note.inside {
+      background: #eafff5
+    }
+.reg .practice-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 20px
+    }
+.reg .practice-layout .scene {
+      padding: 20px
+    }
+.reg .practice-layout .explain {
+      padding: 22px;
+      justify-content: flex-start
+    }
+.reg .practice-layout p {
+      font-size: 1rem
+    }
+.reg .practice-layout .formula-line {
+      font-size: .97rem;
+      margin: 10px 0;
+      padding: 11px 13px
+    }
+.reg .practice-layout .simple-table th, .reg .practice-layout .simple-table td {
+      padding: 10px 9px
+    }
+.reg .practice-graph {
+      max-height: 280px !important
+    }
+.reg .practice-steps {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px
+    }
+.reg .practice-panel[hidden] {
+      display: none
+    }
+.reg .task-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+.reg .choice-card {
+      padding: 18px 20px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow)
+    }
+.reg .choice-card:last-child {
+      grid-column: 1/-1
+    }
+.reg .choice-card h3 {
+      font-size: 1.05rem
+    }
+.reg .choice-card p {
+      font-size: .97rem;
+      margin-bottom: 0
+    }
+.reg .choice-card .gen-badge {
+      margin-bottom: 9px
+    }
+.reg .descriptor-list {
+      display: grid;
+      gap: 13px
+    }
+.reg .descriptor {
+      display: grid;
+      grid-template-columns: 43px 1fr;
+      gap: 14px;
+      padding: 9px 0;
+      align-items: start
+    }
+.reg .descriptor .number {
+      height: 40px;
+      min-width: 40px;
+      border-radius: 12px;
+      color: var(--coral);
+      background: #dbeafe
+    }
+.reg .descriptor h3 {
+      font-size: 1rem;
+      margin-bottom: 5px
+    }
+.reg .descriptor p {
+      font-size: .9rem;
+      line-height: 1.45;
+      margin: 0
+    }
+@media(min-width:901px) and (max-height:820px) {
+  .reg .graph {
+        max-height: 290px
+      }
+  .reg .parameter-cards {
+        margin-top: 12px
+      }
+  .reg .parameter-cards>div {
+        padding: 13px
+      }
+  .reg .intro {
+        margin-bottom: 16px
+      }
+  .reg .concept-definition {
+        font-size: 1.13rem;
+        padding: 18px 22px
+      }
+  .reg .step-card {
+        padding: 16px 12px
+      }
+  .reg .step-card svg {
+        height: 80px
+      }
+  .reg .overview-note {
+        margin-top: 16px;
+        padding: 15px 20px
+      }
+  .reg .practice-layout .simple-table th, .reg .practice-layout .simple-table td {
+        padding: 8px
+      }
+  .reg .choice-card {
+        padding: 15px 18px
+      }
+  .reg .task-grid {
+        gap: 12px
+      }
+  .reg .descriptor-list {
+        gap: 10px
+      }
+}
+@media(max-width:900px) {
+  .reg .practice-layout {
+        grid-template-columns: 1fr
+      }
+  .reg .graph {
+        max-height: none
+      }
+  .reg .pair-cards {
+        grid-template-columns: repeat(2, 1fr)
+      }
+}
+@media(max-width:640px) {
+  .reg .task-grid {
+        grid-template-columns: 1fr
+      }
+  .reg .parameter-cards {
+        grid-template-columns: 1fr
+      }
+  .reg .formula-big {
+        font-size: 2.2rem
+      }
+  .reg .answer-math {
+        font-size: 1.4rem
+      }
+  .reg .pair-reading {
+        grid-template-columns: 1fr 25px 1fr
+      }
+  .reg .pair-reading b {
+        font-size: 2.4rem
+      }
+  .reg .practice-layout .simple-table td, .reg .practice-layout .simple-table th {
+        font-size: .8rem;
+        padding: 9px 4px
+      }
+  .reg .graph-key {
+        font-size: .8rem;
+        gap: 12px
+      }
+  .reg .descriptor {
+        grid-template-columns: 36px 1fr;
+        gap: 10px
+      }
+  .reg .descriptor h3 {
+        font-size: .95rem
+      }
+}
+@media(min-width:901px) and (max-height:820px) {
+  .reg .pair-card {
+        padding: 14px 12px
+      }
+  .reg .pair-card svg {
+        height: 48px
+      }
+  .reg .pair-reading {
+        margin: 12px 0
+      }
+  .reg[aria-labelledby=s7] .graph {
+        max-height: 250px
+      }
+  .reg .choice-card {
+        padding: 12px 18px
+      }
+  .reg .choice-card .gen-badge {
+        margin-bottom: 6px
+      }
+  .reg .choice-card details {
+        margin-top: 6px
+      }
+  .reg .task-grid {
+        gap: 10px
+      }
+}
+  </style>
+</head>
+
+<body class="lesson-page lesson-10emn-12" data-lesson-id="10emn-12">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+
+  <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.GITHUB.IO</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">10 ЕМН</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">12 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Алгоритмы МО: Линейная регрессия</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <canvas id="network-bg" aria-hidden="true"></canvas>
+  <div class="bg-spheres" aria-hidden="true"><span class="bg-sphere"></span><span class="bg-sphere"></span><span
+      class="bg-sphere"></span><span class="bg-sphere"></span></div>
+  <div class="progress" id="progress"></div>
+  <nav class="dots" id="dotsNav" aria-label="Навигация по слайдам"></nav>
+  <main>
+    <section class="slide teach reg active" aria-labelledby="s1">
+      <div class="wrap hero">
+        <div><span class="eyebrow">🧠 10 класс ЕМН · урок 12</span>
+          <h1>Алгоритмы МО:<br><span class="accent">Линейная регрессия: простой числовой прогноз</span></h1>
+          <div class="goal">
+            <div class="goalitem"><b class="goal-code">10.1.2.6</b>
+              <div><strong>Цель обучения</strong><br>моделировать алгоритмы обучения k-means (k-средних), k-NN
+                (ближайших соседей) и линейной регрессии для решения практических задач в электронных таблицах</div>
+            </div>
+          </div>
+        </div>
+        <div class="paper pad"><span class="gen-badge">От группировки — к прогнозу</span><svg class="graph "
+            id="heroGraph" viewBox="0 0 580 350" role="img" aria-label="Диаграмма учебных данных x и y"></svg>
+          <div class="keyline"><strong>В прошлом уроке:</strong> собирали похожие объекты в
+            группы.<br><strong>Сегодня:</strong> по известному x прогнозируем число y.</div><button class="action"
+            style="margin-top:18px" onclick="goToSlide(1)">Как это работает? →</button>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s2">
+      <div class="wrap"><span class="eyebrow">02 · Знакомимся с алгоритмом</span>
+        <h2 id="s2"><span class="accent">Линейная регрессия</span></h2>
+        <div class="concept-definition"><strong>Линейная регрессия</strong> — алгоритм, который подбирает прямую по
+          известным парам <strong>x и y</strong> и использует её для прогноза <strong>числа y</strong> при новом x.
+        </div>
+        <div class="step-cards"><button class="step-card selected" data-overview="0" aria-pressed="true"><span
+              class="step-n">ШАГ 01</span><svg viewBox="0 0 160 100" aria-hidden="true">
+              <rect x="10" y="22" width="54" height="57" rx="15" fill="#eaf2ff" />
+              <rect x="96" y="22" width="54" height="57" rx="15" fill="#dbeafe" /><text x="37" y="60"
+                text-anchor="middle" fill="#2563eb" font-size="29" font-weight="800">x</text><text x="123" y="60"
+                text-anchor="middle" fill="#2563eb" font-size="29" font-weight="800">y</text>
+              <path class="mini-path" d="M68 50 H92" stroke="#2563eb" stroke-width="3" />
+              <path d="M88 44 L95 50 L88 56" fill="none" stroke="#2563eb" stroke-width="2" />
+            </svg>
+            <h3>Пары x и y</h3>
+            <p>Записываем, какому x соответствует известный y.</p>
+          </button><button class="step-card " data-overview="1" aria-pressed="false"><span class="step-n">ШАГ
+              02</span><svg viewBox="0 0 160 100" aria-hidden="true">
+              <path d="M20 15 V85 H148" fill="none" stroke="#bfdbfe" stroke-width="3" />
+              <circle class="mini-rise" cx="43" cy="70" r="7" fill="#2563eb" />
+              <circle class="mini-rise" cx="70" cy="54" r="7" fill="#2563eb" />
+              <circle class="mini-rise" cx="96" cy="38" r="7" fill="#2563eb" />
+              <circle class="mini-rise" cx="123" cy="22" r="7" fill="#2563eb" />
+            </svg>
+            <h3>Точки на диаграмме</h3>
+            <p>Каждую пару показываем одной точкой.</p>
+          </button><button class="step-card " data-overview="2" aria-pressed="false"><span class="step-n">ШАГ
+              03</span><svg viewBox="0 0 160 100" aria-hidden="true">
+              <path d="M20 15 V85 H148" fill="none" stroke="#bfdbfe" stroke-width="3" />
+              <path class="mini-path" d="M25 78 L140 20" stroke="#2563eb" stroke-width="4" /><text x="92" y="95"
+                text-anchor="middle" fill="#2563eb" font-size="16" font-weight="800">y = ax + b</text>
+            </svg>
+            <h3>Модель y = ax + b</h3>
+            <p>Подбираем прямую и вычисляем прогноз.</p>
+          </button><button class="step-card " data-overview="3" aria-pressed="false"><span class="step-n">ШАГ
+              04</span><svg viewBox="0 0 160 100" aria-hidden="true">
+              <path d="M20 78 L140 50" stroke="#2563eb" stroke-width="3" />
+              <path class="mini-path" d="M90 24 V61" stroke="#1d4ed8" stroke-width="3" />
+              <circle cx="90" cy="24" r="9" fill="#2563eb" />
+              <circle cx="90" cy="61" r="9" fill="white" stroke="#1d4ed8" stroke-width="3" />
+            </svg>
+            <h3>Отклонение прогноза</h3>
+            <p>Сравниваем прогноз с известным ответом.</p>
+          </button><button class="step-card " data-overview="4" aria-pressed="false"><span class="step-n">ШАГ
+              05</span><svg viewBox="0 0 160 100" aria-hidden="true">
+              <rect x="12" y="17" width="67" height="70" rx="12" fill="#eaf2ff" />
+              <path d="M22 73 L77 47" stroke="#2563eb" stroke-width="4" />
+              <path class="mini-path" d="M77 47 L145 15" stroke="#1d4ed8" stroke-width="3" /><text x="114" y="83"
+                text-anchor="middle" fill="#1d4ed8" font-size="37" font-weight="800">?</text>
+            </svg>
+            <h3>За пределами данных</h3>
+            <p>Проверяем, насколько далеко ушли от примеров.</p>
+          </button></div>
+        <div class="overview-note" aria-live="polite"><b id="overviewNumber">1</b>
+          <p id="overviewText">Например: за 1 час — 3 детали, за 2 часа — 5 деталей. Записываем пары (1, 3) и (2, 5).
+          </p>
+        </div>
+        <p class="micro" style="margin:14px 0 0">Нажми на карточку. Дальше разберём каждый шаг на одном учебном примере.
+        </p>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s3">
+      <div class="wrap"><span class="eyebrow">03 · Подтема 1 · Пары x и y</span>
+        <h2 id="s3">Одна пара — одно наблюдение</h2>
+        <p class="intro">Учебная мастерская: записали время работы и количество готовых деталей. Числа специально
+          подобраны для простого примера.</p>
+        <div class="pair-cards"><button class="pair-card selected" data-pair="0" aria-pressed="true"><span
+              class="pair-n">Наблюдение 1</span><svg viewBox="0 0 160 70" aria-hidden="true">
+              <circle cx="38" cy="34" r="24" fill="#eaf2ff" stroke="#2563eb" stroke-width="2" />
+              <path d="M38 18 V34 L49 41" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
+              <rect x="92" y="22" width="25" height="30" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+              <rect x="108" y="10" width="25" height="30" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+            </svg><b>(1, 3)</b><span>x = 1 · y = 3</span></button><button class="pair-card " data-pair="1"
+            aria-pressed="false"><span class="pair-n">Наблюдение 2</span><svg viewBox="0 0 160 70" aria-hidden="true">
+              <circle cx="38" cy="34" r="24" fill="#eaf2ff" stroke="#2563eb" stroke-width="2" />
+              <path d="M38 18 V34 L49 41" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
+              <rect x="92" y="22" width="25" height="30" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+              <rect x="108" y="10" width="25" height="30" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+            </svg><b>(2, 5)</b><span>x = 2 · y = 5</span></button><button class="pair-card " data-pair="2"
+            aria-pressed="false"><span class="pair-n">Наблюдение 3</span><svg viewBox="0 0 160 70" aria-hidden="true">
+              <circle cx="38" cy="34" r="24" fill="#eaf2ff" stroke="#2563eb" stroke-width="2" />
+              <path d="M38 18 V34 L49 41" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
+              <rect x="92" y="22" width="25" height="30" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+              <rect x="108" y="10" width="25" height="30" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+            </svg><b>(3, 7)</b><span>x = 3 · y = 7</span></button><button class="pair-card " data-pair="3"
+            aria-pressed="false"><span class="pair-n">Наблюдение 4</span><svg viewBox="0 0 160 70" aria-hidden="true">
+              <circle cx="38" cy="34" r="24" fill="#eaf2ff" stroke="#2563eb" stroke-width="2" />
+              <path d="M38 18 V34 L49 41" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
+              <rect x="92" y="22" width="25" height="30" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+              <rect x="108" y="10" width="25" height="30" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+            </svg><b>(4, 9)</b><span>x = 4 · y = 9</span></button></div>
+        <div class="scene-grid" style="margin-top:20px">
+          <div class="scene">
+            <div class="pair-reading">
+              <div><span>x · время работы, ч</span><b id="pairX">1</b></div><strong>→</strong>
+              <div><span>y · готовые детали, шт.</span><b id="pairY">3</b></div>
+            </div>
+            <p id="pairSentence" aria-live="polite">Через 1 час в мастерской было 3 готовые детали.</p>
+          </div>
+          <div class="explain">
+            <h3>x — что знаем; y — что хотим предсказать</h3>
+            <p>В учебных данных оба числа уже известны. По этим парам модель ищет зависимость.</p>
+            <div class="keyline">При прогнозе даём модели <strong>новое x</strong> и получаем <strong>предполагаемое
+                y</strong>.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s4">
+      <div class="wrap"><span class="eyebrow">04 · Подтема 2 · Точки на диаграмме</span>
+        <h2 id="s4">Пару (2, 5) можно увидеть</h2>
+        <p class="intro">Горизонтальная ось — x, вертикальная — y. Не меняем их местами.</p>
+        <div class="scene-grid">
+          <div class="scene"><svg class="graph " id="pointsGraph" viewBox="0 0 580 350" role="img"
+              aria-label="Диаграмма учебных данных x и y"></svg>
+            <div class="controls"><button class="action" id="pointsNext">Показать точку (2, 5)</button><button
+                class="action secondary" id="pointsReset">Сначала</button></div>
+          </div>
+          <div class="explain">
+            <h3>Два движения — одна точка</h3>
+            <p><strong class="blue">1. По горизонтали:</strong> найдём x = 2.</p>
+            <p><strong class="accent">2. Вверх:</strong> поднимемся до y = 5.</p>
+            <div class="keyline" id="pointsInfo" aria-live="polite">На пересечении поставим точку <strong>(2,
+                5)</strong>.</div>
+            <p>Так же нанесём остальные пары.<br>Посмотри: точки поднимаются почти «лесенкой».</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s5">
+      <div class="wrap"><span class="eyebrow">05 · Подтема 3 · Модель</span>
+        <h2 id="s5">Прямая превращается в формулу</h2>
+        <div class="scene-grid">
+          <div class="scene">
+            <div class="formula-big">y = <span class="blue">a</span>x + <span class="amber">b</span></div>
+            <div class="parameter-cards">
+              <div>
+                <h3 class="blue">a — изменение за шаг</h3>
+                <p>На сколько меняется прогноз y, когда x увеличивается на 1.</p>
+              </div>
+              <div>
+                <h3 class="amber">b — прогноз при x = 0</h3>
+                <p>Где прямая пересекает вертикальную ось.</p>
+              </div>
+            </div>
+            <div class="keyline" style="margin-top:20px">Для наших точек подходит <strong>y = 2x + 1</strong>.<br>Здесь
+              <strong>a = 2</strong>, <strong>b = 1</strong>.</div>
+          </div>
+          <div class="explain">
+            <h3>Подставь x — получи прогноз</h3>
+            <div class="range-row"><label for="predictX">x =</label><input id="predictX" type="range" min="1" max="4"
+                step="0.5" value="2"><output id="predictXValue" for="predictX">2</output></div>
+            <div class="answer-math" id="predictEquation" aria-live="polite">2 × 2 + 1 = 5</div>
+            <p id="predictMeaning">При x = 2 модель прогнозирует 5 деталей.</p>
+            <p class="micro">Двигай ползунок. При x = 2,5 получим прогноз 6, хотя такой пары в исходных данных нет.</p>
+            <p class="micro">Значение b = 1 — ответ модели при x = 0. Наблюдения при x = 0 у нас нет.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s6">
+      <div class="wrap"><span class="eyebrow">06 · Как модель обучается</span>
+        <h2 id="s6">Коэффициенты подбирают по данным</h2>
+        <p class="intro">Мы не просто угадываем формулу: ищем прямую, которая лучше описывает известные примеры.</p>
+        <div class="scene-grid">
+          <div class="scene"><svg class="graph " id="fitGraph" viewBox="0 0 580 350" role="img"
+              aria-label="Диаграмма учебных данных x и y"></svg>
+            <div class="graph-key"><span><i></i>Известные данные</span><span><i class="line-key"></i>Модель</span></div>
+            <div class="fit-result" id="fitMetric" aria-live="polite"></div>
+          </div>
+          <div class="explain">
+            <h3>Попробуй приблизить линию к точкам</h3>
+            <div class="range-row"><label for="fitA">a · наклон</label><input id="fitA" type="range" min="0" max="3"
+                step="0.5" value="1"><output id="fitAValue" for="fitA">1</output></div>
+            <div class="range-row"><label for="fitB">b · сдвиг</label><input id="fitB" type="range" min="0" max="3"
+                step="0.5" value="1"><output id="fitBValue" for="fitB">1</output></div><button class="action"
+              id="fitAuto">Подобрать по данным</button>
+            <p id="fitExplanation" aria-live="polite">Меняй a и b. Чем ближе линия к известным точкам, тем меньше
+              отклонения.</p>
+            <p class="micro">При обучении линейной регрессии обычно уменьшают <strong>сумму квадратов
+                отклонений</strong>. Здесь все точки лежат на одной прямой: можно получить нулевую ошибку.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s7">
+      <div class="wrap"><span class="eyebrow">07 · Подтема 4 · Отклонение прогноза</span>
+        <h2 id="s7">Прогноз и известный ответ могут различаться</h2>
+        <p class="intro">Возьмём известную пару (2, 5) и проверим, что предсказывает формула.</p>
+        <div class="scene-grid">
+          <div class="scene">
+            <div class="model-options"><button class="model-option selected" data-error-model="1"
+                aria-pressed="true">Модель y = x + 1</button><button class="model-option" data-error-model="2"
+                aria-pressed="false">Модель y = 2x + 1</button></div><svg class="graph " id="errorGraph"
+              viewBox="0 0 580 350" role="img" aria-label="Диаграмма учебных данных x и y"></svg>
+            <div class="error-numbers">
+              <div>Известно при x = 2<b>y = 5</b></div>
+              <div>Прогноз модели<b id="errorPrediction">y = 3</b></div>
+            </div>
+          </div>
+          <div class="explain">
+            <h3>Смотрим на один и тот же x</h3>
+            <p>Синяя точка — известный ответ.<br>Пустой кружок — прогноз модели.<br>Расстояние <strong>по
+                вертикали</strong> показывает отклонение.</p>
+            <div class="keyline"><strong>Абсолютная ошибка =<br>|известный y − прогноз|</strong></div>
+            <div class="answer-math" id="errorEquation" aria-live="polite">|5 − 3| = 2</div>
+            <p class="micro">Модуль убирает минус: ошибка 0 означает точное совпадение. Для понятного сравнения моделей
+              здесь используем абсолютные ошибки.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s8">
+      <div class="wrap"><span class="eyebrow">08 · Сравниваем две модели</span>
+        <h2 id="s8">Одна удачная точка — ещё не вся проверка</h2>
+        <div class="scene-grid">
+          <div class="scene">
+            <table class="simple-table">
+              <thead>
+                <tr>
+                  <th>x</th>
+                  <th>Известный y</th>
+                  <th>Ошибка<br>y = 2x + 1</th>
+                  <th>Ошибка<br>y = x + 1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>3</td>
+                  <td>0</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>5</td>
+                  <td>0</td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>7</td>
+                  <td>0</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>9</td>
+                  <td>0</td>
+                  <td>4</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="compare-sum">
+              <div>Сумма ошибок y = 2x + 1<b>0</b></div>
+              <div>Сумма ошибок y = x + 1<b>10</b></div>
+            </div>
+          </div>
+          <div class="explain">
+            <h3>Какая модель лучше на этих данных?</h3>
+            <p>Сравниваем <strong>те же четыре точки</strong> по <strong>одному правилу</strong>: складываем абсолютные
+              ошибки.</p>
+            <div class="model-options"><button class="model-option" data-compare="2">y = 2x + 1</button><button
+                class="model-option" data-compare="1">y = x + 1</button></div>
+            <div class="keyline" id="compareFeedback" aria-live="polite">Выбери модель с меньшей суммой ошибок.</div>
+            <p class="micro">Идеальное совпадение здесь получилось из-за простых учебных чисел. На новых данных даже
+              хорошая модель может ошибиться.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s9">
+      <div class="wrap"><span class="eyebrow">09 · Подтема 5 · За пределами данных</span>
+        <h2 id="s9">Формула посчитает. Но можно ли ей доверять?</h2>
+        <div class="scene-grid">
+          <div class="scene"><svg class="graph " id="rangeGraph" viewBox="0 0 580 350" role="img"
+              aria-label="Диаграмма учебных данных x и y"></svg>
+            <div class="graph-key"><span><i></i>Известные данные</span><span><i
+                  class="line-key"></i>Модель</span><span><i class="open-key"></i>Прогноз</span></div>
+            <div class="model-options"><button class="model-option selected" data-range="2.5" aria-pressed="true">x =
+                2,5</button><button class="model-option" data-range="5" aria-pressed="false">x = 5</button><button
+                class="model-option" data-range="100" aria-pressed="false">x = 100</button></div>
+            <p class="micro" id="rangeScale">Известные x находятся от 1 до 4. Голубая область показывает этот диапазон.
+            </p>
+          </div>
+          <div class="explain">
+            <h3>Модель видела только x = 1, 2, 3, 4</h3>
+            <div class="answer-math" id="rangeEquation">2 × 2,5 + 1 = 6</div>
+            <div class="range-note inside" id="rangeReason" aria-live="polite"></div>
+            <p>В мастерской могут закончиться материалы или измениться скорость работы. Четыре примера не доказывают,
+              что рост продолжится всегда.</p>
+            <div class="keyline"><strong>Далеко за пределами данных — меньше оснований доверять прогнозу.</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s10">
+      <div class="wrap"><span class="eyebrow">10 · Практика · Электронная таблица</span>
+        <h2 id="s10">Построим модель по четырём парам</h2>
+        <p class="intro">Выполняй шаги по очереди. За эту практику можно получить 10 баллов — дескрипторы в конце урока.
+        </p>
+        <div class="practice-steps" role="tablist" aria-label="Шаги практической работы"><button class="sheet-tab"
+            role="tab" id="practiceTab0" aria-controls="practicePanel0" aria-selected="true" tabindex="0"
+            data-practice="0">1 · Данные</button><button class="sheet-tab" role="tab" id="practiceTab1"
+            aria-controls="practicePanel1" aria-selected="false" tabindex="-1" data-practice="1">2 · Модель и
+            прогноз</button><button class="sheet-tab" role="tab" id="practiceTab2" aria-controls="practicePanel2"
+            aria-selected="false" tabindex="-1" data-practice="2">3 · Ошибка</button><button class="sheet-tab"
+            role="tab" id="practiceTab3" aria-controls="practicePanel3" aria-selected="false" tabindex="-1"
+            data-practice="3">4 · Диаграмма</button></div>
+        <div class="practice-layout">
+          <div class="scene">
+            <div id="practiceTableArea">
+              <table class="simple-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                  </tr>
+                  <tr>
+                    <th>1</th>
+                    <th>x</th>
+                    <th>y</th>
+                    <th>Прогноз</th>
+                    <th>Ошибка</th>
+                  </tr>
+                </thead>
+                <tbody id="practiceRows"></tbody>
+              </table>
+              <div class="sheet-mini">
+                <div>H2 · коэффициент a<b id="practiceA">—</b></div>
+                <div>H3 · коэффициент b<b id="practiceB">—</b></div>
+              </div>
+            </div>
+            <div id="practiceChartArea" hidden><svg class="graph practice-graph" id="practiceGraph"
+                viewBox="0 0 580 350" role="img" aria-label="Диаграмма учебных данных x и y"></svg>
+              <div class="graph-key"><span><i></i>Известные данные</span><span><i class="line-key"></i>Модель</span>
+              </div>
+            </div>
+            <p class="micro" style="margin:16px 0 0">Исходные данные: (1, 3), (2, 5), (3, 7), (4, 9).</p>
+          </div>
+          <div class="explain">
+            <div class="practice-panel" id="practicePanel0" role="tabpanel" aria-labelledby="practiceTab0">
+              <h3>1. Введи известные пары</h3>
+              <p>В A1:D1 запиши заголовки, как в образце. В <strong>A2:A5</strong> — 1, 2, 3, 4. В
+                <strong>B2:B5</strong> — 3, 5, 7, 9.</p>
+              <div class="keyline" style="margin-top:16px">A — известный x.<br>B — известный y.<br>C — будущий
+                прогноз.<br>D — абсолютная ошибка.</div>
+              <p class="micro" style="margin-top:16px">Понадобится электронная таблица. Онлайн-сервис ИИ не нужен.</p>
+            </div>
+            <div class="practice-panel" id="practicePanel1" role="tabpanel" aria-labelledby="practiceTab1" hidden>
+              <h3>2. Найди a, b и прогноз</h3>
+              <p>Запиши в G2 «a», в G3 «b». Формулы в H2 и H3 подберут коэффициенты:</p><code
+                class="formula-line">H2: =НАКЛОН(B2:B5;A2:A5)<br>H3: =ОТРЕЗОК(B2:B5;A2:A5)</code>
+              <p>Получится <strong>a = 2</strong> и <strong>b = 1</strong>. Теперь прогноз:</p><code
+                class="formula-line">C2: =$H$2*A2+$H$3</code>
+              <p>Протяни C2 до <strong>C5</strong>. Знаки $ закрепляют ячейки коэффициентов.</p>
+              <p class="micro" style="margin-top:12px">Английские имена: SLOPE и INTERCEPT. Разделитель ; или , зависит
+                от настроек таблицы.</p>
+            </div>
+            <div class="practice-panel" id="practicePanel2" role="tabpanel" aria-labelledby="practiceTab2" hidden>
+              <h3>3. Проверь прогноз</h3><code class="formula-line">D2: =ABS(B2-C2)</code>
+              <p><strong>B2</strong> — известный ответ.<br><strong>C2</strong> — прогноз.<br><strong>ABS</strong> —
+                модуль разницы.</p>
+              <div class="keyline" style="margin-top:16px">Протяни D2 до <strong>D5</strong>.<br>Для наших четырёх точек
+                все ошибки равны <strong>0</strong>.</div>
+              <p class="micro" style="margin-top:16px">Это проверка на известных примерах, а не гарантия точного
+                прогноза для любого нового x.</p>
+            </div>
+            <div class="practice-panel" id="practicePanel3" role="tabpanel" aria-labelledby="practiceTab3" hidden>
+              <h3>4. Построй точечную диаграмму</h3>
+              <p><strong>Вставка → Точечная (XY).</strong></p>
+              <p style="margin-top:12px">Ряд «Данные»: x — <strong>A2:A5</strong>, y — <strong>B2:B5</strong>; покажи
+                маркерами.</p>
+              <p style="margin-top:12px">Ряд «Прогноз»: x — <strong>A2:A5</strong>, y — <strong>C2:C5</strong>; покажи
+                прямыми отрезками.</p>
+              <div class="keyline" style="margin-top:16px">Все четыре точки лежат на линии прогноза. Данные и модель
+                совпали.</div>
+              <p class="micro" style="margin-top:16px">Подпиши оси: x — время, ч; y — детали, шт.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s11">
+      <div class="wrap"><span class="eyebrow">11 · Закрепление на выбор</span>
+        <h2 id="s11">Выбери, как проверить понимание</h2>
+        <p class="intro">Учитель выбирает подходящее задание. Все пять подряд выполнять не нужно.</p>
+        <div class="task-grid">
+          <div class="choice-card"><span class="gen-badge">1 · Индивидуально · 5 мин</span>
+            <h3>Вычисли прогноз</h3>
+            <p>По модели y = 2x + 1 найди прогнозы при x = 1, 2, 3.</p>
+            <details>
+              <summary>Проверить себя</summary>
+              <p>3, 5 и 7.</p>
+            </details>
+          </div>
+          <div class="choice-card"><span class="gen-badge">2 · Электронная таблица · 12 мин</span>
+            <h3>Прогноз и ошибка</h3>
+            <p>Для (1, 3), (2, 5), (3, 7), (4, 9) вычисли прогноз y = 2x + 1 и абсолютную ошибку.</p>
+            <details>
+              <summary>Проверить себя</summary>
+              <p>Прогнозы: 3, 5, 7, 9. Все четыре ошибки равны 0.</p>
+            </details>
+          </div>
+          <div class="choice-card"><span class="gen-badge">3 · В парах · 8 мин</span>
+            <h3>Сравни две модели</h3>
+            <p>Для тех же четырёх точек сравните y = 2x + 1 и y = x + 1 по абсолютным ошибкам.</p>
+            <details>
+              <summary>Проверить себя</summary>
+              <p>Суммы ошибок: 0 и 10. Первая модель точнее на этих данных.</p>
+            </details>
+          </div>
+          <div class="choice-card"><span class="gen-badge">4 · Диаграмма · 10 мин</span>
+            <h3>Покажи данные и модель</h3>
+            <p>Нанеси учебные точки и значения выбранной модели на точечную диаграмму.</p>
+            <details>
+              <summary>Проверить себя</summary>
+              <p>Для y = 2x + 1 прогнозы совпадут с исходными точками. Проверь подписи осей и названия рядов.</p>
+            </details>
+          </div>
+          <div class="choice-card"><span class="gen-badge">5 · Кейс · 7 мин</span>
+            <h3>Можно ли верить прогнозу при x = 100?</h3>
+            <p>Объясни, почему прогноз по четырём малым x менее обоснован при x = 100.</p>
+            <details>
+              <summary>Проверить себя</summary>
+              <p>Модель получила только примеры с x от 1 до 4. Значение 100 далеко за этим диапазоном; там зависимость
+                может измениться.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="slide teach reg" aria-labelledby="s12">
+      <div class="wrap"><span class="eyebrow">12 · Подводим итог</span>
+        <h2 id="s12">Дескрипторы и итог урока</h2>
+        <div class="scene-grid">
+          <div class="scene">
+            <h3>Практика со слайда 10 · 10 баллов</h3>
+            <div class="descriptor-list">
+              <div class="descriptor"><span class="number">1</span>
+                <div>
+                  <h3>Вводит пары x и y · 2 балла</h3>
+                  <p>A2:A5: 1, 2, 3, 4 — 1 б.; B2:B5: 3, 5, 7, 9 — 1 б.</p>
+                </div>
+              </div>
+              <div class="descriptor"><span class="number">2</span>
+                <div>
+                  <h3>Подбирает коэффициенты · 2 балла</h3>
+                  <p>НАКЛОН в H2 даёт a = 2 — 1 б.; ОТРЕЗОК в H3 даёт b = 1 — 1 б.</p>
+                </div>
+              </div>
+              <div class="descriptor"><span class="number">3</span>
+                <div>
+                  <h3>Рассчитывает прогноз · 2 балла</h3>
+                  <p>Верная формула в C2 — 1 б.; прогнозы 3, 5, 7, 9 в C2:C5 — 1 б.</p>
+                </div>
+              </div>
+              <div class="descriptor"><span class="number">4</span>
+                <div>
+                  <h3>Проверяет ошибки · 2 балла</h3>
+                  <p>Верная формула ABS в D2 — 1 б.; нулевые ошибки в D2:D5 — 1 б.</p>
+                </div>
+              </div>
+              <div class="descriptor"><span class="number">5</span>
+                <div>
+                  <h3>Строит диаграмму · 2 балла</h3>
+                  <p>Четыре точки данных на диаграмме XY — 1 б.; линия прогноза — 1 б.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="explain"><span class="gen-badge" style="align-self:flex-start">Главное за урок</span>
+            <h3>По известным парам — к новому числу</h3>
+            <p><strong>Линейная регрессия</strong> подбирает прямую по данным и вычисляет прогноз по формуле <strong>y =
+                ax + b</strong>.</p>
+            <div class="keyline"><strong>Пары → точки → модель → прогноз → проверка ошибки.</strong></div>
+            <div class="answer-block"><strong>Наш пример:</strong> y = 2x + 1.<br>При x = 3 прогноз равен
+              <strong>7</strong>.<br>На четырёх учебных точках ошибка равна <strong>0</strong>.</div>
+            <p><strong>За пределами данных — осторожно:</strong> прогноз при x = 100 требует новых данных для проверки.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="mobile-controls"><button id="mobilePrev" aria-label="Предыдущий слайд">←</button><button id="mobileNext"
+      aria-label="Следующий слайд">→</button></div>
+  <div class="hint">← → листать · F — полный экран</div>
+  <div class="slide-counter" id="slideCounter" aria-live="polite"></div>
+  <script>const slides = [...document.querySelectorAll('.slide')];
+    const dotsNav = document.getElementById('dotsNav');
+    const labels = ['Тема урока', 'Линейная регрессия', 'Пары x и y', 'Точки на диаграмме', 'Формула прогноза', 'Как учится модель', 'Отклонение прогноза', 'Сравнение моделей', 'За пределами данных', 'Практика в таблице', 'Закрепление на выбор', 'Дескрипторы и итог'];
+    let current = 0;
+    slides.forEach((slide, i) => {
+      const dot = document.createElement('button'); dot.className = 'dot'; dot.type = 'button';
+      dot.title = `${i + 1} · ${labels[i]}`; dot.setAttribute('aria-label', dot.title);
+      dot.onclick = () => goToSlide(i); dotsNav.append(dot);
+      const next = document.createElement('button'); next.className = 'slide-next'; next.type = 'button';
+      next.textContent = i === slides.length - 1 ? 'В начало' : 'Далее →';
+      next.onclick = () => goToSlide(i === slides.length - 1 ? 0 : i + 1); slide.append(next);
+    });
+    function goToSlide(i) {if(!window._inSlideSync&&typeof window.goToSlide==='function'&&window.goToSlide._isUniversal){window.goToSlide(arguments[0]);return;}
+      if (i < 0 || i >= slides.length) return;
+      current = i;
+      slides.forEach((s, n) => { s.classList.toggle('active', n === i); s.setAttribute('aria-hidden', String(n !== i)); });
+      [...dotsNav.children].forEach((d, n) => { d.classList.toggle('active', n === i); if (n === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current'); });
+      document.getElementById('progress').style.width = `${(i + 1) / slides.length * 100}%`;
+      document.getElementById('slideCounter').textContent = `${i + 1} / ${slides.length}`;
+      document.getElementById('mobilePrev').disabled = i === 0;
+      document.getElementById('mobileNext').disabled = i === slides.length - 1;
+      slides[i].scrollTop = 0; history.replaceState(null, '', `#${i + 1}`);
+    }
+    function fromHash() { const n = Number(location.hash.slice(1)); goToSlide(Number.isInteger(n) && n >= 1 && n <= slides.length ? n - 1 : 0) }
+    window.addEventListener('hashchange', fromHash);
+    document.getElementById('mobilePrev').onclick = () => goToSlide(current - 1);
+    document.getElementById('mobileNext').onclick = () => goToSlide(current + 1);
+    document.addEventListener('keydown', e => {
+      if (e.target.closest('input,textarea,select,button,a,summary,[contenteditable]') || e.ctrlKey || e.altKey || e.metaKey) return;
+      const steps = { ArrowRight: current + 1, PageDown: current + 1, ' ': current + 1, ArrowLeft: current - 1, PageUp: current - 1, Home: 0, End: slides.length - 1 };
+      if (Object.hasOwn(steps, e.key)) { e.preventDefault(); goToSlide(steps[e.key]); }
+      if (e.key.toLowerCase() === 'f') { const p = document.fullscreenElement ? document.exitFullscreen?.() : document.documentElement.requestFullscreen?.(); p?.catch(() => { }); }
+    });
+    const dataset = [{ x: 1, y: 3 }, { x: 2, y: 5 }, { x: 3, y: 7 }, { x: 4, y: 9 }];
+    const fmt = n => Number(n.toFixed(3)).toLocaleString('ru-RU');
+    const modelValue = (x, a = 2, b = 1) => a * x + b;
+    function fitLine(points) {
+      const mx = points.reduce((s, p) => s + p.x, 0) / points.length;
+      const my = points.reduce((s, p) => s + p.y, 0) / points.length;
+      const denominator = points.reduce((s, p) => s + (p.x - mx) ** 2, 0);
+      const a = points.reduce((s, p) => s + (p.x - mx) * (p.y - my), 0) / denominator;
+      return { a, b: my - a * mx };
+    }
+    function drawChart(id, { points = dataset, a = null, b = 1, xMax = 5, yMax = 12, selected = null, guide = null, prediction = null, errorAt = null, shade = false, animate = false, labels = false } = {}) {
+      const left = 62, right = 548, top = 27, bottom = 292;
+      const px = x => left + x / xMax * (right - left), py = y => bottom - y / yMax * (bottom - top);
+      let svg = '';
+      if (shade) svg += `<rect x="${px(1)}" y="${top}" width="${px(4) - px(1)}" height="${bottom - top}" fill="#eaf2ff"/>`;
+      const xTicks = xMax > 10 ? [0, 20, 40, 60, 80, 100] : [0, 1, 2, 3, 4, 5];
+      const yTicks = yMax > 20 ? [0, 50, 100, 150, 200] : yMax === 16 ? [0, 4, 8, 12, 16] : [0, 2, 4, 6, 8, 10, 12];
+      xTicks.filter(x => x <= xMax).forEach(x => { svg += `<line x1="${px(x)}" y1="${top}" x2="${px(x)}" y2="${bottom}" stroke="#eee7f5"/><text x="${px(x)}" y="${bottom + 23}" text-anchor="middle" font-size="14" fill="#7e6b91">${x}</text>`; });
+      yTicks.filter(y => y <= yMax).forEach(y => { svg += `<line x1="${left}" y1="${py(y)}" x2="${right}" y2="${py(y)}" stroke="#eee7f5"/><text x="${left - 13}" y="${py(y) + 5}" text-anchor="end" font-size="14" fill="#7e6b91">${y}</text>`; });
+      svg += `<path d="M${left} ${top - 7} V${bottom} H${right + 8}" fill="none" stroke="#9784ad" stroke-width="2"/><text x="${left}" y="17" font-size="14" fill="#475569">y · детали</text><text x="${right}" y="340" text-anchor="end" font-size="14" fill="#475569">x · часы</text>`;
+      if (a !== null) {
+        const endX = a > 0 ? Math.min(xMax, (yMax - b) / a) : xMax;
+        const path = (x0, x1, extras = '') => `<path d="M${px(x0)} ${py(modelValue(x0, a, b))} L${px(x1)} ${py(modelValue(x1, a, b))}" fill="none" stroke="#2563eb" stroke-width="3.5" ${extras}/>`;
+        if (shade) { svg += path(0, 1, 'stroke-dasharray="7 5"'); svg += path(1, Math.min(4, endX)); if (endX > 4) svg += path(4, endX, 'stroke-dasharray="7 5"'); }
+        else svg += path(0, endX, animate ? 'class="chart-draw"' : '');
+      }
+      if (guide) { svg += `<path d="M${left} ${bottom} H${px(guide.x)} V${py(guide.y)}" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-dasharray="6 5" ${animate ? 'class="chart-draw"' : ''}/>`; }
+      if (errorAt !== null) { const p = dataset.find(p => p.x === errorAt); svg += `<path d="M${px(p.x)} ${py(p.y)} V${py(modelValue(p.x, a, b))}" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round"/>`; }
+      points.forEach((p, i) => {
+        const active = selected === null || selected === p.x;
+        svg += `<g ${animate ? 'class="plot-appear"' : ''} style="animation-delay:${i * .07}s" opacity="${active ? 1 : .35}"><circle cx="${px(p.x)}" cy="${py(p.y)}" r="${xMax > 10 ? 4 : 7}" fill="#2563eb" stroke="white" stroke-width="2"/>`;
+        if (labels || selected === p.x) svg += `<text x="${px(p.x) + 12}" y="${py(p.y) - 13}" fill="#2563eb" font-size="16" font-weight="800">(${fmt(p.x)}; ${fmt(p.y)})</text>`;
+        svg += '</g>';
+      });
+      if (prediction) { svg += `<circle cx="${px(prediction.x)}" cy="${py(prediction.y)}" r="10" fill="white" fill-opacity=".85" stroke="#1d4ed8" stroke-width="3"/><text x="${px(prediction.x) - 13}" y="${py(prediction.y) - 16}" text-anchor="end" font-size="16" font-weight="800" fill="#1d4ed8">${fmt(prediction.y)}</text>`; }
+      const chart = document.getElementById(id); chart.innerHTML = svg;
+      chart.setAttribute('aria-label', `Оси x: от 0 до ${xMax}, y: от 0 до ${yMax}. Известные точки: ${points.map(p => `(${p.x}; ${p.y})`).join(', ')}.${a !== null ? ` Модель y = ${fmt(a)}x + ${fmt(b)}.` : ''}${prediction ? ` Прогноз при x = ${fmt(prediction.x)}: ${fmt(prediction.y)}.` : ''}`);
+    }
+    drawChart('heroGraph', { a: 2, animate: true });
+
+    const overviewText = [
+      'Например: за 1 час — 3 детали, за 2 часа — 5 деталей. Записываем пары (1, 3) и (2, 5).',
+      'Для пары (2, 5): по горизонтали идём к 2, затем вверх к 5. Там ставим точку.',
+      'Для наших данных подходит y = 2x + 1. Если x = 3, прогноз равен 2 × 3 + 1 = 7.',
+      'Если известно y = 5, а модель дала 3, абсолютная ошибка равна |5 − 3| = 2.',
+      'Мы видели только x от 1 до 4. Для x = 100 формула даст число, но его ещё нужно проверить новыми данными.'
+    ];
+    document.querySelectorAll('[data-overview]').forEach(button => button.onclick = () => {
+      const i = Number(button.dataset.overview);
+      document.querySelectorAll('[data-overview]').forEach(b => { b.classList.toggle('selected', b === button); b.setAttribute('aria-pressed', String(b === button)); });
+      document.getElementById('overviewNumber').textContent = i + 1; document.getElementById('overviewText').textContent = overviewText[i];
+    });
+    document.querySelectorAll('[data-pair]').forEach(button => button.onclick = () => {
+      const p = dataset[Number(button.dataset.pair)];
+      document.querySelectorAll('[data-pair]').forEach(b => { b.classList.toggle('selected', b === button); b.setAttribute('aria-pressed', String(b === button)); });
+      document.getElementById('pairX').textContent = p.x; document.getElementById('pairY').textContent = p.y;
+      document.getElementById('pairSentence').textContent = `Через ${p.x} ${p.x === 1 ? 'час' : 'часа'} в мастерской было ${p.y} ${p.y === 3 ? 'готовые детали' : 'готовых деталей'}.`;
+    });
+
+    let pointStep = 0;
+    function renderPoints() {
+      const button = document.getElementById('pointsNext');
+      drawChart('pointsGraph', { points: pointStep === 0 ? [] : pointStep === 1 ? [dataset[1]] : dataset, guide: pointStep ? dataset[1] : null, labels: pointStep === 2, selected: pointStep === 1 ? 2 : null, animate: pointStep > 0 });
+      button.disabled = pointStep === 2; button.textContent = ['Показать точку (2, 5)', 'Добавить остальные точки', 'Все четыре точки нанесены'][pointStep];
+      document.getElementById('pointsInfo').innerHTML = [
+        'На пересечении поставим точку <strong>(2, 5)</strong>.',
+        '<strong>2 по горизонтали, 5 по вертикали.</strong><br>Это одно наблюдение из таблицы.',
+        '<strong>Все четыре точки лежат на одной прямой.</strong><br>Попробуем описать её формулой.'
+      ][pointStep];
+    }
+    document.getElementById('pointsNext').onclick = () => { if (pointStep < 2) { pointStep++; renderPoints(); } };
+    document.getElementById('pointsReset').onclick = () => { pointStep = 0; renderPoints(); }; renderPoints();
+
+    function updatePrediction() {
+      const x = Number(document.getElementById('predictX').value), y = modelValue(x);
+      document.getElementById('predictXValue').textContent = fmt(x);
+      document.getElementById('predictEquation').textContent = `2 × ${fmt(x)} + 1 = ${fmt(y)}`;
+      document.getElementById('predictMeaning').textContent = `При x = ${fmt(x)} модель прогнозирует ${fmt(y)} ${y === 3 || y === 4 ? 'детали' : 'деталей'}.`;
+    }
+    document.getElementById('predictX').oninput = updatePrediction; updatePrediction();
+
+    function updateFit(automatic = false) {
+      const a = Number(document.getElementById('fitA').value), b = Number(document.getElementById('fitB').value);
+      document.getElementById('fitAValue').textContent = fmt(a); document.getElementById('fitBValue').textContent = fmt(b);
+      drawChart('fitGraph', { a, b, yMax: 16 });
+      const loss = dataset.reduce((sum, p) => sum + (p.y - modelValue(p.x, a, b)) ** 2, 0);
+      document.getElementById('fitMetric').innerHTML = `<strong>Модель: y = ${fmt(a)}x + ${fmt(b)}</strong><br>Сумма квадратов отклонений: <strong>${fmt(loss)}</strong>.`;
+      document.getElementById('fitExplanation').innerHTML = loss === 0 ? `<strong>${automatic ? 'Алгоритм подобрал' : 'Ты нашёл'} a = 2 и b = 1.</strong> Линия проходит через все четыре точки.` : 'Линия пока не совпадает со всеми точками. Попробуй изменить наклон a или сдвиг b.';
+    }
+    ['fitA', 'fitB'].forEach(id => document.getElementById(id).oninput = () => updateFit());
+    document.getElementById('fitAuto').onclick = () => { const fit = fitLine(dataset); document.getElementById('fitA').value = fit.a; document.getElementById('fitB').value = fit.b; updateFit(true); }; updateFit();
+
+    function updateError(a) {
+      const actual = 5, predicted = modelValue(2, a, 1), error = Math.abs(actual - predicted);
+      drawChart('errorGraph', { a, selected: 2, errorAt: 2, prediction: { x: 2, y: predicted } });
+      document.getElementById('errorPrediction').textContent = `y = ${predicted}`;
+      document.getElementById('errorEquation').textContent = `|${actual} − ${predicted}| = ${error}`;
+      document.querySelectorAll('[data-error-model]').forEach(b => { const selected = Number(b.dataset.errorModel) === a; b.classList.toggle('selected', selected); b.setAttribute('aria-pressed', String(selected)); });
+    }
+    document.querySelectorAll('[data-error-model]').forEach(b => b.onclick = () => updateError(Number(b.dataset.errorModel))); updateError(1);
+    document.querySelectorAll('[data-compare]').forEach(b => b.onclick = () => {
+      const correct = Number(b.dataset.compare) === 2;
+      document.getElementById('compareFeedback').innerHTML = correct ? '<strong>Верно: y = 2x + 1.</strong><br>Сумма абсолютных ошибок 0 меньше 10.' : 'У y = x + 1 сумма ошибок равна 10. Сравни её с суммой 0 у другой модели.';
+    });
+
+    function updateRange(x) {
+      const y = modelValue(x), far = x > 10, inside = x >= 1 && x <= 4;
+      drawChart('rangeGraph', { a: 2, prediction: { x, y }, xMax: far ? 105 : 5, yMax: far ? 220 : 12, shade: true });
+      document.getElementById('rangeEquation').textContent = `2 × ${fmt(x)} + 1 = ${fmt(y)}`;
+      const reason = document.getElementById('rangeReason'); reason.classList.toggle('inside', inside);
+      reason.innerHTML = inside ? '<strong>x = 2,5 находится между известными x.</strong> Прогноз опирается на близкие примеры. Но значение 6 ещё не является новым измерением.' : far ? '<strong>201 — результат формулы, а не проверенный факт.</strong> x = 100 очень далеко от диапазона 1–4. Нет данных, что прежняя зависимость там сохранится.' : '<strong>x = 5 уже за пределами наблюдений 1–4.</strong> Он близко к ним, но это всё равно прогноз за пределами данных — его нужно проверить.';
+      document.getElementById('rangeScale').textContent = far ? 'Масштаб увеличен до x = 105. Все четыре известные точки оказались в узкой голубой полосе слева.' : 'Известные x находятся от 1 до 4. Голубая область показывает этот диапазон.';
+      document.querySelectorAll('[data-range]').forEach(b => { const selected = Number(b.dataset.range) === x; b.classList.toggle('selected', selected); b.setAttribute('aria-pressed', String(selected)); });
+    }
+    document.querySelectorAll('[data-range]').forEach(b => b.onclick = () => updateRange(Number(b.dataset.range))); updateRange(2.5);
+
+    let practiceStep = 0;
+    function selectPractice(step, focus = false) {
+      practiceStep = step;
+      document.querySelectorAll('[data-practice]').forEach(tab => {
+        const active = Number(tab.dataset.practice) === step; tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !active; if (active && focus) tab.focus();
+      });
+      document.getElementById('practiceTableArea').hidden = step === 3; document.getElementById('practiceChartArea').hidden = step !== 3;
+      const fitted = fitLine(dataset);
+      document.getElementById('practiceRows').innerHTML = dataset.map((p, i) => `<tr><th>${i + 2}</th><td>${p.x}</td><td>${p.y}</td><td>${step >= 1 ? fmt(modelValue(p.x, fitted.a, fitted.b)) : '—'}</td><td>${step >= 2 ? fmt(Math.abs(p.y - modelValue(p.x, fitted.a, fitted.b))) : '—'}</td></tr>`).join('');
+      document.getElementById('practiceA').textContent = step >= 1 ? fmt(fitted.a) : '—'; document.getElementById('practiceB').textContent = step >= 1 ? fmt(fitted.b) : '—';
+    }
+    document.querySelectorAll('[data-practice]').forEach(tab => {
+      tab.onclick = () => selectPractice(Number(tab.dataset.practice));
+      tab.addEventListener('keydown', e => { if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return; e.preventDefault(); const next = e.key === 'Home' ? 0 : e.key === 'End' ? 3 : (practiceStep + (e.key === 'ArrowRight' ? 1 : 3)) % 4; selectPractice(next, true); });
+    });
+    selectPractice(0); drawChart('practiceGraph', { a: 2, labels: true });
+
+    if (true) {
+      // Canvas particle background
+      const canvas = document.getElementById("network-bg");
+      const ctx = canvas.getContext("2d");
+      let points = [];
+      function initNetwork() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        points = Array.from({ length: 48 }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - .5) * .35,
+          vy: (Math.random() - .5) * .35,
+          r: 1.3 + Math.random() * 2
+        }));
+      }
+      function drawNetwork() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "rgba(37, 99, 235, 0.12)";
+        points.forEach((p, i) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          ctx.fillStyle = "rgba(59, 130, 246, 0.20)";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          for (let j = i + 1; j < points.length; j++) {
+            const q = points[j];
+            const d = Math.hypot(p.x - q.x, p.y - q.y);
+            if (d < 140) {
+              ctx.globalAlpha = 1 - d / 140;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
+          }
+        });
+        requestAnimationFrame(drawNetwork);
+      }
+      window.addEventListener("resize", initNetwork);
+      initNetwork();
+      drawNetwork();
+
+    }
+
+    fromHash();</script>
+  <script src="../../скрипты/lessons.js?v=5.2"></script>
+</body>
+
+</html>

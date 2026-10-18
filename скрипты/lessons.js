@@ -15,7 +15,8 @@
         { num: 3, title: "IP-адрес и сетевые протоколы", file: "9 класс/1 четверть/3 урок.html" },
         { num: 4, title: "IP-адрес. Маска подсети", file: "9 класс/1 четверть/4 урок.html" },
         { num: 5, title: "Доменная система имён (DNS)", file: "9 класс/1 четверть/5 урок.html" },
-        { num: 6, title: "Определение пропускной способности сети", file: "9 класс/1 четверть/6 урок.html" }
+        { num: 6, title: "Определение пропускной способности сети", file: "9 класс/1 четверть/6 урок.html" },
+        { num: 7, title: "Определение пропускной способности сети. СОР", file: "9 класс/1 четверть/7 урок.html" }
       ]
     },
     c10emn: {
@@ -30,7 +31,10 @@
         { num: 7, title: "Практика: однослойный перцептрон в Excel", file: "10 ЕМН/1 четверть/7 урок.html" },
         { num: 8, title: "Модели машинного обучения", file: "10 ЕМН/1 четверть/8 урок.html" },
         { num: 9, title: "Управление приложением жестами", file: "10 ЕМН/1 четверть/9 урок.html" },
-        { num: 10, title: "Алгоритмы МО: k-NN (Ближайшие соседи)", file: "10 ЕМН/1 четверть/10 урок.html" }
+        { num: 10, title: "Алгоритмы МО: k-NN (Ближайшие соседи)", file: "10 ЕМН/1 четверть/10 урок.html" },
+        { num: 11, title: "Алгоритмы МО: k-means (Метод k-средних)", file: "10 ЕМН/1 четверть/11 урок.html" },
+        { num: 12, title: "Алгоритмы МО: Линейная регрессия", file: "10 ЕМН/1 четверть/12 урок.html" },
+        { num: 13, title: "СОЧ за 1 четверть", file: "10 ЕМН/1 четверть/13.СОЧ.html" }
       ]
     },
     c10ogn: {
@@ -42,7 +46,8 @@
         { num: 3, title: "Модели машинного обучения", file: "10 ОГН/1 четверть/3 урок.html" },
         { num: 4, title: "Проектная мастерская: презентация о МО", file: "10 ОГН/1 четверть/4 урок.html" },
         { num: 5, title: "Перцептрон и его назначение", file: "10 ОГН/1 четверть/5 урок.html" },
-        { num: 6, title: "Практика: перцептрон в Excel", file: "10 ОГН/1 четверть/6 урок.html" }
+        { num: 6, title: "Практика: перцептрон в Excel", file: "10 ОГН/1 четверть/6 урок.html" },
+        { num: 7, title: "Практика: перцептрон в Excel. СОР", file: "10 ОГН/1 четверть/7 урок.html" }
       ]
     },
     c11: {
@@ -54,7 +59,8 @@
         { num: 3, title: "Классификация задач ИИ", file: "11 класс/1 четверть/3 урок.html" },
         { num: 4, title: "Классификация задач ИИ — практика", file: "11 класс/1 четверть/4 урок.html" },
         { num: 5, title: "Управление приложением жестами", file: "11 класс/1 четверть/5 урок.html" },
-        { num: 6, title: "Основы моделирования нейронных сетей", file: "11 класс/1 четверть/6 урок.html" }
+        { num: 6, title: "Основы моделирования нейронных сетей", file: "11 класс/1 четверть/6 урок.html" },
+        { num: 7, title: "Моделирование нейронных сетей. СОР", file: "11 класс/1 четверть/7 урок.html" }
       ]
     }
   };
@@ -233,6 +239,13 @@
     return Array.from(document.querySelectorAll('.slide'));
   }
 
+  const _existingInlineShow = (typeof window.goToSlide === 'function' && !window.goToSlide._isUniversal)
+    ? window.goToSlide
+    : ((typeof window.show === 'function' && !window.show._isUniversal) ? window.show : null);
+  if (_existingInlineShow) {
+    window._inlineShowSlide = _existingInlineShow;
+  }
+
   function setupNavControls() {
     let navBar = document.querySelector('.nav-controls');
     if (!navBar) {
@@ -245,7 +258,6 @@
       `;
     }
 
-    // Always attach to document.body directly (detached from navbar)
     if (navBar.parentElement !== document.body) {
       document.body.appendChild(navBar);
     }
@@ -265,12 +277,18 @@
 
     const indicatorWidth = 14;
     const indicatorHeight = 14;
-    const containerRect = container.getBoundingClientRect();
-    const dotRect = activeDot.getBoundingClientRect();
-    const x = dotRect.left - containerRect.left - container.clientLeft +
-      (dotRect.width - indicatorWidth) / 2;
-    const y = dotRect.top - containerRect.top - container.clientTop +
-      (dotRect.height - indicatorHeight) / 2;
+    let x = 0;
+    let y = 0;
+    if (activeDot.offsetWidth > 0 && activeDot.offsetHeight > 0) {
+      x = activeDot.offsetLeft + (activeDot.offsetWidth - indicatorWidth) / 2;
+      y = activeDot.offsetTop + (activeDot.offsetHeight - indicatorHeight) / 2;
+    } else {
+      const containerRect = container.getBoundingClientRect();
+      const dotRect = activeDot.getBoundingClientRect();
+      x = dotRect.left - containerRect.left - container.clientLeft + (dotRect.width - indicatorWidth) / 2;
+      y = dotRect.top - containerRect.top - container.clientTop + (dotRect.height - indicatorHeight) / 2;
+    }
+
     const previousIndex = Number(indicator.dataset.index);
     const previousX = Number(indicator.dataset.x);
     const previousY = Number(indicator.dataset.y);
@@ -282,6 +300,7 @@
     indicator.style.setProperty('--dot-indicator-y', `${y}px`);
 
     if (initialized && previousIndex !== activeIndex) {
+      indicator.classList.add('is-ready');
       indicator.classList.toggle('is-horizontal', Math.abs(x - previousX) > Math.abs(y - previousY));
       indicator.classList.remove('is-moving');
       void indicator.offsetWidth;
@@ -293,7 +312,8 @@
     indicator.dataset.y = String(y);
     if (!initialized) {
       indicator.dataset.initialized = 'true';
-      requestAnimationFrame(() => indicator.classList.add('is-ready'));
+      void indicator.offsetWidth;
+      indicator.classList.add('is-ready');
     }
   }
 
@@ -305,23 +325,44 @@
 
     slides.forEach((slide, idx) => {
       const isActive = idx === globalCurrentSlide;
+      const wasActive = slide.classList.contains('active');
       slide.classList.toggle('active', isActive);
-      slide.setAttribute('aria-hidden', !isActive);
-      if (isActive) slide.scrollTop = 0;
+      slide.setAttribute('aria-hidden', String(!isActive));
+      if (isActive && !wasActive) {
+        slide.scrollTop = 0;
+        requestAnimationFrame(() => {
+          try {
+            slide.getAnimations({ subtree: true }).forEach(anim => {
+              if (anim.playState === 'finished') {
+                anim.cancel();
+                anim.play();
+              }
+            });
+          } catch (e) {}
+        });
+      }
+      slide.querySelectorAll('video').forEach(video => {
+        try {
+          if (isActive) video.play().catch(() => {});
+          else video.pause();
+        } catch (e) {}
+      });
     });
 
     const dotsContainer = document.getElementById('dots') ||
                           document.querySelector('.dots') ||
                           document.getElementById('dotsNav') ||
                           document.querySelector('.dots-nav');
-    const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('button')) : [];
-    dots.forEach((dot, idx) => {
-      const isActive = idx === globalCurrentSlide;
-      dot.classList.toggle('active', isActive);
-      if (isActive) dot.setAttribute('aria-current', 'step');
-      else dot.removeAttribute('aria-current');
-    });
-    updateDotsIndicator(dotsContainer, dots, globalCurrentSlide);
+    if (dotsContainer) {
+      const dots = Array.from(dotsContainer.querySelectorAll('button, .dot, .dotbutton, .dot-nav'));
+      dots.forEach((dot, idx) => {
+        const isActive = idx === globalCurrentSlide;
+        dot.classList.toggle('active', isActive);
+        if (isActive) dot.setAttribute('aria-current', 'step');
+        else dot.removeAttribute('aria-current');
+      });
+      updateDotsIndicator(dotsContainer, dots, globalCurrentSlide);
+    }
 
     const bar = document.getElementById('progress') || document.querySelector('.progress-bar');
     if (bar) {
@@ -334,6 +375,11 @@
     const nextBtn = document.getElementById('nextBtn');
     if (prevBtn) prevBtn.disabled = globalCurrentSlide === 0;
     if (nextBtn) nextBtn.disabled = globalCurrentSlide === total - 1;
+
+    const slideNextBtn = document.getElementById('slideNext') || document.querySelector('button.slide-next#next');
+    if (slideNextBtn) {
+      slideNextBtn.textContent = globalCurrentSlide === total - 1 ? 'Начать заново →' : 'Следующий слайд →';
+    }
 
     let counter = document.getElementById('navSlideCounter');
     const navBar = document.querySelector('.nav-controls');
@@ -349,42 +395,54 @@
     }
 
     try {
+      window._suppressHistoryHook = true;
       history.replaceState(null, '', '#' + (globalCurrentSlide + 1));
-    } catch (e) {}
+      window._suppressHistoryHook = false;
+    } catch (e) {
+      window._suppressHistoryHook = false;
+    }
   }
 
   function goToSlide(index) {
     const slides = getSlides();
     if (!slides.length) return;
-    globalCurrentSlide = Math.max(0, Math.min(slides.length - 1, index));
+    const target = Math.max(0, Math.min(slides.length - 1, Number(index) || 0));
+    if (target !== globalCurrentSlide) {
+      document.querySelectorAll('[data-demo]').forEach(panel => {
+        try { panel.pauseDemo?.(); } catch (e) {}
+      });
+    }
+    globalCurrentSlide = target;
+
+    if (!window._inSlideSync) {
+      window._inSlideSync = true;
+      try {
+        if (typeof window._lessonShowSlide === 'function') {
+          window._lessonShowSlide(target);
+        } else if (typeof window._inlineShowSlide === 'function') {
+          window._inlineShowSlide(target);
+        }
+      } catch (e) {}
+      window._inSlideSync = false;
+    }
+
     updateGlobalUI();
   }
+  goToSlide._isUniversal = true;
 
   function changeSlide(direction) {
     const slides = getSlides();
     if (!slides.length) return;
-    globalCurrentSlide = Math.max(0, Math.min(slides.length - 1, globalCurrentSlide + direction));
-    updateGlobalUI();
+    const target = Math.max(0, Math.min(slides.length - 1, globalCurrentSlide + (Number(direction) || 0)));
+    goToSlide(target);
   }
-
-  window.addEventListener('resize', () => {
-    const dotsContainer = document.getElementById('dots') ||
-                          document.querySelector('.dots') ||
-                          document.getElementById('dotsNav') ||
-                          document.querySelector('.dots-nav');
-    if (!dotsContainer) return;
-    updateDotsIndicator(
-      dotsContainer,
-      Array.from(dotsContainer.querySelectorAll('button')),
-      globalCurrentSlide
-    );
-  }, { passive: true });
+  changeSlide._isUniversal = true;
 
   window.goToSlide = goToSlide;
   window.changeSlide = changeSlide;
   window.updateGlobalUI = updateGlobalUI;
-  window.show = window.goToSlide;
-  window.showSlide = window.goToSlide;
+  window.show = goToSlide;
+  window.showSlide = goToSlide;
 
   const LESSON_DOT_TITLES = {
     '9-1': [
@@ -441,7 +499,6 @@
       document.body.appendChild(dotsContainer);
     }
 
-    // Deduplicate any secondary or rogue dot containers
     document.querySelectorAll('#dots, .dots, #dotsNav, .dots-nav').forEach(el => {
       if (el !== dotsContainer) {
         el.remove();
@@ -458,6 +515,7 @@
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.className = `dot dotbutton ${index === globalCurrentSlide ? 'active' : ''}`;
+      if (index === globalCurrentSlide) dot.setAttribute('aria-current', 'step');
 
       let title = '';
       if (presetTitles && presetTitles[index]) {
@@ -514,11 +572,14 @@
       dot.setAttribute('aria-label', `Слайд ${index + 1}: ${title}`);
       dot.onclick = (e) => {
         e.preventDefault();
+        e.stopImmediatePropagation();
         window.goToSlide(index);
       };
       dotsContainer.appendChild(dot);
     });
 
+    const createdDots = Array.from(dotsContainer.querySelectorAll('button, .dot, .dotbutton, .dot-nav'));
+    updateDotsIndicator(dotsContainer, createdDots, globalCurrentSlide);
   }
 
   function bindUniversalSlideInputs() {
@@ -529,31 +590,86 @@
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
 
+      // 1) Check right-side dot click
+      const dotBtn = target.closest('#dots button, .dots button, #dotsNav button, .dots-nav button, #dots .dot, .dots .dot, #dotsNav .dot, .dots-nav .dot');
+      if (dotBtn) {
+        const container = dotBtn.parentElement;
+        if (container) {
+          const allDots = Array.from(container.querySelectorAll('button, .dot, .dotbutton, .dot-nav'));
+          const idx = allDots.indexOf(dotBtn);
+          if (idx !== -1) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            window.goToSlide(idx);
+            return;
+          }
+        }
+      }
+
+      // 2) Check any slide navigation button (ignore <a> links)
       const control = target.closest(
-        '#prevBtn, #nextBtn, #slideNext, #mobilePrev, #mobileNext, ' +
+        'button#prevBtn, button#nextBtn, button#slideNext, button#mobilePrev, button#mobileNext, ' +
+        'button#startBtn, button#restartBtn, ' +
         '.nav-controls .nav-btn, .mobile-nav-bar .mobile-nav-btn, ' +
-        '.slide-nav button, .slide-next'
+        '.slide-nav button, button.slide-next, button.next-slide-btn, ' +
+        'button.start-btn, button[data-next], button.action.advance, ' +
+        'button[onclick*="changeSlide"], button[onclick*="goToSlide"], button[onclick*="show("], button[onclick*="showSlide("]'
       );
       if (!control || control.disabled) return;
 
       event.preventDefault();
       event.stopImmediatePropagation();
+
+      const onclickAttr = control.getAttribute('onclick') || '';
+      const goToMatch = onclickAttr.match(/(?:goToSlide|showSlide|show)\s*\(\s*(\d+)\s*\)/);
+      if (goToMatch) {
+        window.goToSlide( parseInt(goToMatch[1], 10) );
+        return;
+      }
+
+      const changeMatch = onclickAttr.match(/changeSlide\s*\(\s*(-?\d+)\s*\)/);
+      if (changeMatch) {
+        window.changeSlide( parseInt(changeMatch[1], 10) );
+        return;
+      }
+
+      const btnText = (control.textContent || '').toLowerCase().trim();
       const isPrevious = control.matches(
-        '#prevBtn, #mobilePrev, [aria-label*="Предыдущ"], [aria-label*="Назад"]'
-      );
-      window.changeSlide(isPrevious ? -1 : 1);
+        '#prevBtn, #mobilePrev, #prev, [aria-label*="Предыдущ"], [aria-label*="Назад"], [title*="Назад"]'
+      ) || btnText.startsWith('назад') || btnText.includes('предыдущ');
+
+      if (isPrevious) {
+        window.changeSlide(-1);
+        return;
+      }
+
+      const slides = getSlides();
+      const isLastSlide = slides.length > 0 && globalCurrentSlide === slides.length - 1;
+      const isRestart = control.id === 'restartBtn' ||
+                        btnText.includes('в начало') ||
+                        btnText.includes('к началу') ||
+                        btnText.includes('начать заново') ||
+                        btnText.includes('сначала') ||
+                        (isLastSlide && control.matches('[data-next], .slide-next, .next-slide-btn, .action.advance'));
+
+      if (isRestart) {
+        window.goToSlide(0);
+        return;
+      }
+
+      window.changeSlide(1);
     }, true);
 
     document.addEventListener('keydown', (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (event.altKey || event.ctrlKey || event.metaKey ||
-          (target && target.closest('input, textarea, select, [contenteditable="true"]'))) {
+          (target && target.closest('input, textarea, select, [contenteditable="true"], [role="tab"]'))) {
         return;
       }
 
       let direction = 0;
       if (event.key === 'ArrowRight' || event.key === 'PageDown' ||
-          (event.key === ' ' && target && !target.closest('button, a'))) {
+          (event.key === ' ' && target && !target.closest('button, a, summary, details'))) {
         direction = 1;
       } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
         direction = -1;
@@ -577,31 +693,7 @@
   }
 
   function bindActionButtons() {
-    document.querySelectorAll('.start-btn, [data-next], .action.advance, .slide-next').forEach(btn => {
-      if (!btn.dataset.boundClick) {
-        btn.dataset.boundClick = 'true';
-        if (!btn.onclick && !btn.getAttribute('onclick')) {
-          btn.addEventListener('click', () => window.changeSlide(1));
-        }
-      }
-    });
-
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    if (prevBtn && !prevBtn.dataset.boundNav) {
-      prevBtn.dataset.boundNav = 'true';
-      prevBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.changeSlide(-1);
-      });
-    }
-    if (nextBtn && !nextBtn.dataset.boundNav) {
-      nextBtn.dataset.boundNav = 'true';
-      nextBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.changeSlide(1);
-      });
-    }
+    // Handled centrally in capture phase by bindUniversalSlideInputs()
   }
 
   function initUniversalSlideController() {
@@ -619,14 +711,16 @@
 
     initDotsNav();
     updateGlobalUI();
-    bindActionButtons();
     bindUniversalSlideInputs();
 
-    // Hide redundant class and lesson pills on slides (shown already in top nav badge)
-    document.querySelectorAll('.eyebrow, .slide-badge').forEach(el => {
-      const txt = el.textContent.toLowerCase();
-      if (txt.includes('класс') || txt.includes('урок') || el.closest('.hero, .hero-layout') || el.closest('.slide:first-child, .slide:first-of-type')) {
-        el.style.display = 'none';
+    window.addEventListener('resize', () => {
+      const dotsContainer = document.getElementById('dots') ||
+                            document.querySelector('.dots') ||
+                            document.getElementById('dotsNav') ||
+                            document.querySelector('.dots-nav');
+      if (dotsContainer) {
+        const dots = Array.from(dotsContainer.querySelectorAll('button, .dot, .dotbutton, .dot-nav'));
+        updateDotsIndicator(dotsContainer, dots, globalCurrentSlide);
       }
     });
 
@@ -636,8 +730,7 @@
       if (!isNaN(slideNum) && slideNum >= 1 && slideNum <= slides.length) {
         const target = slideNum - 1;
         if (target !== globalCurrentSlide) {
-          globalCurrentSlide = target;
-          updateGlobalUI();
+          window.goToSlide(target);
         }
       }
     });
@@ -647,6 +740,7 @@
       const origReplace = history.replaceState.bind(history);
       history.replaceState = function(state, unused, url) {
         origReplace(state, unused, url);
+        if (window._suppressHistoryHook) return;
         if (url && typeof url === 'string' && url.includes('#')) {
           const num = parseInt(url.split('#')[1], 10);
           if (!isNaN(num) && num >= 1 && num <= slides.length) {
@@ -719,7 +813,7 @@ let currentSlide = 0;
         const cases = {
             medicine: {
                 icon: 'fa-heart-pulse',
-                color: '#e11d48',
+                color: '#7c3aed',
                 title: 'ИИ находит признаки болезни на снимке',
                 story: 'Система заметила подозрительный участок на рентгене. Врач получил предупреждение и назначил дополнительную проверку.',
                 responsibility: 'Итоговый диагноз ставит врач. Разработчики отвечают за качество модели, больница - за правила использования.',
@@ -729,7 +823,7 @@ let currentSlide = 0;
             },
             education: {
                 icon: 'fa-school',
-                color: '#4f46e5',
+                color: '#9333ea',
                 title: 'ИИ советует ученику индивидуальный маршрут',
                 story: 'Платформа решила, что ученику нужно больше простых заданий, потому что он ошибся в тесте после пропуска урока.',
                 responsibility: 'Учитель проверяет рекомендацию и учитывает контекст: болезнь, стресс, отсутствие интернета.',
@@ -739,7 +833,7 @@ let currentSlide = 0;
             },
             finance: {
                 icon: 'fa-credit-card',
-                color: '#16a34a',
+                color: '#6d28d9',
                 title: 'ИИ решает, дать ли кредит',
                 story: 'Банк использует модель риска. Клиенту отказали, но в письме написано только: "решение принято автоматически".',
                 responsibility: 'Банк отвечает за отказ и обязан дать канал для пересмотра решения человеком.',
@@ -749,7 +843,7 @@ let currentSlide = 0;
             },
             social: {
                 icon: 'fa-comments',
-                color: '#d97706',
+                color: '#8b5cf6',
                 title: 'ИИ подбирает ленту в социальной сети',
                 story: 'Алгоритм заметил, что подросток часто задерживается на тревожных видео, и начал показывать их еще больше.',
                 responsibility: 'Платформа отвечает за дизайн рекомендаций, особенно когда речь идет о подростках.',
@@ -965,8 +1059,8 @@ let currentSlide = 0;
 
         function drawNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(23, 32, 51, 0.08)';
-            ctx.fillStyle = 'rgba(79, 70, 229, 0.16)';
+            ctx.strokeStyle = 'rgba(124, 58, 237, 0.12)';
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.22)';
 
             particles.forEach((point, index) => {
                 point.x += point.vx;
@@ -1067,7 +1161,7 @@ research.querySelector('.lead').textContent='Работа в паре · 15–20
 const table=research.querySelector('.research-table');table.querySelector('thead tr').insertAdjacentHTML('beforeend','<th>Полное название АНГЛ - РУС</th>');table.querySelectorAll('tbody tr').forEach(row=>row.insertAdjacentHTML('beforeend','<td></td>'));research.querySelector('.definition').remove();
 finish.before(research);finish.querySelector('.eyebrow').textContent='06 / 06 · Финиш';})();
 
-'use strict';const $=id=>document.getElementById(id),slides=[...document.querySelectorAll('.slide')];let current=0;slides.forEach((s,i)=>{const b=document.createElement('button');b.className='dotbutton';b.title=`Слайд ${i+1}: ${s.getAttribute('aria-label')}`;b.dataset.tooltip=b.title;b.onclick=()=>show(i);$('dots').append(b);s.querySelector('[data-next]').onclick=()=>show(i===slides.length-1?0:i+1)});function show(n){current=Math.max(0,Math.min(n,slides.length-1));slides.forEach((s,i)=>s.classList.toggle('active',i===current));document.querySelectorAll('.dotbutton').forEach((b,i)=>b.toggleAttribute('aria-current',i===current));slides[current].scrollTop=0;$('progress').style.width=((current+1)/slides.length*100)+'%';history.replaceState(null,'','#'+(current+1))}window.addEventListener('hashchange',()=>show((parseInt(location.hash.slice(1))||1)-1));document.addEventListener('keydown',e=>{if(e.target.closest('button,input,summary')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='ArrowRight'||e.key==='PageDown')show(current+1);if(e.key==='ArrowLeft'||e.key==='PageUp')show(current-1)});
+'use strict';const $=id=>document.getElementById(id),slides=[...document.querySelectorAll('.slide')];let current=0;slides.forEach((s,i)=>{const b=document.createElement('button');b.className='dotbutton';b.title=`Слайд ${i+1}: ${s.getAttribute('aria-label')}`;b.dataset.tooltip=b.title;b.onclick=()=>show(i);$('dots').append(b);s.querySelector('[data-next]').onclick=()=>show(i===slides.length-1?0:i+1)});window._lessonShowSlide = show; function show(n){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(n,slides.length-1));slides.forEach((s,i)=>s.classList.toggle('active',i===current));document.querySelectorAll('.dotbutton').forEach((b,i)=>b.toggleAttribute('aria-current',i===current));slides[current].scrollTop=0;$('progress').style.width=((current+1)/slides.length*100)+'%';history.replaceState(null,'','#'+(current+1))}window.addEventListener('hashchange',()=>show((parseInt(location.hash.slice(1))||1)-1));document.addEventListener('keydown',e=>{if(e.target.closest('button,input,summary')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='ArrowRight'||e.key==='PageDown')show(current+1);if(e.key==='ArrowLeft'||e.key==='PageUp')show(current-1)});
 function valid(v){const a=v.split('.');return a.length===4&&a.every(x=>/^(0|[1-9]\d{0,2})$/.test(x)&&+x<=255)}const builds=[...document.querySelectorAll('.build')];builds.forEach(b=>{b.parts=[];const pcs=[...b.querySelectorAll('.piece')],out=b.querySelector('.buildstatus'),tools=document.createElement('div');tools.className='buildtools';tools.innerHTML='<button class="choice">Убрать последний</button><button class="choice">Сначала</button>';b.append(tools);const draw=()=>{out.textContent=b.parts.map(x=>x.textContent).join('');pcs.forEach(x=>x.disabled=b.parts.includes(x))};pcs.forEach(x=>x.onclick=()=>{b.parts.push(x);draw()});tools.children[0].onclick=()=>{b.parts.pop();draw()};tools.children[1].onclick=()=>{b.parts=[];draw()};draw()});$('checkBuild').onclick=()=>{let n=0;builds.forEach(b=>{const v=b.parts.map(x=>x.textContent).join(''),ok=b.parts.length===4&&valid(v);n+=+ok;b.classList.toggle('correct',ok);b.classList.toggle('wrong',!ok);b.querySelector('.buildstatus').textContent=(v||'Адрес ещё не собран')+(ok?' ✓':' — проверь запись')});$('buildScore').className='result '+(n===3?'good':'bad');$('buildScore').textContent=`Верно: ${n} из 3. `+(n===3?'Во всех адресах четыре октета от 0 до 255.':'Проверь порядок фрагментов и диапазон каждого октета.')};
 let task,done=new Set;document.querySelectorAll('[data-answer]').forEach(x=>x.onclick=()=>{task=x;document.querySelectorAll('[data-answer]').forEach(y=>y.classList.remove('selected'));x.classList.add('selected');$('practiceResult').className='result';$('practiceResult').textContent='Теперь выбери подходящий протокол.'});document.querySelectorAll('[data-protocol]').forEach(x=>x.onclick=()=>{if(!task){$('practiceResult').textContent='Сначала выбери одну ситуацию.';return}const ok=x.dataset.protocol===task.dataset.answer;if(ok)done.add(task.dataset.answer);task.classList.toggle('correct',ok);task.classList.toggle('wrong',!ok);$('practiceResult').className='result '+(ok?'good':'bad');$('practiceResult').textContent=ok?'Верно! '+({IP:'IP указывает адрес получателя.',TCP:'TCP следит за порядком и получением частей.',FTP:'FTP служит для передачи файлов.',HTTPS:'HTTPS защищает обмен браузера с сайтом.'})[x.dataset.protocol]:'Попробуй ещё раз: подумай, какая задача описана.';$('practiceScore').textContent=`Решено: ${done.size} из 4`});
 const quiz=[['Какой протокол указывает адрес получателя пакета?',['TCP','IP','FTP'],1,'IP отвечает за адресацию и передачу пакетов.'],['Какой протокол проверяет порядок и получение данных?',['HTTPS','TCP','IP'],1,'TCP обеспечивает надёжную передачу.'],['Что используют для защищённого входа на сайт?',['FTP','HTTPS','IP'],1,'HTTPS защищает обмен браузера и сайта.']];let qi=0,qs=0;function qdraw(){const q=quiz[qi];$('quizCount').textContent=`Вопрос ${qi+1} из ${quiz.length} · верно ${qs}`;$('quizQuestion').textContent=q[0];$('quizOptions').innerHTML='';$('quizFeedback').className='result';$('quizFeedback').textContent='Выбери один ответ.';$('quizNext').hidden=true;q[1].forEach((v,i)=>{const b=document.createElement('button');b.className='choice';b.textContent=v;b.onclick=()=>{const ok=i===q[2];if(ok)qs++;[...$('quizOptions').children].forEach((x,n)=>{x.disabled=true;if(n===q[2])x.classList.add('correct')});if(!ok)b.classList.add('wrong');$('quizFeedback').className='result '+(ok?'good':'bad');$('quizFeedback').textContent=(ok?'Верно! ':'Разберёмся: ')+q[3];$('quizNext').hidden=false;$('quizNext').textContent=qi===quiz.length-1?'Пройти ещё раз':'Следующий вопрос'};$('quizOptions').append(b)})}$('quizNext').onclick=()=>{if(qi<quiz.length-1){qi++;qdraw()}else{qi=0;qs=0;qdraw()}};qdraw();show((parseInt(location.hash.slice(1))||1)-1);
@@ -1091,7 +1185,7 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
         $('dots').append(b);
         s.querySelector('[data-next]').onclick=()=>show(i===slides.length-1?0:i+1)
       });
-      function show(n){
+      window._lessonShowSlide = show; function show(n){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
         current=Math.max(0,Math.min(n,slides.length-1));
         slides.forEach((s,i)=>s.classList.toggle('active',i===current));
         document.querySelectorAll('.dotbutton').forEach((b, i) => {
@@ -1584,7 +1678,7 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
         $('dots').append(b);
         s.querySelector('[data-next]').onclick=()=>show(i===slides.length-1?0:i+1)
       });
-      function show(n){
+      window._lessonShowSlide = show; function show(n){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
         current=Math.max(0,Math.min(n,slides.length-1));
         slides.forEach((s,i)=>s.classList.toggle('active',i===current));
         document.querySelectorAll('.dotbutton').forEach((b, i) => {
@@ -1627,7 +1721,7 @@ function finishReview(){
     const status=document.createElement('span');status.className='tag';status.textContent=reviewAnswers[i]===q.answer?'✓ Верно':'✕ Разберём ошибку';li.prepend(status);$('reviewAnswerList').append(li);
   });
   if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    for(let i=0;i<28;i++){const piece=document.createElement('i');piece.style.setProperty('--left',`${(i*37)%100}%`);piece.style.setProperty('--delay',`${(i%7)*.08}s`);piece.style.setProperty('--drift',`${(i%2?1:-1)*(20+i*3)}px`);piece.style.background=['#b95132','#ee9b55','#789473','#dfb553'][i%4];$('reviewConfetti').append(piece);}
+    for(let i=0;i<28;i++){const piece=document.createElement('i');piece.style.setProperty('--left',`${(i*37)%100}%`);piece.style.setProperty('--delay',`${(i%7)*.08}s`);piece.style.setProperty('--drift',`${(i%2?1:-1)*(20+i*3)}px`);piece.style.background=['#7c3aed','#9333ea','#8b5cf6','#a855f7'][i%4];$('reviewConfetti').append(piece);}
     setTimeout(()=>$('reviewConfetti').replaceChildren(),2600);
   }
   $('reviewSummaryTitle').focus({preventScroll:true});slides[1].scrollTop=0;
@@ -1772,7 +1866,7 @@ show((parseInt(location.hash.slice(1))||1)-1);
       }
     });
 
-    function show(n) {
+    window._lessonShowSlide = show; function show(n) {if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
       current = Math.max(0, Math.min(n, slides.length - 1));
       slides.forEach((s, i) => s.classList.toggle('active', i === current));
       document.querySelectorAll('.dotbutton').forEach((b, i) => {
@@ -1914,7 +2008,7 @@ show((parseInt(location.hash.slice(1))||1)-1);
           piece.style.setProperty('--left', `${(i * 37) % 100}%`);
           piece.style.setProperty('--delay', `${(i % 7) * .08}s`);
           piece.style.setProperty('--drift', `${(i % 2 ? 1 : -1) * (20 + i * 3)}px`);
-          piece.style.background = ['#b95132', '#ee9b55', '#789473', '#dfb553'][i % 4];
+          piece.style.background = ['#7c3aed', '#9333ea', '#8b5cf6', '#a855f7'][i % 4];
           $('reviewConfetti').append(piece);
         }
         setTimeout(() => $('reviewConfetti').replaceChildren(), 2600);
@@ -2426,7 +2520,7 @@ show((parseInt(location.hash.slice(1))||1)-1);
           okCount++;
           inp.classList.add('correct');
           stat.textContent = '✓';
-          stat.style.color = '#354d31';
+          stat.style.color = '#5b21b6';
         } else {
           inp.classList.add('wrong');
           stat.textContent = '✕';
@@ -2461,7 +2555,7 @@ show((parseInt(location.hash.slice(1))||1)-1);
           okCount++;
           inp.classList.add('correct');
           stat.textContent = '✓';
-          stat.style.color = '#354d31';
+          stat.style.color = '#5b21b6';
         } else {
           inp.classList.add('wrong');
           stat.textContent = '✕';
@@ -2522,8 +2616,8 @@ show((parseInt(location.hash.slice(1))||1)-1);
 
       function drawBgNetwork() {
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        bgCtx.strokeStyle = 'rgba(105, 70, 45, 0.08)';
-        bgCtx.fillStyle = 'rgba(185, 81, 50, 0.22)';
+        bgCtx.strokeStyle = 'rgba(124, 58, 237, 0.12)';
+        bgCtx.fillStyle = 'rgba(139, 92, 246, 0.22)';
 
         bgParticles.forEach((point, index) => {
           point.x += point.vx;
@@ -2597,7 +2691,7 @@ let currentSlide = 0;
             actionRow.className = 'slide-action-row';
 
             const button = document.createElement('button');
-            button.className = 'nav-btn start-btn';
+            button.className = 'start-btn';
             button.type = 'button';
             button.innerHTML = `${nextButtonLabels[index] || 'Дальше'} <i class="fas fa-arrow-right"></i>`;
             button.onclick = () => changeSlide(1);
@@ -2607,21 +2701,16 @@ let currentSlide = 0;
         });
 
         function updateUI() {
-            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
-            document.querySelectorAll('.dot').forEach((dot, index) => dot.classList.toggle('active', index === currentSlide));
-            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            if (typeof window.updateGlobalUI === 'function') window.updateGlobalUI();
         }
 
         function changeSlide(direction) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
-            updateUI();
+            window.changeSlide(direction);
         }
 
         function goToSlide(index) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, index));
-            updateUI();
+            currentSlide = index;
+            window.goToSlide(index);
         }
 
         const eraData = {
@@ -2943,7 +3032,7 @@ const dotLabels=["Старт","Повторение","Смена подхода"
 const imageModal=document.getElementById("imageModal");document.querySelector(".zoomable-image").onclick=()=>imageModal.showModal();imageModal.querySelector("button").onclick=()=>imageModal.close();imageModal.onclick=e=>{if(e.target===imageModal)imageModal.close()};
 slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=n===slides.length-1?"В начало":"Далее →";nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
 const dots=[...document.querySelectorAll(".dot")];
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
 function toggleFullScreen(){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}
 document.addEventListener("keydown",e=>{if(imageModal.open)return;const typing=["INPUT","TEXTAREA"].includes(document.activeElement.tagName);if(!typing&&["ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==="f")toggleFullScreen()});
@@ -2979,8 +3068,8 @@ function initParticles(){
 }
 function drawNetwork(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='rgba(124, 77, 255, 0.10)';
-  ctx.fillStyle='rgba(94, 234, 212, 0.18)';
+  ctx.strokeStyle='rgba(37, 99, 235, 0.10)';
+  ctx.fillStyle='rgba(59, 130, 246, 0.18)';
   particles.forEach((point,index)=>{
 point.x += point.vx; point.y += point.vy;
 if(point.x < 0 || point.x > canvas.width) point.vx *= -1;
@@ -3011,14 +3100,14 @@ let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute('aria-label','Перейти к слайду: '+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});
 const dots=[...document.querySelectorAll('.dot')];
 const mobilePrev=document.getElementById('mobilePrev');const mobileNext=document.getElementById('mobileNext');
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){if(document.fullscreenElement){document.exitFullscreen?.()}else{document.documentElement.requestFullscreen?.()}}});
 const canvas=document.getElementById('network-bg');
 const ctx=canvas.getContext('2d');
 let particles=[];
 function initParticles(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;particles=Array.from({length:54},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.34,vy:(Math.random()-.5)*.34,r:1.4+Math.random()*2.2}));}
-function drawNetwork(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.10)';ctx.fillStyle='rgba(94,234,212,.18)';particles.forEach((point,index)=>{point.x+=point.vx;point.y+=point.vy;if(point.x<0||point.x>canvas.width)point.vx*=-1;if(point.y<0||point.y>canvas.height)point.vy*=-1;ctx.beginPath();ctx.arc(point.x,point.y,point.r,0,Math.PI*2);ctx.fill();for(let next=index+1;next<particles.length;next++){const other=particles[next];const distance=Math.hypot(point.x-other.x,point.y-other.y);if(distance<150){ctx.globalAlpha=1-distance/150;ctx.beginPath();ctx.moveTo(point.x,point.y);ctx.lineTo(other.x,other.y);ctx.stroke();ctx.globalAlpha=1;}}});requestAnimationFrame(drawNetwork)}
+function drawNetwork(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(37,99,235,.10)';ctx.fillStyle='rgba(59,130,246,.18)';particles.forEach((point,index)=>{point.x+=point.vx;point.y+=point.vy;if(point.x<0||point.x>canvas.width)point.vx*=-1;if(point.y<0||point.y>canvas.height)point.vy*=-1;ctx.beginPath();ctx.arc(point.x,point.y,point.r,0,Math.PI*2);ctx.fill();for(let next=index+1;next<particles.length;next++){const other=particles[next];const distance=Math.hypot(point.x-other.x,point.y-other.y);if(distance<150){ctx.globalAlpha=1-distance/150;ctx.beginPath();ctx.moveTo(point.x,point.y);ctx.lineTo(other.x,other.y);ctx.stroke();ctx.globalAlpha=1;}}});requestAnimationFrame(drawNetwork)}
 window.addEventListener('resize',initParticles);initParticles();drawNetwork();show(0);
   };
 
@@ -3026,17 +3115,17 @@ window.addEventListener('resize',initParticles);initParticles();drawNetwork();sh
   LESSON_SCRIPTS['10emn-5'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Старт','02 · История','03 · Структура','04 · Взвешенная сумма','05 · Функция активации','06 · Ограничения','07 · Практика','08 · Оценивание'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
 document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badge').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badge').forEach(item=>item.classList.remove('active'));button.classList.add('active');document.getElementById('clickInfo').innerHTML=button.dataset.info}));
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(37,99,235,.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(59,130,246,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
   /* --- LESSON 10emn-6 (10 ЕМН - 6 урок) --- */
   LESSON_SCRIPTS['10emn-6'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Старт','02 · Повторение','03 · Практика','04 · Excel','05 · Итог и дескрипторы'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;if(slides[current].classList.contains('excel-slide'))window.getSelection()?.removeAllRanges()}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;if(slides[current].classList.contains('excel-slide'))window.getSelection()?.removeAllRanges()}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
 // Classroom restriction for the Excel slide only; normal navigation remains available.
 const excelSlide=document.querySelector('.excel-slide');
 ['selectstart','dragstart','contextmenu'].forEach(type=>excelSlide.addEventListener(type,e=>e.preventDefault()));
@@ -3049,28 +3138,28 @@ if((command&&(['KeyA','KeyC','KeyX'].includes(e.code)||['a','c','x'].includes(e.
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
 let held=null;const chips=[...document.querySelectorAll('.chip')],zones=[...document.querySelectorAll('.drop-zone')],experience=document.getElementById('recallExperience');const elementZones=zones.filter(z=>z.dataset.set==='element'),roleZones=zones.filter(z=>z.dataset.set==='description');function elementsReady(){return elementZones.every(z=>z.querySelector('.chip'))}function unlockRoles(){experience.classList.add('roles-unlocked')}function place(chip,zone){if(!chip||!zone||chip.dataset.kind!==zone.dataset.kind||chip.dataset.set!==zone.dataset.set)return false;const old=zones.find(z=>z.dataset.kind===chip.dataset.kind&&z.dataset.set===chip.dataset.set&&z.contains(chip));if(old){old.classList.remove('filled');old.innerHTML='<small>'+old.dataset.label+'</small>'}zone.dataset.label=zone.innerHTML;zone.innerHTML='';zone.append(chip);zone.classList.add('filled');held=null;chips.forEach(c=>c.classList.remove('selected'));if(chip.dataset.set==='element'&&elementsReady())unlockRoles();return true}chips.forEach(chip=>{chip.addEventListener('dragstart',e=>{held=chip;e.dataTransfer.effectAllowed='move'});chip.addEventListener('click',()=>{held=chip;chips.forEach(c=>c.classList.toggle('selected',c===chip))})});zones.forEach(zone=>{zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over')});zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');place(held,zone)});zone.addEventListener('click',()=>place(held,zone))});
 const status=document.getElementById('recallStatus');document.getElementById('checkRecall').onclick=()=>{if(!elementsReady()){status.textContent='Сначала соберите схему из элементов.';status.className='status bad';return}if(!roleZones.every(z=>z.querySelector('.chip'))){status.textContent='Теперь распределите роли под элементами схемы.';status.className='status bad';return}status.textContent='Верно! Схема и роли собраны.';status.className='status ok'};document.getElementById('resetRecall').onclick=()=>{elementZones.forEach(z=>z.innerHTML='<small>'+({inputs:'Начало',weights:'Связи',sum:'Обработка',activation:'Решение',output:'Конец'})[z.dataset.kind]+'</small>');roleZones.forEach(z=>z.innerHTML='<small>'+({inputs:'Роль входов',weights:'Роль весов',sum:'Роль сумматора',activation:'Роль активации',output:'Роль выхода'})[z.dataset.kind]+'</small>');zones.forEach(z=>z.classList.remove('filled'));const elementTray=document.getElementById('elementTray'),descTray=document.getElementById('descTray');chips.forEach(c=>(c.dataset.set==='description'?descTray:elementTray).append(c));experience.classList.remove('roles-unlocked');held=null;status.textContent='';status.className='status'};
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(37,99,235,.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(59,130,246,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
   /* --- LESSON 10emn-7 (10 ЕМН - 7 урок) --- */
   LESSON_SCRIPTS['10emn-7'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=['01 · Титул','02 · Задание','03 · Итог'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;}
 prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
 const downloadLinks=[...document.querySelectorAll('a[download]')];downloadLinks.forEach(link=>{link.addEventListener('click',()=>{const randomName='perceptron-' + Math.random().toString(36).slice(2,8) + '-' + Date.now(); link.setAttribute('download', randomName + '.xlsx');});});
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(37,99,235,.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(59,130,246,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
   /* --- LESSON 10emn-8 (10 ЕМН - 8 урок) --- */
   LESSON_SCRIPTS['10emn-8'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),dotLabels=["01 · Титул", "02 · Что такое МО", "03 · Три парадигмы", "04 · С учителем", "05 · Без учителя", "06 · С подкреплением", "07 · Сравнение", "08 · Задание", "09 · Дескриптор"];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-function show(i){document.querySelectorAll("[data-demo]").forEach(panel=>panel.pauseDemo?.());current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}document.querySelectorAll("[data-demo]").forEach(panel=>panel.pauseDemo?.());current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;}
 prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable;if(!typing&&(['ArrowRight','PageDown'].includes(e.key)||(e.key===' '&&!document.activeElement.closest('button,summary,a')))){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});if(!matchMedia("(prefers-reduced-motion: reduce)").matches)requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(37,99,235,.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(59,130,246,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});if(true)requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
 const demoFrames={"supervised": [["Обучающие данные", "Ответы уже приложены", "В наборе есть письма и метки. По словам, ссылкам и другим признакам модель ищет связь с ответом «спам / не спам»."], ["Прогноз и ошибка", "Сверяемся с меткой", "Для письма «Получите приз!» модель предположила «не спам». В данных метка «спам»: прогноз неверный. Ошибка показывает, что параметры нужно изменить."], ["Обучение", "Исправляем на многих примерах", "Алгоритм корректирует параметры, чтобы уменьшать ошибку. Цикл повторяется на множестве писем. Одной удачной попытки недостаточно."], ["После обучения", "Новое письмо без готового ответа", "Подаём признаки нового письма. Модель выдаёт прогноз «спам». Метку на вход не подаём. Верность прогноза ещё нужно проверить: модель может ошибаться."]], "unsupervised": [["Данные без меток", "Одна точка — один покупатель", "Положение точки показывает частоту покупок и средний чек. Все точки пока одного цвета: готовых названий групп нет."], ["Сходство", "Сравниваем по двум признакам", "Соседние точки означают похожие показатели. Фиолетовый отрезок соединяет близкие объекты, оранжевый — далёкие. Перед сравнением масштаб признаков согласуют."], ["Группировка", "В этом примере видны три группы", "Одинаковый цвет обозначает один кластер. Покупатели никуда не переместились: алгоритм сгруппировал их по сходству. Не в каждом наборе будет ровно три группы."], ["Объяснение результата", "Названия групп даёт человек", "Теперь можно описать кластеры: например, «часто покупают, небольшой чек». Эти названия появились после анализа, а не были метками для обучения."]], "reinforcement": [["Начало эпизода", "Готового маршрута нет", "Робот видит своё положение и препятствия. Он выбирает действие. Цель — дойти до звезды и получить высокую суммарную награду."], ["Попытка вправо · −5", "Столкновение со стеной", "Робот остаётся на месте и получает штраф −5. Это обратная связь о последствиях, а не подсказка всего правильного маршрута."], ["Шаг вверх · −1", "Пробуем обход", "Другой ход свободен. За обычный шаг робот получает −1: лишние перемещения будут уменьшать суммарную награду."], ["Шаг вправо · −1", "Продолжаем исследовать", "Робот находится над препятствием. Он получает новое состояние среды и снова выбирает действие."], ["Шаг вправо · −1", "Награда может прийти позже", "Сейчас награда отрицательная, но этот шаг может приблизить к будущим +10. Важна сумма за весь путь."], ["Шаг вправо · −1", "Обходим вторую стену", "На этом участке можно пройти безопасно. Робот собирает опыт: состояние, действие и награду."], ["Шаг вправо · −1", "Остался один шаг", "Цель находится снизу. Путь над препятствиями позволяет обойти обе стены."], ["Шаг вниз · +10", "Цель достигнута", "За доставку получено +10. В эпизоде было столкновение −5 и пять обычных шагов по −1: итоговая награда 0."], ["Итог эпизода", "Без столкновения выгоднее", "Этот же обход без первого столкновения дал бы +5: пять шагов по −1 и +10 за цель. На множестве попыток алгоритм учится выбирать более выгодную стратегию."]]};
 
 const robotPositions=[[96,166],[96,166],[96,76],[186,76],[276,76],[366,76],[456,76],[456,166],[456,166]];
@@ -3144,7 +3233,7 @@ const raceWorld=(()=>{
  function random(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}
  function gaussian(){return Math.sqrt(-2*Math.log(Math.max(random(),1e-9)))*Math.cos(2*Math.PI*random())}
  function wrap(angle){while(angle>Math.PI)angle-=Math.PI*2;while(angle<-Math.PI)angle+=Math.PI*2;return angle}
- function spawn(genes){cars=genes.map((weights,i)=>{const angle=-Math.PI/2+Math.floor(i/5)*.022,r=RADIUS+(i%5-2)*7;return {weights,x:CX+Math.cos(angle)*r,y:CY+Math.sin(angle)*r,heading:angle+Math.PI/2,speed:150+(i%7)*4,progress:0,fitness:0,alive:true,lap:false,trail:[],color:['#ede3ff','#c2a6ff','#8d6aff','#a0f0d4','#ffd2ad'][i%5]}});elapsed=0;lastUi=-1}
+ function spawn(genes){cars=genes.map((weights,i)=>{const angle=-Math.PI/2+Math.floor(i/5)*.022,r=RADIUS+(i%5-2)*7;return {weights,x:CX+Math.cos(angle)*r,y:CY+Math.sin(angle)*r,heading:angle+Math.PI/2,speed:150+(i%7)*4,progress:0,fitness:0,alive:true,lap:false,trail:[],color:['#dbeafe','#93c5fd','#3b82f6','#93c5fd','#bae6fd'][i%5]}});elapsed=0;lastUi=-1}
  spawn(Array.from({length:COUNT},()=>[-3+random()*8,-6+random()*12,-7+random()*14]));
  function newGeneration(){
   previousFinished=cars.filter(car=>car.lap).length;
@@ -3169,20 +3258,20 @@ const raceWorld=(()=>{
  function circle(radius,fill,stroke,width){pen.beginPath();pen.arc(CX,CY,radius,0,Math.PI*2);if(fill){pen.fillStyle=fill;pen.fill()}if(stroke){pen.strokeStyle=stroke;pen.lineWidth=width;pen.stroke()}}
  function draw(){
   pen.clearRect(0,0,SIZE,SIZE);
-  circle(RADIUS+41,'#e7def4');circle(RADIUS+31,null,'#fff',2);
-  circle(RADIUS,null,'#443653',HALF*2+5);
-  pen.setLineDash([9,8]);circle(RADIUS+HALF+1,null,'#c9b1ff',5);circle(RADIUS-HALF-1,null,'#c9b1ff',5);pen.setLineDash([]);
+  circle(RADIUS+41,'#dbeafe');circle(RADIUS+31,null,'#fff',2);
+  circle(RADIUS,null,'#1e3a8a',HALF*2+5);
+  pen.setLineDash([9,8]);circle(RADIUS+HALF+1,null,'#bfdbfe',5);circle(RADIUS-HALF-1,null,'#bfdbfe',5);pen.setLineDash([]);
   pen.setLineDash([8,14]);circle(RADIUS,null,'#ffffff42',1.5);pen.setLineDash([]);
-  circle(RADIUS-HALF-7,'#f4f0fc');circle(RADIUS-HALF-17,null,'#fff',1.5);
-  for(let row=0;row<12;row++)for(let col=0;col<3;col++){pen.fillStyle=(row+col)%2?'#efe7ff':'#645371';pen.fillRect(CX-6+col*4,CY-RADIUS-HALF+row*4.3,4,4.3)}
-  pen.fillStyle='#aa95c0';pen.font='700 11px Segoe UI, Arial';pen.textAlign='center';pen.fillText('УЧЕБНЫЙ ЗАЕЗД',CX,CY-40);
-  pen.fillStyle='#7c4dff';pen.font='800 56px Segoe UI, Arial';pen.fillText('100',CX,CY+15);
-  pen.fillStyle='#65557b';pen.font='500 13px Segoe UI, Arial';pen.fillText('машин в поколении',CX,CY+41);
+  circle(RADIUS-HALF-7,'#f8fbff');circle(RADIUS-HALF-17,null,'#fff',1.5);
+  for(let row=0;row<12;row++)for(let col=0;col<3;col++){pen.fillStyle=(row+col)%2?'#eff6ff':'#334155';pen.fillRect(CX-6+col*4,CY-RADIUS-HALF+row*4.3,4,4.3)}
+  pen.fillStyle='#93c5fd';pen.font='700 11px Segoe UI, Arial';pen.textAlign='center';pen.fillText('УЧЕБНЫЙ ЗАЕЗД',CX,CY-40);
+  pen.fillStyle='#2563eb';pen.font='800 56px Segoe UI, Arial';pen.fillText('100',CX,CY+15);
+  pen.fillStyle='#475569';pen.font='500 13px Segoe UI, Arial';pen.fillText('машин в поколении',CX,CY+41);
   for(const car of cars){
    if(car.alive&&car.trail.length>1){pen.strokeStyle=car.color+'30';pen.lineWidth=2;pen.beginPath();car.trail.forEach(([x,y],i)=>i?pen.lineTo(x,y):pen.moveTo(x,y));pen.stroke()}
-   pen.save();pen.translate(car.x,car.y);pen.rotate(car.heading);pen.globalAlpha=car.alive ? .95 : .24;pen.fillStyle=car.alive?car.color:'#ff9e68';pen.fillRect(-6,-3,12,6);pen.fillStyle=car.alive?'#2e2040':'#6c3e31';pen.fillRect(0,-2,3,4);pen.fillStyle='#fff';pen.fillRect(4,-2.5,1.5,1.2);pen.fillRect(4,1.3,1.5,1.2);pen.restore();
+   pen.save();pen.translate(car.x,car.y);pen.rotate(car.heading);pen.globalAlpha=car.alive ? .95 : .24;pen.fillStyle=car.alive?car.color:'#38bdf8';pen.fillRect(-6,-3,12,6);pen.fillStyle=car.alive?'#0f172a':'#1e40af';pen.fillRect(0,-2,3,4);pen.fillStyle='#fff';pen.fillRect(4,-2.5,1.5,1.2);pen.fillRect(4,1.3,1.5,1.2);pen.restore();
   }
-  pen.fillStyle='#8d7db0';pen.font='600 11px Segoe UI, Arial';pen.textAlign='center';pen.fillText('СТАРТ / ФИНИШ',CX,CY-RADIUS-HALF-17);
+  pen.fillStyle='#64748b';pen.font='600 11px Segoe UI, Arial';pen.textAlign='center';pen.fillText('СТАРТ / ФИНИШ',CX,CY-RADIUS-HALF-17);
  }
  function updateStats(){document.getElementById('raceGeneration').textContent=String(generation).padStart(2,'0');document.getElementById('raceAlive').textContent=cars.filter(car=>car.alive).length;document.getElementById('raceFinished').textContent=cars.filter(car=>car.lap).length+' / 100';document.getElementById('raceStatus').textContent=generation===1?'Первый заезд':'В прошлом заезде: '+previousFinished+' прошли круг'}
  function resize(){const width=Math.max(1,surface.getBoundingClientRect().width),ratio=Math.min(devicePixelRatio||1,2);surface.width=Math.round(width*ratio);surface.height=surface.width;pen.setTransform(surface.width/SIZE,0,0,surface.height/SIZE,0,0);draw()}
@@ -3362,7 +3451,7 @@ const raceWorld=(()=>{
       }
     }
 
-    function setSlide(index) {
+    window._lessonShowSlide = setSlide; function setSlide(index) {if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
       if (index < 0 || index >= slides.length) return;
       if (currentSlide !== index) {
         if (inferenceRunning || cameraStartPending) stopCamera();
@@ -3467,14 +3556,14 @@ const raceWorld=(()=>{
         particles.slice(index + 1).forEach(other => {
           const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
           if (distance < 190) {
-            ctx.strokeStyle = `rgba(244, 63, 94, ${.12 * (1 - distance / 190)})`;
+            ctx.strokeStyle = `rgba(37, 99, 235, ${.14 * (1 - distance / 190)})`;
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(other.x, other.y);
             ctx.stroke();
           }
         });
-        ctx.fillStyle = 'rgba(244, 63, 94, .2)';
+        ctx.fillStyle = 'rgba(59, 130, 246, .22)';
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -4290,7 +4379,7 @@ const dots = [...document.querySelectorAll(".dot")];
 const mobilePrev = document.getElementById("mobilePrev");
 const mobileNext = document.getElementById("mobileNext");
 
-function show(i) {
+window._lessonShowSlide = show; function show(i) {if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
   current = Math.max(0, Math.min(i, slides.length - 1));
   slides.forEach((s, n) => s.classList.toggle("active", n === current));
   dots.forEach((d, n) => d.classList.toggle("active", n === current));
@@ -4338,13 +4427,13 @@ function initNetwork() {
 }
 function drawNetwork() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = "rgba(124,77,255,.09)";
+  ctx.strokeStyle = "rgba(37,99,235,.10)";
   points.forEach((p, i) => {
     p.x += p.vx;
     p.y += p.vy;
     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-    ctx.fillStyle = "rgba(81,196,166,.18)";
+    ctx.fillStyle = "rgba(59,130,246,.18)";
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fill();
@@ -4418,7 +4507,7 @@ function setK(k) {
     [p4, p7, p2, p9].forEach(p => { p.style.transform = "translate(-50%,-50%) scale(1.15)"; });
     [r4, r7, r2, r9].forEach(r => r.classList.add("highlight"));
     summary.innerHTML = "При k=4: Соседи {2,4} (A) и {7,9} (B) → Ничья 2:2!";
-    voteBox.innerHTML = "<p style='color:#ad5928'>⚠️ <strong>Ничья при чётном k=4:</strong><br>Взяты все 4 точки: две из Класса A и две из Класса B. Счёт 2 : 2. Алгоритм не может однозначно выбрать победителя! Именно поэтому в бинарной классификации всегда выбирают <strong>нечётное k</strong>.</p>";
+    voteBox.innerHTML = "<p style='color:#1d4ed8'>⚠️ <strong>Ничья при чётном k=4:</strong><br>Взяты все 4 точки: две из Класса A и две из Класса B. Счёт 2 : 2. Алгоритм не может однозначно выбрать победителя! Именно поэтому в бинарной классификации всегда выбирают <strong>нечётное k</strong>.</p>";
   }
 }
 
@@ -4687,7 +4776,7 @@ let currentSlide = 0;
             actionRow.className = 'slide-action-row';
 
             const button = document.createElement('button');
-            button.className = 'nav-btn start-btn';
+            button.className = 'start-btn';
             button.type = 'button';
             button.innerHTML = `${nextButtonLabels[index] || 'Дальше'} <i class="fas fa-arrow-right"></i>`;
             button.onclick = () => changeSlide(1);
@@ -4697,21 +4786,16 @@ let currentSlide = 0;
         });
 
         function updateUI() {
-            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
-            document.querySelectorAll('.dot').forEach((dot, index) => dot.classList.toggle('active', index === currentSlide));
-            document.getElementById('progress').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            if (typeof window.updateGlobalUI === 'function') window.updateGlobalUI();
         }
 
         function changeSlide(direction) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
-            updateUI();
+            window.changeSlide(direction);
         }
 
         function goToSlide(index) {
-            currentSlide = Math.max(0, Math.min(totalSlides - 1, index));
-            updateUI();
+            currentSlide = index;
+            window.goToSlide(index);
         }
 
         const eraData = {
@@ -4969,8 +5053,8 @@ let currentSlide = 0;
 
         function drawNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(37, 99, 235, 0.09)';
-            ctx.fillStyle = 'rgba(8, 145, 178, 0.16)';
+            ctx.strokeStyle = 'rgba(5, 150, 105, 0.10)';
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
 
             particles.forEach((point, index) => {
                 point.x += point.vx;
@@ -5015,7 +5099,7 @@ const dotLabels=["Старт","Повторение","Смена подхода"
 const imageModal=document.getElementById("imageModal");document.querySelector(".zoomable-image").onclick=()=>imageModal.showModal();imageModal.querySelector("button").onclick=()=>imageModal.close();imageModal.onclick=e=>{if(e.target===imageModal)imageModal.close()};
 slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=n===slides.length-1?"В начало":"Далее →";nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
 const dots=[...document.querySelectorAll(".dot")];
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
 function toggleFullScreen(){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}
 document.addEventListener("keydown",e=>{if(imageModal.open)return;const typing=["INPUT","TEXTAREA"].includes(document.activeElement.tagName);if(!typing&&["ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==="f")toggleFullScreen()});
@@ -5048,7 +5132,7 @@ startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.s
 const slides=[...document.querySelectorAll(".slide")],progress=document.getElementById("progress"),dots=document.getElementById("dots");let current=0;
 const dotLabels=["Старт","Вход в тему","Три парадигмы","С учителем","Без учителя","С подкреплением","Сравнение","Практика","Оценивание"];
 slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dots.appendChild(dot);const next=document.createElement("button");next.className="slide-next";next.type="button";next.textContent=n===slides.length-1?"В начало":"Далее →";next.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(next)});
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>{s.classList.toggle("active",n===current);const eyebrow=s.querySelector(".eyebrow");if(eyebrow&&n>0){const title=eyebrow.textContent.replace(/^\d{2}\s*·\s*/,"");eyebrow.textContent=String(n+1).padStart(2,"0")+" · "+title}});[...dots.children].forEach((d,n)=>d.classList.toggle("active",n===current));progress.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1;location.hash=current+1}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>{s.classList.toggle("active",n===current);const eyebrow=s.querySelector(".eyebrow");if(eyebrow&&n>0){const title=eyebrow.textContent.replace(/^\d{2}\s*·\s*/,"");eyebrow.textContent=String(n+1).padStart(2,"0")+" · "+title}});[...dots.children].forEach((d,n)=>d.classList.toggle("active",n===current));progress.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
 function full(){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}
 document.addEventListener("keydown",e=>{if(!["INPUT","TEXTAREA"].includes(document.activeElement.tagName)&&["ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault();show(current+1)}if(!["INPUT","TEXTAREA"].includes(document.activeElement.tagName)&&["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(current-1)}if(e.key.toLowerCase()==="f")full()});
@@ -5068,7 +5152,7 @@ const slides=[...document.querySelectorAll('.slide')],dots=document.getElementBy
 const labels=['1 · Старт','2 · Результат','3 · Темы','4 · Содержание','5 · Дескриптор','6 · Итог'];
 labels.forEach((label,i)=>{const b=document.createElement('button');b.className='dot';b.dataset.label=label;b.onclick=()=>show(i);dots.appendChild(b)});
 function alignNext(){const badge=document.querySelector('.slide.active .eyebrow'),next=document.getElementById('next');if(badge&&next)next.style.top=Math.max(18,badge.getBoundingClientRect().top)+'px'}
-function show(i){current=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,n)=>s.classList.toggle('active',n===current));[...dots.children].forEach((d,n)=>d.classList.toggle('active',n===current));progress.style.width=((current+1)/slides.length*100)+'%';document.getElementById('next').textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →';document.getElementById('prev').disabled=current===0;requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,450)})}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,n)=>s.classList.toggle('active',n===current));[...dots.children].forEach((d,n)=>d.classList.toggle('active',n===current));progress.style.width=((current+1)/slides.length*100)+'%';document.getElementById('next').textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →';document.getElementById('prev').disabled=current===0;requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,450)})}
 function step(n){show(current===slides.length-1&&n>0?0:current+n)}document.getElementById('next').onclick=()=>step(1);document.getElementById('prev').onclick=()=>step(-1);document.getElementById('mnext').onclick=()=>step(1);document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')step(1);if(e.key==='ArrowLeft')step(-1)});show(0);
 window.addEventListener('resize',alignNext);document.querySelectorAll('#topics .choice').forEach(button=>button.onclick=()=>{document.querySelectorAll('#topics .choice').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');document.getElementById('topicResponse').textContent='Выбрано: '+button.querySelector('strong').textContent+' Теперь сформулируйте главный вопрос одним предложением.'});
   };
@@ -5077,17 +5161,17 @@ window.addEventListener('resize',alignNext);document.querySelectorAll('#topics .
   LESSON_SCRIPTS['10ogn-5'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),slideNext=document.getElementById('slideNext'),dotLabels=['01 · Старт','02 · Машинное обучение','03 · Структура','04 · Взвешенная сумма','05 · Функция активации','06 · Ограничения','07 · Практика','08 · Оценивание'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));const activeSlide=slides[current];requestAnimationFrame(()=>activeSlide.getAnimations({subtree:true}).forEach(animation=>{animation.cancel();animation.play()}));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →'}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));const activeSlide=slides[current];requestAnimationFrame(()=>activeSlide.getAnimations({subtree:true}).forEach(animation=>{animation.cancel();animation.play()}));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →'}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
 document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badge').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badge').forEach(item=>item.classList.remove('active'));button.classList.add('active');document.getElementById('clickInfo').innerHTML=button.dataset.info}));
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(5, 150, 105, 0.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(16, 185, 129, 0.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
   /* --- LESSON 10ogn-6 (10 ОГН - 6 урок) --- */
   LESSON_SCRIPTS['10ogn-6'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),slideNext=document.getElementById('slideNext'),dotLabels=['01 · Старт','02 · Повторение','03 · Практика','04 · Excel','05 · Итог и дескрипторы'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-function show(i){current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →';requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,470)});if(slides[current].classList.contains('excel-slide'))window.getSelection()?.removeAllRanges()}function alignNext(){const badge=slides[current].querySelector('.eyebrow');if(badge&&getComputedStyle(slideNext).display!=='none')slideNext.style.top=Math.max(18,badge.getBoundingClientRect().top)+'px'}addEventListener('resize',alignNext);prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →';requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,470)});if(slides[current].classList.contains('excel-slide'))window.getSelection()?.removeAllRanges()}function alignNext(){const badge=slides[current].querySelector('.eyebrow');if(badge&&getComputedStyle(slideNext).display!=='none')slideNext.style.top=Math.max(18,badge.getBoundingClientRect().top)+'px'}addEventListener('resize',alignNext);prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
 // Classroom restriction for the Excel slide only; normal navigation remains available.
 const excelSlide=document.querySelector('.excel-slide');
 ['selectstart','dragstart','contextmenu'].forEach(type=>excelSlide.addEventListener(type,e=>e.preventDefault()));
@@ -5176,7 +5260,7 @@ Object.values(trays).forEach(shuffle);
   const fmt=n=>n.toFixed(1).replace('.',',');
   tw.textContent=`w₁=${fmt(wPool[0])}, w₂=${fmt(wPool[1])}, w₃=${fmt(wPool[2])}`;
 })();
-const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(124,77,255,.09)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(81,196,166,.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
+const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(5, 150, 105, 0.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(16, 185, 129, 0.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
   };
 
   /* --- LESSON 11-1 (11 класс - 1 урок) --- */
@@ -5277,8 +5361,8 @@ const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');l
 
         function draw() {
             ctx.clearRect(0,0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(99, 102, 241, 0.1)';
-            ctx.fillStyle = 'rgba(99, 102, 241, 0.1)';
+            ctx.strokeStyle = 'rgba(217, 119, 6, 0.12)';
+            ctx.fillStyle = 'rgba(217, 119, 6, 0.12)';
             
             particles.forEach((p, i) => {
                 p.x += p.vx;
@@ -5363,7 +5447,7 @@ const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');l
 
         function draw() {
             ctx.clearRect(0,0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'rgba(244, 63, 94, 0.05)';
+            ctx.strokeStyle = 'rgba(217, 119, 6, 0.08)';
             particles.forEach((p, i) => {
                 p.x += p.vx; p.y += p.vy;
                 if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
@@ -5398,7 +5482,7 @@ const titles=[...document.querySelectorAll('h1,h2')].map(h=>h.textContent);
 const dotsNav=document.getElementById('dotsNav');
 slides.forEach((slide,i)=>{const dot=document.createElement('button');dot.type='button';dot.className='dot-nav';dot.setAttribute('aria-label',`Слайд ${i+1}: ${titles[i]}`);dot.addEventListener('click',()=>goToSlide(i));dotsNav.appendChild(dot);});
 function updateUI(){slides.forEach((slide,i)=>{slide.classList.toggle('active',i===currentSlide);slide.setAttribute('aria-hidden',String(i!==currentSlide));});[...dotsNav.children].forEach((dot,i)=>{dot.classList.toggle('active',i===currentSlide);if(i===currentSlide)dot.setAttribute('aria-current','step');else dot.removeAttribute('aria-current');});document.getElementById('progress').style.width=`${(currentSlide+1)/slides.length*100}%`;document.getElementById('counter').textContent=`${currentSlide+1} / ${slides.length}`;document.getElementById('prevBtn').disabled=currentSlide===0;document.getElementById('nextBtn').disabled=currentSlide===slides.length-1;}
-function goToSlide(i){currentSlide=Math.max(0,Math.min(slides.length-1,i));updateUI();slides[currentSlide].scrollTop=0;}
+window._lessonShowSlide = goToSlide; function goToSlide(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}currentSlide=Math.max(0,Math.min(slides.length-1,i));updateUI();slides[currentSlide].scrollTop=0;}
 function changeSlide(dir){goToSlide(currentSlide+dir);}
 document.getElementById('prevBtn').addEventListener('click',()=>changeSlide(-1));document.getElementById('nextBtn').addEventListener('click',()=>changeSlide(1));
 document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select,button')||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowRight'){e.preventDefault();changeSlide(1);}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1);}if(e.key==='Home')goToSlide(0);if(e.key==='End')goToSlide(slides.length-1);});
@@ -5412,7 +5496,7 @@ document.getElementById('exitTech').addEventListener('change',()=>{document.getE
 document.getElementById('exitCheck').addEventListener('click',()=>{const value=document.getElementById('exitTech').value;const result=document.getElementById('exitResult');result.className=`result ${value==='cv'?'correct':'incorrect'}`;result.textContent=!value?'Сначала выбери технологию.':value==='cv'?'Верно: CV анализирует изображение и находит повреждения. Назови сферу применения.':'Подумай: сервис анализирует готовое фото или создаёт новый контент? Попробуй ещё раз.';});
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let particles=[];
 function initParticles(){canvas.width=innerWidth;canvas.height=innerHeight;particles=Array.from({length:35},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.9,vy:(Math.random()-.5)*.9,radius:Math.random()*1.5+1}));drawBackground(false);}
-function drawBackground(move){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach((p,i)=>{if(move){p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=canvas.width+30;if(p.x>canvas.width+30)p.x=-30;if(p.y<-30)p.y=canvas.height+30;if(p.y>canvas.height+30)p.y=-30;}particles.slice(i+1).forEach(q=>{const distance=Math.hypot(p.x-q.x,p.y-q.y);if(distance<190){ctx.strokeStyle=`rgba(244,63,94,${.12*(1-distance/190)})`;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}});ctx.fillStyle='rgba(244,63,94,.2)';ctx.beginPath();ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);ctx.fill();});}
+function drawBackground(move){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach((p,i)=>{if(move){p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=canvas.width+30;if(p.x>canvas.width+30)p.x=-30;if(p.y<-30)p.y=canvas.height+30;if(p.y>canvas.height+30)p.y=-30;}particles.slice(i+1).forEach(q=>{const distance=Math.hypot(p.x-q.x,p.y-q.y);if(distance<190){ctx.strokeStyle=`rgba(217, 119, 6, ${.14 * (1 - distance / 190)})`;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}});ctx.fillStyle='rgba(245, 158, 11, .22)';ctx.beginPath();ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);ctx.fill();});}
 function animate(){if(!document.hidden)drawBackground(true);requestAnimationFrame(animate);}window.addEventListener('resize',initParticles);initParticles();animate();updateUI();
   };
 
@@ -5439,7 +5523,7 @@ function animate(){if(!document.hidden)drawBackground(true);requestAnimationFram
         dotsNav.append(dot);
       });
 
-      function goToSlide(index) {
+      window._lessonShowSlide = goToSlide; function goToSlide(index) {if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
         currentSlide = Math.max(0, Math.min(slides.length - 1, index));
         slides.forEach((slide, number) => {
           const active = number === currentSlide;
@@ -5522,14 +5606,14 @@ function animate(){if(!document.hidden)drawBackground(true);requestAnimationFram
           particles.slice(index + 1).forEach(other => {
             const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
             if (distance < 190) {
-              ctx.strokeStyle = `rgba(244, 63, 94, ${.12 * (1 - distance / 190)})`;
+              ctx.strokeStyle = `rgba(217, 119, 6, ${.14 * (1 - distance / 190)})`;
               ctx.beginPath();
               ctx.moveTo(particle.x, particle.y);
               ctx.lineTo(other.x, other.y);
               ctx.stroke();
             }
           });
-          ctx.fillStyle = 'rgba(244, 63, 94, .2)';
+          ctx.fillStyle = 'rgba(245, 158, 11, .22)';
           ctx.beginPath();
           ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
           ctx.fill();
@@ -5724,7 +5808,7 @@ function animate(){if(!document.hidden)drawBackground(true);requestAnimationFram
       }
     }
 
-    function setSlide(index) {
+    window._lessonShowSlide = setSlide; function setSlide(index) {if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
       if (index < 0 || index >= slides.length) return;
       if (currentSlide !== index) {
         if (inferenceRunning || cameraStartPending) stopCamera();
@@ -5825,14 +5909,14 @@ function animate(){if(!document.hidden)drawBackground(true);requestAnimationFram
         particles.slice(index + 1).forEach(other => {
           const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
           if (distance < 190) {
-            ctx.strokeStyle = `rgba(244, 63, 94, ${.12 * (1 - distance / 190)})`;
+            ctx.strokeStyle = `rgba(217, 119, 6, ${.14 * (1 - distance / 190)})`;
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(other.x, other.y);
             ctx.stroke();
           }
         });
-        ctx.fillStyle = 'rgba(244, 63, 94, .2)';
+        ctx.fillStyle = 'rgba(245, 158, 11, .22)';
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -6629,7 +6713,7 @@ const slides = [...document.querySelectorAll('.slide')];
       const nextButton = document.getElementById('nextBtn');
       let currentSlide = 0;
 
-      function goToSlide(number) {
+      window._lessonShowSlide = goToSlide; function goToSlide(number) {if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}
         if (number < 0 || number >= slides.length) return;
         currentSlide = number;
         slides.forEach((slide, index) => {
@@ -6886,14 +6970,14 @@ const slides = [...document.querySelectorAll('.slide')];
           particles.slice(index + 1).forEach(other => {
             const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
             if (distance < 190) {
-              ctx.strokeStyle = `rgba(244, 63, 94, ${.12 * (1 - distance / 190)})`;
+              ctx.strokeStyle = `rgba(217, 119, 6, ${.14 * (1 - distance / 190)})`;
               ctx.beginPath();
               ctx.moveTo(particle.x, particle.y);
               ctx.lineTo(other.x, other.y);
               ctx.stroke();
             }
           });
-          ctx.fillStyle = 'rgba(244, 63, 94, .2)';
+          ctx.fillStyle = 'rgba(245, 158, 11, .22)';
           ctx.beginPath();
           ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
           ctx.fill();
@@ -6924,6 +7008,7 @@ const slides = [...document.querySelectorAll('.slide')];
   };
 
   function runCurrentLesson() {
+    window._lessonShowSlide = null;
     syncDynamicLessons();
     updateDocumentTitle();
     initClassesModal();
@@ -6959,13 +7044,10 @@ const slides = [...document.querySelectorAll('.slide')];
     window.show = goToSlide;
     window.showSlide = goToSlide;
 
-    // Ensure controls, dots, buttons and slide UI are fully bound and deduplicated after any custom script run
-    setTimeout(() => {
-      setupNavControls();
-      initDotsNav();
-      bindActionButtons();
-      updateGlobalUI();
-    }, 60);
+    // Synchronously finalize controls, dots, and active slide UI right after lesson script initialization
+    setupNavControls();
+    initDotsNav();
+    updateGlobalUI();
   }
 
   if (document.readyState === 'loading') {

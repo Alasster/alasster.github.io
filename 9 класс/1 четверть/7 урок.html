@@ -1,0 +1,1277 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>9 класс · 1 четверть · Урок 7 — Определение пропускной способности сети. СОР</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=5.2">
+  <style>
+html {
+      margin: 0;
+      height: 100%;
+    }
+button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+button {
+      cursor: pointer;
+      border: 0;
+    }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #7c3aed;
+      outline-offset: 4px;
+    }
+code, .mono {
+      font-family: Consolas, monospace;
+    }
+.accent {
+      color: var(--clay);
+    }
+.small {
+      font-size: .9rem;
+    }
+@keyframes float-sphere {
+      from { transform: translate3d(-20px, -15px, 0) scale(.95); }
+      to { transform: translate3d(90px, 60px, 0) scale(1.12); }
+    }
+.slidehead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+.action {
+      padding: 12px 20px;
+      background: var(--clay);
+      color: #fff;
+      border-radius: 13px;
+      font-weight: 800;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: transform .15s, background .15s, box-shadow .15s;
+    }
+.action:hover {
+      background: #a34327;
+      transform: translateY(-1px);
+    }
+.advance {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+.secondary {
+      background: #ede9fe;
+      color: var(--ink);
+    }
+.secondary:hover {
+      background: #e6ceb9;
+    }
+.paper, .card {
+      background: #ffffffe6;
+      border: 1px solid #ffffffdd;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+    }
+.card {
+      box-shadow: none;
+      border-color: var(--line);
+      border-radius: 19px;
+    }
+.grid2, .hero {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+.hero {
+      align-items: center;
+      gap: 30px;
+    }
+.definition {
+      padding: 17px 20px;
+      border-left: 5px solid var(--clay);
+      border-radius: 0 15px 15px 0;
+      background: #faf7ffe8;
+      font-size: 1.06rem;
+      line-height: 1.5;
+      margin-top: 18px;
+    }
+.tag {
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 800;
+      color: #6d28d9;
+      background: #f3e8ff;
+      padding: 6px 12px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+.below {
+      margin-top: 18px;
+    }
+.controlsrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+.result {
+      padding: 13px 16px;
+      border-radius: 13px;
+      background: #f5f0ff;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 16px;
+      min-height: 48px;
+    }
+.result.good {
+      background: #f3e8ff;
+      color: #5b21b6;
+    }
+.result.bad {
+      background: #fae3df;
+      color: #89332b;
+    }
+@keyframes enter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 1: ТИТУЛЬНЫЙ СТИЛЬ                                     */
+/* ----------------------------------------------------------- */
+.sor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, #7c3aed, #ee9b55);
+      color: #fff;
+      border-radius: 99px;
+      font-size: .88rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 14px rgba(185, 81, 50, 0.28);
+    }
+.sor-specs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+.spec-item {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+.spec-item strong {
+      display: block;
+      font: 800 1.4rem Consolas, monospace;
+      color: var(--clay);
+    }
+.spec-item small {
+      font-size: .78rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 2: ПРАВИЛА СОР И АНИМАЦИИ                             */
+/* ----------------------------------------------------------- */
+.rules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+.rule-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      box-shadow: 0 6px 20px rgba(105, 70, 45, 0.04);
+      transition: transform .2s, border-color .2s;
+    }
+.rule-card:hover {
+      transform: translateY(-2px);
+      border-color: #d9bca7;
+    }
+.rule-icon-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+.rule-icon-wrap.ban {
+      background: #fde8e5;
+      color: var(--red);
+      border: 1px solid #f9cac4;
+    }
+.rule-icon-wrap.ok {
+      background: #edf5eb;
+      color: var(--green);
+      border: 1px solid #cbe3c7;
+    }
+.rule-icon-wrap.timer {
+      background: #fff3e5;
+      color: var(--clay);
+      border: 1px solid #f6d6be;
+    }
+/* Анимации SVG иконок правил */
+@keyframes shakeBan {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-8deg); }
+      40% { transform: rotate(8deg); }
+      60% { transform: rotate(-5deg); }
+      80% { transform: rotate(5deg); }
+    }
+@keyframes pulseAi {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.12); opacity: .75; }
+    }
+@keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+.anim-shake {
+      animation: shakeBan 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+.anim-pulse {
+      animation: pulseAi 2s ease-in-out infinite;
+      transform-origin: center;
+    }
+.anim-ring {
+      animation: pulseRing 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+/* КНОПКА ЗАПУСКА СОР */
+.sor-launch-box {
+      background: linear-gradient(135deg, #faf7ff, #fdf1e4);
+      border: 2px dashed var(--clay);
+      border-radius: 22px;
+      padding: 24px 28px;
+      text-align: center;
+      margin-top: 20px;
+    }
+.sor-launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--clay), var(--orange));
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 800;
+      padding: 16px 32px;
+      border-radius: 16px;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(185, 81, 50, 0.35);
+      transition: transform .15s, box-shadow .15s;
+    }
+.sor-launch-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(185, 81, 50, 0.45);
+    }
+.timer-widget {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-top: 14px;
+    }
+.timer-display {
+      font: 800 2rem Consolas, monospace;
+      color: var(--clay);
+      letter-spacing: .05em;
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 3: ПРАКТИЧЕСКИЕ ЗАДАЧИ И ШПАРГАЛКА                     */
+/* ----------------------------------------------------------- */
+.formula-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 14px 0 18px;
+    }
+.formula-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+    }
+.formula-card strong {
+      font: 800 1.25rem Consolas, monospace;
+      color: var(--clay);
+      display: block;
+      margin-bottom: 4px;
+    }
+.formula-card p {
+      margin: 0;
+      font-size: .84rem;
+    }
+.unit-pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+.unit-pill {
+      background: #edf5eb;
+      color: #5b21b6;
+      padding: 5px 11px;
+      border-radius: 99px;
+      font: 700 .84rem Consolas, monospace;
+      border: 1px solid #d4e5d1;
+    }
+.task-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+.task-row:last-child {
+      border-bottom: none;
+    }
+.task-input {
+      width: 140px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      font: 800 1.05rem Consolas, monospace;
+      background: #fff;
+      transition: border-color .15s, background .15s;
+    }
+.task-input.correct {
+      border-color: #8b5cf6;
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+.task-input.wrong {
+      border-color: #7c3aed;
+      background: #fdecea;
+      color: #89332b;
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 4: ДЕСКРИПТОРЫ И КАЛЬКУЛЯТОР БАЛЛОВ                    */
+/* ----------------------------------------------------------- */
+.descriptor-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+.descriptor-table th, .descriptor-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: .92rem;
+    }
+.descriptor-table th {
+      background: #f5f0ff;
+      color: var(--ink);
+      font-weight: 800;
+    }
+.descriptor-table tr:last-child td {
+      border-bottom: none;
+    }
+.badge-point {
+      display: inline-block;
+      font: 800 .85rem Consolas, monospace;
+      color: var(--clay);
+      background: #f3e8ff;
+      padding: 4px 8px;
+      border-radius: 16px;
+      border: 1px solid #ddd6fe;
+    }
+.scale-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+.scale-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+.scale-card strong {
+      font-size: 1.3rem;
+      display: block;
+    }
+.scale-card.mark5 strong { color: #27ae60; }
+.scale-card.mark4 strong { color: #7c3aed; }
+.scale-card.mark3 strong { color: #8b5cf6; }
+.scale-card.mark2 strong { color: #c0392b; }
+@media (max-width: 768px) {
+  .grid2, .hero, .rules-grid, .formula-trio, .sor-specs, .scale-grid {
+        grid-template-columns: 1fr;
+      }
+  .task-row {
+        grid-template-columns: 1fr;
+      }
+}
+@media print {
+  .advance, button {
+        display: none !important;
+      }
+}
+  </style>
+</head>
+<body class="lesson-page lesson-9-7" data-lesson-id="9-7">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+
+  <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.GITHUB.IO</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">9 класс</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">7 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Определение пропускной способности сети. СОР</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <div class="bg-spheres" aria-hidden="true">
+    <div class="bg-sphere"></div>
+    <div class="bg-sphere"></div>
+    <div class="bg-sphere"></div>
+    <div class="bg-sphere"></div>
+  </div>
+  <canvas id="network-bg" aria-hidden="true"></canvas>
+
+  <div class="progress" id="progress"></div>
+
+  <main>
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 1: ТИТУЛЬНЫЙ СЛАЙД СОР                              -->
+    <!-- ========================================================= -->
+    <section class="slide active" aria-label="Титульный">
+      <div class="wrap">
+        <header class="slidehead" style="justify-content: flex-end;">
+          <button class="action advance" data-next>Далее к правилам →</button>
+        </header>
+
+        <div class="hero">
+          <div>
+            
+            <span class="tag">9 класс · Урок 7 · Суммативное оценивание</span>
+            <h1>СОР 1: Пропускная<br>способность <span class="accent">сети</span></h1>
+            
+            <div class="definition">
+              <strong>Цель обучения 9.1.2.4:</strong> определять пропускную способность сети и производить математический расчёт объёма, времени и скорости передачи данных.
+            </div>
+
+            
+          </div>
+
+          <div class="paper">
+            <h3>Структура урока</h3>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin:16px 0;">
+              <div class="card" style="padding:14px; background:#fff;">
+                <strong style="color:var(--clay);">Часть 1 · Суммативная работа</strong>
+                <p class="small" style="margin:4px 0 0;">20 мин урока на выполнение СОР по информатике</p>
+              </div>
+              <div class="card" style="padding:14px; background:#fff;">
+                <strong style="color:var(--sage);">Часть 2 · Формативные задания</strong>
+                <p class="small" style="margin:4px 0 0;">20 мин урока на выполнение формативных заданий</p>
+              </div>
+             
+              
+            </div>
+
+            <div style="text-align:center; margin-top:14px;">
+              <button class="action" style="width:100%;" onclick="show(1)">Перейти к правилам и запуску СОР →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 2: ПРАВИЛА СОР И КНОПКА ОТКРЫТИЯ ТЕСТА              -->
+    <!-- ========================================================= -->
+    <section class="slide" aria-label="Правила СОР">
+      <div class="wrap">
+        <header class="slidehead">
+          <span class="eyebrow">02 / 04 · Регламент и честность</span>
+          <button class="action advance" data-next>К практическим задачам →</button>
+        </header>
+
+        <h2>Правила проведения суммативной работы</h2>
+        <p class="lead">Соблюдай академическую честность. Оценка отражает твои реальные знания и навыки!</p>
+
+        <div class="rules-grid">
+          <!-- Правило 1: Телефоны -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap ban">
+              <svg class="anim-shake" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="var(--red)" stroke-width="2.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3>1. Смартфоны и гаджеты под запретом</h3>
+            </div>
+          </div>
+
+          <!-- Правило 2: Нейросети и поиск -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap ban">
+              <svg class="anim-pulse" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
+                <rect x="3" y="10" width="18" height="12" rx="4"/>
+                <line x1="9" y1="15" x2="9.01" y2="15"/>
+                <line x1="15" y1="15" x2="15.01" y2="15"/>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="var(--red)" stroke-width="2.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3>2. Без нейросетей и сторонних вкладок</h3>
+            </div>
+          </div>
+
+          <!-- Правило 3: Без списывания -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap ok">
+              <svg class="anim-ring" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <h3>3. Тишина и самостоятельность</h3>
+            </div>
+          </div>
+
+          <!-- Правило 4: Тайминг -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap timer">
+              <svg class="anim-ring" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <h3>4. Регламент времени — ровно 20 минут</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- КНОПКА ОТКРЫТИЯ СОР И ИНТЕРАКТИВНЫЙ ТАЙМЕР ДЛЯ УЧИТЕЛЯ/УЧЕНИКОВ -->
+        <div class="sor-launch-box">
+          <h3 style="font-size:1.4rem; margin-bottom:8px;">Готов приступить к выполнению заданий?</h3>
+          <p class="small" style="margin-bottom:16px;">Нажми на кнопку ниже, чтобы открыть официальную форму СОР в новой вкладке:</p>
+
+          <!-- Кнопка с ссылкой на СОР (учитель добавит свой URL) -->
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLScly8xkYgytEhdBssD-Dk-RX4LnDvGgc_eDjx0MTAR3kLfU5w/viewform?usp=sharing&ouid=117068677279396679436" id="sorLink" target="_blank" rel="noopener noreferrer" class="sor-launch-btn">
+            📝 Открыть задания СОР онлайн
+          </a>
+
+          
+
+          <div class="timer-widget">
+            <div style="text-align:left;">
+              <strong>Таймер суммативной работы:</strong>
+              <div class="small" style="color:var(--muted);">Обратный отсчёт на 20 минут для контроля времени</div>
+            </div>
+            <div class="timer-display" id="sorTimerVal">20:00</div>
+            <div class="controlsrow">
+              <button class="action" id="btnTimerStart" style="padding:8px 16px; min-height:38px;">Старт</button>
+              <button class="action secondary" id="btnTimerPause" style="padding:8px 16px; min-height:38px;">Пауза</button>
+              <button class="action secondary" id="btnTimerReset" style="padding:8px 16px; min-height:38px;">Сброс</button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 3: ПРАКТИЧЕСКИЕ ЗАДАЧИ И ФОРМУЛЫ ИЗ 6 УРОКА         -->
+    <!-- ========================================================= -->
+    <section class="slide" aria-label="Практические задачи">
+      <div class="wrap">
+        <header class="slidehead">
+          <span class="eyebrow">03 / 04 · Практикум и формулы</span>
+          <button class="action advance" data-next>К дескрипторам СОР →</button>
+        </header>
+
+        <h2>Формулы и практические задачи связиста</h2>
+        <p class="small">Вспомни ключевые формулы из 6 урока для расчёта времени, объёма и скорости канала связи перед суммативным тестом.</p>
+
+        <!-- БЛОК ФОРМУЛ ИЗ 6 УРОКА -->
+        <div class="formula-trio">
+          <div class="formula-card">
+            <strong>t = Q / v</strong>
+            <p><strong>Время передачи (с)</strong></p>
+          </div>
+          <div class="formula-card">
+            <strong>Q = v × t</strong>
+            <p><strong>Объём файла (бит, байт)</strong></p>
+          </div>
+          <div class="formula-card">
+            <strong>v = Q / t</strong>
+            <p><strong>Скорость передачи (бит/с)</strong></p>
+          </div>
+        </div>
+
+        <div class="unit-pill-row">
+          <span class="unit-pill">1 Байт = 8 бит</span>
+          <span class="unit-pill">1 КБайт = 1024 Байт</span>
+          <span class="unit-pill">1 МБайт = 1024 КБайт</span>
+          <span class="unit-pill">1 ГБайт = 1024 МБайт</span>
+          <span class="unit-pill">1 Кбит/с = 1024 бит/с</span>
+          <span class="unit-pill">1 Мбит/с = 1024 Кбит/с</span>
+        </div>
+
+        <!-- ИНТЕРАКТИВНЫЙ ТРЕНАЖЁР ЗАДАЧ С РАНДОМНЫМИ ЗНАЧЕНИЯМИ -->
+        <div class="paper">
+          <div style="margin-bottom:14px;">
+            <h3 style="margin:0;">Интерактивный тренажёр задач СОР (6 задач с проверкой)</h3>
+            <p class="small" style="margin:4px 0 0;">Реши все 6 задач на расчёт параметров передачи данных. Числа генерируются автоматически при обновлении страницы. Ответы — целые числа.</p>
+          </div>
+
+          <!-- Задача 1: Поиск времени передачи t (тип 1) -->
+          <div class="task-row">
+            <div>
+              <strong>Задача 1 · Определение времени передачи (t)</strong>
+              <p class="small" id="taskText1" style="margin:4px 0 0;">Загрузка условия...</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="taskInp1" class="task-input" placeholder="число" autocomplete="off">
+              <span id="taskStat1" style="font-weight:800; font-size:1.3rem; min-width:24px; text-align:center;">-</span>
+            </div>
+          </div>
+
+          <!-- Задача 2: Поиск времени передачи t (тип 2) -->
+          <div class="task-row">
+            <div>
+              <strong>Задача 2 · Определение времени передачи (t)</strong>
+              <p class="small" id="taskText2" style="margin:4px 0 0;">Загрузка условия...</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="taskInp2" class="task-input" placeholder="число" autocomplete="off">
+              <span id="taskStat2" style="font-weight:800; font-size:1.3rem; min-width:24px; text-align:center;">-</span>
+            </div>
+          </div>
+
+          <!-- Задача 3: Поиск объёма файла Q (тип 1) -->
+          <div class="task-row">
+            <div>
+              <strong>Задача 3 · Определение переданного объёма (Q)</strong>
+              <p class="small" id="taskText3" style="margin:4px 0 0;">Загрузка условия...</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="taskInp3" class="task-input" placeholder="число" autocomplete="off">
+              <span id="taskStat3" style="font-weight:800; font-size:1.3rem; min-width:24px; text-align:center;">-</span>
+            </div>
+          </div>
+
+          <!-- Задача 4: Поиск объёма файла Q (тип 2) -->
+          <div class="task-row">
+            <div>
+              <strong>Задача 4 · Определение переданного объёма (Q)</strong>
+              <p class="small" id="taskText4" style="margin:4px 0 0;">Загрузка условия...</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="taskInp4" class="task-input" placeholder="число" autocomplete="off">
+              <span id="taskStat4" style="font-weight:800; font-size:1.3rem; min-width:24px; text-align:center;">-</span>
+            </div>
+          </div>
+
+          <!-- Задача 5: Поиск скорости передачи v (тип 1) -->
+          <div class="task-row">
+            <div>
+              <strong>Задача 5 · Определение скорости канала (v)</strong>
+              <p class="small" id="taskText5" style="margin:4px 0 0;">Загрузка условия...</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="taskInp5" class="task-input" placeholder="число" autocomplete="off">
+              <span id="taskStat5" style="font-weight:800; font-size:1.3rem; min-width:24px; text-align:center;">-</span>
+            </div>
+          </div>
+
+          <!-- Задача 6: Поиск скорости передачи v (тип 2) -->
+          <div class="task-row">
+            <div>
+              <strong>Задача 6 · Определение скорости канала (v)</strong>
+              <p class="small" id="taskText6" style="margin:4px 0 0;">Загрузка условия...</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="taskInp6" class="task-input" placeholder="число" autocomplete="off">
+              <span id="taskStat6" style="font-weight:800; font-size:1.3rem; min-width:24px; text-align:center;">-</span>
+            </div>
+          </div>
+
+          <div class="controlsrow" style="margin-top:16px;">
+            <button class="action" id="btnCheckTasks">Проверить решение задач</button>
+            <button class="action secondary" id="btnClearTasks">Очистить поля</button>
+          </div>
+
+          <div class="result" id="tasksFeedback">
+            Введи ответы ко всем 6 задачам и нажми «Проверить решение задач».
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 4: ДЕСКРИПТОРЫ И КРИТЕРИИ ОЦЕНИВАНИЯ СОР             -->
+    <!-- ========================================================= -->
+    <section class="slide" aria-label="Дескрипторы СОР">
+      <div class="wrap">
+        <header class="slidehead">
+          <span class="eyebrow">04 / 04 · Дескрипторы и шкала</span>
+          <button class="action advance" data-next>К началу ↺</button>
+        </header>
+
+        <h2>Критерии оценивания и дескрипторы СОР</h2>
+        <p class="lead">Спецификация суммативного оценивания за 1 четверть (Максимум: 10 баллов):</p>
+
+        <div class="paper">
+          <table class="descriptor-table">
+            <thead>
+              <tr>
+                <th style="width:25%;">Критерий оценивания</th>
+                <th style="width:12%;">№ Зад.</th>
+                <th style="width:51%;">Дескриптор: обучающийся</th>
+                <th style="width:12%; text-align:center;">Балл</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="2"><strong>Знание единиц измерения и сетевых понятий</strong></td>
+                <td style="text-align:center;"><strong>Теория</strong></td>
+                <td>Верно сопоставляет единицы (1 Байт = 8 бит, 1024 КБайт = 1 МБайт, 1024 МБайт = 1 ГБайт)</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Сети</strong></td>
+                <td>Объясняет назначение сетевых протоколов и адресации (IP, DNS, маска)</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong>Расчёт времени передачи данных (t = Q / v)</strong></td>
+                <td style="text-align:center;"><strong>Задача 1</strong></td>
+                <td>Переводит объём из МБайт в Кбиты (или скорость в МБайт/с) и находит время в секундах</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Задача 2</strong></td>
+                <td>Переводит КБайты в Кбиты и вычисляет точное время прохождения пакета в секундах</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong>Расчёт объёма переданного файла (Q = v × t)</strong></td>
+                <td style="text-align:center;"><strong>Задача 3</strong></td>
+                <td>Применяет формулу Q = v × t и переводит полученный объём данных в МБайты</td>
+                <td style="text-align:center;"><span class="badge-point">2 балла</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Задача 4</strong></td>
+                <td>Рассчитывает суммарный объём переданной информации в КБайтах при известной скорости</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong>Расчёт пропускной способности (v = Q / t)</strong></td>
+                <td style="text-align:center;"><strong>Задача 5</strong></td>
+                <td>Переводит переданный объём из КБайт в Мбиты и находит скорость канала в Мбит/с</td>
+                <td style="text-align:center;"><span class="badge-point">2 балла</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Задача 6</strong></td>
+                <td>Определяет пропускную способность канала связи в Кбит/с при известном времени</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- ШКАЛА ПЕРЕВОДА БАЛЛОВ В ОЦЕНКУ -->
+          <h3 style="margin-top:20px;">Шкала перевода баллов СОР в оценку</h3>
+          <div class="scale-grid">
+            <div class="scale-card mark5">
+              <strong>Оценка «5»</strong>
+              <div class="small" style="font-weight:700; color:#27ae60;">9 – 10 баллов</div>
+              <p class="small" style="margin:4px 0 0;">Высокий уровень усвоения темы</p>
+            </div>
+            <div class="scale-card mark4">
+              <strong>Оценка «4»</strong>
+              <div class="small" style="font-weight:700; color:#7c3aed;">7 – 8 баллов</div>
+              <p class="small" style="margin:4px 0 0;">Хороший уровень (допустимы 1-2 неточности)</p>
+            </div>
+            <div class="scale-card mark3">
+              <strong>Оценка «3»</strong>
+              <div class="small" style="font-weight:700; color:#8b5cf6;">4 – 6 баллов</div>
+              <p class="small" style="margin:4px 0 0;">Базовый уровень усвоения материала</p>
+            </div>
+            <div class="scale-card mark2">
+              <strong>Оценка «2»</strong>
+              <div class="small" style="font-weight:700; color:#c0392b;">0 – 3 балла</div>
+              <p class="small" style="margin:4px 0 0;">Требуется дополнительная работа</p>
+            </div>
+          </div>
+
+          <!-- ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР БАЛЛОВ -->
+          <div class="card below" style="background:#faf7ff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h3 style="margin:0;">Интерактивный расчёт оценки за СОР:</h3>
+                <p class="small" style="margin:2px 0 0;">Выбери набранный балл, чтобы узнать оценку:</p>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label for="scoreSelector" style="font-weight:700; font-size:.92rem;">Набрано баллов:</label>
+                <select id="scoreSelector" style="border:2px solid var(--line); border-radius:10px; padding:6px 12px; font-weight:800; font-family:Consolas, monospace; background:#fff;">
+                  <option value="10">10 из 10</option>
+                  <option value="9">9 из 10</option>
+                  <option value="8">8 из 10</option>
+                  <option value="7">7 из 10</option>
+                  <option value="6">6 из 10</option>
+                  <option value="5">5 из 10</option>
+                  <option value="4">4 из 10</option>
+                  <option value="3">3 из 10</option>
+                  <option value="2">2 из 10</option>
+                  <option value="1">1 из 10</option>
+                </select>
+              </div>
+            </div>
+            <div id="gradeResultBox" class="result good" style="margin-top:12px; font-weight:700;">
+              Результат: 10 баллов — Отлично (Оценка «5»). Превосходное владение формулами и переводом единиц!
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ТОЧКИ НАВИГАЦИИ ПО СЛАЙДАМ -->
+  <nav class="dots" id="dots" aria-label="Слайды урока"></nav>
+
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const slides = [...document.querySelectorAll('.slide')];
+    let current = 0;
+
+    // Инициализация точек навигации (4 слайда)
+    slides.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.className = 'dotbutton';
+      b.title = `Слайд ${i + 1}: ${s.getAttribute('aria-label')}`;
+      b.setAttribute('aria-label', b.title);
+      b.dataset.tooltip = b.title;
+      b.onclick = () => show(i);
+      $('dots').append(b);
+      const nextBtn = s.querySelector('[data-next]');
+      if (nextBtn) {
+        nextBtn.onclick = () => show(i === slides.length - 1 ? 0 : i + 1);
+      }
+    });
+
+    function show(n) {if(!window._inSlideSync&&typeof window.goToSlide==='function'&&window.goToSlide._isUniversal){window.goToSlide(arguments[0]);return;}
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      document.querySelectorAll('.dotbutton').forEach((b, i) => {
+        if (i === current) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+      });
+      slides[current].scrollTop = 0;
+      $('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+      history.replaceState(null, '', '#' + (current + 1));
+    }
+
+    window.addEventListener('hashchange', () => show((parseInt(location.hash.slice(1)) || 1) - 1));
+    document.addEventListener('keydown', e => {
+      if (e.target.closest('button, input, summary, textarea, select') || e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        e.preventDefault();
+        show(current + 1);
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        show(current - 1);
+      }
+    });
+
+    // -------------------------------------------------------------
+    // СЛАЙД 2: ТАЙМЕР ОБРАТНОГО ОТСЧЁТА СОР (20 МИНУТ)
+    // -------------------------------------------------------------
+    let timerTotalSeconds = 20 * 60; // 20 минут
+    let timerInterval = null;
+    let timerRunning = false;
+
+    function renderTimer() {
+      const mins = Math.floor(timerTotalSeconds / 60);
+      const secs = timerTotalSeconds % 60;
+      $('sorTimerVal').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    $('btnTimerStart').onclick = () => {
+      if (timerRunning) return;
+      timerRunning = true;
+      timerInterval = setInterval(() => {
+        if (timerTotalSeconds > 0) {
+          timerTotalSeconds--;
+          renderTimer();
+        } else {
+          clearInterval(timerInterval);
+          timerRunning = false;
+          alert('Время суммативной работы (40 минут) завершено! Пора сдавать ответы.');
+        }
+      }, 1000);
+    };
+
+    $('btnTimerPause').onclick = () => {
+      if (!timerRunning) return;
+      clearInterval(timerInterval);
+      timerRunning = false;
+    };
+
+    $('btnTimerReset').onclick = () => {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerTotalSeconds = 20 * 60;
+      renderTimer();
+    };
+
+    // -------------------------------------------------------------
+    // СЛАЙД 3: ПРАКТИЧЕСКИЕ ЗАДАЧИ С РАНДОМНЫМИ ЗНАЧЕНИЯМИ
+    // -------------------------------------------------------------
+    let currentTaskAnswers = [];
+
+    function randChoice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generatePracticeTasks() {
+      // Задача 1: Время t (в секундах) — файл в МБайтах, скорость в Кбит/с
+      const opts1 = [
+        { Q: 1, v: 256, t: 32 },
+        { Q: 2, v: 256, t: 64 },
+        { Q: 2, v: 512, t: 32 },
+        { Q: 3, v: 512, t: 48 },
+        { Q: 4, v: 512, t: 64 },
+        { Q: 3, v: 1024, t: 24 },
+        { Q: 5, v: 1024, t: 40 },
+        { Q: 6, v: 1024, t: 48 },
+        { Q: 8, v: 1024, t: 64 },
+        { Q: 5, v: 2048, t: 20 },
+        { Q: 6, v: 2048, t: 24 },
+        { Q: 8, v: 2048, t: 32 },
+        { Q: 10, v: 2048, t: 40 }
+      ];
+      const item1 = randChoice(opts1);
+      $('taskText1').innerHTML = `Файл презентации объёмом <strong>${item1.Q} МБайт</strong> передаётся по линии связи со скоростью <strong>${item1.v} Кбит/с</strong> (считай 1 МБайт = 1024 КБайт). За сколько <strong>секунд</strong> передастся файл?`;
+
+      // Задача 2: Время t (в секундах) — сетевой пакет в КБайтах, скорость в Кбит/с
+      const opts2 = [
+        { Q: 600, v: 80, t: 60 },
+        { Q: 450, v: 60, t: 60 },
+        { Q: 800, v: 160, t: 40 },
+        { Q: 750, v: 200, t: 30 },
+        { Q: 900, v: 120, t: 60 },
+        { Q: 1200, v: 320, t: 30 },
+        { Q: 1500, v: 400, t: 30 },
+        { Q: 2000, v: 320, t: 50 },
+        { Q: 2500, v: 500, t: 40 },
+        { Q: 3600, v: 480, t: 60 }
+      ];
+      const item2 = randChoice(opts2);
+      $('taskText2').innerHTML = `Пакет данных объёмом <strong>${item2.Q} КБайт</strong> передаётся по каналу со скоростью <strong>${item2.v} Кбит/с</strong>. За сколько <strong>секунд</strong> завершится передача?`;
+
+      // Задача 3: Объём данных Q (в МБайтах) — скорость в Кбит/с, время в секундах
+      const opts3 = [
+        { v: 512, t: 32, Q: 2 },
+        { v: 512, t: 48, Q: 3 },
+        { v: 512, t: 64, Q: 4 },
+        { v: 1024, t: 16, Q: 2 },
+        { v: 1024, t: 24, Q: 3 },
+        { v: 1024, t: 32, Q: 4 },
+        { v: 1024, t: 48, Q: 6 },
+        { v: 1024, t: 64, Q: 8 },
+        { v: 2048, t: 12, Q: 3 },
+        { v: 2048, t: 16, Q: 4 },
+        { v: 2048, t: 20, Q: 5 },
+        { v: 2048, t: 24, Q: 6 },
+        { v: 2048, t: 32, Q: 8 },
+        { v: 4096, t: 10, Q: 5 },
+        { v: 4096, t: 12, Q: 6 },
+        { v: 4096, t: 16, Q: 8 },
+        { v: 4096, t: 20, Q: 10 }
+      ];
+      const item3 = randChoice(opts3);
+      $('taskText3').innerHTML = `Скорость соединения равна <strong>${item3.v} Кбит/с</strong>. Какой объём информации (в <strong>МБайтах</strong>) будет передан за <strong>${item3.t} секунд</strong> (считай 1 МБайт = 1024 КБайт)?`;
+
+      // Задача 4: Объём данных Q (в КБайтах) — скорость в Кбит/с, время в секундах
+      const opts4 = [
+        { v: 160, t: 25, Q: 500 },
+        { v: 240, t: 20, Q: 600 },
+        { v: 320, t: 15, Q: 600 },
+        { v: 320, t: 25, Q: 1000 },
+        { v: 400, t: 18, Q: 900 },
+        { v: 480, t: 15, Q: 900 },
+        { v: 560, t: 20, Q: 1400 },
+        { v: 640, t: 25, Q: 2000 },
+        { v: 800, t: 30, Q: 3000 }
+      ];
+      const item4 = randChoice(opts4);
+      $('taskText4').innerHTML = `Скорость модема составляет <strong>${item4.v} Кбит/с</strong>. Какой объём данных (в <strong>КБайтах</strong>) будет передан за <strong>${item4.t} секунд</strong>?`;
+
+      // Задача 5: Скорость передачи v (в Мбит/с) — объём в КБайтах, время в секундах
+      const opts5 = [
+        { Q: 2048, t: 4, v: 4 },
+        { Q: 2048, t: 8, v: 2 },
+        { Q: 3072, t: 3, v: 8 },
+        { Q: 3072, t: 4, v: 6 },
+        { Q: 3072, t: 6, v: 4 },
+        { Q: 4096, t: 4, v: 8 },
+        { Q: 4096, t: 8, v: 4 },
+        { Q: 5120, t: 4, v: 10 },
+        { Q: 5120, t: 5, v: 8 },
+        { Q: 5120, t: 8, v: 5 },
+        { Q: 5120, t: 10, v: 4 },
+        { Q: 6144, t: 4, v: 12 },
+        { Q: 6144, t: 6, v: 8 },
+        { Q: 6144, t: 8, v: 6 },
+        { Q: 8192, t: 4, v: 16 },
+        { Q: 8192, t: 8, v: 8 },
+        { Q: 10240, t: 8, v: 10 },
+        { Q: 10240, t: 10, v: 8 }
+      ];
+      const item5 = randChoice(opts5);
+      $('taskText5').innerHTML = `За <strong>${item5.t} секунд</strong> по каналу был передан файл архива размером <strong>${item5.Q} КБайт</strong> (считай 1 МБайт = 1024 КБайт). Какова пропускная способность канала в <strong>Мбит/с</strong>?`;
+
+      // Задача 6: Скорость передачи v (в Кбит/с) — объём в МБайтах, время в секундах
+      const opts6 = [
+        { Q: 1, t: 16, v: 512 },
+        { Q: 1, t: 32, v: 256 },
+        { Q: 2, t: 16, v: 1024 },
+        { Q: 2, t: 32, v: 512 },
+        { Q: 3, t: 24, v: 1024 },
+        { Q: 3, t: 48, v: 512 },
+        { Q: 4, t: 16, v: 2048 },
+        { Q: 4, t: 32, v: 1024 },
+        { Q: 5, t: 20, v: 2048 },
+        { Q: 5, t: 40, v: 1024 },
+        { Q: 6, t: 24, v: 2048 },
+        { Q: 8, t: 32, v: 2048 },
+        { Q: 8, t: 64, v: 1024 }
+      ];
+      const item6 = randChoice(opts6);
+      $('taskText6').innerHTML = `Файл базы данных размером <strong>${item6.Q} МБайт</strong> был передан за <strong>${item6.t} секунд</strong> (считай 1 МБайт = 1024 КБайт). Какова скорость передачи в <strong>Кбит/с</strong>?`;
+
+      currentTaskAnswers = [
+        String(item1.t),
+        String(item2.t),
+        String(item3.Q),
+        String(item4.Q),
+        String(item5.v),
+        String(item6.v)
+      ];
+      clearTaskInputs();
+    }
+
+    function clearTaskInputs() {
+      for (let i = 1; i <= 6; i++) {
+        const inp = $('taskInp' + i);
+        inp.value = '';
+        inp.classList.remove('correct', 'wrong');
+        $('taskStat' + i).textContent = '-';
+        $('taskStat' + i).style.color = 'inherit';
+      }
+      $('tasksFeedback').className = 'result';
+      $('tasksFeedback').textContent = 'Введи ответы ко всем 6 задачам и нажми «Проверить решение задач».';
+    }
+
+    $('btnClearTasks').onclick = clearTaskInputs;
+
+    $('btnCheckTasks').onclick = () => {
+      let correctCount = 0;
+      currentTaskAnswers.forEach((ans, idx) => {
+        const inp = $('taskInp' + (idx + 1));
+        const stat = $('taskStat' + (idx + 1));
+        const val = inp.value.trim();
+        inp.classList.remove('correct', 'wrong');
+
+        if (val === ans) {
+          correctCount++;
+          inp.classList.add('correct');
+          stat.textContent = '✓';
+          stat.style.color = '#5b21b6';
+        } else {
+          inp.classList.add('wrong');
+          stat.textContent = '✕';
+          stat.style.color = '#89332b';
+        }
+      });
+
+      const fb = $('tasksFeedback');
+      if (correctCount === 6) {
+        fb.className = 'result good';
+        fb.textContent = 'Отлично! Все 6 практических задач решены верно. Ты полностью готов к расчётам на СОР!';
+      } else {
+        fb.className = 'result bad';
+        fb.textContent = `Верно решено: ${correctCount} из 6 задач. Проверь перевод между байтами/битами (×8) и приставками (1024).`;
+      }
+    };
+
+    // -------------------------------------------------------------
+    // СЛАЙД 4: КАЛЬКУЛЯТОР БАЛЛОВ СОР
+    // -------------------------------------------------------------
+    $('scoreSelector').onchange = () => {
+      const score = parseInt($('scoreSelector').value, 10);
+      const box = $('gradeResultBox');
+
+      if (score >= 9) {
+        box.className = 'result good';
+        box.textContent = `Результат: ${score} из 10 баллов — Отлично (Оценка «5»). Превосходное владение формулами и переводом единиц!`;
+      } else if (score >= 7) {
+        box.className = 'result good';
+        box.textContent = `Результат: ${score} из 10 баллов — Хорошо (Оценка «4»). Достойный результат, материал усвоен уверенно.`;
+      } else if (score >= 4) {
+        box.className = 'result';
+        box.textContent = `Результат: ${score} из 10 баллов — Удовлетворительно (Оценка «3»). Базовый порог пройден, повтори формулу Q = v × t.`;
+      } else {
+        box.className = 'result bad';
+        box.textContent = `Результат: ${score} из 10 баллов — Неудовлетворительно (Оценка «2»). Требуется повторить материал 6 урока и перевод единиц.`;
+      }
+    };
+
+    // -------------------------------------------------------------
+    // АНИМАЦИЯ ФОНОВЫХ СЕТЕВЫХ ЧАСТИЦ (CANVAS)
+    // -------------------------------------------------------------
+    const bgCanvas = document.getElementById('network-bg');
+    if (bgCanvas) {
+      const bgCtx = bgCanvas.getContext('2d');
+      let bgParticles = [];
+
+      function initBgParticles() {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+        bgParticles = Array.from({ length: 42 }, () => ({
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          r: Math.random() * 2 + 1.8
+        }));
+      }
+
+      function drawBgNetwork() {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        bgCtx.strokeStyle = 'rgba(124, 58, 237, 0.12)';
+        bgCtx.fillStyle = 'rgba(139, 92, 246, 0.22)';
+
+        bgParticles.forEach((point, index) => {
+          point.x += point.vx;
+          point.y += point.vy;
+          if (point.x < 0 || point.x > bgCanvas.width) point.vx *= -1;
+          if (point.y < 0 || point.y > bgCanvas.height) point.vy *= -1;
+
+          bgCtx.beginPath();
+          bgCtx.arc(point.x, point.y, point.r, 0, Math.PI * 2);
+          bgCtx.fill();
+
+          for (let next = index + 1; next < bgParticles.length; next++) {
+            const other = bgParticles[next];
+            const distance = Math.hypot(point.x - other.x, point.y - other.y);
+            if (distance < 140) {
+              bgCtx.globalAlpha = (1 - distance / 140) * 0.65;
+              bgCtx.beginPath();
+              bgCtx.moveTo(point.x, point.y);
+              bgCtx.lineTo(other.x, other.y);
+              bgCtx.stroke();
+              bgCtx.globalAlpha = 1;
+            }
+          }
+        });
+
+        requestAnimationFrame(drawBgNetwork);
+      }
+
+      window.addEventListener('resize', initBgParticles);
+      initBgParticles();
+      drawBgNetwork();
+    }
+
+    // Инициализация при старте
+    generatePracticeTasks();
+    show((parseInt(location.hash.slice(1)) || 1) - 1);
+  </script>
+  <script src="../../скрипты/lessons.js?v=5.2"></script>
+</body>
+</html>

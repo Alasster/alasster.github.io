@@ -1,0 +1,1269 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>10 класс ОГН · 1 четверть · Урок 7 — Определение пропускной способности сети. СОР</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=5.2">
+  <style>
+html {
+      margin: 0;
+      height: 100%;
+    }
+button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+button {
+      cursor: pointer;
+      border: 0;
+    }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #496044;
+      outline-offset: 4px;
+    }
+code, .mono {
+      font-family: Consolas, monospace;
+    }
+.accent {
+      color: var(--clay);
+    }
+.small {
+      font-size: .9rem;
+    }
+@keyframes float-sphere {
+      from { transform: translate3d(-20px, -15px, 0) scale(.95); }
+      to { transform: translate3d(90px, 60px, 0) scale(1.12); }
+    }
+.slidehead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+.action {
+      padding: 12px 20px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 13px;
+      font-weight: 800;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+      transition: transform .15s, background .15s, box-shadow .15s;
+    }
+.action:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+    }
+.advance {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+.secondary {
+      background: #ecfdf5;
+      color: var(--blue);
+      box-shadow: none;
+    }
+.secondary:hover {
+      background: #d1fae5;
+    }
+.paper, .card {
+      background: var(--paper);
+      border: 1px solid #fff;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+      backdrop-filter: blur(12px);
+    }
+.card {
+      box-shadow: 0 10px 22px rgba(23, 32, 51, 0.07);
+      border-color: var(--line);
+      border-radius: 18px;
+    }
+.grid2, .hero {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+.hero {
+      align-items: center;
+      gap: 30px;
+    }
+.definition {
+      padding: 17px 20px;
+      border-left: 5px solid var(--blue);
+      border-radius: 0 15px 15px 0;
+      background: #f0fdf4;
+      font-size: 1.06rem;
+      line-height: 1.5;
+      margin-top: 18px;
+    }
+.tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .82rem;
+      font-weight: 800;
+      color: var(--blue);
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 6px 13px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+.below {
+      margin-top: 18px;
+    }
+.controlsrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+.result {
+      padding: 13px 16px;
+      border-radius: 13px;
+      background: #fff4e6;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 16px;
+      min-height: 48px;
+    }
+.result.good {
+      background: #e7f0df;
+      color: #354d31;
+    }
+.result.bad {
+      background: #fae3df;
+      color: #89332b;
+    }
+@keyframes enter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 1: ТИТУЛЬНЫЙ СТИЛЬ                                     */
+/* ----------------------------------------------------------- */
+.sor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, #059669, #ee9b55);
+      color: #fff;
+      border-radius: 99px;
+      font-size: .88rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 14px rgba(185, 81, 50, 0.28);
+    }
+.sor-specs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+.spec-item {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+.spec-item strong {
+      display: block;
+      font: 800 1.4rem Consolas, monospace;
+      color: var(--clay);
+    }
+.spec-item small {
+      font-size: .78rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 2: ПРАВИЛА СОР И АНИМАЦИИ                             */
+/* ----------------------------------------------------------- */
+.rules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+.rule-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      box-shadow: 0 6px 20px rgba(105, 70, 45, 0.04);
+      transition: transform .2s, border-color .2s;
+    }
+.rule-card:hover {
+      transform: translateY(-2px);
+      border-color: #d9bca7;
+    }
+.rule-icon-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+.rule-icon-wrap.ban {
+      background: #fde8e5;
+      color: var(--red);
+      border: 1px solid #f9cac4;
+    }
+.rule-icon-wrap.ok {
+      background: #edf5eb;
+      color: var(--green);
+      border: 1px solid #cbe3c7;
+    }
+.rule-icon-wrap.timer {
+      background: #fff3e5;
+      color: var(--clay);
+      border: 1px solid #f6d6be;
+    }
+/* Анимации SVG иконок правил */
+@keyframes shakeBan {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-8deg); }
+      40% { transform: rotate(8deg); }
+      60% { transform: rotate(-5deg); }
+      80% { transform: rotate(5deg); }
+    }
+@keyframes pulseAi {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.12); opacity: .75; }
+    }
+@keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+.anim-shake {
+      animation: shakeBan 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+.anim-pulse {
+      animation: pulseAi 2s ease-in-out infinite;
+      transform-origin: center;
+    }
+.anim-ring {
+      animation: pulseRing 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+/* КНОПКА ЗАПУСКА СОР */
+.sor-launch-box {
+      background: linear-gradient(135deg, #ecfdf5, #ecfdf5);
+      border: 2px dashed #6ee7b7;
+      border-radius: 22px;
+      padding: 24px 28px;
+      text-align: center;
+      margin-top: 20px;
+    }
+.sor-launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 800;
+      padding: 16px 32px;
+      border-radius: 16px;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+      transition: transform .15s, box-shadow .15s;
+    }
+.sor-launch-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.45);
+    }
+.timer-widget {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-top: 14px;
+    }
+.timer-display {
+      font: 800 2rem Consolas, monospace;
+      color: var(--blue);
+      letter-spacing: .05em;
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 3: ПРАКТИЧЕСКИЕ ЗАДАЧИ И ШПАРГАЛКА                     */
+/* ----------------------------------------------------------- */
+.formula-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 14px 0 18px;
+    }
+.formula-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(23, 32, 51, 0.04);
+    }
+.formula-card strong {
+      font: 800 1.25rem Consolas, monospace;
+      color: var(--blue);
+      display: block;
+      margin-bottom: 4px;
+    }
+.formula-card p {
+      margin: 0;
+      font-size: .84rem;
+    }
+.unit-pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+.unit-pill {
+      background: #ecfdf5;
+      color: var(--blue);
+      padding: 5px 11px;
+      border-radius: 99px;
+      font: 700 .84rem Consolas, monospace;
+      border: 1px solid #a7f3d0;
+    }
+.task-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+.task-row:last-child {
+      border-bottom: none;
+    }
+.task-input {
+      width: 140px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      font: 800 1.05rem Consolas, monospace;
+      background: #fff;
+      transition: border-color .15s, background .15s;
+    }
+.task-input.correct {
+      border-color: #16a34a;
+      background: #ecfdf5;
+      color: #166534;
+    }
+.task-input.wrong {
+      border-color: #dc2626;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+/* ----------------------------------------------------------- */
+/* СЛАЙД 4: ДЕСКРИПТОРЫ И КАЛЬКУЛЯТОР БАЛЛОВ                    */
+/* ----------------------------------------------------------- */
+.descriptor-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+.descriptor-table th, .descriptor-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: .92rem;
+    }
+.descriptor-table th {
+      background: #ecfdf5;
+      color: var(--blue);
+      font-weight: 800;
+    }
+.descriptor-table tr:last-child td {
+      border-bottom: none;
+    }
+.badge-point {
+      display: inline-block;
+      font: 800 .85rem Consolas, monospace;
+      color: var(--blue);
+      background: #ecfdf5;
+      padding: 4px 8px;
+      border-radius: 16px;
+      border: 1px solid #a7f3d0;
+    }
+.scale-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+.scale-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+.scale-card strong {
+      font-size: 1.3rem;
+      display: block;
+    }
+.scale-card.mark5 strong { color: #16a34a; }
+.scale-card.mark4 strong { color: #059669; }
+.scale-card.mark3 strong { color: #d97706; }
+.scale-card.mark2 strong { color: #dc2626; }
+/* Excel-стили для перцептрона */
+.sheet-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+.sheet-scroll {
+      overflow-x: auto;
+      border: 1px solid #bac6bf;
+      background: white;
+      border-radius: 6px;
+    }
+.excel-table {
+      width: 100%;
+      min-width: 820px;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font: 15px/1.45 Calibri, "Segoe UI", Arial, sans-serif;
+    }
+.excel-table td, .excel-table th {
+      border: 1px solid #cbd3ce;
+      padding: 9px 11px;
+      vertical-align: middle;
+      color: #243a2d;
+      text-align: left;
+    }
+.excel-table .sheet-letters th, .excel-table .row-number {
+      background: #edf0ed;
+      color: #65736b;
+      text-align: center;
+      font-weight: 400;
+      padding: 5px;
+      width: 44px;
+    }
+.excel-table .sheet-title {
+      background: #047857;
+      color: white;
+      font-weight: 700;
+      font-size: 17px;
+      padding: 10px 14px;
+    }
+.excel-table .sheet-head th:not(.row-number) {
+      background: #e0eee4;
+      font-weight: 700;
+      color: #1b4b2f;
+    }
+.excel-table .sheet-input {
+      background: #fff5cf;
+      text-align: center;
+      font-weight: 700;
+    }
+.excel-table .sheet-formula {
+      background: #f0f8f1;
+    }
+.excel-table .sheet-label {
+      font-weight: 700;
+      background: #fafcfb;
+    }
+.excel-table code {
+      font: 14px/1.5 Consolas, monospace;
+      color: #172033;
+    }
+.sheet-tabs {
+      padding: 7px 14px;
+      background: #edf0ed;
+      border: 1px solid #bac6bf;
+      border-top: 0;
+      border-radius: 0 0 6px 6px;
+    }
+.sheet-tabs span {
+      display: inline-block;
+      padding: 4px 16px;
+      border-bottom: 3px solid #047857;
+      background: white;
+      color: #047857;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+.formula-box {
+      padding: 11px 14px;
+      margin: 8px 0;
+      border-radius: 12px;
+      background: #172033;
+      color: #fff;
+      font: 700 .9rem Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+.formula-box em {
+      color: #6ee7b7;
+      font-style: normal;
+    }
+.download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 22px;
+      background: #16a34a;
+      color: #fff;
+      border-radius: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(22, 163, 74, 0.28);
+      transition: transform .15s, background .15s;
+    }
+.download-btn:hover {
+      background: #15803d;
+      transform: translateY(-2px);
+    }
+@media (max-width: 768px) {
+  .grid2, .hero, .rules-grid, .formula-trio, .sor-specs, .scale-grid {
+        grid-template-columns: 1fr;
+      }
+  .task-row {
+        grid-template-columns: 1fr;
+      }
+}
+@media print {
+  .advance, button {
+        display: none !important;
+      }
+}
+  </style>
+</head>
+<body class="lesson-page lesson-10ogn-7" data-lesson-id="10ogn-7">
+  <!-- Ambient glowing blobs behind glass -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+
+  <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.GITHUB.IO</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">10 ОГН</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">7 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Практика: перцептрон в Excel. СОР</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <div class="bg-spheres" aria-hidden="true">
+    <div class="bg-sphere"></div>
+    <div class="bg-sphere"></div>
+    <div class="bg-sphere"></div>
+    <div class="bg-sphere"></div>
+  </div>
+  <canvas id="network-bg" aria-hidden="true"></canvas>
+
+  <div class="progress" id="progress"></div>
+
+  <main>
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 1: ТИТУЛЬНЫЙ СЛАЙД СОР                              -->
+    <!-- ========================================================= -->
+    <section class="slide active" aria-label="Титульный">
+      <div class="wrap">
+        <header class="slidehead" style="justify-content: flex-end;">
+          <button class="action advance" data-next>Далее к правилам →</button>
+        </header>
+
+        <div class="hero">
+          <div>
+            
+            <span class="tag">10 класс · ОГН · Урок 7 · Суммативное оценивание</span>
+            <h1>СОР 1: Перцептрон <br> <span class="accent">и его назначение</span></h1>
+            
+            <div class="definition">
+              <strong>Цель обучения 10.1.2.5:</strong> моделировать работу перцептрона в электронных таблицах с использованием функции единичного скачка, и объяснять как изменение весов влияет на процесс обучения
+            </div>
+
+            
+          </div>
+
+          <div class="paper">
+            <h3>Структура урока</h3>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin:16px 0;">
+              <div class="card" style="padding:14px; background:#fff;">
+                <strong style="color:var(--blue);">Часть 1 · Суммативная работа</strong>
+                <p class="small" style="margin:4px 0 0;">20 мин урока на выполнение онлайн-теста СОР</p>
+              </div>
+              <div class="card" style="padding:14px; background:#fff;">
+                <strong style="color:var(--sage);">Часть 2 · Практика: Перцептрон в Excel</strong>
+                <p class="small" style="margin:4px 0 0;">20 мин на сборку модели нейрона в таблице (10 баллов)</p>
+              </div>
+             
+              
+            </div>
+
+            <div style="text-align:center; margin-top:14px;">
+              <button class="action" style="width:100%;" onclick="show(1)">Перейти к правилам и запуску СОР →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 2: ПРАВИЛА СОР И КНОПКА ОТКРЫТИЯ ТЕСТА              -->
+    <!-- ========================================================= -->
+    <section class="slide" aria-label="Правила СОР">
+      <div class="wrap">
+        <header class="slidehead">
+          <span class="eyebrow">02 / 04 · Регламент и честность</span>
+          <button class="action advance" data-next>К практическим задачам →</button>
+        </header>
+
+        <h2>Правила проведения суммативной работы</h2>
+        <p class="lead">Соблюдай академическую честность. Оценка отражает твои реальные знания и навыки!</p>
+
+        <div class="rules-grid">
+          <!-- Правило 1: Телефоны -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap ban">
+              <svg class="anim-shake" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="var(--red)" stroke-width="2.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3>1. Смартфоны и гаджеты под запретом</h3>
+            </div>
+          </div>
+
+          <!-- Правило 2: Нейросети и поиск -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap ban">
+              <svg class="anim-pulse" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
+                <rect x="3" y="10" width="18" height="12" rx="4"/>
+                <line x1="9" y1="15" x2="9.01" y2="15"/>
+                <line x1="15" y1="15" x2="15.01" y2="15"/>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="var(--red)" stroke-width="2.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3>2. Без нейросетей и сторонних вкладок</h3>
+            </div>
+          </div>
+
+          <!-- Правило 3: Без списывания -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap ok">
+              <svg class="anim-ring" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <h3>3. Тишина и самостоятельность</h3>
+            </div>
+          </div>
+
+          <!-- Правило 4: Тайминг -->
+          <div class="rule-card">
+            <div class="rule-icon-wrap timer">
+              <svg class="anim-ring" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <h3>4. Регламент времени — ровно 20 минут</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- КНОПКА ОТКРЫТИЯ СОР И ИНТЕРАКТИВНЫЙ ТАЙМЕР ДЛЯ УЧИТЕЛЯ/УЧЕНИКОВ -->
+        <div class="sor-launch-box">
+          <h3 style="font-size:1.4rem; margin-bottom:8px;">Готов приступить к выполнению заданий?</h3>
+          <p class="small" style="margin-bottom:16px;">Нажми на кнопку ниже, чтобы открыть официальную форму СОР в новой вкладке:</p>
+
+          <!-- Кнопка с ссылкой на СОР (учитель добавит свой URL) -->
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT7M_6inK5p-K50SoyDfpXbtiBL-nmoTsFvETprMe1WxNcFg/viewform?usp=sharing&ouid=117068677279396679436" id="sorLink" target="_blank" rel="noopener noreferrer" class="sor-launch-btn">
+            📝 Открыть задания СОР онлайн
+          </a>
+
+          
+
+          <div class="timer-widget">
+            <div style="text-align:left;">
+              <strong>Таймер суммативной работы:</strong>
+              <div class="small" style="color:var(--muted);">Обратный отсчёт на 20 минут для контроля времени</div>
+            </div>
+            <div class="timer-display" id="sorTimerVal">20:00</div>
+            <div class="controlsrow">
+              <button class="action" id="btnTimerStart" style="padding:8px 16px; min-height:38px;">Старт</button>
+              <button class="action secondary" id="btnTimerPause" style="padding:8px 16px; min-height:38px;">Пауза</button>
+              <button class="action secondary" id="btnTimerReset" style="padding:8px 16px; min-height:38px;">Сброс</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 3: ПРАКТИЧЕСКАЯ РАБОТА: ПЕРЦЕПТРОН В EXCEL          -->
+    <!-- ========================================================= -->
+    <section class="slide" aria-label="Перцептрон в Excel">
+      <div class="wrap">
+        <header class="slidehead">
+          <span class="eyebrow">03 / 04 · Практика в Excel</span>
+          <button class="action advance" data-next>К дескрипторам работы →</button>
+        </header>
+
+        <h2>Практическая работа: «Перцептрон в Excel — Кредитный скоринг»</h2>
+        <p class="small">Соберите однослойный искусственный нейрон в электронной таблице. Модель принимает решение: <strong>«Одобрить кредит»</strong> (1) или <strong>«Отказать»</strong> (0) на основе 4 признаков заёмщика.</p>
+
+        <!-- Образец листа Excel -->
+        <div class="paper" style="padding:22px; margin-bottom:18px;">
+          <div class="sheet-top">
+            <span class="tag" style="margin:0;">Образец листа · Ячейки A1:E8</span>
+            <span class="small" style="color:var(--muted);">Жёлтые ячейки (C2:D5) — входы и веса · Зелёные (E2:E8) — расчётные формулы</span>
+          </div>
+
+          <div class="sheet-scroll" tabindex="0" role="region" aria-label="Образец таблицы Excel с перцептроном">
+            <table class="excel-table">
+              <thead>
+                <tr class="sheet-letters">
+                  <th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sheet-head">
+                  <th class="row-number">1</th>
+                  <th style="width:22%;">Признак (фактор)</th>
+                  <th style="width:25%;">Условие признака</th>
+                  <th style="width:14%; text-align:center;">Вход x</th>
+                  <th style="width:14%; text-align:center;">Вес w</th>
+                  <th style="width:25%;">Вклад x*w / Результат</th>
+                </tr>
+                <tr>
+                  <th class="row-number">2</th>
+                  <td>Официальный доход</td>
+                  <td>Стабильный — 1, Нет — 0</td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-formula"></td>
+                </tr>
+                <tr>
+                  <th class="row-number">3</th>
+                  <td>Кредитная история</td>
+                  <td>Положительная — 1, С плохой — 0</td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-formula"></td>
+                </tr>
+                <tr>
+                  <th class="row-number">4</th>
+                  <td>Стаж работы &gt; 1 года</td>
+                  <td>Да — 1, Меньше года — 0</td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-formula"></td>
+                </tr>
+                <tr>
+                  <th class="row-number">5</th>
+                  <td>Наличие залога / имущества</td>
+                  <td>Есть — 1, Нет — 0</td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-input"></td>
+                  <td class="sheet-formula"></td>
+                </tr>
+                <tr>
+                  <th class="row-number">6</th>
+                  <td colspan="4" class="sheet-label">Сумматор (взвешенная сумма) — net</td>
+                  <td class="sheet-formula"></td>
+                </tr>
+                <tr>
+                  <th class="row-number">7</th>
+                  <td colspan="4" class="sheet-label">Функция активации φ(net) — округление до 0 или 1</td>
+                  <td class="sheet-formula"></td>
+                </tr>
+                <tr>
+                  <th class="row-number">8</th>
+                  <td colspan="4" class="sheet-label">Итоговое решение нейрона</td>
+                  <td class="sheet-formula"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sheet-tabs"><span>Лист1</span></div>
+        </div>
+
+        <!-- Пошаговое руководство и кнопка скачивания -->
+        <div class="grid2">
+          <div class="card" style="background:#fff;">
+            <h3>Инструкция к выполнению работы</h3>
+            <ol style="margin:0; padding-left:20px; line-height:1.6; color:var(--muted); font-size:.95rem;">
+              <li>Задайте входные значения x (0 или 1) и веса w (от 0,1 до 0,4- в сумме веса должны составлять 1,0).</li>
+              <li>Введите формулы в столбце <strong>E</strong>: произведения для строк 2–5, сумму в строке 6 и активацию в строке 7.</li>
+              <li>В ячейку <strong>E8</strong> введите логическое условие для вывода решения «Одобрить» или «Отказать».</li>
+              <li>Протестируйте пересчёт: поменяйте доход или кредитную историю на 0 и проверьте изменение вердикта.</li>
+            </ol>
+          </div>
+
+          <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; background:#fff;">
+            <div>
+              <h3>Шаблон для выполнения</h3>
+              <p class="small">Скачайте готовую структуру таблицы в формате CSV, откройте её в Excel или Google Таблицах и завершите расчёты.</p>
+              
+              <div class="formula-box">
+                <em>Вклад x·w:</em> =C2*D2 ... =C5*D5<br>
+                <em>Сумматор net:</em> =СУММ(E2:E5)<br>
+                <em>Активация:</em> =ОКРУГЛ(E6;0)<br>
+                <em>Решение:</em> =ЕСЛИ(E7=1;"Одобрить";"Отказать")
+              </div>
+            </div>
+
+            <div style="margin-top:14px; text-align:center;">
+              <button class="download-btn" id="btnDownloadCsv" style="width:100%; justify-content:center; cursor:pointer; border:none;">
+                📥 Скачать шаблон таблицы (.csv)
+              </button>
+              <div id="downloadStatus" class="small" style="margin-top:8px; color:var(--muted);">Имя файла будет сгенерировано случайно (например, <span id="sampleFileName">kx7wq9.csv</span>)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- СЛАЙД 4: ДЕСКРИПТОРЫ И КРИТЕРИИ ОЦЕНИВАНИЯ (10 БАЛЛОВ)      -->
+    <!-- ========================================================= -->
+    <section class="slide" aria-label="Дескрипторы оценивания">
+      <div class="wrap">
+        <header class="slidehead">
+          <span class="eyebrow">04 / 04 · Дескрипторы и шкала</span>
+          <button class="action advance" data-next>К началу ↺</button>
+        </header>
+
+        <h2>Критерии оценивания: «Перцептрон в Excel»</h2>
+        <p class="lead">Рубрика формативного/суммативного оценивания практической работы (Максимум: 10 баллов):</p>
+
+        <div class="paper">
+          <table class="descriptor-table">
+            <thead>
+              <tr>
+                <th style="width:26%;">Критерий оценивания</th>
+                <th style="width:14%;">Этап</th>
+                <th style="width:48%;">Дескриптор: обучающийся</th>
+                <th style="width:12%; text-align:center;">Балл</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="2"><strong>Структура и дизайн таблицы</strong></td>
+                <td style="text-align:center;"><strong>Таблица</strong></td>
+                <td>Правильно оформил структуру таблицы, объединил ячейки заголовков и строк суммы/активации, включил границы</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Признаки</strong></td>
+                <td>Сформулировал не менее 4 релевантных признаков задачи и задал бинарные входные сигналы xᵢ (0 или 1)</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong>Весовые коэффициенты (w)</strong></td>
+                <td style="text-align:center;"><strong>Веса wᵢ</strong></td>
+                <td>Определил и ввёл веса признаков соответственно их важности; сумма весов строго равна 1,0 (или 100%)</td>
+                <td style="text-align:center;"><span class="badge-point">2 балла</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Обоснование</strong></td>
+                <td>Устно или письменно обосновал, почему наиболее значимый признак получил наибольший вес</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong>Сумматор и взвешенный вклад</strong></td>
+                <td style="text-align:center;"><strong>Вклады x·w</strong></td>
+                <td>Записал формулы умножения каждого входа на вес (=C3*D3 ... =C6*D6) и применил автозаполнение</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Сумматор net</strong></td>
+                <td>Применил формулу суммы =СУММ(E3:E6) для расчёта интегрального сигнала net нейрона</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong>Активация и логический вывод</strong></td>
+                <td style="text-align:center;"><strong>Активация φ</strong></td>
+                <td>Реализовал пороговую функцию активации через округление =ОКРУГЛ(E7;0) со значениями 0 или 1</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><strong>Условие ЕСЛИ</strong></td>
+                <td>Ввёл логическую функцию =ЕСЛИ(...) для интерпретации вердикта модели текстом («Одобрить» / «Отказать»)</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+              <tr>
+                <td><strong>Тестирование модели</strong></td>
+                <td style="text-align:center;"><strong>Проверка</strong></td>
+                <td>Продемонстрировал динамический пересчёт модели при смене входных признаков xᵢ и объяснил результат</td>
+                <td style="text-align:center;"><span class="badge-point">1 балл</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- ШКАЛА ПЕРЕВОДА БАЛЛОВ В ОЦЕНКУ -->
+          <h3 style="margin-top:20px;">Шкала перевода баллов в оценку</h3>
+          <div class="scale-grid">
+            <div class="scale-card mark5">
+              <strong>Оценка «5»</strong>
+              <div class="small" style="font-weight:700; color:#16a34a;">9 – 10 баллов</div>
+              <p class="small" style="margin:4px 0 0;">Отлично! Модель полностью собрана и протестирована</p>
+            </div>
+            <div class="scale-card mark4">
+              <strong>Оценка «4»</strong>
+              <div class="small" style="font-weight:700; color:#059669;">7 – 8 баллов</div>
+              <p class="small" style="margin:4px 0 0;">Хорошо! Есть небольшие недочёты в формулах или весах</p>
+            </div>
+            <div class="scale-card mark3">
+              <strong>Оценка «3»</strong>
+              <div class="small" style="font-weight:700; color:#d97706;">4 – 6 баллов</div>
+              <p class="small" style="margin:4px 0 0;">Базовый уровень: таблица заполнена, но формулы не полные</p>
+            </div>
+            <div class="scale-card mark2">
+              <strong>Оценка «2»</strong>
+              <div class="small" style="font-weight:700; color:#dc2626;">0 – 3 балла</div>
+              <p class="small" style="margin:4px 0 0;">Требуется доработка формул и структуры модели</p>
+            </div>
+          </div>
+
+          <!-- ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР БАЛЛОВ -->
+          <div class="card below" style="background:#f0fdf4; border:1px solid var(--line);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h3 style="margin:0;">Интерактивный расчёт оценки за работу:</h3>
+                <p class="small" style="margin:2px 0 0;">Выбери набранный балл, чтобы узнать оценку:</p>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label for="scoreSelector" style="font-weight:700; font-size:.92rem;">Набрано баллов:</label>
+                <select id="scoreSelector" style="border:2px solid var(--line); border-radius:10px; padding:6px 12px; font-weight:800; font-family:Consolas, monospace; background:#fff;">
+                  <option value="10">10 из 10</option>
+                  <option value="9">9 из 10</option>
+                  <option value="8">8 из 10</option>
+                  <option value="7">7 из 10</option>
+                  <option value="6">6 из 10</option>
+                  <option value="5">5 из 10</option>
+                  <option value="4">4 из 10</option>
+                  <option value="3">3 из 10</option>
+                  <option value="2">2 из 10</option>
+                  <option value="1">1 из 10</option>
+                </select>
+              </div>
+            </div>
+            <div id="gradeResultBox" class="result good" style="margin-top:12px; font-weight:700;">
+              Результат: 10 баллов — Отлично (Оценка «5»). Перцептрон полностью рабочий, формулы и интерпретация безупречны!
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ТОЧКИ НАВИГАЦИИ ПО СЛАЙДАМ -->
+  <nav class="dots" id="dots" aria-label="Слайды урока"></nav>
+
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const slides = [...document.querySelectorAll('.slide')];
+    let current = 0;
+
+    // Инициализация точек навигации (4 слайда)
+    slides.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.className = 'dotbutton';
+      b.title = `Слайд ${i + 1}: ${s.getAttribute('aria-label')}`;
+      b.setAttribute('aria-label', b.title);
+      b.dataset.tooltip = b.title;
+      b.onclick = () => show(i);
+      $('dots').append(b);
+      const nextBtn = s.querySelector('[data-next]');
+      if (nextBtn) {
+        nextBtn.onclick = () => show(i === slides.length - 1 ? 0 : i + 1);
+      }
+    });
+
+    function show(n) {if(!window._inSlideSync&&typeof window.goToSlide==='function'&&window.goToSlide._isUniversal){window.goToSlide(arguments[0]);return;}
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      document.querySelectorAll('.dotbutton').forEach((b, i) => {
+        if (i === current) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+      });
+      slides[current].scrollTop = 0;
+      $('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+      history.replaceState(null, '', '#' + (current + 1));
+    }
+
+    window.addEventListener('hashchange', () => show((parseInt(location.hash.slice(1)) || 1) - 1));
+    document.addEventListener('keydown', e => {
+      if (e.target.closest('button, input, summary, textarea, select') || e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        e.preventDefault();
+        show(current + 1);
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        show(current - 1);
+      }
+    });
+
+    // -------------------------------------------------------------
+    // СЛАЙД 2: ТАЙМЕР ОБРАТНОГО ОТСЧЁТА СОР (20 МИНУТ)
+    // -------------------------------------------------------------
+    let timerTotalSeconds = 20 * 60; // 20 минут
+    let timerInterval = null;
+    let timerRunning = false;
+
+    function renderTimer() {
+      const mins = Math.floor(timerTotalSeconds / 60);
+      const secs = timerTotalSeconds % 60;
+      $('sorTimerVal').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    $('btnTimerStart').onclick = () => {
+      if (timerRunning) return;
+      timerRunning = true;
+      timerInterval = setInterval(() => {
+        if (timerTotalSeconds > 0) {
+          timerTotalSeconds--;
+          renderTimer();
+        } else {
+          clearInterval(timerInterval);
+          timerRunning = false;
+          alert('Время суммативной работы (40 минут) завершено! Пора сдавать ответы.');
+        }
+      }, 1000);
+    };
+
+    $('btnTimerPause').onclick = () => {
+      if (!timerRunning) return;
+      clearInterval(timerInterval);
+      timerRunning = false;
+    };
+
+    $('btnTimerReset').onclick = () => {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerTotalSeconds = 20 * 60;
+      renderTimer();
+    };
+
+    // -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // СЛАЙД 3: СКАЧИВАНИЕ ШАБЛОНА CSV СО СЛУЧАЙНЫМ ИМЕНЕМ
+    // -------------------------------------------------------------
+    function generateRandomFileName() {
+      const letters = 'abcdefghijklmnopqrstuvwxyz';
+      let name = '';
+      const len = Math.floor(Math.random() * 4) + 6; // 6-9 букв
+      for (let i = 0; i < len; i++) {
+        name += letters[Math.floor(Math.random() * letters.length)];
+      }
+      return name + '.csv';
+    }
+
+    const sampleNameEl = $('sampleFileName');
+    if (sampleNameEl) {
+      sampleNameEl.textContent = generateRandomFileName();
+    }
+
+    const btnDownload = $('btnDownloadCsv');
+    if (btnDownload) {
+      btnDownload.onclick = () => {
+        const randomName = generateRandomFileName();
+        // CSV-структура с BOM для корректного открытия в Excel (русские буквы и точка с запятой)
+        const csvContent =
+`\uFEFFКритерий;Как выбрать x;Вход x;Вес w;Вклад x*w
+Официальный доход;Стабильный - 1 / Нет - 0;;;
+Кредитная история;Положительная - 1 / С плохой - 0;;;
+Стаж работы > 1 года;Да - 1 / Меньше года - 0;;;
+Наличие залога / имущества;Есть - 1 / Нет - 0;;;
+Взвешенная сумма - net;;;;
+Функция активации - округление до 0 или 1;;;;
+Итог (решение нейрона);;;;
+`;
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = randomName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        const statusEl = $('downloadStatus');
+        if (statusEl) {
+          statusEl.innerHTML = `✅ Скачан файл: <strong style="color:var(--blue);">${randomName}</strong>. Откройте его в Excel/Calc.`;
+        }
+      };
+    }
+
+    // -------------------------------------------------------------
+    // СЛАЙД 4: КАЛЬКУЛЯТОР БАЛЛОВ ЗА РАБОТУ «ПЕРЦЕПТРОН»
+    // -------------------------------------------------------------
+    const scoreSelector = $('scoreSelector');
+    if (scoreSelector) {
+      scoreSelector.onchange = () => {
+        const score = parseInt(scoreSelector.value, 10);
+        const box = $('gradeResultBox');
+
+        if (score >= 9) {
+          box.className = 'result good';
+          box.textContent = `Результат: ${score} из 10 баллов — Отлично (Оценка «5»). Перцептрон полностью рабочий, формулы и интерпретация безупречны!`;
+        } else if (score >= 7) {
+          box.className = 'result good';
+          box.textContent = `Результат: ${score} из 10 баллов — Хорошо (Оценка «4»). Достойный результат, перцептрон работает, возможны мелкие замечания по весам.`;
+        } else if (score >= 4) {
+          box.className = 'result';
+          box.textContent = `Результат: ${score} из 10 баллов — Удовлетворительно (Оценка «3»). Базовый порог: таблица есть, но проверь формулы net и округления.`;
+        } else {
+          box.className = 'result bad';
+          box.textContent = `Результат: ${score} из 10 баллов — Неудовлетворительно (Оценка «2»). Требуется завершить ввод формул и проверить логику решения.`;
+        }
+      };
+    }
+
+    // -------------------------------------------------------------
+    // АНИМАЦИЯ ФОНОВЫХ СЕТЕВЫХ ЧАСТИЦ (CANVAS)
+    // -------------------------------------------------------------
+    const bgCanvas = document.getElementById('network-bg');
+    if (bgCanvas) {
+      const bgCtx = bgCanvas.getContext('2d');
+      let bgParticles = [];
+
+      function initBgParticles() {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+        bgParticles = Array.from({ length: 42 }, () => ({
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          r: Math.random() * 2 + 1.8
+        }));
+      }
+
+      function drawBgNetwork() {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        bgCtx.strokeStyle = 'rgba(5, 150, 105, 0.12)';
+        bgCtx.fillStyle = 'rgba(16, 185, 129, 0.22)';
+
+        bgParticles.forEach((point, index) => {
+          point.x += point.vx;
+          point.y += point.vy;
+          if (point.x < 0 || point.x > bgCanvas.width) point.vx *= -1;
+          if (point.y < 0 || point.y > bgCanvas.height) point.vy *= -1;
+
+          bgCtx.beginPath();
+          bgCtx.arc(point.x, point.y, point.r, 0, Math.PI * 2);
+          bgCtx.fill();
+
+          for (let next = index + 1; next < bgParticles.length; next++) {
+            const other = bgParticles[next];
+            const distance = Math.hypot(point.x - other.x, point.y - other.y);
+            if (distance < 140) {
+              bgCtx.globalAlpha = (1 - distance / 140) * 0.65;
+              bgCtx.beginPath();
+              bgCtx.moveTo(point.x, point.y);
+              bgCtx.lineTo(other.x, other.y);
+              bgCtx.stroke();
+              bgCtx.globalAlpha = 1;
+            }
+          }
+        });
+
+        requestAnimationFrame(drawBgNetwork);
+      }
+
+      window.addEventListener('resize', initBgParticles);
+      initBgParticles();
+      drawBgNetwork();
+    }
+
+    // Инициализация при старте
+    show((parseInt(location.hash.slice(1)) || 1) - 1);
+  </script>
+  <script src="../../скрипты/lessons.js?v=5.2"></script>
+</body>
+</html>
