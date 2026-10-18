@@ -214,53 +214,48 @@ function updateActiveTestLettersFromUI() {
 }
 
 // Сворачивание и разворачивание правой колонки редактора
-function toggleEditorSidebar(forceState = null) {
-  const container = document.getElementById("editor-layout-grid");
+function toggleEditorSidebar(forceState) {
+  const container = document.getElementById("editor-layout-grid") || document.querySelector(".editor-layout");
+  const sidebar = document.getElementById("editor-right-sidebar");
   const btn = document.getElementById("btn-toggle-editor-sidebar");
   if (!container) return;
 
-  const isCollapsed = forceState !== null ? forceState : !container.classList.contains("sidebar-collapsed");
-  if (isCollapsed) {
+  const isCurrentlyCollapsed = container.classList.contains("sidebar-collapsed") || 
+                               (sidebar && (sidebar.style.display === "none" || (window.getComputedStyle && window.getComputedStyle(sidebar).display === "none")));
+
+  const shouldCollapse = (typeof forceState === "boolean") ? forceState : !isCurrentlyCollapsed;
+
+  if (shouldCollapse) {
+    // Скрываем настройки: центральный блок заданий расширяется (2 колонки)
     container.classList.add("sidebar-collapsed");
+    container.style.gridTemplateColumns = "260px minmax(0, 1fr)";
+    if (sidebar) sidebar.style.display = "none";
     if (btn) {
       btn.classList.remove("active");
       btn.setAttribute("aria-expanded", "false");
-      btn.title = "Открыть настройки (время, классы, оформление)";
+      btn.title = "Показать настройки (время, классы, цвета)";
     }
-    localStorage.setItem("bagalau_editor_sidebar_collapsed", "1");
+    try { localStorage.setItem("bagalau_editor_sidebar_collapsed", "1"); } catch(e){}
   } else {
+    // Показываем настройки: стандартный 3-колоночный вид
     container.classList.remove("sidebar-collapsed");
+    container.style.gridTemplateColumns = "";
+    if (sidebar) sidebar.style.display = "";
     if (btn) {
       btn.classList.add("active");
       btn.setAttribute("aria-expanded", "true");
       btn.title = "Скрыть панель настроек";
     }
-    localStorage.removeItem("bagalau_editor_sidebar_collapsed");
+    try { localStorage.removeItem("bagalau_editor_sidebar_collapsed"); } catch(e){}
   }
 }
+window.toggleEditorSidebar = toggleEditorSidebar;
 
 function initEditorSidebarState() {
   const isCollapsed = localStorage.getItem("bagalau_editor_sidebar_collapsed") === "1";
-  const container = document.getElementById("editor-layout-grid");
-  const btn = document.getElementById("btn-toggle-editor-sidebar");
-  if (container) {
-    if (isCollapsed) {
-      container.classList.add("sidebar-collapsed");
-      if (btn) {
-        btn.classList.remove("active");
-        btn.setAttribute("aria-expanded", "false");
-        btn.title = "Открыть настройки (время, классы, оформление)";
-      }
-    } else {
-      container.classList.remove("sidebar-collapsed");
-      if (btn) {
-        btn.classList.add("active");
-        btn.setAttribute("aria-expanded", "true");
-        btn.title = "Скрыть панель настроек";
-      }
-    }
-  }
+  toggleEditorSidebar(isCollapsed);
 }
+window.initEditorSidebarState = initEditorSidebarState;
 
 function updateVariantBgColor(varNum, color) {
   if (varNum === "1") {
