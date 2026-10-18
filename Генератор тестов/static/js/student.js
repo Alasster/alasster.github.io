@@ -673,17 +673,21 @@ function renderTasks() {
 
     // Изображение к заданию с защитой
     let imageHtml = "";
-    if (t.image_url) {
+    if (t.image_url && t.image_url.trim()) {
       const alignClass = `align-${t.image_align || 'center'}`;
       let sizeClass = "size-100";
       if (t.image_size === "200px") sizeClass = "size-200";
       else if (t.image_size === "400px" || t.image_size === "450px") sizeClass = "size-450";
 
+      let cleanUrl = t.image_url.trim();
+      if (cleanUrl.startsWith("http://localhost:8000/")) cleanUrl = cleanUrl.replace("http://localhost:8000", "");
+      else if (cleanUrl.startsWith("http://127.0.0.1:8000/")) cleanUrl = cleanUrl.replace("http://127.0.0.1:8000", "");
+
       imageHtml = `
         <div class="task-image-box ${alignClass} ${sizeClass}">
           <div class="img-shield-wrapper">
             <div class="img-shield-overlay"></div>
-            <img src="${escapeHtml(t.image_url)}" class="task-img-protected" alt="Иллюстрация к заданию">
+            <img src="${escapeHtml(cleanUrl)}" class="task-img-protected task-image" alt="Иллюстрация к заданию" loading="eager" onerror="this.onerror=null; this.parentElement.parentElement.style.display='none';">
           </div>
         </div>
       `;

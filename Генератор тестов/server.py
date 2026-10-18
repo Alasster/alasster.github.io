@@ -15,7 +15,7 @@ import logging
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
 
-from fastapi import FastAPI, Request, Response, HTTPException, status, Depends, Query, BackgroundTasks
+from fastapi import FastAPI, Request, Response, HTTPException, status, Depends, Query, BackgroundTasks, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -674,6 +674,27 @@ async def reorder_tasks(test_id: str, task_ids: List[str], teacher: dict = Depen
         await sync_launches_for_test(db, test_id)
         await db.commit()
     return {"ok": True}
+
+@app.post("/api/upload/image")
+async def upload_task_image(file: UploadFile = File(...), teacher: dict = Depends(get_current_teacher)):
+    filename = file.filename or "image.png"
+    ext = os.path.splitext(filename)[1].lower()
+    allowed_exts = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"}
+    if ext not in allowed_exts:
+        raise HTTPException(status_code=400, detail="Формат файла не поддерживается. Выберите PNG, JPG, JPEG, WebP, GIF или SVG.")
+
+    uploads_dir = os.path.join(BASE_DIR, "static", "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+
+    safe_name = f"{uuid.uuid4().hex[:12]}_{secrets.token_hex(4)}{ext}"
+    dest_path = os.path.join(uploads_dir, safe_name)
+
+    contents = await file.read()
+    with open(dest_path, "wb") as f:
+        f.write(contents)
+
+    rel_url = f"/static/uploads/{safe_name}"
+    return {"ok": True, "url": rel_url, "filename": safe_name}
 
 # --- Launches (Запуски и Проведение) ---
 @app.post("/api/launches")

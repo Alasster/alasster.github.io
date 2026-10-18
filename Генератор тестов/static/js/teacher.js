@@ -972,20 +972,31 @@ function renderTaskEditorForm() {
   }
 
   // Блок управления картинкой (скрыт по умолчанию, пока не нажата кнопка)
-  const hasImage = Boolean(t.image_url && t.image_url.trim());
+  const hasImage = Boolean((t.image_url && t.image_url.trim()) || t._showImageSection);
   const imgBoxHtml = hasImage ? `
     <div id="task-image-section" style="background: #F8FAFC; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem; margin-top: 1.25rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
         <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 700;">
-          <span>🖼 Прикреплённое изображение (по ссылке):</span>
+          <span>🖼 Изображение к заданию:</span>
         </label>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="removeTaskImage()" style="color: var(--danger); font-size: 0.78rem; padding: 2px 8px;">✕ Убрать изображение</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeTaskImage()" style="color: var(--danger); font-size: 0.8rem; padding: 4px 10px;">✕ Убрать изображение</button>
       </div>
-      <input type="text" class="form-control" value="${escapeHtml(t.image_url || '')}" oninput="updateTaskImage(this.value)" onblur="saveCurrentTask(true)" placeholder="https://... или путь к файлу">
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem;">
+        <label class="btn btn-primary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600; padding: 6px 14px; margin: 0;">
+          <span>📁 Выбрать файл с компьютера</span>
+          <input type="file" id="task-image-file-input" accept="image/*" style="display: none;" onchange="handleTaskImageFileUpload(this)">
+        </label>
+        <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">или вставьте ссылку / скриншот (Ctrl+V):</span>
+      </div>
+
+      <div style="margin-bottom: 0.75rem;">
+        <input type="text" id="task-image-url-input" class="form-control" value="${escapeHtml(t.image_url || '')}" oninput="updateTaskImage(this.value)" onblur="saveCurrentTask(true)" placeholder="https://... или путь к файлу">
+      </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
         <div>
-          <label style="font-size: 0.82rem; font-weight: 600;">Размер изображения:</label>
+          <label style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.25rem; display: block;">Размер изображения:</label>
           <select class="form-control" onchange="activeTask.image_size = this.value; renderImagePreview(); scheduleAutoSaveTask(50);">
             <option value="200px" ${t.image_size === '200px' ? 'selected' : ''}>Маленький (200px)</option>
             <option value="450px" ${t.image_size === '450px' || t.image_size === '400px' ? 'selected' : ''}>Средний (450px)</option>
@@ -993,7 +1004,7 @@ function renderTaskEditorForm() {
           </select>
         </div>
         <div>
-          <label style="font-size: 0.82rem; font-weight: 600;">Положение:</label>
+          <label style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.25rem; display: block;">Положение:</label>
           <select class="form-control" onchange="activeTask.image_align = this.value; renderImagePreview(); scheduleAutoSaveTask(50);">
             <option value="left" ${t.image_align === 'left' ? 'selected' : ''}>По левому краю</option>
             <option value="center" ${t.image_align === 'center' || !t.image_align ? 'selected' : ''}>По центру</option>
@@ -1006,8 +1017,8 @@ function renderTaskEditorForm() {
     </div>
   ` : `
     <div id="task-image-section" style="margin-top: 0.85rem;">
-      <button type="button" class="btn btn-secondary btn-sm" onclick="showTaskImageInput()" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 5px 12px; font-weight: 600;">
-        <span>🖼</span> <span>Прикрепить изображение к заданию (по ссылке)</span>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="showTaskImageInput()" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 6px 14px; font-weight: 600;">
+        <span>🖼</span> <span>Добавить изображение к заданию</span>
       </button>
     </div>
   `;
@@ -1059,45 +1070,127 @@ function renderTaskEditorForm() {
 
 function showTaskImageInput() {
   if (!activeTask) return;
-  activeTask.image_url = " ";
+  activeTask._showImageSection = true;
   renderTaskEditorForm();
-  const input = document.querySelector("#task-image-section input");
-  if (input) {
-    activeTask.image_url = "";
-    input.value = "";
-    input.focus();
-  }
+  const input = document.getElementById("task-image-url-input");
+  if (input) input.focus();
 }
+window.showTaskImageInput = showTaskImageInput;
 
 function removeTaskImage() {
   if (!activeTask) return;
   activeTask.image_url = "";
+  activeTask._showImageSection = false;
   renderTaskEditorForm();
   scheduleAutoSaveTask(50);
 }
+window.removeTaskImage = removeTaskImage;
+
+async function handleTaskImageFileUpload(input) {
+  if (!input.files || input.files.length === 0 || !activeTask) return;
+  const file = input.files[0];
+  
+  const preview = document.getElementById("image-preview-container");
+  if (preview) {
+    preview.innerHTML = '<div style="padding: 0.6rem; color: var(--primary); font-weight: 600; font-size: 0.88rem;">⏳ Загрузка изображения на сервер...</div>';
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/upload/image", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Не удалось загрузить файл");
+    }
+
+    const data = await res.json();
+    activeTask.image_url = data.url;
+    activeTask._showImageSection = true;
+
+    const urlInput = document.getElementById("task-image-url-input");
+    if (urlInput) urlInput.value = data.url;
+
+    renderImagePreview();
+    await saveCurrentTask(true);
+  } catch (err) {
+    console.warn("Server upload failed, converting to DataURL:", err);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      activeTask.image_url = e.target.result;
+      activeTask._showImageSection = true;
+      const urlInput = document.getElementById("task-image-url-input");
+      if (urlInput) urlInput.value = "data:image/...;base64";
+      renderImagePreview();
+      await saveCurrentTask(true);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+window.handleTaskImageFileUpload = handleTaskImageFileUpload;
 
 function renderImagePreview() {
   const container = document.getElementById("image-preview-container");
-  if (!container || !activeTask || !activeTask.image_url || !activeTask.image_url.trim()) {
-    if (container) container.innerHTML = "";
+  if (!container || !activeTask) return;
+  const url = (activeTask.image_url || "").trim();
+  if (!url) {
+    container.innerHTML = `<div style="font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin-top: 0.5rem;">Изображение не прикреплено. Выберите файл с компьютера или вставьте ссылку.</div>`;
     return;
   }
   const align = activeTask.image_align || "center";
   const size = activeTask.image_size || "100%";
   container.innerHTML = `
-    <div style="text-align: ${align}; margin-top: 0.5rem;">
-      <img src="${escapeHtml(activeTask.image_url.trim())}" style="max-width: ${size}; border: 1px solid var(--border); border-radius: var(--radius-sm);" onerror="this.style.display='none'">
+    <div style="text-align: ${align}; margin-top: 0.75rem;">
+      <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem;">Предпросмотр:</div>
+      <img src="${escapeHtml(url)}" style="max-width: ${size}; max-height: 380px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); object-fit: contain; box-shadow: 0 2px 6px rgba(0,0,0,0.06);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'color: var(--danger); font-size: 0.85rem; padding: 0.5rem;\\'>⚠️ Не удалось загрузить изображение по указанному адресу. Проверьте правильность ссылки или загрузите файл с компьютера.</div>';">
     </div>
   `;
 }
+window.renderImagePreview = renderImagePreview;
 
 function updateTaskImage(url) {
   if (activeTask) {
-    activeTask.image_url = url.trim();
+    let clean = (url || "").trim();
+    if (clean.startsWith("http://localhost:8000/")) {
+      clean = clean.replace("http://localhost:8000", "");
+    } else if (clean.startsWith("http://127.0.0.1:8000/")) {
+      clean = clean.replace("http://127.0.0.1:8000", "");
+    }
+    activeTask.image_url = clean;
+    if (clean) activeTask._showImageSection = true;
     renderImagePreview();
     scheduleAutoSaveTask();
   }
 }
+window.updateTaskImage = updateTaskImage;
+
+// Глобальная поддержка вставки картинок из буфера обмена (Ctrl+V)
+document.addEventListener("paste", async (e) => {
+  const container = document.getElementById("task-editor-form-container");
+  if (!container || !activeTask) return;
+  if (container.contains(e.target) || e.target === document.body) {
+    const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+    if (items) {
+      for (const item of items) {
+        if (item.type && item.type.indexOf("image") === 0) {
+          const blob = item.getAsFile();
+          if (blob) {
+            e.preventDefault();
+            activeTask._showImageSection = true;
+            renderTaskEditorForm();
+            await handleTaskImageFileUpload({ files: [blob] });
+            break;
+          }
+        }
+      }
+    }
+  }
+});
 
 function changeTaskType(newType) {
   if (!activeTask) return;
