@@ -342,13 +342,17 @@
       // Автоматически определяем рабочий адрес сервера учителя (локальный или по сети)
       const btn = document.getElementById('open-soch-btn');
       const candidateBases = [];
-      if (window.location.protocol.startsWith('http') && window.location.hostname) {
-        candidateBases.push('http://' + window.location.hostname + ':8000');
-      }
       if (Array.isArray(CFG.server_urls)) {
         CFG.server_urls.forEach(u => {
           if (u && !candidateBases.includes(u)) candidateBases.push(u);
         });
+      }
+      if (window.location.protocol.startsWith('http') && window.location.hostname && !window.location.hostname.includes('github.io')) {
+        const localHostUrl = 'http://' + window.location.hostname + ':8000';
+        if (!candidateBases.includes(localHostUrl)) candidateBases.push(localHostUrl);
+      }
+      if (!candidateBases.includes('http://192.168.68.101:8000')) {
+        candidateBases.push('http://192.168.68.101:8000');
       }
       if (!candidateBases.includes('http://127.0.0.1:8000')) {
         candidateBases.push('http://127.0.0.1:8000');

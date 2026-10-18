@@ -1665,6 +1665,31 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
             if attempt["status"] != "in_progress":
                 raise HTTPException(status_code=403, detail="Данная попытка не может быть сдана")
 
+            # Если вместе с подтверждением пришли ответы (req.answers), атомарно сохраняем их в базу
+            if req.answers and isinstance(req.answers, dict):
+                for task_id, ans_val in req.answers.items():
+                    if isinstance(ans_val, dict) and "answer" in ans_val:
+                        raw_ans = ans_val["answer"]
+                        ver = ans_val.get("version", 1)
+                    else:
+                        raw_ans = ans_val
+                        ver = 1
+                    ans_json = json.dumps(raw_ans, ensure_ascii=False)
+                    c_ex = await db.execute("SELECT id, version FROM student_answers WHERE attempt_id = ? AND task_id = ?", (attempt["id"], str(task_id)))
+                    row_ex = await c_ex.fetchone()
+                    if row_ex:
+                        await db.execute("""
+                            UPDATE student_answers
+                            SET answer_json = ?, version = version + 1, updated_at = ?
+                            WHERE id = ?
+                        """, (ans_json, now, row_ex["id"]))
+                    else:
+                        ans_id = str(uuid.uuid4())
+                        await db.execute("""
+                            INSERT INTO student_answers (id, attempt_id, task_id, answer_json, version, updated_at)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        """, (ans_id, attempt["id"], str(task_id), ans_json, ver, now))
+
             conf_code = f"BAG-{datetime.now().strftime('%Y')}-{secrets.token_hex(3).upper()}"
             await db.execute("""
                 UPDATE student_attempts

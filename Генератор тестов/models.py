@@ -130,6 +130,7 @@ class BatchSaveAnswersRequest(BaseModel):
 
 class StudentSubmitRequest(BaseModel):
     final_confirmation: bool = True
+    answers: Optional[Dict[str, Any]] = None
 
 # --- Teacher Grading & Live Control ---
 class TeacherActionStudentRequest(BaseModel):

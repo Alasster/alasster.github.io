@@ -1991,6 +1991,10 @@ async function refreshStudentsList() {
   if (!activeLaunch) return;
   try {
     const res = await fetch(`/api/launches/${activeLaunch.id}/students`);
+    if (res.status === 401) {
+      stopLiveMonitoring();
+      return;
+    }
     if (!res.ok) return;
     activeLaunchStudents = await res.json();
     renderLiveStudentsTable();

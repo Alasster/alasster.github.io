@@ -48,6 +48,38 @@ document.addEventListener("dragstart", (e) => {
 }, true);
 
 // =========================================================================
+// РАБОТА С ТОКЕНОМ УЧЕНИКА (С ПОДДЕРЖКОЙ SESSIONSTORAGE И LOCALSTORAGE)
+// =========================================================================
+function getStudentToken() {
+  let tok = sessionStorage.getItem("bagalau_student_token");
+  if (!tok) {
+    tok = localStorage.getItem("bagalau_student_token");
+  }
+  if (!tok && launchId) {
+    tok = localStorage.getItem(`bagalau_student_token_${launchId}`);
+  }
+  return tok || "";
+}
+
+function setStudentToken(token) {
+  if (!token) return;
+  try { sessionStorage.setItem("bagalau_student_token", token); } catch (e) {}
+  try { localStorage.setItem("bagalau_student_token", token); } catch (e) {}
+  if (launchId) {
+    try { localStorage.setItem(`bagalau_student_token_${launchId}`, token); } catch (e) {}
+  }
+}
+
+function clearStudentToken() {
+  try { sessionStorage.removeItem("bagalau_student_token"); } catch (e) {}
+  try { localStorage.removeItem("bagalau_student_token"); } catch (e) {}
+  if (launchId) {
+    try { localStorage.removeItem(`bagalau_student_token_${launchId}`); } catch (e) {}
+  }
+  document.cookie = "bagalau_student_token=; path=/; max-age=0;";
+}
+
+// =========================================================================
 // ИНИЦИАЛИЗАЦИЯ
 // =========================================================================
 document.addEventListener("DOMContentLoaded", async () => {
@@ -57,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const recoveryToken = urlParams.get("recovery_token");
   if (recoveryToken) {
-    sessionStorage.setItem("bagalau_student_token", recoveryToken);
+    setStudentToken(recoveryToken);
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 
@@ -238,12 +270,11 @@ function onGradeSelectChange() {
 
 // Завершить и закрыть
 function logoutStudentAndReset() {
-  sessionStorage.clear();
-  localStorage.removeItem("bagalau_student_token");
+  clearStudentToken();
   if (launchId) {
     localStorage.removeItem(`draft_answers_${launchId}`);
+    localStorage.removeItem(`bagalau_draft_${launchId}`);
   }
-  document.cookie = "bagalau_student_token=; path=/; max-age=0;";
   window.close();
   setTimeout(() => {
     window.location.reload();
@@ -252,7 +283,7 @@ function logoutStudentAndReset() {
 
 // Проверка наличия активной попытки
 async function checkExistingAttempt() {
-  const token = sessionStorage.getItem("bagalau_student_token");
+  const token = getStudentToken();
   if (!token) {
     showScreen("screen-join");
     return;
@@ -263,8 +294,12 @@ async function checkExistingAttempt() {
       headers: { "X-Attempt-Token": token }
     });
     if (!res.ok) {
-      sessionStorage.removeItem("bagalau_student_token");
-      showScreen("screen-join");
+      if (res.status === 401 || res.status === 404) {
+        clearStudentToken();
+        showScreen("screen-join");
+        return;
+      }
+      restoreFromOfflineDraft();
       return;
     }
     currentAttempt = await res.json();
@@ -374,7 +409,7 @@ document.getElementById("join-form").addEventListener("submit", async (e) => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Ошибка подключения");
 
-    sessionStorage.setItem("bagalau_student_token", data.attempt_token);
+    setStudentToken(data.attempt_token);
     await checkExistingAttempt();
   } catch (err) {
     alert(err.message);
@@ -385,7 +420,7 @@ document.getElementById("join-form").addEventListener("submit", async (e) => {
 
 // Нажатие кнопки "Начать выполнение работы"
 document.getElementById("btn-start-exam").addEventListener("click", async () => {
-  const token = sessionStorage.getItem("bagalau_student_token");
+  const token = getStudentToken();
   const btn = document.getElementById("btn-start-exam");
   btn.disabled = true;
   btn.textContent = "Загрузка заданий...";
@@ -409,7 +444,7 @@ document.getElementById("btn-start-exam").addEventListener("click", async () => 
 
 // Запуск сессии выполнения заданий
 async function startExamSession() {
-  const token = sessionStorage.getItem("bagalau_student_token");
+  const token = getStudentToken();
   
   // Если задания ещё не загружены в память (например, были в режиме ожидания), запрашиваем с сервера
   if (!currentAttempt || !currentAttempt.tasks || currentAttempt.tasks.length === 0) {
@@ -749,7 +784,7 @@ function saveAnswer(taskId, answer) {
   }
 
   saveDebounceTimers[taskId] = setTimeout(async () => {
-    const token = sessionStorage.getItem("bagalau_student_token");
+    const token = getStudentToken();
     try {
       const res = await fetch("/api/student/save", {
         method: "POST",
@@ -846,7 +881,7 @@ function startTimer(serverDeadlineIso) {
 // Фоновый Heartbeat
 function startHeartbeatAndPoll() {
   if (heartbeatInterval) clearInterval(heartbeatInterval);
-  const token = sessionStorage.getItem("bagalau_student_token");
+  const token = getStudentToken();
 
   heartbeatInterval = setInterval(async () => {
     try {
@@ -1045,25 +1080,129 @@ document.getElementById("btn-submit-exam").addEventListener("click", () => {
   }
 });
 
+// Сбор всех ответов для надёжной атомарной сдачи
+function collectAllAnswers() {
+  const answers = {};
+  if (localDrafts && typeof localDrafts === "object") {
+    for (const [taskId, draft] of Object.entries(localDrafts)) {
+      if (draft && draft.answer !== undefined && draft.answer !== null) {
+        answers[taskId] = draft.answer;
+      }
+    }
+  }
+
+  // Также сканируем DOM для актуализации значений
+  if (Array.isArray(currentTasks)) {
+    currentTasks.forEach(t => {
+      const tId = t.id;
+      if (t.question_type === "single_choice") {
+        const checked = document.querySelector(`input[name="task-${tId}"]:checked`);
+        if (checked && checked.value) {
+          answers[tId] = checked.value;
+        }
+      } else if (t.question_type === "number" || t.question_type === "fill_blank" || t.question_type === "short_text") {
+        const inp = document.getElementById(`input-task-${tId}`);
+        if (inp && inp.value !== undefined && inp.value !== "") {
+          answers[tId] = inp.value;
+        }
+      }
+    });
+  }
+
+  return answers;
+}
+
+function showSubmissionErrorBanner(msg) {
+  let errBox = document.getElementById("submission-error-banner");
+  if (!errBox) {
+    errBox = document.createElement("div");
+    errBox.id = "submission-error-banner";
+    errBox.style.cssText = "margin: 1rem 0; padding: 14px 18px; border-radius: 8px; background: #FEF2F2; border: 1.5px solid #F87171; color: #991B1B; font-size: 0.95rem; line-height: 1.4;";
+    const submitBtn = document.getElementById("btn-submit-exam");
+    if (submitBtn && submitBtn.parentNode) {
+      submitBtn.parentNode.insertBefore(errBox, submitBtn);
+    }
+  }
+  errBox.innerHTML = `
+    <div style="display: flex; align-items: flex-start; gap: 10px;">
+      <span style="font-size: 1.3rem; line-height: 1;">⚠️</span>
+      <div>
+        <strong>Не удалось отправить работу на сервер:</strong> ${escapeHtml(msg)}<br>
+        <span style="color: #4B5563; font-size: 0.88rem;">Ваши ответы надёжно сохранены в браузере. Проверьте подключение к сети и нажмите кнопку <b>«Повторить отправку»</b> ниже.</span>
+      </div>
+    </div>
+  `;
+  errBox.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function clearSubmissionErrorBanner() {
+  const errBox = document.getElementById("submission-error-banner");
+  if (errBox) errBox.remove();
+}
+
 async function submitWork(isAutoExpired = false) {
-  const token = sessionStorage.getItem("bagalau_student_token");
+  const token = getStudentToken();
   const submitBtn = document.getElementById("btn-submit-exam");
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.textContent = "Отправка...";
+    submitBtn.textContent = "Отправка ответов...";
   }
 
-  try {
-    const res = await fetch("/api/student/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Attempt-Token": token
-      },
-      body: JSON.stringify({ final_confirmation: true })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Не удалось отправить работу");
+  // Очищаем отложенные таймеры фонового автосохранения
+  for (const tid in saveDebounceTimers) {
+    clearTimeout(saveDebounceTimers[tid]);
+  }
+
+  const allAnswers = collectAllAnswers();
+
+  // Retry-петля: до 3 попыток при сбоях сети/LAN
+  const maxRetries = 3;
+  let lastError = null;
+  let successData = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      if (submitBtn) {
+        submitBtn.textContent = attempt === 1 ? "Отправка ответов..." : `Повтор отправки (${attempt}/${maxRetries})...`;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const res = await fetch("/api/student/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Attempt-Token": token
+        },
+        body: JSON.stringify({
+          final_confirmation: true,
+          answers: allAnswers
+        }),
+        keepalive: true,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || `Ошибка сервера (${res.status})`);
+      }
+
+      successData = await res.json();
+      break;
+    } catch (err) {
+      console.warn(`Попытка ${attempt} отправки не удалась:`, err);
+      lastError = err;
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, attempt * 1000));
+      }
+    }
+  }
+
+  if (successData) {
+    clearSubmissionErrorBanner();
 
     if (timerInterval) clearInterval(timerInterval);
     if (heartbeatInterval) clearInterval(heartbeatInterval);
@@ -1072,21 +1211,26 @@ async function submitWork(isAutoExpired = false) {
       localStorage.removeItem(`bagalau_draft_${launchId}`);
     } catch (e) {}
 
-    currentAttempt.status = data.status;
-    currentAttempt.confirmation_code = data.confirmation_code;
-    currentAttempt.submitted_at = data.submitted_at;
-    currentAttempt.completed_count = data.completed_count;
-    currentAttempt.total_tasks = data.total_tasks;
-    currentAttempt.time_spent_seconds = data.time_spent_seconds;
-    currentAttempt.total_score = data.total_score;
-    currentAttempt.max_score = data.max_score;
+    currentAttempt.status = successData.status;
+    currentAttempt.confirmation_code = successData.confirmation_code;
+    currentAttempt.submitted_at = successData.submitted_at;
+    currentAttempt.completed_count = successData.completed_count;
+    currentAttempt.total_tasks = successData.total_tasks;
+    currentAttempt.time_spent_seconds = successData.time_spent_seconds;
+    currentAttempt.total_score = successData.total_score;
+    currentAttempt.max_score = successData.max_score;
 
-    showSubmissionSuccessScreen(data);
-  } catch (err) {
-    alert("Ошибка отправки: " + err.message);
+    showSubmissionSuccessScreen(successData);
+  } else {
+    const errorMsg = lastError?.name === "AbortError"
+      ? "Превышено время ожидания ответа от сервера."
+      : (lastError?.message || "Сеть временно недоступна");
+
+    showSubmissionErrorBanner(errorMsg);
+
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Отправить работу";
+      submitBtn.textContent = "Повторить отправку";
     }
   }
 }
@@ -1122,7 +1266,7 @@ function showSubmissionSuccessScreen(data = null) {
 }
 
 async function loadStudentResults() {
-  const token = sessionStorage.getItem("bagalau_student_token");
+  const token = getStudentToken();
   try {
     const res = await fetch("/api/student/results", {
       headers: { "X-Attempt-Token": token }
@@ -1163,7 +1307,7 @@ async function loadStudentResults() {
 }
 
 function clearStudentSession() {
-  sessionStorage.removeItem("bagalau_student_token");
+  clearStudentToken();
   window.location.reload();
 }
 
