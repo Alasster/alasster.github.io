@@ -172,6 +172,96 @@ function getSelectedLetters() {
   return selected;
 }
 
+// Отрисовка чекбоксов букв классов в правой панели редактора заданий
+function renderEditorLettersGrid(selectedLetters = []) {
+  const grid = document.getElementById("editor-letters-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const selectedSet = new Set((selectedLetters || []).map(String));
+
+  CLASS_LETTERS.forEach(letter => {
+    const box = document.createElement("div");
+    box.className = "letter-box" + (selectedSet.has(letter) ? " active" : "");
+    box.textContent = letter;
+    box.dataset.letter = letter;
+    box.title = `Класс «${letter}»`;
+    box.addEventListener("click", () => {
+      box.classList.toggle("active");
+      updateActiveTestLettersFromUI();
+    });
+    grid.appendChild(box);
+  });
+}
+
+function selectAllEditorLetters(selectBool) {
+  document.querySelectorAll("#editor-letters-grid .letter-box").forEach(box => {
+    if (selectBool) box.classList.add("active");
+    else box.classList.remove("active");
+  });
+  updateActiveTestLettersFromUI();
+}
+
+function updateActiveTestLettersFromUI() {
+  if (!activeTest) return;
+  const boxes = document.querySelectorAll("#editor-letters-grid .letter-box.active");
+  activeTest.class_letters = Array.from(boxes).map(b => b.dataset.letter);
+  const lettersStr = activeTest.class_letters.length > 0 ? ` (${activeTest.class_letters.join(", ")})` : "";
+  const badge = document.getElementById("editor-test-badge");
+  if (badge) {
+    badge.textContent = `${activeTest.exam_type} · ${activeTest.grade_level} класс${lettersStr}`;
+  }
+}
+
+// Сворачивание и разворачивание правой колонки редактора
+function toggleEditorSidebar(forceState = null) {
+  const container = document.getElementById("editor-layout-grid");
+  const btn = document.getElementById("btn-toggle-editor-sidebar");
+  if (!container) return;
+
+  const isCollapsed = forceState !== null ? forceState : !container.classList.contains("sidebar-collapsed");
+  if (isCollapsed) {
+    container.classList.add("sidebar-collapsed");
+    if (btn) {
+      btn.classList.remove("active");
+      btn.setAttribute("aria-expanded", "false");
+      btn.title = "Открыть настройки (время, классы, оформление)";
+    }
+    localStorage.setItem("bagalau_editor_sidebar_collapsed", "1");
+  } else {
+    container.classList.remove("sidebar-collapsed");
+    if (btn) {
+      btn.classList.add("active");
+      btn.setAttribute("aria-expanded", "true");
+      btn.title = "Скрыть панель настроек";
+    }
+    localStorage.removeItem("bagalau_editor_sidebar_collapsed");
+  }
+}
+
+function initEditorSidebarState() {
+  const isCollapsed = localStorage.getItem("bagalau_editor_sidebar_collapsed") === "1";
+  const container = document.getElementById("editor-layout-grid");
+  const btn = document.getElementById("btn-toggle-editor-sidebar");
+  if (container) {
+    if (isCollapsed) {
+      container.classList.add("sidebar-collapsed");
+      if (btn) {
+        btn.classList.remove("active");
+        btn.setAttribute("aria-expanded", "false");
+        btn.title = "Открыть настройки (время, классы, оформление)";
+      }
+    } else {
+      container.classList.remove("sidebar-collapsed");
+      if (btn) {
+        btn.classList.add("active");
+        btn.setAttribute("aria-expanded", "true");
+        btn.title = "Скрыть панель настроек";
+      }
+    }
+  }
+}
+
 function updateVariantBgColor(varNum, color) {
   if (varNum === "1") {
     const c1 = document.getElementById("editor-bg-v1");
@@ -439,6 +529,18 @@ async function openTestEditor(testId) {
 
     document.getElementById("editor-inst-text").value = activeTest.instructions || "";
     document.getElementById("editor-shuffle-options").checked = !!activeTest.shuffle_options;
+
+    // Продолжительность (минут)
+    const durInput = document.getElementById("editor-test-duration");
+    if (durInput) {
+      durInput.value = (activeTest.duration_minutes !== undefined && activeTest.duration_minutes !== null) ? activeTest.duration_minutes : 45;
+    }
+
+    // Буквы классов в правой панели
+    renderEditorLettersGrid(activeTest.class_letters || []);
+
+    // Восстанавливаем состояние свернутости боковой панели
+    initEditorSidebarState();
 
     switchMainView("editor");
     await switchEditorVariant("1");
@@ -1312,6 +1414,14 @@ async function saveTestGeneralSettings() {
   activeTest.bg_color_v2 = bg2;
   activeTest.bg_color = bg1;
 
+  // Duration
+  const durVal = parseInt(document.getElementById("editor-test-duration")?.value, 10);
+  activeTest.duration_minutes = isNaN(durVal) ? 45 : durVal;
+
+  // Selected letters
+  const activeBoxes = document.querySelectorAll("#editor-letters-grid .letter-box.active");
+  activeTest.class_letters = Array.from(activeBoxes).map(b => b.dataset.letter);
+
   try {
     const res = await fetch(`/api/tests/${activeTest.id}`, {
       method: "PUT",
@@ -1329,11 +1439,20 @@ async function saveTestGeneralSettings() {
         bg_color_v1: activeTest.bg_color_v1,
         bg_color_v2: activeTest.bg_color_v2,
         class_letters: activeTest.class_letters,
+        duration_minutes: activeTest.duration_minutes,
         has_variants: true
       })
     });
     if (!res.ok) throw new Error("Не удалось сохранить параметры");
     activeTest.shuffle_options = document.getElementById("editor-shuffle-options").checked;
+
+    // Обновляем бейдж класса и букв в шапке редактора
+    const lettersStr = activeTest.class_letters.length > 0 ? ` (${activeTest.class_letters.join(", ")})` : "";
+    const badge = document.getElementById("editor-test-badge");
+    if (badge) {
+      badge.textContent = `${activeTest.exam_type} · ${activeTest.grade_level} класс${lettersStr}`;
+    }
+
     alert("Настройки работы сохранены");
   } catch (err) {
     alert(err.message);
@@ -1910,6 +2029,10 @@ async function openCreateLaunchModal(testId) {
     : (t ? `${t.grade_level}` : "9 А, 9 Б");
 
   document.getElementById("launch-classes-input").value = defaultClasses;
+  const defaultDuration = (t && t.duration_minutes !== undefined && t.duration_minutes !== null) ? t.duration_minutes : 45;
+  const durEl = document.getElementById("launch-duration-input");
+  if (durEl) durEl.value = defaultDuration;
+
   document.getElementById("create-launch-modal").classList.add("open");
 }
 

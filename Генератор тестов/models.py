@@ -70,6 +70,7 @@ class CreateTestRequest(BaseModel):
     bg_color_v2: Optional[str] = "#e6f4ea"
     has_variants: Optional[bool] = True
     shuffle_options: bool = False
+    duration_minutes: Optional[int] = 45
 
 class UpdateTestRequest(CreateTestRequest):
     is_archived: Optional[bool] = False

@@ -124,8 +124,15 @@
   box-shadow: var(--glass-shadow-hover);
 }
 .glass-app .modal-header, .glass-app .modal-footer { flex-wrap: wrap; gap: 12px; }
-.glass-app .modal-footer { border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
-.glass-app .editor-layout { grid-template-columns: 260px minmax(0, 1fr) 300px; }
+.glass-app .editor-layout { grid-template-columns: 260px minmax(0, 1fr) 300px; transition: grid-template-columns 0.25s ease; }
+.glass-app .editor-layout.sidebar-collapsed { grid-template-columns: 260px minmax(0, 1fr) !important; }
+.glass-app .editor-layout.sidebar-collapsed #editor-right-sidebar { display: none !important; }
+.glass-app #btn-toggle-editor-sidebar.active {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: var(--primary, #4F46E5) !important;
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 0 12px -2px rgba(99, 102, 241, 0.3);
+}
 .glass-app .editor-layout > * { min-width: 0; }
 .glass-app .task-nav-item:not(.active),
 .glass-app .option-label:not(.selected),

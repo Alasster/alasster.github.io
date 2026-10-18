@@ -303,6 +303,7 @@ async def list_tests(
             td["bg_color_v1"] = td.get("bg_color_v1") or "#fce8e6"
             td["bg_color_v2"] = td.get("bg_color_v2") or "#e6f4ea"
             td["has_variants"] = has_vars
+            td["duration_minutes"] = td.get("duration_minutes") if td.get("duration_minutes") is not None else 45
             tests_list.append(td)
         return tests_list
 
@@ -320,18 +321,20 @@ async def create_test(req: CreateTestRequest, teacher: dict = Depends(get_curren
     bg_v2 = req.bg_color_v2 or "#e6f4ea"
     has_vars = 1 if req.has_variants is not False else 0
     var_str = str(req.variant or "1")
+    dur = req.duration_minutes if req.duration_minutes is not None else 45
     async with get_db() as db:
         await db.execute("""
             INSERT INTO tests (
                 id, teacher_id, title, exam_type, subject, grade_level,
                 class_letters_json, variant, bg_color, bg_color_v1, bg_color_v2, has_variants,
-                quarter, section, instructions, learning_objectives, assessment_criteria, is_archived, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+                quarter, section, instructions, learning_objectives, assessment_criteria, is_archived, created_at, updated_at,
+                duration_minutes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
         """, (
             test_id, teacher["id"], req.title.strip(), req.exam_type, req.subject.strip(),
             req.grade_level.strip(), letters_json, var_str, bg, bg_v1, bg_v2, has_vars,
             req.quarter, req.section, req.instructions,
-            req.learning_objectives, req.assessment_criteria, now, now
+            req.learning_objectives, req.assessment_criteria, now, now, dur
         ))
         await db.execute("UPDATE tests SET shuffle_options = ? WHERE id = ?", (int(req.shuffle_options), test_id))
         await db.commit()
@@ -365,6 +368,7 @@ async def get_test(test_id: str, teacher: dict = Depends(get_current_teacher)):
         test_data["bg_color_v1"] = test_data.get("bg_color_v1") or "#fce8e6"
         test_data["bg_color_v2"] = test_data.get("bg_color_v2") or "#e6f4ea"
         test_data["has_variants"] = bool(test_data.get("has_variants", 1))
+        test_data["duration_minutes"] = test_data.get("duration_minutes") if test_data.get("duration_minutes") is not None else 45
         test_data["tasks"] = tasks
         return test_data
 
@@ -377,19 +381,22 @@ async def update_test(test_id: str, req: UpdateTestRequest, teacher: dict = Depe
     bg_v2 = req.bg_color_v2 or "#e6f4ea"
     has_vars = 1 if req.has_variants is not False else 0
     var_str = str(req.variant or "1")
+    dur = req.duration_minutes if req.duration_minutes is not None else 45
     async with get_db() as db:
         await db.execute("""
             UPDATE tests
             SET title = ?, exam_type = ?, subject = ?, grade_level = ?,
                 class_letters_json = ?, variant = ?, bg_color = ?, bg_color_v1 = ?, bg_color_v2 = ?, has_variants = ?,
                 quarter = ?, section = ?, instructions = ?, learning_objectives = ?,
-                assessment_criteria = ?, is_archived = ?, updated_at = ?, shuffle_options = ?
+                assessment_criteria = ?, is_archived = ?, updated_at = ?, shuffle_options = ?,
+                duration_minutes = ?
             WHERE id = ? AND teacher_id = ?
         """, (
             req.title.strip(), req.exam_type, req.subject.strip(), req.grade_level.strip(),
             letters_json, var_str, bg, bg_v1, bg_v2, has_vars,
             req.quarter, req.section, req.instructions, req.learning_objectives,
-            req.assessment_criteria, 1 if req.is_archived else 0, now, int(req.shuffle_options), test_id, teacher["id"]
+            req.assessment_criteria, 1 if req.is_archived else 0, now, int(req.shuffle_options),
+            dur, test_id, teacher["id"]
         ))
         await sync_launches_for_test(db, test_id)
         await db.commit()
@@ -411,17 +418,39 @@ async def sync_launches_for_test(db, test_id: str):
 
     snap_json = json.dumps(snapshot_tasks, ensure_ascii=False)
 
-    test_cur = await db.execute("SELECT bg_color, bg_color_v1, bg_color_v2 FROM tests WHERE id = ?", (test_id,))
+    test_cur = await db.execute("SELECT bg_color, bg_color_v1, bg_color_v2, duration_minutes, class_letters_json, grade_level FROM tests WHERE id = ?", (test_id,))
     test_row = await test_cur.fetchone()
     if test_row:
-        await db.execute("""
-            UPDATE launches
-            SET snapshot_tasks_json = ?,
-                bg_color = COALESCE(?, bg_color),
-                bg_color_v1 = COALESCE(?, bg_color_v1),
-                bg_color_v2 = COALESCE(?, bg_color_v2)
-            WHERE test_id = ? AND status != 'finished'
-        """, (snap_json, test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], test_id))
+        allowed_classes = []
+        if test_row["class_letters_json"]:
+            try:
+                letters = json.loads(test_row["class_letters_json"])
+                if letters and isinstance(letters, list):
+                    allowed_classes = [f"{test_row['grade_level']} {l}".strip() for l in letters]
+            except Exception:
+                pass
+
+        if allowed_classes:
+            await db.execute("""
+                UPDATE launches
+                SET snapshot_tasks_json = ?,
+                    bg_color = COALESCE(?, bg_color),
+                    bg_color_v1 = COALESCE(?, bg_color_v1),
+                    bg_color_v2 = COALESCE(?, bg_color_v2),
+                    duration_minutes = COALESCE(?, duration_minutes),
+                    allowed_classes_json = ?
+                WHERE test_id = ? AND status != 'finished'
+            """, (snap_json, test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], test_row["duration_minutes"], json.dumps(allowed_classes, ensure_ascii=False), test_id))
+        else:
+            await db.execute("""
+                UPDATE launches
+                SET snapshot_tasks_json = ?,
+                    bg_color = COALESCE(?, bg_color),
+                    bg_color_v1 = COALESCE(?, bg_color_v1),
+                    bg_color_v2 = COALESCE(?, bg_color_v2),
+                    duration_minutes = COALESCE(?, duration_minutes)
+                WHERE test_id = ? AND status != 'finished'
+            """, (snap_json, test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], test_row["duration_minutes"], test_id))
     else:
         await db.execute("""
             UPDATE launches
@@ -492,19 +521,21 @@ async def duplicate_test(test_id: str, teacher: dict = Depends(get_current_teach
         now = datetime.now().isoformat()
         new_title = f"{test['title']} (Копия)"
 
+        dur = test["duration_minutes"] if ("duration_minutes" in test.keys() and test["duration_minutes"] is not None) else 45
         await db.execute("""
             INSERT INTO tests (
                 id, teacher_id, title, exam_type, subject, grade_level,
                 class_letters_json, variant, bg_color, bg_color_v1, bg_color_v2, has_variants,
                 quarter, section, instructions,
-                learning_objectives, assessment_criteria, is_archived, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+                learning_objectives, assessment_criteria, is_archived, created_at, updated_at,
+                duration_minutes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
         """, (
             new_test_id, teacher["id"], new_title, test["exam_type"], test["subject"],
             test["grade_level"], test["class_letters_json"], test["variant"], test["bg_color"],
             test.get("bg_color_v1") or "#fce8e6", test.get("bg_color_v2") or "#e6f4ea", test.get("has_variants", 1),
             test["quarter"], test["section"], test["instructions"],
-            test["learning_objectives"], test["assessment_criteria"], now, now
+            test["learning_objectives"], test["assessment_criteria"], now, now, dur
         ))
 
         await db.execute("UPDATE tests SET shuffle_options = ? WHERE id = ?", (test.get("shuffle_options", 0), new_test_id))
