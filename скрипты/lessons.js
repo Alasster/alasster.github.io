@@ -60,7 +60,8 @@
         { num: 4, title: "Классификация задач ИИ — практика", file: "11 класс/1 четверть/4 урок.html" },
         { num: 5, title: "Управление приложением жестами", file: "11 класс/1 четверть/5 урок.html" },
         { num: 6, title: "Основы моделирования нейронных сетей", file: "11 класс/1 четверть/6 урок.html" },
-        { num: 7, title: "Моделирование нейронных сетей. СОР", file: "11 класс/1 четверть/7 урок.html" }
+        { num: 7, title: "Моделирование нейронных сетей. СОР", file: "11 класс/1 четверть/7 урок.html" },
+        { num: 99, title: "Тестовый нативный урок СОР", file: "11 класс/1 четверть/99 урок.html" }
       ]
     }
   };
@@ -7007,8 +7008,32 @@ const slides = [...document.querySelectorAll('.slide')];
       goToHash();
   };
 
+  function ensureLessonFavicon() {
+    try {
+      let link = document.querySelector("link[rel*='icon']");
+      const body = document.body;
+      const lid = (body && body.dataset.lessonId) || (body && (body.className.match(/\blesson-([a-zA-Z0-9_-]+)\b/) || [])[1]) || "";
+      let stroke = "%234F46E5";
+      if (lid.startsWith("9-")) stroke = "%237C3AED";
+      else if (lid.startsWith("10emn-") || lid.startsWith("10-")) stroke = "%232563EB";
+      else if (lid.startsWith("10ogn-")) stroke = "%23059669";
+      else if (lid.startsWith("11-")) stroke = "%23D97706";
+
+      const svgIcon = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='" + stroke + "' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>";
+
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        link.type = "image/svg+xml";
+        link.href = svgIcon;
+        document.head.appendChild(link);
+      }
+    } catch (e) {}
+  }
+
   function runCurrentLesson() {
     window._lessonShowSlide = null;
+    ensureLessonFavicon();
     syncDynamicLessons();
     updateDocumentTitle();
     initClassesModal();
