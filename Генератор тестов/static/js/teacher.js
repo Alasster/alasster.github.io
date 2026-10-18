@@ -1874,7 +1874,7 @@ function closeStudentPreview() {
 }
 
 // =========================================================================
-// 4. СОЗДАНИЕ СТРАНИЦЫ УРОКА НА САЙТЕ ALASSTER.GITHUB.IO
+// 4. СОЗДАНИЕ СТРАНИЦЫ УРОКА НА САЙТЕ ALASSTER.SITE
 // =========================================================================
 let sitePageLaunchId = "";
 
@@ -2295,6 +2295,311 @@ function copyStudentLink() {
 
 // Загрузка результатов с раздельной сортировкой, фильтрацией и печатью
 let gradingRawData = null;
+let currentGradingAttemptId = null;
+
+function parseClassAndLetter(rawClass) {
+  if (!rawClass) return { grade: "", letter: "" };
+  const str = String(rawClass).trim();
+  const match = str.match(/^(.*?)\s*([А-Яа-яA-Za-z])$/);
+  if (match) {
+    return {
+      grade: match[1].trim() || str,
+      letter: match[2].toUpperCase().trim()
+    };
+  }
+  return {
+    grade: str,
+    letter: ""
+  };
+}
+
+function isAnswerGiven(val) {
+  if (val === null || val === undefined || val === "") return false;
+  if (Array.isArray(val)) return val.length > 0;
+  if (typeof val === "object") return Object.keys(val).length > 0;
+  return true;
+}
+
+function formatDuration(startedAt, submittedAt) {
+  if (!startedAt || !submittedAt) return "—";
+  try {
+    const start = new Date(startedAt).getTime();
+    const end = new Date(submittedAt).getTime();
+    const diffSec = Math.max(0, Math.round((end - start) / 1000));
+    const mins = Math.floor(diffSec / 60);
+    const secs = diffSec % 60;
+    if (mins > 0 && secs > 0) return `${mins} мин ${secs} сек`;
+    if (mins > 0) return `${mins} мин`;
+    return `${secs} сек`;
+  } catch (e) {
+    return "—";
+  }
+}
+
+function formatQuestionReviewHtml(t, ans, isPrint = false) {
+  const qType = t.question_type;
+  const studentAns = ans?.answer_parsed;
+  const correctKey = t.answer_key;
+
+  if (qType === "single_choice" || qType === "dropdown" || qType === "true_false") {
+    let options = Array.isArray(t.options) && t.options.length ? [...t.options] : [];
+    if (qType === "true_false" && options.length === 0) {
+      options = ["Истина", "Ложь"];
+    }
+    if (studentAns !== null && studentAns !== undefined && studentAns !== "" && !options.some(o => String(o) === String(studentAns))) {
+      options.push(String(studentAns));
+    }
+
+    const keyList = Array.isArray(correctKey) ? correctKey.map(String) : (correctKey !== null && correctKey !== undefined ? [String(correctKey)] : []);
+
+    let rowsHtml = options.map(opt => {
+      const optStr = String(opt);
+      const isChosen = studentAns !== null && studentAns !== undefined && String(studentAns) === optStr;
+      const isKey = keyList.includes(optStr);
+
+      if (isChosen && isKey) {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #ECFDF5; border: 1.5px solid #10B981; border-radius: 6px; margin-bottom: 5px; color: #065F46; font-weight: 600;">
+            <span>● ${escapeHtml(optStr)}</span>
+            <span style="font-size: 0.8rem; background: #10B981; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✔ Выбор ученика — Верно</span>
+          </div>
+        `;
+      } else if (isChosen && !isKey) {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #FEF2F2; border: 1.5px solid #EF4444; border-radius: 6px; margin-bottom: 5px; color: #991B1B; font-weight: 600;">
+            <span>● ${escapeHtml(optStr)}</span>
+            <span style="font-size: 0.8rem; background: #EF4444; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✖ Выбор ученика — Неверно</span>
+          </div>
+        `;
+      } else if (isKey) {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #F0FDF4; border: 1.5px dashed #10B981; border-radius: 6px; margin-bottom: 5px; color: #047857; font-weight: 600;">
+            <span>○ ${escapeHtml(optStr)}</span>
+            <span style="font-size: 0.8rem; border: 1px solid #10B981; color: #047857; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✔ Правильный вариант</span>
+          </div>
+        `;
+      } else {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; margin-bottom: 5px; color: #475569;">
+            <span>○ ${escapeHtml(optStr)}</span>
+          </div>
+        `;
+      }
+    }).join("");
+
+    if (!studentAns && studentAns !== 0) {
+      rowsHtml += `<div style="font-size: 0.82rem; color: #EF4444; margin-top: 4px; font-style: italic;">Ученик не дал ответа на это задание.</div>`;
+    }
+
+    return `<div style="margin-top: 6px;">${rowsHtml}</div>`;
+  }
+
+  if (qType === "multi_choice") {
+    let options = Array.isArray(t.options) && t.options.length ? [...t.options] : [];
+    const studentList = Array.isArray(studentAns) ? studentAns.map(String) : (studentAns !== null && studentAns !== undefined && studentAns !== "" ? [String(studentAns)] : []);
+    const keyList = Array.isArray(correctKey) ? correctKey.map(String) : (correctKey !== null && correctKey !== undefined && correctKey !== "" ? [String(correctKey)] : []);
+
+    studentList.forEach(s => {
+      if (!options.some(o => String(o) === s)) options.push(s);
+    });
+
+    let rowsHtml = options.map(opt => {
+      const optStr = String(opt);
+      const isChosen = studentList.includes(optStr);
+      const isKey = keyList.includes(optStr);
+
+      if (isChosen && isKey) {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #ECFDF5; border: 1.5px solid #10B981; border-radius: 6px; margin-bottom: 5px; color: #065F46; font-weight: 600;">
+            <span>☑ ${escapeHtml(optStr)}</span>
+            <span style="font-size: 0.8rem; background: #10B981; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✔ Выбор ученика — Верно</span>
+          </div>
+        `;
+      } else if (isChosen && !isKey) {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #FEF2F2; border: 1.5px solid #EF4444; border-radius: 6px; margin-bottom: 5px; color: #991B1B; font-weight: 600;">
+            <span>☑ ${escapeHtml(optStr)}</span>
+            <span style="font-size: 0.8rem; background: #EF4444; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✖ Выбор ученика — Неверно</span>
+          </div>
+        `;
+      } else if (isKey) {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #F0FDF4; border: 1.5px dashed #10B981; border-radius: 6px; margin-bottom: 5px; color: #047857; font-weight: 600;">
+            <span>☐ ${escapeHtml(optStr)}</span>
+            <span style="font-size: 0.8rem; border: 1px solid #10B981; color: #047857; padding: 2px 7px; border-radius: 4px; font-weight: 700;">✔ Должен быть выбран</span>
+          </div>
+        `;
+      } else {
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; margin-bottom: 5px; color: #475569;">
+            <span>☐ ${escapeHtml(optStr)}</span>
+          </div>
+        `;
+      }
+    }).join("");
+
+    if (studentList.length === 0) {
+      rowsHtml += `<div style="font-size: 0.82rem; color: #EF4444; margin-top: 4px; font-style: italic;">Ученик не выбрал вариантов.</div>`;
+    }
+
+    return `<div style="margin-top: 6px;">${rowsHtml}</div>`;
+  }
+
+  if (qType === "group_classification") {
+    const keyObj = (typeof correctKey === "object" && correctKey !== null) ? correctKey : {};
+    const stuObj = (typeof studentAns === "object" && studentAns !== null) ? studentAns : {};
+    const items = Array.from(new Set([...Object.keys(keyObj), ...(t.options || []), ...Object.keys(stuObj)]));
+
+    let rowsHtml = items.map(item => {
+      const studentCat = stuObj[item] || "—";
+      const correctCat = keyObj[item] || "—";
+      const isMatch = studentCat !== "—" && studentCat === correctCat;
+      const rowBg = isMatch ? "#F0FDF4" : (studentCat !== "—" ? "#FEF2F2" : "#F8FAFC");
+      const statusBadge = isMatch
+        ? '<span style="color: #059669; font-weight: 700;">✔ Верно</span>'
+        : '<span style="color: #DC2626; font-weight: 700;">✖ Неверно</span>';
+
+      return `
+        <tr style="background: ${rowBg}; border-bottom: 1px solid #CBD5E1;">
+          <td style="padding: 7px 10px; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(item)}</td>
+          <td style="padding: 7px 10px; color: ${studentCat === '—' ? '#94A3B8' : '#0F172A'}; border: 1px solid #CBD5E1;">${escapeHtml(studentCat)}</td>
+          <td style="padding: 7px 10px; color: #047857; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(correctCat)}</td>
+          <td style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1;">${statusBadge}</td>
+        </tr>
+      `;
+    }).join("");
+
+    return `
+      <div style="overflow-x: auto; margin-top: 6px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="background: #F1F5F9; border-bottom: 1.5px solid #CBD5E1;">
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Элемент</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Ответ ученика</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Правильная категория</th>
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 95px;">Результат</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || '<tr><td colspan="4" style="padding: 8px; text-align: center; color: #94A3B8;">Нет данных</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  if (qType === "matching") {
+    const keyObj = (typeof correctKey === "object" && correctKey !== null) ? correctKey : {};
+    const stuObj = (typeof studentAns === "object" && studentAns !== null) ? studentAns : {};
+    const items = Array.from(new Set([...Object.keys(keyObj), ...Object.keys(stuObj)]));
+
+    let rowsHtml = items.map(item => {
+      const studentMatch = stuObj[item] || "—";
+      const correctMatch = keyObj[item] || "—";
+      const isMatch = studentMatch !== "—" && studentMatch === correctMatch;
+      const rowBg = isMatch ? "#F0FDF4" : (studentMatch !== "—" ? "#FEF2F2" : "#F8FAFC");
+      const statusBadge = isMatch
+        ? '<span style="color: #059669; font-weight: 700;">✔ Верно</span>'
+        : '<span style="color: #DC2626; font-weight: 700;">✖ Неверно</span>';
+
+      return `
+        <tr style="background: ${rowBg}; border-bottom: 1px solid #CBD5E1;">
+          <td style="padding: 7px 10px; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(item)}</td>
+          <td style="padding: 7px 10px; color: ${studentMatch === '—' ? '#94A3B8' : '#0F172A'}; border: 1px solid #CBD5E1;">${escapeHtml(studentMatch)}</td>
+          <td style="padding: 7px 10px; color: #047857; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(correctMatch)}</td>
+          <td style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1;">${statusBadge}</td>
+        </tr>
+      `;
+    }).join("");
+
+    return `
+      <div style="overflow-x: auto; margin-top: 6px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="background: #F1F5F9; border-bottom: 1.5px solid #CBD5E1;">
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Элемент / Термин</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Ответ ученика</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Правильное соответствие</th>
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 95px;">Результат</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || '<tr><td colspan="4" style="padding: 8px; text-align: center; color: #94A3B8;">Нет данных</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  if (qType === "ordering") {
+    const keyList = Array.isArray(correctKey) ? correctKey : [];
+    const stuList = Array.isArray(studentAns) ? studentAns : [];
+    const maxLen = Math.max(keyList.length, stuList.length);
+
+    let rowsHtml = "";
+    for (let i = 0; i < maxLen; i++) {
+      const studentStep = stuList[i] || "—";
+      const correctStep = keyList[i] || "—";
+      const isMatch = studentStep !== "—" && studentStep === correctStep;
+      const rowBg = isMatch ? "#F0FDF4" : (studentStep !== "—" ? "#FEF2F2" : "#F8FAFC");
+      const statusBadge = isMatch
+        ? '<span style="color: #059669; font-weight: 700;">✔ Верно</span>'
+        : '<span style="color: #DC2626; font-weight: 700;">✖ Неверно</span>';
+
+      rowsHtml += `
+        <tr style="background: ${rowBg}; border-bottom: 1px solid #CBD5E1;">
+          <td style="padding: 7px 10px; text-align: center; font-weight: 700; border: 1px solid #CBD5E1;">Шаг ${i + 1}</td>
+          <td style="padding: 7px 10px; border: 1px solid #CBD5E1;">${escapeHtml(studentStep)}</td>
+          <td style="padding: 7px 10px; color: #047857; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(correctStep)}</td>
+          <td style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1;">${statusBadge}</td>
+        </tr>
+      `;
+    }
+
+    return `
+      <div style="overflow-x: auto; margin-top: 6px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="background: #F1F5F9; border-bottom: 1.5px solid #CBD5E1;">
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 80px;">Позиция</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Ответ ученика</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Правильный порядок</th>
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 95px;">Результат</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || '<tr><td colspan="4" style="padding: 8px; text-align: center; color: #94A3B8;">Нет данных</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // Default: short_text, fill_blank, number, text_manual
+  const score = ans?.final_score !== null && ans?.final_score !== undefined ? parseFloat(ans.final_score) : 0;
+  const tMax = parseFloat(t.max_score || 1);
+  const isCorrect = score >= tMax;
+  const isPartial = score > 0 && score < tMax;
+
+  let stuValStr = studentAns !== null && studentAns !== undefined ? (typeof studentAns === "object" ? JSON.stringify(studentAns) : String(studentAns)) : "";
+  let keyValStr = correctKey !== null && correctKey !== undefined ? (Array.isArray(correctKey) ? correctKey.join("; ") : (typeof correctKey === "object" ? JSON.stringify(correctKey) : String(correctKey))) : "—";
+
+  return `
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 14px; margin-top: 6px; font-size: 0.9rem;">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;">
+        <strong style="min-width: 130px; color: #475569;">Ответ ученика:</strong>
+        <span style="font-weight: 600; color: ${isCorrect ? '#059669' : (stuValStr ? '#DC2626' : '#94A3B8')};">
+          ${stuValStr ? escapeHtml(stuValStr) : '— (нет ответа)'}
+        </span>
+        ${stuValStr ? (isCorrect ? '<span style="color: #059669; font-weight: 700; font-size: 0.82rem;">(✔ Верно)</span>' : (isPartial ? '<span style="color: #D97706; font-weight: 700; font-size: 0.82rem;">(⚠ Частично)</span>' : '<span style="color: #DC2626; font-weight: 700; font-size: 0.82rem;">(✖ Неверно)</span>')) : ''}
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <strong style="min-width: 130px; color: #475569;">Правильный ключ:</strong>
+        <span style="font-weight: 600; color: #047857;">${escapeHtml(keyValStr)}</span>
+      </div>
+    </div>
+  `;
+}
 
 async function loadGradingData() {
   if (!activeLaunch) return;
@@ -2303,18 +2608,44 @@ async function loadGradingData() {
     if (!res.ok) return;
     gradingRawData = await res.json();
 
-    // Заполняем фильтр по классам уникальными классами
+    const attempts = gradingRawData.attempts || [];
+
+    // Заполняем фильтр по классам
     const classSelect = document.getElementById("filter-results-class");
     if (classSelect) {
       const prevVal = classSelect.value;
-      const uniqueClasses = Array.from(new Set((gradingRawData.attempts || []).map(a => a.student_class).filter(Boolean))).sort();
-      classSelect.innerHTML = '<option value="">Все классы</option>' + uniqueClasses.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-      if (uniqueClasses.includes(prevVal)) classSelect.value = prevVal;
+      const uniqueGrades = Array.from(new Set(attempts.map(a => parseClassAndLetter(a.student_class).grade).filter(Boolean))).sort();
+      classSelect.innerHTML = '<option value="">Все классы</option>' + uniqueGrades.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      if (uniqueGrades.includes(prevVal)) classSelect.value = prevVal;
+    }
+
+    // Заполняем фильтр по буквам
+    const letterSelect = document.getElementById("filter-results-letter");
+    if (letterSelect) {
+      const prevVal = letterSelect.value;
+      const uniqueLetters = Array.from(new Set(attempts.map(a => parseClassAndLetter(a.student_class).letter).filter(l => l && l !== "—"))).sort((a, b) => a.localeCompare(b, "ru"));
+      letterSelect.innerHTML = '<option value="">Все буквы</option>' + uniqueLetters.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+      if (uniqueLetters.includes(prevVal)) letterSelect.value = prevVal;
     }
 
     renderGradingView();
   } catch (e) {}
 }
+
+function resetResultsFilters() {
+  const cSel = document.getElementById("filter-results-class");
+  const lSel = document.getElementById("filter-results-letter");
+  const qSel = document.getElementById("filter-results-quarter");
+  const vSel = document.getElementById("filter-results-variant");
+  const sInput = document.getElementById("filter-results-search");
+  if (cSel) cSel.value = "";
+  if (lSel) lSel.value = "";
+  if (qSel) qSel.value = "";
+  if (vSel) vSel.value = "";
+  if (sInput) sInput.value = "";
+  renderGradingView();
+}
+window.resetResultsFilters = resetResultsFilters;
 
 function renderGradingView() {
   if (!gradingRawData) return;
@@ -2322,33 +2653,33 @@ function renderGradingView() {
   if (!container) return;
 
   const classFilter = document.getElementById("filter-results-class")?.value || "";
+  const letterFilter = document.getElementById("filter-results-letter")?.value || "";
+  const quarterFilter = document.getElementById("filter-results-quarter")?.value || "";
   const variantFilter = document.getElementById("filter-results-variant")?.value || "";
   const searchFilter = (document.getElementById("filter-results-search")?.value || "").toLowerCase().trim();
-  const sortBy = document.getElementById("sort-results-by")?.value || "name_asc";
 
   let attempts = [...(gradingRawData.attempts || [])];
 
-  // Фильтрация по классу, варианту и поиску
+  // Фильтрация
   attempts = attempts.filter(att => {
-    if (classFilter && att.student_class !== classFilter) return false;
+    const classInfo = parseClassAndLetter(att.student_class);
+    if (classFilter && classInfo.grade !== classFilter) return false;
+    if (letterFilter && classInfo.letter !== letterFilter) return false;
     if (variantFilter && String(att.variant || "1") !== variantFilter) return false;
     if (searchFilter && !(att.student_name || "").toLowerCase().includes(searchFilter)) return false;
+
+    if (quarterFilter) {
+      const lQ = String(gradingRawData.launch?.quarter || "").replace(/\D/g, "");
+      const fQ = String(quarterFilter).replace(/\D/g, "");
+      if (lQ && fQ && lQ !== fQ) return false;
+    }
     return true;
   });
 
-  // Сортировка
-  attempts.sort((a, b) => {
-    if (sortBy === "name_asc") return (a.student_name || "").localeCompare(b.student_name || "");
-    if (sortBy === "name_desc") return (b.student_name || "").localeCompare(a.student_name || "");
-    if (sortBy === "class_asc") return (a.student_class || "").localeCompare(b.student_class || "") || (a.student_name || "").localeCompare(b.student_name || "");
-    if (sortBy === "score_desc") return (b.total_score || 0) - (a.total_score || 0);
-    if (sortBy === "score_asc") return (a.total_score || 0) - (b.total_score || 0);
-    if (sortBy === "time_desc") return (b.submitted_at || "").localeCompare(a.submitted_at || "");
-    return 0;
-  });
+  // Автоматическая сортировка по алфавиту (ФИО А-Я)
+  attempts.sort((a, b) => (a.student_name || "").localeCompare(b.student_name || "", "ru"));
 
   const tasks = gradingRawData.tasks || [];
-  const answersByAtt = gradingRawData.answers_by_attempt || {};
 
   if (attempts.length === 0) {
     container.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--text-muted);">По выбранным фильтрам ученики не найдены.</div>`;
@@ -2377,7 +2708,6 @@ function renderGradingView() {
       ? '<span class="badge" style="background: #E6F4EA; color: #166534; font-weight: 700;">🍃 Вар. 2</span>'
       : '<span class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700;">🌸 Вар. 1</span>';
 
-    // Вычисляем максимум баллов только для заданий варианта ученика
     const studentTasks = tasks.filter(t => {
       const tv = String(t.variant || "1");
       return tv === "all" || tv === "1,2" || tv === vStr;
@@ -2399,7 +2729,10 @@ function renderGradingView() {
         <td>
           <div style="display: flex; gap: 0.4rem; align-items: center;">
             <button type="button" class="btn btn-secondary btn-sm" onclick="openStudentGradingModal('${att.id}')">
-              📄 Просмотр и печать (PDF)
+              📄 Просмотр
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="printStudentSheet('${att.id}')" title="Печать бланка в PDF">
+              🖨 Печать в PDF
             </button>
             <button type="button" class="btn btn-danger btn-sm" onclick="deleteStudentAttempt('${att.id}', '${escapeHtml(att.student_name)}')" title="Удалить попытку и разрешить пересдачу">
               🗑
@@ -2419,18 +2752,28 @@ function printAllResultsSummary() {
   if (!gradingRawData || !activeLaunch) return;
 
   const classFilter = document.getElementById("filter-results-class")?.value || "";
+  const letterFilter = document.getElementById("filter-results-letter")?.value || "";
+  const quarterFilter = document.getElementById("filter-results-quarter")?.value || "";
   const variantFilter = document.getElementById("filter-results-variant")?.value || "";
   const searchFilter = (document.getElementById("filter-results-search")?.value || "").toLowerCase().trim();
 
   let attempts = [...(gradingRawData.attempts || [])];
   attempts = attempts.filter(att => {
-    if (classFilter && att.student_class !== classFilter) return false;
+    const classInfo = parseClassAndLetter(att.student_class);
+    if (classFilter && classInfo.grade !== classFilter) return false;
+    if (letterFilter && classInfo.letter !== letterFilter) return false;
     if (variantFilter && String(att.variant || "1") !== variantFilter) return false;
     if (searchFilter && !(att.student_name || "").toLowerCase().includes(searchFilter)) return false;
+    if (quarterFilter) {
+      const lQ = String(gradingRawData.launch?.quarter || "").replace(/\D/g, "");
+      const fQ = String(quarterFilter).replace(/\D/g, "");
+      if (lQ && fQ && lQ !== fQ) return false;
+    }
     return true;
   });
 
-  attempts.sort((a, b) => (a.student_class || "").localeCompare(b.student_class || "") || (a.student_name || "").localeCompare(b.student_name || ""));
+  // Автоматическая сортировка по алфавиту
+  attempts.sort((a, b) => (a.student_name || "").localeCompare(b.student_name || "", "ru"));
 
   const tasks = gradingRawData.tasks || [];
 
@@ -2453,12 +2796,16 @@ function printAllResultsSummary() {
         <td style="text-align: center;"><strong>${score}</strong> / ${maxScore}</td>
         <td style="text-align: center;">${pct}%</td>
         <td style="text-align: center;">${att.submitted_at ? new Date(att.submitted_at).toLocaleTimeString() : '—'}</td>
-        <td style="text-align: center; font-family: monospace; font-size: 0.85rem;">${att.confirmation_code || '—'}</td>
       </tr>
     `;
   }).join("");
 
   const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Браузер заблокировал всплывающее окно. Пожалуйста, разрешите всплывающие окна.");
+    return;
+  }
+
   printWindow.document.write(`
     <!DOCTYPE html>
     <html lang="ru">
@@ -2495,12 +2842,11 @@ function printAllResultsSummary() {
             <th style="width: 90px;">Вариант</th>
             <th style="width: 100px;">Балл</th>
             <th style="width: 70px;">%</th>
-            <th style="width: 90px;">Время</th>
-            <th style="width: 100px;">Код сдачи</th>
+            <th style="width: 90px;">Время сдачи</th>
           </tr>
         </thead>
         <tbody>
-          ${rowsHtml || '<tr><td colspan="8" style="text-align: center;">Нет данных</td></tr>'}
+          ${rowsHtml || '<tr><td colspan="7" style="text-align: center;">Нет данных</td></tr>'}
         </tbody>
       </table>
     </body>
@@ -2510,21 +2856,23 @@ function printAllResultsSummary() {
   printWindow.focus();
 }
 
-// Открытие бланка проверки работы ученика с возможностью печати в PDF
+// Открытие бланка проверки работы ученика
 function openStudentGradingModal(attemptId) {
   if (!gradingRawData) return;
   const att = (gradingRawData.attempts || []).find(a => a.id === attemptId);
   if (!att) return;
 
+  currentGradingAttemptId = attemptId;
   const vStr = String(att.variant || "1");
   const allTasks = gradingRawData.tasks || [];
-  // Фильтруем задания строго под вариант ученика
   const tasks = allTasks.filter(t => {
     const tv = String(t.variant || "1");
     return tv === "all" || tv === "1,2" || tv === vStr;
   });
 
   const answers = (gradingRawData.answers_by_attempt || {})[attemptId] || {};
+  const durationText = formatDuration(att.started_at, att.submitted_at);
+  const classInfo = parseClassAndLetter(att.student_class);
 
   document.getElementById("grade-modal-student").textContent = `${att.student_name} (${att.student_class}) · Вариант ${vStr} · Сдано: ${att.submitted_at ? new Date(att.submitted_at).toLocaleTimeString() : '—'}`;
 
@@ -2533,30 +2881,40 @@ function openStudentGradingModal(attemptId) {
 
   let totalScore = 0;
   let maxScore = 0;
+  let answeredCount = 0;
 
-  tasks.forEach(t => {
-    maxScore += parseFloat(t.max_score || 1);
+  tasks.forEach((t, idx) => {
+    const tMax = parseFloat(t.max_score || 1);
+    maxScore += tMax;
     const ans = answers[t.id] || {};
     const score = ans.final_score !== null && ans.final_score !== undefined ? parseFloat(ans.final_score) : 0;
     totalScore += score;
+    if (isAnswerGiven(ans.answer_parsed)) answeredCount++;
 
-    const isCorrect = score >= parseFloat(t.max_score || 1);
-    const isPartial = score > 0 && score < parseFloat(t.max_score || 1);
+    const isCorrect = score >= tMax;
+    const isPartial = score > 0 && score < tMax;
     const badgeColor = isCorrect ? "#10B981" : (isPartial ? "#F59E0B" : "#EF4444");
     const badgeLabel = isCorrect ? "Верно" : (isPartial ? "Частично" : "Неверно");
 
     const card = document.createElement("div");
     card.className = "print-task-card";
+    card.style.background = "#FFFFFF";
+    card.style.border = "1px solid var(--border)";
+    card.style.borderRadius = "8px";
+    card.style.padding = "1rem";
+    card.style.marginBottom = "1rem";
+
     card.innerHTML = `
-      <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.5rem;">
-        <span>Задание ${t.order_index} (${TASK_TYPES[t.question_type] || t.question_type})</span>
-        <span style="color: ${badgeColor}; font-weight: 800;">${score} / ${t.max_score} б. · ${badgeLabel}</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);">
+        <span style="font-size: 1rem; color: var(--text-main);">Задание ${t.order_index || (idx + 1)} <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500;">(${escapeHtml(TASK_TYPES[t.question_type] || t.question_type)})</span></span>
+        <span style="color: ${badgeColor}; font-weight: 800; font-size: 0.95rem;">${score} / ${tMax} б. · ${badgeLabel}</span>
       </div>
-      <p style="margin-bottom: 0.5rem; font-size: 0.95rem;">${escapeHtml(t.question_text)}</p>
-      <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; font-size: 0.88rem;">
-        <div><strong>Ответ ученика:</strong> <span style="font-family: 'JetBrains Mono', monospace;">${ans.answer_parsed ? escapeHtml(JSON.stringify(ans.answer_parsed)) : 'Нет ответа'}</span></div>
-        <div style="margin-top: 0.35rem;"><strong>Правильный ключ:</strong> <span style="color: #059669; font-weight: 600;">${t.answer_key ? escapeHtml(JSON.stringify(t.answer_key)) : '—'}</span></div>
-      </div>
+      <p style="margin-bottom: 0.65rem; font-size: 0.95rem; font-weight: 500;">${escapeHtml(t.question_text)}</p>
+      ${t.image_url ? `<img src="${escapeHtml(t.image_url)}" style="max-width: 100%; max-height: 250px; border-radius: 6px; margin-bottom: 0.75rem; display: block;" />` : ''}
+      ${formatQuestionReviewHtml(t, ans, false)}
+      ${t.descriptor ? `<div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem;"><em>Дескриптор: ${escapeHtml(t.descriptor)}</em></div>` : ''}
+      ${t.comment_explanation ? `<div style="font-size: 0.82rem; color: #4338CA; margin-top: 0.35rem;"><strong>Пояснение:</strong> ${escapeHtml(t.comment_explanation)}</div>` : ''}
+      ${ans.teacher_comment ? `<div style="font-size: 0.82rem; color: #B45309; margin-top: 0.35rem;"><strong>Комментарий учителя:</strong> ${escapeHtml(ans.teacher_comment)}</div>` : ''}
     `;
     container.appendChild(card);
   });
@@ -2567,23 +2925,287 @@ function openStudentGradingModal(attemptId) {
 
   const summary = document.createElement("div");
   summary.style.background = "var(--primary-light)";
-  summary.style.border = "1px solid var(--border-focus)";
+  summary.style.border = "1.5px solid var(--border-focus)";
   summary.style.borderRadius = "8px";
-  summary.style.padding = "1rem";
+  summary.style.padding = "1rem 1.25rem";
   summary.style.marginBottom = "1.25rem";
-  summary.style.textAlign = "center";
   summary.innerHTML = `
-    <h3 style="font-size: 1.25rem; color: var(--primary); margin-bottom: 0.25rem;">ИТОГОВЫЙ БАЛЛ: ${totalScore} из ${maxScore} (${pct}%)</h3>
-    <p style="font-size: 0.85rem; color: var(--text-muted);">Код подтверждения: <strong>${att.confirmation_code || '—'}</strong></p>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div>
+        <h3 style="font-size: 1.25rem; color: var(--primary); margin: 0 0 0.25rem 0;">ИТОГОВЫЙ БАЛЛ: ${totalScore} из ${maxScore} (${pct}%)</h3>
+        <div style="font-size: 0.88rem; color: var(--text-main);">
+          <span>Класс: <strong>${escapeHtml(classInfo.grade || att.student_class)}</strong></span>
+          ${classInfo.letter && classInfo.letter !== '—' ? `<span style="margin-left: 0.75rem;">Буква: <strong>${escapeHtml(classInfo.letter)}</strong></span>` : ''}
+          <span style="margin-left: 0.75rem;">Вариант: <strong>${escapeHtml(vStr)}</strong></span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 1rem; font-size: 0.88rem; color: var(--text-main);">
+        <div>Выполнено: <strong>${answeredCount} из ${tasks.length}</strong></div>
+        <div>Время: <strong>${escapeHtml(durationText)}</strong></div>
+      </div>
+    </div>
   `;
   container.prepend(summary);
+
+  try {
+    if (window.renderMathInElement) {
+      window.renderMathInElement(container, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  } catch (e) {}
 
   document.getElementById("student-grading-modal").classList.add("open");
 }
 
-function printStudentSheet() {
-  window.print();
+// Выделенная печать бланка ответов конкретного ученика в PDF
+function printStudentSheet(attemptId) {
+  if (!gradingRawData) return;
+  const targetId = attemptId || currentGradingAttemptId;
+  const att = (gradingRawData.attempts || []).find(a => a.id === targetId);
+  if (!att) return;
+
+  const vStr = String(att.variant || "1");
+  const allTasks = gradingRawData.tasks || [];
+  const tasks = allTasks.filter(t => {
+    const tv = String(t.variant || "1");
+    return tv === "all" || tv === "1,2" || tv === vStr;
+  });
+
+  const answers = (gradingRawData.answers_by_attempt || {})[att.id] || {};
+
+  let totalScore = 0;
+  let maxScore = 0;
+  let answeredCount = 0;
+
+  tasks.forEach(t => {
+    const tMax = parseFloat(t.max_score || 1);
+    maxScore += tMax;
+    const ans = answers[t.id] || {};
+    const score = ans.final_score !== null && ans.final_score !== undefined ? parseFloat(ans.final_score) : 0;
+    totalScore += score;
+    if (isAnswerGiven(ans.answer_parsed)) answeredCount++;
+  });
+
+  totalScore = Math.round(totalScore * 10) / 10;
+  maxScore = Math.round(maxScore * 10) / 10;
+  const pct = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+  const durationText = formatDuration(att.started_at, att.submitted_at);
+  const classInfo = parseClassAndLetter(att.student_class);
+
+  const tasksHtml = tasks.map((t, idx) => {
+    const ans = answers[t.id] || {};
+    const score = ans.final_score !== null && ans.final_score !== undefined ? parseFloat(ans.final_score) : 0;
+    const tMax = parseFloat(t.max_score || 1);
+    const isCorrect = score >= tMax;
+    const isPartial = score > 0 && score < tMax;
+    const badgeColor = isCorrect ? "#059669" : (isPartial ? "#D97706" : "#DC2626");
+    const badgeLabel = isCorrect ? "Верно" : (isPartial ? "Частично" : "Неверно");
+
+    return `
+      <div class="task-card">
+        <div class="task-header">
+          <div class="task-num">Задание ${t.order_index || (idx + 1)}. <span style="font-weight: 500; font-size: 12px; color: #64748b;">(${escapeHtml(TASK_TYPES[t.question_type] || t.question_type)})</span></div>
+          <div class="task-score" style="color: ${badgeColor};">${score} / ${tMax} б. · ${badgeLabel}</div>
+        </div>
+        <div class="task-question">${escapeHtml(t.question_text)}</div>
+        ${t.image_url ? `<img src="${escapeHtml(t.image_url)}" style="max-width: 100%; max-height: 220px; border-radius: 6px; margin-bottom: 8px; display: block;" />` : ''}
+        ${formatQuestionReviewHtml(t, ans, true)}
+        ${t.descriptor ? `<div style="font-size: 11.5px; color: #64748b; margin-top: 6px;"><em>Дескриптор: ${escapeHtml(t.descriptor)}</em></div>` : ''}
+      </div>
+    `;
+  }).join("");
+
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Браузер заблокировал всплывающее окно печати. Пожалуйста, разрешите всплывающие окна.");
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+      <meta charset="UTF-8">
+      <title>Бланк ответов — ${escapeHtml(att.student_name)}</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 12mm 15mm 15mm 15mm;
+        }
+        * { box-sizing: border-box; }
+        body {
+          font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+          color: #1e293b;
+          margin: 0;
+          padding: 20px;
+          font-size: 13px;
+          line-height: 1.45;
+          background: #ffffff;
+        }
+        .no-print {
+          margin-bottom: 20px;
+          padding: 12px 18px;
+          background: #f8fafc;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        @media print {
+          body { padding: 0; }
+          .no-print { display: none !important; }
+          .task-card { page-break-inside: avoid; }
+        }
+        .header-box {
+          border: 2px solid #3b82f6;
+          border-radius: 8px;
+          padding: 14px 18px;
+          margin-bottom: 18px;
+          background: #f8fafc;
+        }
+        .header-title {
+          font-size: 17px;
+          font-weight: 800;
+          color: #1e3a8a;
+          margin: 0 0 10px 0;
+        }
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
+          font-size: 12.5px;
+        }
+        .info-item {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          padding: 7px 10px;
+        }
+        .info-label {
+          font-size: 10.5px;
+          color: #64748b;
+          font-weight: 700;
+          text-transform: uppercase;
+          margin-bottom: 2px;
+        }
+        .info-val {
+          font-size: 13.5px;
+          font-weight: 700;
+          color: #0f172a;
+        }
+        .task-card {
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          padding: 12px 16px;
+          margin-bottom: 12px;
+          background: #ffffff;
+        }
+        .task-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          padding-bottom: 6px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+        .task-num {
+          font-size: 13.5px;
+          font-weight: 800;
+          color: #1e293b;
+        }
+        .task-score {
+          font-size: 12.5px;
+          font-weight: 800;
+        }
+        .task-question {
+          font-size: 13px;
+          font-weight: 600;
+          margin: 0 0 10px 0;
+          color: #0f172a;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+          margin-top: 6px;
+        }
+        th, td {
+          border: 1px solid #cbd5e1;
+          padding: 6px 8px;
+          text-align: left;
+        }
+        th {
+          background: #f1f5f9;
+          font-weight: 700;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="no-print">
+        <div>
+          <strong style="color: #0f172a;">📄 Бланк результатов проверки ученика</strong>
+          <span style="color: #64748b; margin-left: 8px;">(для сохранения в PDF выберите «Сохранить как PDF» в окне печати)</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="window.print()" style="padding: 7px 16px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px;">🖨 Печать / PDF</button>
+          <button onclick="window.close()" style="padding: 7px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Закрыть</button>
+        </div>
+      </div>
+
+      <div class="header-box">
+        <div class="header-title">${escapeHtml(activeLaunch?.title || gradingRawData.launch?.title || "Результаты работы")}</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Фамилия и имя</div>
+            <div class="info-val">${escapeHtml(att.student_name)}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Класс</div>
+            <div class="info-val">${escapeHtml(classInfo.grade || att.student_class)}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Буква</div>
+            <div class="info-val">${escapeHtml(classInfo.letter || "—")}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Вариант</div>
+            <div class="info-val">Вариант ${escapeHtml(vStr)}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Выполнено заданий</div>
+            <div class="info-val">${answeredCount} из ${tasks.length}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Набранные баллы</div>
+            <div class="info-val" style="color: #2563eb;">${totalScore} из ${maxScore}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Процент</div>
+            <div class="info-val" style="color: #059669;">${pct}%</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Потраченное время</div>
+            <div class="info-val">${escapeHtml(durationText)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        ${tasksHtml}
+      </div>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
 }
+window.printStudentSheet = printStudentSheet;
 
 function downloadExport(type) {
   if (!activeLaunch) return;

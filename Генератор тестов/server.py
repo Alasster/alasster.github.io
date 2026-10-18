@@ -1134,7 +1134,17 @@ async def get_launch_grading_data(launch_id: str, teacher: dict = Depends(get_cu
                     a["answer_parsed"] = a["answer_json"]
             answers_by_attempt[att_id][a["task_id"]] = a
 
+        cur_launch = await db.execute("""
+            SELECT l.*, t.quarter, t.subject, t.grade_level, t.exam_type
+            FROM launches l
+            JOIN tests t ON l.test_id = t.id
+            WHERE l.id = ? AND l.teacher_id = ?
+        """, (launch_id, teacher["id"]))
+        l_row = await cur_launch.fetchone()
+        launch_meta = dict(l_row) if l_row else {}
+
         return {
+            "launch": launch_meta,
             "tasks": tasks,
             "attempts": attempts,
             "answers_by_attempt": answers_by_attempt

@@ -372,7 +372,7 @@
             <button type="button" class="btn btn-primary btn-sm" onclick="copyStudentLink()">Копировать</button>
           </div>
           <button type="button" class="btn btn-secondary btn-sm" onclick="openCreateSitePageModal()">
-            🌐 Создать страницу на сайте alasster.github.io
+            🌐 Создать страницу на сайте alasster.site
           </button>
         </div>
       </div>
@@ -441,6 +441,24 @@
               </div>
 
               <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Буква:</label>
+                <select id="filter-results-letter" class="form-control" style="width: auto; min-width: 100px; font-size: 0.88rem;" onchange="renderGradingView()">
+                  <option value="">Все буквы</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Четверть:</label>
+                <select id="filter-results-quarter" class="form-control" style="width: auto; min-width: 125px; font-size: 0.88rem;" onchange="renderGradingView()">
+                  <option value="">Все четверти</option>
+                  <option value="1 четверть">1 четверть</option>
+                  <option value="2 четверть">2 четверть</option>
+                  <option value="3 четверть">3 четверть</option>
+                  <option value="4 четверть">4 четверть</option>
+                </select>
+              </div>
+
+              <div>
                 <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Вариант:</label>
                 <select id="filter-results-variant" class="form-control" style="width: auto; min-width: 120px; font-size: 0.88rem;" onchange="renderGradingView()">
                   <option value="">Все варианты</option>
@@ -450,20 +468,12 @@
               </div>
 
               <div>
-                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Сортировка:</label>
-                <select id="sort-results-by" class="form-control" style="width: auto; min-width: 170px; font-size: 0.88rem;" onchange="renderGradingView()">
-                  <option value="name_asc">ФИО (А-Я)</option>
-                  <option value="name_desc">ФИО (Я-А)</option>
-                  <option value="class_asc">По классу и букве</option>
-                  <option value="score_desc">По баллу (сначала высшие)</option>
-                  <option value="score_asc">По баллу (сначала низшие)</option>
-                  <option value="time_desc">По времени сдачи (свежие)</option>
-                </select>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Поиск ученика:</label>
+                <input type="text" id="filter-results-search" class="form-control" placeholder="Поиск по ФИО..." style="width: 160px; font-size: 0.88rem;" oninput="renderGradingView()">
               </div>
 
-              <div>
-                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">Поиск ученика:</label>
-                <input type="text" id="filter-results-search" class="form-control" placeholder="Поиск по ФИО..." style="width: 170px; font-size: 0.88rem;" oninput="renderGradingView()">
+              <div style="align-self: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="resetResultsFilters()" style="font-size: 0.88rem; padding: 7px 12px;" title="Сбросить все фильтры и показать всех">🔄 Сбросить</button>
               </div>
             </div>
 
@@ -692,7 +702,7 @@
     </div>
   </div>
 
-  <!-- 3. Модальное окно: Создание страницы урока на сайте alasster.github.io -->
+  <!-- 3. Модальное окно: Создание страницы урока на сайте alasster.site -->
   <div id="create-site-page-modal" class="modal-backdrop">
     <div class="modal-dialog">
       <div class="modal-header">
@@ -702,7 +712,7 @@
       <form id="create-site-page-form" onsubmit="handleCreateSitePage(event)">
         <div class="modal-body">
           <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
-            Страница урока будет автоматически сгенерирована и сохранена в нужную папку вашего сайта <code>alasster.github.io</code>.
+            Страница урока будет автоматически сгенерирована и сохранена в нужную папку вашего сайта <code>alasster.site</code>.
           </p>
 
           <div class="form-group">
@@ -824,6 +834,6 @@
   <!-- KaTeX скрипты -->
   <script src="/static/vendor/katex.min.js"></script>
   <script src="/static/vendor/auto-render.min.js"></script>
-  <script src="/static/js/teacher.js?v=20261018-v7"></script>
+  <script src="/static/js/teacher.js?v=20261018-v8"></script>
 </body>
 </html>
