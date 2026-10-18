@@ -391,8 +391,43 @@ async def update_test(test_id: str, req: UpdateTestRequest, teacher: dict = Depe
             req.quarter, req.section, req.instructions, req.learning_objectives,
             req.assessment_criteria, 1 if req.is_archived else 0, now, int(req.shuffle_options), test_id, teacher["id"]
         ))
+        await sync_launches_for_test(db, test_id)
         await db.commit()
     return {"ok": True}
+
+async def sync_launches_for_test(db, test_id: str):
+    """Синхронизирует слепок заданий (snapshot_tasks_json) во всех незавершённых проведениях (launches) данного теста,
+       чтобы ссылка для учеников оставалась постоянной, а изменения заданий сразу вступали в силу без перепубликации урока."""
+    tasks_cur = await db.execute("SELECT * FROM tasks WHERE test_id = ? ORDER BY order_index ASC", (test_id,))
+    raw_tasks = await tasks_cur.fetchall()
+    snapshot_tasks = []
+    for rt in raw_tasks:
+        t = dict(rt)
+        t["options"] = json.loads(t["options_json"]) if t["options_json"] else []
+        t["answer_key"] = json.loads(t["answer_key_json"]) if t["answer_key_json"] else None
+        t["categories"] = json.loads(t["categories_json"]) if t.get("categories_json") else []
+        t["variant"] = t.get("variant") or "1"
+        snapshot_tasks.append(t)
+
+    snap_json = json.dumps(snapshot_tasks, ensure_ascii=False)
+
+    test_cur = await db.execute("SELECT bg_color, bg_color_v1, bg_color_v2 FROM tests WHERE id = ?", (test_id,))
+    test_row = await test_cur.fetchone()
+    if test_row:
+        await db.execute("""
+            UPDATE launches
+            SET snapshot_tasks_json = ?,
+                bg_color = COALESCE(?, bg_color),
+                bg_color_v1 = COALESCE(?, bg_color_v1),
+                bg_color_v2 = COALESCE(?, bg_color_v2)
+            WHERE test_id = ? AND status != 'finished'
+        """, (snap_json, test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], test_id))
+    else:
+        await db.execute("""
+            UPDATE launches
+            SET snapshot_tasks_json = ?
+            WHERE test_id = ? AND status != 'finished'
+        """, (snap_json, test_id))
 
 async def _delete_test_cascade(db, test_id: str, teacher_id: str):
     cur = await db.execute("SELECT id FROM launches WHERE test_id = ?", (test_id,))
@@ -532,6 +567,7 @@ async def create_task(test_id: str, task: TaskItem, teacher: dict = Depends(get_
             str(task.variant or "1"), now
         ))
         await db.execute("UPDATE tests SET updated_at = ? WHERE id = ?", (now, test_id))
+        await sync_launches_for_test(db, test_id)
         await db.commit()
     return {"id": task_id, "order_index": next_order}
 
@@ -564,6 +600,7 @@ async def update_task(task_id: str, task: TaskItem, teacher: dict = Depends(get_
             str(task.variant or "1"), task_id
         ))
         await db.execute("UPDATE tests SET updated_at = ? WHERE id = ?", (now, row["test_id"]))
+        await sync_launches_for_test(db, row["test_id"])
         await db.commit()
     return {"ok": True}
 
@@ -588,6 +625,8 @@ async def delete_task(task_id: str, teacher: dict = Depends(get_current_teacher)
         for idx, t in enumerate(all_tasks, 1):
             await db.execute("UPDATE tasks SET order_index = ? WHERE id = ?", (idx, t["id"]))
 
+        await db.execute("UPDATE tests SET updated_at = ? WHERE id = ?", (datetime.now().isoformat(), test_id))
+        await sync_launches_for_test(db, test_id)
         await db.commit()
     return {"ok": True}
 
@@ -600,6 +639,8 @@ async def reorder_tasks(test_id: str, task_ids: List[str], teacher: dict = Depen
 
         for idx, t_id in enumerate(task_ids, 1):
             await db.execute("UPDATE tasks SET order_index = ? WHERE id = ? AND test_id = ?", (idx, t_id, test_id))
+        await db.execute("UPDATE tests SET updated_at = ? WHERE id = ?", (datetime.now().isoformat(), test_id))
+        await sync_launches_for_test(db, test_id)
         await db.commit()
     return {"ok": True}
 
@@ -810,6 +851,25 @@ async def update_launch_settings(launch_id: str, req: UpdateLaunchSettingsReques
         if updates:
             params.append(launch_id)
             await db.execute(f"UPDATE launches SET {', '.join(updates)} WHERE id = ?", params)
+
+            # Если изменена продолжительность, пересчитываем дедлайн для учеников, решающих работу сейчас
+            if req.duration_minutes is not None:
+                cur_active = await db.execute(
+                    "SELECT id, started_at, extra_time_minutes FROM student_attempts WHERE launch_id = ? AND status = 'in_progress' AND started_at IS NOT NULL",
+                    (launch_id,)
+                )
+                active_atts = await cur_active.fetchall()
+                for att in active_atts:
+                    try:
+                        st_dt = datetime.fromisoformat(att["started_at"])
+                        if st_dt.tzinfo is None:
+                            st_dt = st_dt.replace(tzinfo=timezone.utc)
+                        tot_m = req.duration_minutes + (att["extra_time_minutes"] or 0)
+                        new_dl = (st_dt + timedelta(minutes=tot_m)).isoformat() if tot_m > 0 else None
+                        await db.execute("UPDATE student_attempts SET server_deadline = ? WHERE id = ?", (new_dl, att["id"]))
+                    except Exception:
+                        pass
+
             await db.commit()
 
     broadcast_live_event(launch_id, "launch_settings_updated", {"updated": True})

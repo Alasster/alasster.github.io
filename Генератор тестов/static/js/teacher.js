@@ -1984,6 +1984,72 @@ function switchLaunchTab(tabId) {
 
   if (tabId === "tab-live-results") {
     loadGradingData();
+  } else if (tabId === "tab-live-settings" && activeLaunch) {
+    const elManual = document.getElementById("set-manual-approval");
+    const elDuration = document.getElementById("set-duration");
+    const elScores = document.getElementById("set-pub-scores");
+    const elAnswers = document.getElementById("set-pub-answers");
+    const elComments = document.getElementById("set-pub-comments");
+    if (elManual) elManual.checked = !!activeLaunch.manual_approval;
+    if (elDuration) elDuration.value = activeLaunch.duration_minutes !== undefined ? activeLaunch.duration_minutes : 40;
+    if (elScores) elScores.checked = !!activeLaunch.publish_scores;
+    if (elAnswers) elAnswers.checked = !!activeLaunch.publish_answers;
+    if (elComments) elComments.checked = !!activeLaunch.publish_comments;
+  }
+}
+
+async function saveLaunchSettings() {
+  if (!activeLaunch) {
+    alert("Сессия проведения не выбрана");
+    return;
+  }
+
+  const manualApproval = document.getElementById("set-manual-approval") ? document.getElementById("set-manual-approval").checked : false;
+  const durationInput = document.getElementById("set-duration");
+  const durationMinutes = durationInput ? (parseInt(durationInput.value, 10) || 0) : 0;
+  const pubScores = document.getElementById("set-pub-scores") ? document.getElementById("set-pub-scores").checked : false;
+  const pubAnswers = document.getElementById("set-pub-answers") ? document.getElementById("set-pub-answers").checked : false;
+  const pubComments = document.getElementById("set-pub-comments") ? document.getElementById("set-pub-comments").checked : false;
+
+  const btn = document.querySelector("#tab-live-settings button.btn-primary");
+  const originalText = btn ? btn.textContent : "Сохранить настройки проведения";
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Сохранение...";
+  }
+
+  try {
+    const res = await fetch(`/api/launches/${activeLaunch.id}/settings`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        manual_approval: manualApproval,
+        duration_minutes: durationMinutes,
+        publish_scores: pubScores,
+        publish_answers: pubAnswers,
+        publish_comments: pubComments
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Не удалось сохранить настройки");
+
+    activeLaunch.manual_approval = manualApproval;
+    activeLaunch.duration_minutes = durationMinutes;
+    activeLaunch.publish_scores = pubScores;
+    activeLaunch.publish_answers = pubAnswers;
+    activeLaunch.publish_comments = pubComments;
+
+    if (durationInput) durationInput.value = durationMinutes;
+
+    alert("✓ Настройки проведения успешно сохранены!");
+  } catch (err) {
+    alert("Ошибка сохранения: " + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
   }
 }
 
