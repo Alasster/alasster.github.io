@@ -2740,6 +2740,21 @@ function resetResultsFilters() {
 }
 window.resetResultsFilters = resetResultsFilters;
 
+function getGradingAttemptScore(att) {
+  if (att && att.total_score !== undefined && att.total_score !== null) {
+    return Math.round(parseFloat(att.total_score) * 10) / 10;
+  }
+  const attAnswers = (gradingRawData?.answers_by_attempt || {})[att?.id] || {};
+  let sum = 0;
+  Object.values(attAnswers).forEach(ans => {
+    if (ans && ans.final_score !== null && ans.final_score !== undefined) {
+      sum += parseFloat(ans.final_score);
+    }
+  });
+  return Math.round(sum * 10) / 10;
+}
+window.getGradingAttemptScore = getGradingAttemptScore;
+
 function renderGradingView() {
   if (!gradingRawData) return;
   const container = document.getElementById("grading-table-container");
@@ -2806,7 +2821,7 @@ function renderGradingView() {
       return tv === "all" || tv === "1,2" || tv === vStr;
     });
     const maxScore = studentTasks.reduce((sum, t) => sum + parseFloat(t.max_score || 1), 0);
-    const studentTotal = Math.round((parseFloat(att.total_score || 0)) * 10) / 10;
+    const studentTotal = getGradingAttemptScore(att);
     const pct = maxScore > 0 ? Math.round((studentTotal / maxScore) * 100) : 0;
 
     tableHtml += `
@@ -2842,7 +2857,11 @@ function renderGradingView() {
 
 // Печать общей сводной ведомости
 function printAllResultsSummary() {
-  if (!gradingRawData || !activeLaunch) return;
+  const launch = activeLaunch || gradingRawData?.launch;
+  if (!gradingRawData || !launch) {
+    alert("Данные для печати ещё загружаются. Пожалуйста, попробуйте через пару секунд.");
+    return;
+  }
 
   const classFilter = document.getElementById("filter-results-class")?.value || "";
   const letterFilter = document.getElementById("filter-results-letter")?.value || "";
@@ -2877,7 +2896,7 @@ function printAllResultsSummary() {
       return tv === "all" || tv === "1,2" || tv === vStr;
     });
     const maxScore = studentTasks.reduce((sum, t) => sum + parseFloat(t.max_score || 1), 0);
-    const score = Math.round((parseFloat(att.total_score || 0)) * 10) / 10;
+    const score = getGradingAttemptScore(att);
     const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
 
     return `
@@ -2899,12 +2918,14 @@ function printAllResultsSummary() {
     return;
   }
 
+  const launchTitle = escapeHtml(launch.title || "Результаты работы");
+
   printWindow.document.write(`
     <!DOCTYPE html>
     <html lang="ru">
     <head>
       <meta charset="UTF-8">
-      <title>Ведомость — ${escapeHtml(activeLaunch.title)}</title>
+      <title>Ведомость — ${launchTitle}</title>
       <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; padding: 25px; color: #111; }
         h1 { font-size: 20px; margin-bottom: 5px; }
@@ -2922,9 +2943,9 @@ function printAllResultsSummary() {
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
         <div>
           <h1>Сводная ведомость результатов оценивания</h1>
-          <p><strong>Работа:</strong> ${escapeHtml(activeLaunch.title)} | <strong>Дата:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Работа:</strong> ${launchTitle} | <strong>Дата:</strong> ${new Date().toLocaleDateString()}</p>
         </div>
-        <button onclick="window.print()" style="padding: 8px 16px; cursor: pointer; font-size: 14px;">Печать</button>
+        <button onclick="window.print()" style="padding: 8px 16px; cursor: pointer; font-size: 14px; background: #4F46E5; color: #fff; border: none; border-radius: 6px; font-weight: 700;">🖨 Печать</button>
       </div>
       <table>
         <thead>
@@ -2948,6 +2969,7 @@ function printAllResultsSummary() {
   printWindow.document.close();
   printWindow.focus();
 }
+window.printAllResultsSummary = printAllResultsSummary;
 
 // Открытие бланка проверки работы ученика
 function openStudentGradingModal(attemptId) {

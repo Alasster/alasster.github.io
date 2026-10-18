@@ -993,10 +993,10 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
         # Выбираем попытки
         cur = await db.execute("""
             SELECT sa.*, 
-                   COUNT(ans.id) as answered_count,
+                   COUNT(CASE WHEN ans.answer_json IS NOT NULL AND ans.answer_json != '""' AND ans.answer_json != 'null' THEN 1 END) as answered_count,
                    SUM(COALESCE(ans.final_score, 0)) as total_score
             FROM student_attempts sa
-            LEFT JOIN student_answers ans ON sa.id = ans.attempt_id AND ans.answer_json IS NOT NULL AND ans.answer_json != '""'
+            LEFT JOIN student_answers ans ON sa.id = ans.attempt_id
             WHERE sa.launch_id = ?
             GROUP BY sa.id
             ORDER BY sa.created_at DESC
@@ -1027,6 +1027,7 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
                 stu_task_count = task_count
             d["variant"] = stu_var
             d["task_count"] = stu_task_count
+            d["total_score"] = round(float(d.get("total_score") or 0.0), 1)
             d["progress_pct"] = round((d["answered_count"] / stu_task_count * 100), 1) if stu_task_count > 0 else 0
             d["device_label"] = get_device_info(d.get("ip_address"))
             result.append(d)
@@ -1155,6 +1156,12 @@ async def get_launch_grading_data(launch_id: str, teacher: dict = Depends(get_cu
                     a["answer_parsed"] = a["answer_json"]
             answers_by_attempt[att_id][a["task_id"]] = a
 
+        # Подсчитываем точный итоговый балл каждого ученика
+        for att in attempts:
+            stu_answers = answers_by_attempt.get(att["id"], {})
+            tot = sum(float(a.get("final_score") if a.get("final_score") is not None else 0.0) for a in stu_answers.values())
+            att["total_score"] = round(tot, 1)
+
         cur_launch = await db.execute("""
             SELECT l.*, t.quarter, t.subject, t.grade_level, t.exam_type
             FROM launches l
@@ -1224,6 +1231,11 @@ async def export_xlsx(launch_id: str, teacher: dict = Depends(get_current_teache
         for a in raw_ans:
             answers_by_attempt.setdefault(a["attempt_id"], {})[a["task_id"]] = dict(a)
 
+        for att in attempts:
+            stu_answers = answers_by_attempt.get(att["id"], {})
+            tot = sum(float(a.get("final_score") if a.get("final_score") is not None else 0.0) for a in stu_answers.values())
+            att["total_score"] = round(tot, 1)
+
         from urllib.parse import quote
         xlsx_bytes = generate_excel_report(dict(launch_row), attempts, tasks, answers_by_attempt)
         filename = f"Results_{launch_row['title'].replace(' ', '_')}.xlsx"
@@ -1255,6 +1267,11 @@ async def export_csv(launch_id: str, teacher: dict = Depends(get_current_teacher
         answers_by_attempt = {}
         for a in raw_ans:
             answers_by_attempt.setdefault(a["attempt_id"], {})[a["task_id"]] = dict(a)
+
+        for att in attempts:
+            stu_answers = answers_by_attempt.get(att["id"], {})
+            tot = sum(float(a.get("final_score") if a.get("final_score") is not None else 0.0) for a in stu_answers.values())
+            att["total_score"] = round(tot, 1)
 
         from urllib.parse import quote
         csv_str = generate_csv_report(dict(launch_row), attempts, tasks, answers_by_attempt)

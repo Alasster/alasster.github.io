@@ -38,6 +38,17 @@ def format_submitted_date(dt_str: str) -> str:
     except Exception:
         return str(dt_str)
 
+def get_attempt_total_score(att: dict, answers_by_attempt: dict) -> float:
+    att_answers = answers_by_attempt.get(att.get("id"), {})
+    if att_answers:
+        return round(sum(float(a.get("final_score") if a and a.get("final_score") is not None else 0.0) for a in att_answers.values()), 1)
+    if att.get("total_score") is not None:
+        try:
+            return round(float(att["total_score"]), 1)
+        except Exception:
+            pass
+    return 0.0
+
 def generate_csv_report(launch_info: dict, attempts: list, tasks: list, answers_by_attempt: dict) -> str:
     output = io.StringIO()
     writer = csv.writer(output, delimiter=";")
@@ -59,7 +70,7 @@ def generate_csv_report(launch_info: dict, attempts: list, tasks: list, answers_
         stu_var = str(att.get("variant") or "1")
         stu_tasks = [t for t in tasks if str(t.get("variant") or "1") in (stu_var, "all", "1,2")] or tasks
         max_possible = sum(float(t.get("max_score", 1)) for t in stu_tasks)
-        total_score = round(float(att.get("total_score") or 0.0), 1)
+        total_score = get_attempt_total_score(att, answers_by_attempt)
         percent = round((total_score / max_possible * 100), 1) if max_possible > 0 else 0
 
         writer.writerow([
@@ -79,7 +90,7 @@ def generate_csv_report(launch_info: dict, attempts: list, tasks: list, answers_
         stu_var = str(att.get("variant") or "1")
         stu_tasks = [t for t in tasks if str(t.get("variant") or "1") in (stu_var, "all", "1,2")] or tasks
         max_possible = sum(float(t.get("max_score", 1)) for t in stu_tasks)
-        total_score = round(float(att.get("total_score") or 0.0), 1)
+        total_score = get_attempt_total_score(att, answers_by_attempt)
         percent = round((total_score / max_possible * 100), 1) if max_possible > 0 else 0
         att_answers = answers_by_attempt.get(att["id"], {})
 
@@ -158,7 +169,7 @@ def generate_excel_report(launch_info: dict, attempts: list, tasks: list, answer
         stu_var = str(att.get("variant") or "1")
         stu_tasks = [t for t in tasks if str(t.get("variant") or "1") in (stu_var, "all", "1,2")] or tasks
         max_possible = sum(float(t.get("max_score", 1)) for t in stu_tasks)
-        total_score = round(float(att.get("total_score") or 0.0), 1)
+        total_score = get_attempt_total_score(att, answers_by_attempt)
         percent = round((total_score / max_possible * 100), 1) if max_possible > 0 else 0
 
         ws_all.cell(row=curr_row, column=1, value=idx).alignment = center_align
@@ -202,7 +213,7 @@ def generate_excel_report(launch_info: dict, attempts: list, tasks: list, answer
         stu_var = str(att.get("variant") or "1")
         stu_tasks = [t for t in tasks if str(t.get("variant") or "1") in (stu_var, "all", "1,2")] or tasks
         max_possible = sum(float(t.get("max_score", 1)) for t in stu_tasks)
-        total_score = round(float(att.get("total_score") or 0.0), 1)
+        total_score = get_attempt_total_score(att, answers_by_attempt)
         percent = round((total_score / max_possible * 100), 1) if max_possible > 0 else 0
         att_answers = answers_by_attempt.get(att["id"], {})
 
