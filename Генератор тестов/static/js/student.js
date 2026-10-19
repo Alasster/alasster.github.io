@@ -51,7 +51,8 @@ document.addEventListener("dragstart", (e) => {
 // РАБОТА С ТОКЕНОМ УЧЕНИКА (С ПОДДЕРЖКОЙ SESSIONSTORAGE И LOCALSTORAGE)
 // =========================================================================
 function getStudentToken() {
-  let tok = sessionStorage.getItem("bagalau_student_token");
+  let tok = launchId ? localStorage.getItem(`bagalau_student_token_${launchId}`) : "";
+  if (!tok) tok = sessionStorage.getItem("bagalau_student_token");
   if (!tok) {
     tok = localStorage.getItem("bagalau_student_token");
   }
@@ -303,6 +304,11 @@ async function checkExistingAttempt() {
       return;
     }
     currentAttempt = await res.json();
+    if (currentAttempt.launch_id !== launchId) {
+      currentAttempt = null;
+      showScreen("screen-join");
+      return;
+    }
     applyCustomBgColor(currentAttempt.bg_color);
 
     // Обновляем бейджи варианта на всех экранах
@@ -398,7 +404,7 @@ document.getElementById("join-form").addEventListener("submit", async (e) => {
   try {
     const res = await fetch(`/api/student/join/${launchId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Attempt-Token": getStudentToken() },
       body: JSON.stringify({
         student_name: name,
         student_class: sClass,

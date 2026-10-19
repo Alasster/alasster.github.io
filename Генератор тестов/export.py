@@ -1,9 +1,12 @@
 import io
 import csv
+import json
 import re
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+from openpyxl.utils.cell import quote_sheetname
+from openpyxl.worksheet.hyperlink import Hyperlink
 
 TASK_TYPE_NAMES = {
     "single_choice": "Один правильный выбор",
@@ -18,6 +21,21 @@ TASK_TYPE_NAMES = {
     "ordering": "Упорядочивание",
     "text_manual": "Развёрнутый ответ"
 }
+
+
+def get_export_answer_value(answer: dict):
+    """Read persisted answers, retaining support for already parsed report data."""
+    value = answer.get("answer_json")
+    if value is None:
+        return answer.get("answer_parsed")
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            # Preserve legacy plain text instead of replacing it with no answer.
+            return value
+    return value
+
 
 def format_answer_value(val) -> str:
     if val is None or val == "":
@@ -100,7 +118,7 @@ def generate_csv_report(launch_info: dict, attempts: list, tasks: list, answers_
 
         for t_order, t in enumerate(stu_tasks, 1):
             ans = att_answers.get(t["id"], {})
-            ans_parsed = ans.get("answer_parsed") if ans else None
+            ans_parsed = get_export_answer_value(ans)
             score = float(ans.get("final_score") if ans and ans.get("final_score") is not None else 0.0)
             t_max = float(t.get("max_score", 1))
             status_text = "Верно" if score >= t_max else ("Частично" if score > 0 else "Неверно")
@@ -210,6 +228,14 @@ def generate_excel_report(launch_info: dict, attempts: list, tasks: list, answer
 
         ws_stu = wb.create_sheet(title=sheet_title)
 
+        name_cell = ws_all.cell(row=idx + 4, column=2)
+        name_cell.hyperlink = Hyperlink(
+            ref=name_cell.coordinate,
+            location=f"{quote_sheetname(ws_stu.title)}!A1",
+            tooltip="Открыть ответы ученика",
+        )
+        name_cell.font = Font(name="Calibri", size=11, color="4F46E5", underline="single")
+
         stu_var = str(att.get("variant") or "1")
         stu_tasks = [t for t in tasks if str(t.get("variant") or "1") in (stu_var, "all", "1,2")] or tasks
         max_possible = sum(float(t.get("max_score", 1)) for t in stu_tasks)
@@ -236,7 +262,7 @@ def generate_excel_report(launch_info: dict, attempts: list, tasks: list, answer
         r_idx = 6
         for t_order, t in enumerate(stu_tasks, 1):
             ans = att_answers.get(t["id"], {})
-            ans_parsed = ans.get("answer_parsed") if ans else None
+            ans_parsed = get_export_answer_value(ans)
             score = float(ans.get("final_score") if ans and ans.get("final_score") is not None else 0.0)
             t_max = float(t.get("max_score", 1))
 

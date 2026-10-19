@@ -12,6 +12,7 @@ import uuid
 import secrets
 import asyncio
 import logging
+import unicodedata
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
 
@@ -946,9 +947,16 @@ async def delete_launch(launch_id: str, teacher: dict = Depends(get_current_teac
 @app.delete("/api/launches/{launch_id}/students/{attempt_id}")
 async def delete_student_attempt_endpoint(launch_id: str, attempt_id: str, teacher: dict = Depends(get_current_teacher)):
     async with get_db() as db:
-        c = await db.execute("SELECT id FROM launches WHERE id = ? AND teacher_id = ?", (launch_id, teacher["id"]))
-        if not await c.fetchone():
-            raise HTTPException(status_code=404, detail="Запуск не найден")
+        await db.execute("BEGIN IMMEDIATE")
+        c = await db.execute("""
+            SELECT sa.* FROM student_attempts sa JOIN launches l ON l.id = sa.launch_id
+            WHERE sa.id = ? AND l.id = ? AND l.teacher_id = ?
+        """, (attempt_id, launch_id, teacher["id"]))
+        attempt = await c.fetchone()
+        if not attempt:
+            raise HTTPException(status_code=404, detail="Попытка не найдена")
+
+        await record_retake_permission(db, launch_id, attempt)
         
         await db.execute("DELETE FROM student_answers WHERE attempt_id = ?", (attempt_id,))
         await db.execute("DELETE FROM student_attempts WHERE id = ? AND launch_id = ?", (attempt_id, launch_id))
@@ -1053,6 +1061,7 @@ async def teacher_student_action(
         if action == "admit":
             await db.execute("UPDATE student_attempts SET status = 'approved' WHERE id = ?", (attempt_id,))
         elif action == "remove":
+            await record_retake_permission(db, launch_id, row)
             await db.execute("DELETE FROM student_attempts WHERE id = ?", (attempt_id,))
         elif action == "block":
             await db.execute("UPDATE student_attempts SET status = 'blocked' WHERE id = ?", (attempt_id,))
@@ -1383,6 +1392,59 @@ def is_class_allowed(student_class: str, allowed_classes: list) -> bool:
                     return True
     return False
 
+
+REJOIN_COOLDOWN = timedelta(minutes=20)
+
+
+async def record_retake_permission(db, launch_id: str, attempt):
+    # Reuse the audit table: a teacher deletion grants one new registration even
+    # if other students are still using the same public IP. No schema migration.
+    await db.execute("""
+        INSERT INTO audit_logs (id, launch_id, action, details_json, created_at)
+        VALUES (?, ?, 'student_retake_allowed', ?, ?)
+    """, (str(uuid.uuid4()), launch_id, json.dumps({
+        "attempt_id": attempt["id"],
+        "identity": [normalize_student_identity(attempt["student_name"]),
+                     normalize_student_identity(attempt["student_class"])],
+    }), datetime.now().isoformat()))
+
+
+def normalize_student_identity(value: str) -> str:
+    # SQLite LOWER does not case-fold Cyrillic; also ignore repeated spaces.
+    return " ".join(unicodedata.normalize("NFKC", value).casefold().split())
+
+
+def recent_attempt_from_ip(attempt, client_ip: Optional[str], now: datetime) -> bool:
+    if not client_ip or attempt["ip_address"] != client_ip:
+        return False
+    for field in ("created_at", "started_at", "submitted_at"):
+        value = attempt[field]
+        if not value:
+            continue
+        try:
+            # Legacy timestamps are server-local; newer start times include UTC.
+            when = datetime.fromisoformat(value).astimezone(timezone.utc)
+        except (TypeError, ValueError):
+            return True
+        if now - when < REJOIN_COOLDOWN:
+            return True
+    return False
+
+
+def student_join_response(response: Response, attempt, launch_id: str):
+    token = attempt["attempt_token"]
+    response.set_cookie("bagalau_student_token", token, httponly=True,
+                        samesite="lax", max_age=86400)
+    # Logout clears the working session, but must not permit a new variant.
+    # A per-launch path avoids mixing different exams in the same browser.
+    response.set_cookie("bagalau_join_guard", token, httponly=True,
+                        samesite="lax", max_age=86400,
+                        path=f"/api/student/join/{launch_id}")
+    return {key: attempt[key] for key in (
+        "attempt_token", "status", "student_name", "student_class", "variant"
+    )} | {"attempt_id": attempt["id"]}
+
+
 @app.post("/api/student/join/{launch_id}")
 async def student_join(launch_id: str, req: StudentJoinRequest, request: Request, response: Response):
     student_name = req.student_name.strip()
@@ -1392,7 +1454,18 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
     if not student_name or not student_class:
         raise HTTPException(status_code=400, detail="Укажите фамилию, имя и класс")
 
+    client_ip = request.client.host if request.client else None
+    tokens = {token for token in (
+        request.headers.get("X-Attempt-Token"),
+        request.cookies.get("bagalau_student_token"),
+        request.cookies.get("bagalau_join_guard"),
+    ) if token}
+    identity = (normalize_student_identity(student_name), normalize_student_identity(student_class))
+
     async with get_db() as db:
+        # Serialize the check and insertion so simultaneous joins cannot bypass it.
+        # No network operations or schema changes occur inside this transaction.
+        await db.execute("BEGIN IMMEDIATE")
         cursor = await db.execute("SELECT * FROM launches WHERE id = ?", (launch_id,))
         launch = await cursor.fetchone()
         if not launch:
@@ -1410,16 +1483,57 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
         if launch_status == "finished":
             raise HTTPException(status_code=403, detail="Проведение работы уже завершено")
 
-        # Проверка на совпадение имени и класса (возможный дубль)
-        c_dup = await db.execute("""
-            SELECT id FROM student_attempts
-            WHERE launch_id = ? AND LOWER(student_name) = LOWER(?) AND student_class = ?
-        """, (launch_id, student_name, student_class))
-        existing_dup = await c_dup.fetchone()
-        is_duplicate = 1 if existing_dup else 0
+        cursor = await db.execute("""
+            SELECT * FROM student_attempts WHERE launch_id = ?
+            ORDER BY created_at DESC, rowid DESC
+        """, (launch_id,))
+        attempts = await cursor.fetchall()
+        matching = [a for a in attempts if a["attempt_token"] in tokens or (
+            normalize_student_identity(a["student_name"]),
+            normalize_student_identity(a["student_class"])
+        ) == identity]
+        extra_allowed = False
+        if matching:
+            existing = matching[0]
+            same_identity = (
+                normalize_student_identity(existing["student_name"]),
+                normalize_student_identity(existing["student_class"])
+            ) == identity
+            if not same_identity:
+                raise HTTPException(status_code=409, detail="В этом браузере уже зарегистрирована попытка. Для нового входа обратитесь к учителю: он должен удалить попытку и разрешить пересдачу.")
+            if existing["allow_extra_attempt"] == 1:
+                extra_allowed = True
+                await db.execute("UPDATE student_attempts SET allow_extra_attempt = 0 WHERE id = ?", (existing["id"],))
+            elif str(existing["variant"] or "1") != student_variant:
+                raise HTTPException(status_code=409, detail="Вариант уже закреплён за вашей попыткой. Сменить вариант можно только после удаления попытки учителем.")
+            elif existing["attempt_token"] in tokens:
+                # A retry/refresh resumes the original attempt, deadline and receipt.
+                return student_join_response(response, existing, launch_id)
+            else:
+                raise HTTPException(status_code=409, detail="Для этого ученика уже есть попытка. Пересдача возможна только с разрешения учителя. Обратитесь к учителю для восстановления доступа или удаления попытки.")
+
+        if not matching:
+            permissions = await db.execute("""
+                SELECT id, details_json FROM audit_logs
+                WHERE launch_id = ? AND action = 'student_retake_allowed'
+                ORDER BY created_at DESC
+            """, (launch_id,))
+            for permission in await permissions.fetchall():
+                if tuple(json.loads(permission["details_json"]).get("identity", [])) == identity:
+                    extra_allowed = True
+                    await db.execute("UPDATE audit_logs SET action = 'student_retake_used' WHERE id = ?", (permission["id"],))
+                    break
+
+        now_utc = datetime.now(timezone.utc)
+        ip_review_required = not extra_allowed and any(
+            recent_attempt_from_ip(a, client_ip, now_utc) for a in attempts
+        )
+        is_duplicate = 1 if ip_review_required else 0
 
         # Определяем начальный статус попытки
-        manual_appr = bool(launch["manual_approval"])
+        # Internet users may share one NAT address. Do not grant a second variant
+        # automatically, but let the teacher admit a genuinely different student.
+        manual_appr = bool(launch["manual_approval"]) or ip_review_required
         if launch_status == "waiting":
             init_status = "waiting_approval" if manual_appr else "in_waiting"
         elif launch_status == "active":
@@ -1430,7 +1544,6 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
         attempt_id = str(uuid.uuid4())
         attempt_token = secrets.token_urlsafe(32)
         now = datetime.now().isoformat()
-        client_ip = request.client.host if request.client else None
         user_agent = request.headers.get("user-agent", "")
         desk_input = (req.desk_number or "").strip()
         auto_device = get_device_info(client_ip)
@@ -1447,15 +1560,6 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
         ))
         await db.commit()
 
-    # Устанавливаем защищенную куку для сессии ученика
-    response.set_cookie(
-        key="bagalau_student_token",
-        value=attempt_token,
-        httponly=True,
-        samesite="lax",
-        max_age=86400
-    )
-
     broadcast_live_event(launch_id, "student_joined", {
         "attempt_id": attempt_id,
         "student_name": student_name,
@@ -1466,14 +1570,14 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
         "device_label": final_device
     })
 
-    return {
-        "attempt_id": attempt_id,
+    return student_join_response(response, {
+        "id": attempt_id,
         "attempt_token": attempt_token,
         "status": init_status,
         "student_name": student_name,
         "student_class": student_class,
         "variant": student_variant
-    }
+    }, launch_id)
 
 @app.get("/api/student/attempt")
 async def get_student_attempt(attempt: dict = Depends(get_current_student_attempt)):

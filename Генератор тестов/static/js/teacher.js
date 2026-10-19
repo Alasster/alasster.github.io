@@ -2315,7 +2315,7 @@ function renderLiveStudentsTable() {
       <td>${escapeHtml(s.student_class)}</td>
       <td>${varBadge}</td>
       <td><span style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">${escapeHtml(s.device_label || 'Сеть')}</span></td>
-      <td><span class="badge badge-${s.status}">${getStatusLabel(s.status)}</span></td>
+      <td><span class="badge badge-${s.status}">${getStatusLabel(s.status)}</span>${s.is_duplicate_flag ? '<br><small>Повторный IP: проверьте ученика</small>' : ''}</td>
       <td>${connHtml}</td>
       <td>${s.answered_count || 0} / ${s.task_count || 0} (${s.progress_pct || 0}%)</td>
       <td>${s.started_at ? new Date(s.started_at).toLocaleTimeString() : '—'}</td>

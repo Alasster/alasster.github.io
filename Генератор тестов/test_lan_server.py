@@ -86,6 +86,10 @@ def run():
                     joined = request(f'/api/student/join/{launch}', {
                         'student_name': f'Тест ученик {index}', 'student_class': '10 А'})
                     headers = {'X-Attempt-Token': joined['attempt_token']}
+                    # These simulated browsers share one IP, like students behind NAT.
+                    if joined['status'] == 'waiting_approval':
+                        request(f'/api/launches/{launch}/students/{joined["attempt_id"]}/action',
+                                {'action': 'admit'}, teacher)
                     request('/api/student/start', {}, headers)
                     visible = request('/api/student/attempt', headers=headers)
                     assert len(visible['tasks']) == 4
@@ -127,6 +131,9 @@ def run():
                 # A request exceeding the browser keepalive 64 KiB limit must submit.
                 joined = request(f'/api/student/join/{launch}', {'student_name': 'Большой ответ', 'student_class': '10 А'})
                 headers = {'X-Attempt-Token': joined['attempt_token']}
+                if joined['status'] == 'waiting_approval':
+                    request(f'/api/launches/{launch}/students/{joined["attempt_id"]}/action',
+                            {'action': 'admit'}, teacher)
                 request('/api/student/start', {}, headers)
                 with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
                     payload = {'answers': {tasks[0]: 'ответ ' * 20000}}
