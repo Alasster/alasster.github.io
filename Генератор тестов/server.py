@@ -2060,7 +2060,14 @@ def cleanup_site_lessons_for_launches(site_root: str, launch_ids: list):
 
 def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
     urls = []
+    port = (request.url.port or (443 if request.url.scheme == "https" else 80)) if request else int(os.environ.get("BAGALAU_PORT", "8000"))
     env_url = os.environ.get("BAGALAU_PUBLIC_URL")
+    if not env_url:
+        try:
+            with open(os.path.join(BASE_DIR, ".runtime", "public_url.txt"), encoding="utf-8-sig") as f:
+                env_url = f.read().strip()
+        except OSError:
+            pass
     if env_url:
         urls.append(env_url.rstrip("/"))
     if request:
@@ -2081,14 +2088,14 @@ def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
             else:
                 lan_ips.append(ip)
         for ip in lan_ips + vpn_ips:
-            port = request.url.port if request else int(os.environ.get("BAGALAU_PORT", "8000"))
-            u = f"http://{ip}:{port or 8000}"
+            u = f"http://{ip}:{port}"
             if u not in urls:
                 urls.append(u)
     except Exception:
         pass
-    if "http://127.0.0.1:8000" not in urls:
-        urls.append("http://127.0.0.1:8000")
+    local_url = f"http://127.0.0.1:{port}"
+    if local_url not in urls:
+        urls.append(local_url)
     return urls
 
 def generate_native_lesson_html(
@@ -2336,8 +2343,31 @@ async def student_get_results(attempt: dict = Depends(get_current_student_attemp
 
 if __name__ == "__main__":
     import uvicorn
+    from contextlib import nullcontext
+    from public_gateway import StudentPublicGateway
+
+    class TunnelServer(uvicorn.Server):
+        def capture_signals(self):
+            return nullcontext()
+
+        def install_signal_handlers(self):
+            pass
+
     port = int(os.environ.get("BAGALAU_PORT", "8000"))
+    student_port = int(os.environ.get("BAGALAU_STUDENT_PORT", "8001"))
     print("Адреса сервера «Бағалау»:")
     for url in get_teacher_network_urls():
         print(f"  {url}/teacher")
-    uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
+
+    async def serve_servers():
+        teacher_server = uvicorn.Server(uvicorn.Config(app, host="0.0.0.0", port=port))
+        student_server = TunnelServer(uvicorn.Config(
+            StudentPublicGateway(app), host="127.0.0.1", port=student_port, lifespan="off"))
+        tunnel_task = asyncio.create_task(student_server.serve())
+        try:
+            await teacher_server.serve()
+        finally:
+            student_server.should_exit = True
+            await tunnel_task
+
+    asyncio.run(serve_servers())

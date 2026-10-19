@@ -34,12 +34,12 @@ try {
     foreach ($candidate in @('python3.13.exe', 'python.exe', 'python3.exe')) {
         $command = Get-Command $candidate -ErrorAction SilentlyContinue
         if ($command) {
-            & $command.Source -c 'import sys; assert sys.version_info >= (3, 9)' 2>$null
+            & $command.Source -c 'import sys; sys.exit(sys.version_info < (3, 9))' 2>$null
             if ($LASTEXITCODE -eq 0) { $python = $command.Source; break }
         }
     }
     if (-not $python) { throw 'Не найден Python 3.9 или новее. Установите Python и повторите запуск.' }
-    & $python -c 'import fastapi, uvicorn, aiosqlite, openpyxl, multipart' 2>$null
+    & $python -c "import importlib.util,sys; sys.exit(not all(importlib.util.find_spec(m) for m in ['fastapi','uvicorn','aiosqlite','openpyxl','multipart']))" 2>$null
     if ($LASTEXITCODE -ne 0) {
         & $python -m pip install -r (Join-Path $PSScriptRoot 'requirements.txt')
         if ($LASTEXITCODE -ne 0) { throw 'Не установлены зависимости. Проверьте интернет и повторите запуск.' }
@@ -47,15 +47,24 @@ try {
     if (-not $NoFirewall) {
         try {
             $existing = Get-NetFirewallRule -PolicyStore ActiveStore -DisplayName $ruleName -ErrorAction SilentlyContinue |
-                Where-Object { $_.Enabled -eq 'True' -and $_.Action -eq 'Allow' -and $_.Profile -eq 'Any' }
+                Where-Object { $_.Enabled -eq 'True' -and $_.Action -eq 'Allow' -and $_.Direction -eq 'Inbound' -and $_.Profile -eq 'Any' }
             $ports = $existing | Get-NetFirewallPortFilter | Where-Object { $_.LocalPort -eq '8000' -and $_.Protocol -eq 'TCP' }
             if (-not $ports) { Enable-BagalauFirewall }
         } catch { throw ('Сетевой доступ не настроен: ' + $_.Exception.Message) }
     }
-    $probe = "import urllib.request,json; o=urllib.request.build_opener(urllib.request.ProxyHandler({})); assert json.load(o.open('http://127.0.0.1:8000/api/health',timeout=2)).get('ok') is True"
+    $probe = @'
+import urllib.request,json,sys
+try:
+    o=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    ready=json.load(o.open('http://127.0.0.1:8000/api/health',timeout=2)).get('ok') is True
+except Exception:
+    ready=False
+sys.exit(0 if ready else 1)
+'@
     & $python -c $probe 2>$null
     if ($LASTEXITCODE -eq 0) {
         Write-Host 'Сервер уже работает. Кабинет: http://127.0.0.1:8000/teacher'
+        Write-Host 'Повторный запуск не нужен. Это окно можно закрыть: работающий сервер продолжит принимать ответы.'
         exit 0
     }
     Write-Host 'Кабинет учителя: http://127.0.0.1:8000/teacher'

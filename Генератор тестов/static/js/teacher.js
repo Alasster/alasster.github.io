@@ -2167,7 +2167,7 @@ async function openLiveMonitoring(launchId) {
     activeLaunch = await res.json();
 
     const netUrls = activeLaunch.server_urls || [];
-    let studentOrigin = window.location.origin;
+    let studentOrigin = netUrls.find(u => u.startsWith("https://")) || window.location.origin;
     if (studentOrigin.includes("127.0.0.1") || studentOrigin.includes("localhost")) {
       const lanUrl = netUrls.find(u => !u.includes("127.0.0.1") && !u.includes("localhost"));
       if (lanUrl) studentOrigin = lanUrl;
