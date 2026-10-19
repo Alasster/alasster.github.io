@@ -245,11 +245,8 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-          <a id="open-soch-btn" href="http://100.105.182.22:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
-            <i class="fa-solid fa-laptop"></i> С ноутбуков школы
-          </a>
-          <a id="open-soch-phone-btn" href="http://192.168.21.1:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn" style="background: #2563EB;">
-            <i class="fa-solid fa-mobile-screen"></i> С телефонов (Wi-Fi)
+          <a id="open-soch-btn" href="http://192.168.21.1:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
+            <i class="fa-solid fa-up-right-from-square"></i> Открыть СОЧ
           </a>
           <button type="button" class="start-btn" style="background: #FFFFFF; color: var(--primary); border: 1.5px solid rgba(79,70,229,0.3);" onclick="changeSlide(1)">
             Итоги 1 четверти <i class="fas fa-arrow-right"></i>
@@ -358,11 +355,8 @@
         const localHostUrl = 'http://' + window.location.hostname + ':8000';
         if (!candidateBases.includes(localHostUrl)) candidateBases.push(localHostUrl);
       }
-      if (!candidateBases.includes('http://100.105.182.22:8000')) {
-        candidateBases.unshift('http://100.105.182.22:8000');
-      }
       if (!candidateBases.includes('http://192.168.21.1:8000')) {
-        candidateBases.push('http://192.168.21.1:8000');
+        candidateBases.unshift('http://192.168.21.1:8000');
       }
       if (!candidateBases.includes('http://192.168.68.101:8000')) {
         candidateBases.push('http://192.168.68.101:8000');
