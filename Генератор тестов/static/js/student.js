@@ -806,7 +806,7 @@ function saveAnswer(taskId, answer) {
       }
 
       if (data.ok) {
-        if (localDrafts[taskId]) {
+        if (localDrafts[taskId] && localDrafts[taskId].version === curVersion) {
           localDrafts[taskId].version = data.version;
           localDrafts[taskId].synced = true;
         }
@@ -1183,7 +1183,6 @@ async function submitWork(isAutoExpired = false) {
           final_confirmation: true,
           answers: allAnswers
         }),
-        keepalive: true,
         signal: controller.signal
       });
 

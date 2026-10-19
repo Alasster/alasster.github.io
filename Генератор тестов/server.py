@@ -966,15 +966,14 @@ def get_device_info(ip: Optional[str]) -> str:
     if ip in HOSTNAME_CACHE:
         return HOSTNAME_CACHE[ip]
 
-    label = ip
-    is_tailscale = ip.startswith("100.")
+    # Reverse DNS on school networks can take seconds per PC and blocks the
+    # entire async server (including joining, saving and submitting answers).
+    import ipaddress
     try:
-        import socket
-        resolved = socket.gethostbyaddr(ip)[0]
-        clean_name = resolved.split(".")[0]
-        label = f"{clean_name} (Tailscale)" if is_tailscale else f"{clean_name} ({ip})"
-    except Exception:
-        label = f"{ip} (Tailscale)" if is_tailscale else ip
+        is_tailscale = ipaddress.ip_address(ip) in ipaddress.ip_network("100.64.0.0/10")
+    except ValueError:
+        is_tailscale = False
+    label = f"{ip} (Tailscale)" if is_tailscale else ip
 
     HOSTNAME_CACHE[ip] = label
     return label
@@ -1712,6 +1711,10 @@ async def student_save_answer(req: SaveAnswerRequest, attempt: dict = Depends(ge
     ans_json = json.dumps(req.answer, ensure_ascii=False)
 
     async with get_db() as db:
+        await db.execute("BEGIN IMMEDIATE")
+        current = await (await db.execute("SELECT status FROM student_attempts WHERE id = ?", (attempt["id"],))).fetchone()
+        if not current or current["status"] != "in_progress":
+            raise HTTPException(status_code=403, detail="Попытка уже завершена")
         c = await db.execute("SELECT id, version FROM student_answers WHERE attempt_id = ? AND task_id = ?", (attempt["id"], req.task_id))
         row = await c.fetchone()
         if row:
@@ -1747,6 +1750,10 @@ async def student_batch_save(req: BatchSaveAnswersRequest, attempt: dict = Depen
     saved_versions = {}
 
     async with get_db() as db:
+        await db.execute("BEGIN IMMEDIATE")
+        current = await (await db.execute("SELECT status FROM student_attempts WHERE id = ?", (attempt["id"],))).fetchone()
+        if not current or current["status"] != "in_progress":
+            raise HTTPException(status_code=403, detail="Попытка уже завершена")
         for item in req.answers:
             ans_json = json.dumps(item.answer, ensure_ascii=False)
             c = await db.execute("SELECT id, version FROM student_answers WHERE attempt_id = ? AND task_id = ?", (attempt["id"], item.task_id))
@@ -1798,6 +1805,11 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
     now = datetime.now().isoformat()
 
     async with get_db() as db:
+        await db.execute("BEGIN IMMEDIATE")
+        current = await (await db.execute("SELECT * FROM student_attempts WHERE id = ?", (attempt["id"],))).fetchone()
+        if not current:
+            raise HTTPException(status_code=404, detail="Попытка не найдена")
+        attempt.update(dict(current))
         # Если уже сдана, возвращаем существующие подсчитанные результаты
         if attempt["status"] in ["submitted", "time_expired"]:
             conf_code = attempt.get("confirmation_code") or f"BAG-{secrets.token_hex(3).upper()}"
@@ -1898,7 +1910,7 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
     return {
         "ok": True,
         "status": "submitted",
-        "submitted_at": now,
+        "submitted_at": attempt.get("submitted_at") or now,
         "confirmation_code": conf_code,
         "completed_count": completed_count,
         "total_tasks": total_tasks,
@@ -2068,8 +2080,9 @@ def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
                 vpn_ips.append(ip)
             else:
                 lan_ips.append(ip)
-        for ip in vpn_ips + lan_ips:
-            u = f"http://{ip}:8000"
+        for ip in lan_ips + vpn_ips:
+            port = request.url.port if request else int(os.environ.get("BAGALAU_PORT", "8000"))
+            u = f"http://{ip}:{port or 8000}"
             if u not in urls:
                 urls.append(u)
     except Exception:
@@ -2323,5 +2336,8 @@ async def student_get_results(attempt: dict = Depends(get_current_student_attemp
 
 if __name__ == "__main__":
     import uvicorn
-    print("Запуск веб-сервиса «Бағалау» на http://127.0.0.1:8000 ...")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
+    port = int(os.environ.get("BAGALAU_PORT", "8000"))
+    print("Адреса сервера «Бағалау»:")
+    for url in get_teacher_network_urls():
+        print(f"  {url}/teacher")
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=False)

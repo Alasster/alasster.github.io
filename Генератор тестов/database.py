@@ -4,7 +4,7 @@ import json
 import logging
 from datetime import datetime, timezone
 
-DB_DIR = os.path.join(os.path.dirname(__file__), "data")
+DB_DIR = os.environ.get("BAGALAU_DB_DIR", os.path.join(os.path.dirname(__file__), "data"))
 DB_PATH = os.path.join(DB_DIR, "bagalau.sqlite3")
 
 from contextlib import asynccontextmanager
@@ -14,12 +14,13 @@ logger = logging.getLogger("bagalau.db")
 @asynccontextmanager
 async def get_db():
     os.makedirs(DB_DIR, exist_ok=True)
-    db = await aiosqlite.connect(DB_PATH)
+    db = await aiosqlite.connect(DB_PATH, timeout=30)
     db.row_factory = aiosqlite.Row
-    await db.execute("PRAGMA journal_mode = WAL;")
-    await db.execute("PRAGMA synchronous = NORMAL;")
-    await db.execute("PRAGMA foreign_keys = ON;")
     try:
+        await db.execute("PRAGMA busy_timeout = 30000;")
+        await db.execute("PRAGMA journal_mode = WAL;")
+        await db.execute("PRAGMA synchronous = NORMAL;")
+        await db.execute("PRAGMA foreign_keys = ON;")
         yield db
     finally:
         await db.close()
