@@ -34,17 +34,12 @@ if %errorlevel% neq 0 (
     echo.
 )
 
-:: 3. Запуск Cloudflare туннеля (если скачан)
-if exist cloudflared.exe (
-    taskkill /f /im cloudflared.exe >nul 2>nul
-    start /b "" cloudflared.exe tunnel --url http://127.0.0.1:8000 >nul 2>nul
-)
-
-:: 4. Запуск сервера
-echo Сервер запускается на: http://127.0.0.1:8000
-echo Адрес в сети школы:   http://192.168.21.1:8000
-echo Кабинет учителя:      http://127.0.0.1:8000/teacher
-echo Вход по умолчанию:    логин: teacher / пароль: bagalau2026
+:: 3. Запуск сервера
+echo Сервер запускается на:          http://127.0.0.1:8000
+echo Адрес для учеников (Tailscale): http://100.105.182.22:8000
+echo Адрес в локальной сети:         http://192.168.21.1:8000
+echo Кабинет учителя:                http://127.0.0.1:8000/teacher
+echo Вход по умолчанию:              логин: teacher / пароль: bagalau2026
 echo.
 echo Для остановки сервера закройте это окно.
 echo =========================================================================

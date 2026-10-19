@@ -2068,7 +2068,7 @@ def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
                 vpn_ips.append(ip)
             else:
                 lan_ips.append(ip)
-        for ip in lan_ips + vpn_ips:
+        for ip in vpn_ips + lan_ips:
             u = f"http://{ip}:8000"
             if u not in urls:
                 urls.append(u)

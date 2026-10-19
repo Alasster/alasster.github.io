@@ -246,7 +246,7 @@
 
         <div style="display: flex; flex-direction: column; gap: 8px;">
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-            <a id="open-soch-btn" href="https://astrology-articles-campus-warranties.trycloudflare.com/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
+            <a id="open-soch-btn" href="http://100.105.182.22:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
               <i class="fa-solid fa-up-right-from-square"></i> Открыть СОЧ
             </a>
             <button type="button" class="start-btn" style="background: #FFFFFF; color: var(--primary); border: 1.5px solid rgba(79,70,229,0.3);" onclick="changeSlide(1)">
@@ -254,9 +254,9 @@
             </button>
           </div>
           <div style="font-size: 0.8rem; color: #64748B;">
-            🌐 <b>Основная ссылка (с любого телефона/интернета):</b> <a href="https://astrology-articles-campus-warranties.trycloudflare.com/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline; font-weight: 600;">Открыть через облако</a>
+            🔗 <b>Сеть Tailscale (основная):</b> <a href="http://100.105.182.22:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline; font-weight: 600;">100.105.182.22:8000</a>
             <br>
-            Локальная сеть школы: <a href="http://192.168.21.1:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline;">192.168.21.1:8000</a> &nbsp;|&nbsp; 
+            Локальная сеть: <a href="http://192.168.21.1:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline;">192.168.21.1:8000</a> &nbsp;|&nbsp; 
             Дома: <a href="http://192.168.68.101:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline;">192.168.68.101:8000</a>
           </div>
         </div>
@@ -363,9 +363,8 @@
         const localHostUrl = 'http://' + window.location.hostname + ':8000';
         if (!candidateBases.includes(localHostUrl)) candidateBases.push(localHostUrl);
       }
-      const cloudflareUrl = 'https://astrology-articles-campus-warranties.trycloudflare.com';
-      if (!candidateBases.includes(cloudflareUrl)) {
-        candidateBases.unshift(cloudflareUrl);
+      if (!candidateBases.includes('http://100.105.182.22:8000')) {
+        candidateBases.unshift('http://100.105.182.22:8000');
       }
       if (!candidateBases.includes('http://192.168.21.1:8000')) {
         candidateBases.push('http://192.168.21.1:8000');

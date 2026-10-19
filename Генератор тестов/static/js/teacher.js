@@ -2169,7 +2169,7 @@ async function openLiveMonitoring(launchId) {
     const netUrls = activeLaunch.server_urls || [];
     let studentOrigin = window.location.origin;
     if (studentOrigin.includes("127.0.0.1") || studentOrigin.includes("localhost")) {
-      const lanUrl = netUrls.find(u => !u.includes("127.0.0.1") && !u.includes("localhost") && !u.includes("100."));
+      const lanUrl = netUrls.find(u => !u.includes("127.0.0.1") && !u.includes("localhost"));
       if (lanUrl) studentOrigin = lanUrl;
       else if (netUrls[0]) studentOrigin = netUrls[0];
     }
