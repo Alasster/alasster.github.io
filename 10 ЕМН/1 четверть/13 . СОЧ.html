@@ -244,13 +244,21 @@
           </p>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-          <a id="open-soch-btn" href="http://192.168.68.101:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
-            <i class="fa-solid fa-up-right-from-square"></i> Открыть СОЧ
-          </a>
-          <button type="button" class="start-btn" style="background: #FFFFFF; color: var(--primary); border: 1.5px solid rgba(79,70,229,0.3);" onclick="changeSlide(1)">
-            Итоги 1 четверти <i class="fas fa-arrow-right"></i>
-          </button>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <a id="open-soch-btn" href="https://film-multiple-wright-relation.trycloudflare.com/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
+              <i class="fa-solid fa-up-right-from-square"></i> Открыть СОЧ
+            </a>
+            <button type="button" class="start-btn" style="background: #FFFFFF; color: var(--primary); border: 1.5px solid rgba(79,70,229,0.3);" onclick="changeSlide(1)">
+              Итоги 1 четверти <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <div style="font-size: 0.8rem; color: #64748B;">
+            🌐 <b>Основная ссылка (с любого телефона/интернета):</b> <a href="https://film-multiple-wright-relation.trycloudflare.com/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline; font-weight: 600;">Открыть через облако</a>
+            <br>
+            Локальная сеть школы: <a href="http://192.168.21.1:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline;">192.168.21.1:8000</a> &nbsp;|&nbsp; 
+            Дома: <a href="http://192.168.68.101:8000/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" style="color: var(--primary); text-decoration: underline;">192.168.68.101:8000</a>
+          </div>
         </div>
       </div>
     </div>
@@ -354,6 +362,13 @@
       if (window.location.protocol.startsWith('http') && window.location.hostname && !window.location.hostname.includes('github.io') && !window.location.hostname.includes('alasster.site')) {
         const localHostUrl = 'http://' + window.location.hostname + ':8000';
         if (!candidateBases.includes(localHostUrl)) candidateBases.push(localHostUrl);
+      }
+      const cloudflareUrl = 'https://film-multiple-wright-relation.trycloudflare.com';
+      if (!candidateBases.includes(cloudflareUrl)) {
+        candidateBases.unshift(cloudflareUrl);
+      }
+      if (!candidateBases.includes('http://192.168.21.1:8000')) {
+        candidateBases.push('http://192.168.21.1:8000');
       }
       if (!candidateBases.includes('http://192.168.68.101:8000')) {
         candidateBases.push('http://192.168.68.101:8000');

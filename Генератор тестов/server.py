@@ -787,7 +787,7 @@ async def list_launches(test_id: Optional[str] = None, teacher: dict = Depends(g
         return result
 
 @app.get("/api/launches/{launch_id}")
-async def get_launch(launch_id: str, teacher: dict = Depends(get_current_teacher)):
+async def get_launch(launch_id: str, request: Request, teacher: dict = Depends(get_current_teacher)):
     async with get_db() as db:
         cursor = await db.execute("""
             SELECT l.*, t.subject, t.grade_level, t.exam_type, t.instructions, t.learning_objectives, t.assessment_criteria
@@ -804,6 +804,7 @@ async def get_launch(launch_id: str, teacher: dict = Depends(get_current_teacher
         ld["tasks"] = json.loads(ld["snapshot_tasks_json"])
         ld["bg_color_v1"] = ld.get("bg_color_v1") or "#fce8e6"
         ld["bg_color_v2"] = ld.get("bg_color_v2") or "#e6f4ea"
+        ld["server_urls"] = get_teacher_network_urls(request)
         return ld
 
 @app.put("/api/launches/{launch_id}/status")
@@ -2057,12 +2058,20 @@ def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
     try:
         import socket
         hostname = socket.gethostname()
+        lan_ips = []
+        vpn_ips = []
         for info in socket.getaddrinfo(hostname, None, socket.AF_INET):
             ip = info[4][0]
-            if ip and not ip.startswith("127.") and not ip.startswith("169.254."):
-                u = f"http://{ip}:8000"
-                if u not in urls:
-                    urls.append(u)
+            if not ip or ip.startswith("127.") or ip.startswith("169.254."):
+                continue
+            if ip.startswith("100."):
+                vpn_ips.append(ip)
+            else:
+                lan_ips.append(ip)
+        for ip in lan_ips + vpn_ips:
+            u = f"http://{ip}:8000"
+            if u not in urls:
+                urls.append(u)
     except Exception:
         pass
     if "http://127.0.0.1:8000" not in urls:

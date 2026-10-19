@@ -352,6 +352,9 @@
         const localHostUrl = 'http://' + window.location.hostname + ':8000';
         if (!candidateBases.includes(localHostUrl)) candidateBases.push(localHostUrl);
       }
+      if (!candidateBases.includes('http://192.168.21.1:8000')) {
+        candidateBases.push('http://192.168.21.1:8000');
+      }
       if (!candidateBases.includes('http://192.168.68.101:8000')) {
         candidateBases.push('http://192.168.68.101:8000');
       }

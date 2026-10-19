@@ -2166,8 +2166,14 @@ async function openLiveMonitoring(launchId) {
     if (!res.ok) throw new Error("Не удалось загрузить данные сессии");
     activeLaunch = await res.json();
 
-    document.getElementById("live-launch-title").textContent = activeLaunch.title;
-    document.getElementById("live-public-url").value = `${window.location.origin}/exam/${activeLaunch.id}`;
+    const netUrls = activeLaunch.server_urls || [];
+    let studentOrigin = window.location.origin;
+    if (studentOrigin.includes("127.0.0.1") || studentOrigin.includes("localhost")) {
+      const lanUrl = netUrls.find(u => !u.includes("127.0.0.1") && !u.includes("localhost") && !u.includes("100."));
+      if (lanUrl) studentOrigin = lanUrl;
+      else if (netUrls[0]) studentOrigin = netUrls[0];
+    }
+    document.getElementById("live-public-url").value = `${studentOrigin}/exam/${activeLaunch.id}`;
     updateLiveStatusBadge(activeLaunch.status);
 
     document.getElementById("set-manual-approval").checked = !!activeLaunch.manual_approval;
