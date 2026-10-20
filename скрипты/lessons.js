@@ -128,7 +128,7 @@
       group.lessons.sort((a, b) => {
         const na = parseInt(String(a.num), 10) || 0;
         const nb = parseInt(String(b.num), 10) || 0;
-        return na - nb;
+        return nb - na;
       });
     });
   }
@@ -163,6 +163,7 @@
         </a>
       `;
     }).join('');
+    listEl.scrollTop = 0;
   }
 
   function openClassesModal() {

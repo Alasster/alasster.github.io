@@ -103,7 +103,10 @@ function showClassModal(id) {
   list.innerHTML = '';
   list.scrollTop = 0;
 
-  data.lessons.forEach(l => {
+  const latestLessons = [...data.lessons].sort((a, b) =>
+    (parseInt(String(b.num), 10) || 0) - (parseInt(String(a.num), 10) || 0)
+  );
+  latestLessons.forEach(l => {
     const row = document.createElement('div');
     row.className = 'lesson-row-card';
     row.innerHTML = `
