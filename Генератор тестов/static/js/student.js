@@ -346,6 +346,15 @@ function handleAttemptState() {
   const status = currentAttempt.status;
   const launchStatus = currentAttempt.launch_status;
 
+  if (status === "removed") {
+    if (timerInterval) clearInterval(timerInterval);
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
+    if (publishedResultsInterval) clearInterval(publishedResultsInterval);
+    showStudentStatus("Работа закрыта", "Эта попытка удалена из проведения учителем. Можно войти заново.");
+    clearStudentToken();
+    return;
+  }
+
   if (status === "submitted" || status === "time_expired") {
     showSubmissionSuccessScreen();
     return;
