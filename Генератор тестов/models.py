@@ -111,6 +111,12 @@ class UpdateLaunchSettingsRequest(BaseModel):
     bg_color_v1: Optional[str] = None
     bg_color_v2: Optional[str] = None
 
+class StudentResultsVisibilityRequest(BaseModel):
+    enabled: bool
+
+class StudentResultsVisibilityRequest(BaseModel):
+    enabled: bool
+
 # --- Student Interaction Models ---
 class StudentJoinRequest(BaseModel):
     student_name: str

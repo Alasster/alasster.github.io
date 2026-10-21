@@ -77,7 +77,10 @@ async def get_current_student_attempt(request: Request) -> dict:
         cursor = await db.execute("""
             SELECT sa.*, l.status as launch_status, l.duration_minutes, l.title as launch_title,
                    l.shuffle_questions, l.shuffle_options, l.allow_back_nav, l.show_all_at_once,
-                   l.publish_scores, l.publish_answers, l.publish_comments, l.timezone,
+                   CASE WHEN sa.publish_results_override IS NULL THEN l.publish_scores ELSE sa.publish_results_override END AS publish_scores,
+                   CASE WHEN sa.publish_results_override IS NULL THEN l.publish_answers ELSE sa.publish_results_override END AS publish_answers,
+                   CASE WHEN sa.publish_results_override IS NULL THEN l.publish_comments ELSE sa.publish_results_override END AS publish_comments,
+                   l.timezone,
                    l.bg_color, l.bg_color_v1, l.bg_color_v2
             FROM student_attempts sa
             JOIN launches l ON sa.launch_id = l.id

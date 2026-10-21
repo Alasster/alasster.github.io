@@ -2350,6 +2350,13 @@ function renderLiveStudentsTable() {
       <td>${s.started_at ? new Date(s.started_at).toLocaleTimeString() : '—'}</td>
       <td>${s.submitted_at ? new Date(s.submitted_at).toLocaleTimeString() : '—'}</td>
       <td>
+        ${['submitted', 'time_expired'].includes(s.status) ? `
+          <label class="publish-results-toggle student-results-toggle" title="Показать ответы этому ученику">
+            <input type="checkbox" ${s.results_published ? 'checked' : ''} onchange="toggleStudentResults('${s.id}', this.checked)">
+            <span class="publish-results-toggle-slider" aria-hidden="true"></span>
+          </label>` : '<span style="color: var(--text-muted);">—</span>'}
+      </td>
+      <td>
         <div style="display: flex; gap: 0.35rem; align-items: center;">
           ${s.status === 'waiting_approval' ? `<button type="button" class="btn btn-success btn-sm" onclick="studentAction('${s.id}', 'admit')">Допустить</button>` : ''}
           ${s.status === 'in_progress' ? `<button type="button" class="btn btn-warning btn-sm" onclick="studentAction('${s.id}', 'add_time')">+5 мин</button>` : ''}
@@ -2367,6 +2374,24 @@ function renderLiveStudentsTable() {
   document.getElementById("cnt-progress").textContent = inProgress;
   document.getElementById("cnt-submitted").textContent = submitted;
 }
+
+async function toggleStudentResults(attemptId, enabled) {
+  if (!activeLaunch) return;
+  try {
+    const res = await fetch(`/api/launches/${activeLaunch.id}/students/${attemptId}/results-visibility`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "Не удалось изменить доступ");
+    const student = activeLaunchStudents.find(s => s.id === attemptId);
+    if (student) student.results_published = enabled;
+  } catch (e) {
+    alert("Ошибка: " + e.message);
+    await refreshStudentsList();
+  }
+}
+window.toggleStudentResults = toggleStudentResults;
 
 async function deleteStudentAttempt(attemptId, studentName, permanent = false) {
   if (!activeLaunch) return;

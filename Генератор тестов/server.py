@@ -35,7 +35,8 @@ from models import (
     CreateLaunchRequest, UpdateLaunchStatusRequest, UpdateLaunchSettingsRequest,
     StudentJoinRequest, SaveAnswerRequest, BatchSaveAnswersRequest, StudentSubmitRequest,
     TeacherActionStudentRequest, GradeSingleAnswerRequest, RosterImportRequest,
-    StudentTaskView, CreateLessonPageRequest, DeleteLessonPageRequest, CreateBackupRequest
+    StudentTaskView, CreateLessonPageRequest, DeleteLessonPageRequest, CreateBackupRequest,
+    StudentResultsVisibilityRequest
 )
 from evaluator import evaluate_answer
 from export import generate_excel_report, generate_csv_report
@@ -1065,10 +1066,13 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
 
         # Выбираем попытки
         cur = await db.execute("""
-            SELECT sa.*, 
+            SELECT sa.*, l.publish_scores AS launch_publish_scores,
+                   l.publish_answers AS launch_publish_answers,
+                   l.publish_comments AS launch_publish_comments,
                    COUNT(CASE WHEN ans.answer_json IS NOT NULL AND ans.answer_json != '""' AND ans.answer_json != 'null' THEN 1 END) as answered_count,
                    SUM(COALESCE(ans.final_score, 0)) as total_score
             FROM student_attempts sa
+            JOIN launches l ON l.id = sa.launch_id
             LEFT JOIN student_answers ans ON sa.id = ans.attempt_id
             WHERE sa.launch_id = ? AND sa.status != 'removed'
             GROUP BY sa.id
@@ -1099,6 +1103,10 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
             if stu_task_count == 0:
                 stu_task_count = task_count
             d["variant"] = stu_var
+            override = d.get("publish_results_override")
+            d["results_published"] = bool(override) if override is not None else bool(
+                d.get("launch_publish_scores") or d.get("launch_publish_answers") or d.get("launch_publish_comments")
+            )
             d["task_count"] = stu_task_count
             d["total_score"] = round(float(d.get("total_score") or 0.0), 1)
             d["progress_pct"] = round((d["answered_count"] / stu_task_count * 100), 1) if stu_task_count > 0 else 0
@@ -1106,6 +1114,31 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
             result.append(d)
 
         return result
+
+@app.put("/api/launches/{launch_id}/students/{attempt_id}/results-visibility")
+async def update_student_results_visibility(
+    launch_id: str,
+    attempt_id: str,
+    req: StudentResultsVisibilityRequest,
+    teacher: dict = Depends(get_current_teacher)
+):
+    async with get_db() as db:
+        cur_launch = await db.execute("SELECT id FROM launches WHERE id = ? AND teacher_id = ?", (launch_id, teacher["id"]))
+        if not await cur_launch.fetchone():
+            raise HTTPException(status_code=404, detail="Запуск не найден")
+        cur = await db.execute(
+            "SELECT id FROM student_attempts WHERE id = ? AND launch_id = ? AND status IN ('submitted', 'time_expired')",
+            (attempt_id, launch_id)
+        )
+        if not await cur.fetchone():
+            raise HTTPException(status_code=400, detail="Результаты можно выдавать только после сдачи работы")
+        await db.execute(
+            "UPDATE student_attempts SET publish_results_override = ? WHERE id = ? AND launch_id = ?",
+            (1 if req.enabled else 0, attempt_id, launch_id)
+        )
+        await db.commit()
+    broadcast_live_event(launch_id, "student_results_visibility_changed", {"attempt_id": attempt_id, "enabled": req.enabled})
+    return {"ok": True, "enabled": req.enabled}
 
 @app.post("/api/launches/{launch_id}/students/{attempt_id}/action")
 async def teacher_student_action(

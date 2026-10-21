@@ -1322,7 +1322,7 @@ async function loadStudentResults() {
             <div style="font-size: 0.9rem; color: var(--text-muted);">
               <strong>Ваш ответ:</strong> ${studentAnswer}<br>
               ${correctAnswer}
-              ${t.explanation ? `<strong>Пояснение:</strong> ${escapeHtml(t.explanation)}<br>` : ''}
+              ${t.explanation ? `<div class="teacher-explanation"><div class="teacher-explanation-title">Пояснение учителя</div><div>${escapeHtml(t.explanation)}</div></div>` : ''}
               ${t.teacher_comment ? `<strong>Комментарий учителя:</strong> <em>${escapeHtml(t.teacher_comment)}</em>` : ''}
             </div>
           </div>

@@ -214,7 +214,8 @@ async def init_db():
             ("launches", "bg_color_v2", "TEXT DEFAULT '#e6f4ea'"),
             ("launches", "is_archived", "INTEGER DEFAULT 0"),
             ("student_attempts", "device_name", "TEXT"),
-            ("student_attempts", "variant", "TEXT DEFAULT '1'")
+            ("student_attempts", "variant", "TEXT DEFAULT '1'"),
+            ("student_attempts", "publish_results_override", "INTEGER DEFAULT NULL")
         ]
         for tbl, col, col_def in migrations:
             try:
