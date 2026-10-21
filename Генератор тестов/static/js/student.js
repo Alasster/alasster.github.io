@@ -8,6 +8,8 @@ let localDrafts = {}; // taskId -> { answer, version, synced }
 let timerInterval = null;
 let heartbeatInterval = null;
 let currentRemainingSeconds = null;
+let publishedResultsInterval = null;
+let publishedResultsState = "";
 
 // =========================================================================
 // ТИХАЯ ЗАЩИТА ОТ СПИСЫВАНИЯ (БЕЗ АЛЕРТОВ И УВЕДОМЛЕНИЙ)
@@ -1272,6 +1274,9 @@ function showSubmissionSuccessScreen(data = null) {
   document.getElementById("res-score-badge").textContent = `${totalScore} из ${maxScore} (${pct}%)`;
 
   loadStudentResults();
+  if (!publishedResultsInterval) {
+    publishedResultsInterval = setInterval(loadStudentResults, 5000);
+  }
 }
 
 async function loadStudentResults() {
@@ -1284,6 +1289,9 @@ async function loadStudentResults() {
     const data = await res.json();
 
     const box = document.getElementById("results-box");
+    const state = `${!!data.published}:${!!data.publish_scores}:${!!data.publish_answers}:${!!data.publish_comments}`;
+    if (state === publishedResultsState) return;
+    publishedResultsState = state;
     if (!data.published) {
       box.style.display = "none";
       return;
@@ -1292,7 +1300,9 @@ async function loadStudentResults() {
     if (data.publish_answers || data.publish_comments || data.publish_scores) {
       box.style.display = "block";
       let html = `<div style="margin-top: 1.5rem; text-align: left;">
-        <button type="button" id="btn-show-published-results" class="btn btn-primary" onclick="togglePublishedResults()">Посмотреть ответы</button>
+        <div class="published-results-button-wrap">
+        <button type="button" id="btn-show-published-results" class="btn btn-primary published-results-button" onclick="togglePublishedResults()">Посмотреть ответы</button>
+        </div>
         <div id="published-results-details" style="display: none; margin-top: 1rem;">
         <h4 style="margin-bottom: 1rem;">Разбор заданий:</h4>`;
       data.tasks.forEach(t => {
