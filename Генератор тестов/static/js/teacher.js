@@ -2289,7 +2289,8 @@ async function saveLaunchSettings() {
 
     if (durationInput) durationInput.value = durationMinutes;
 
-    alert("✓ Настройки проведения успешно сохранены!");
+    // Для тумблеров не показываем модальное подтверждение: изменение уже
+    // видно по состоянию переключателя и обновлённым строкам учеников.
   } catch (err) {
     alert("Ошибка сохранения: " + err.message);
   } finally {
