@@ -12,6 +12,8 @@ import uuid
 import secrets
 import asyncio
 import logging
+import shutil
+import subprocess
 import unicodedata
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
@@ -129,6 +131,37 @@ async def background_timer_and_heartbeat_checker():
         except Exception as e:
             logger.error("Error in timer checker: %s", e)
 
+async def auto_enable_internet_access():
+    """Start the optional public student gateway after the server is listening."""
+    if os.environ.get("BAGALAU_AUTO_INTERNET", "1").strip().lower() in {"0", "false", "no", "off"}:
+        return
+    await asyncio.sleep(5)
+    script_path = os.path.join(BASE_DIR, "enable_internet.ps1")
+    if not os.path.isfile(script_path) or sys.platform != "win32":
+        return
+    powershell = shutil.which("powershell.exe") or shutil.which("pwsh.exe")
+    if not powershell:
+        logger.info("Интернет-ссылка не запущена: PowerShell не найден")
+        return
+    runtime_dir = os.path.join(BASE_DIR, ".runtime")
+    os.makedirs(runtime_dir, exist_ok=True)
+    log_path = os.path.join(runtime_dir, "auto-internet.log")
+    try:
+        log_file = open(log_path, "a", encoding="utf-8")
+        creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        subprocess.Popen(
+            [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script_path],
+            cwd=BASE_DIR,
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
+            creationflags=creationflags,
+            close_fds=False,
+        )
+        log_file.close()
+        logger.info("Автозапуск интернет-ссылки отправлен в фон")
+    except Exception as exc:
+        logger.warning("Не удалось запустить интернет-ссылку автоматически: %s", exc)
+
 @app.on_event("startup")
 async def on_startup():
     await init_db()
@@ -147,6 +180,7 @@ async def on_startup():
             logger.info("Default teacher account created: login 'teacher', password 'bagalau2026'")
             
     asyncio.create_task(background_timer_and_heartbeat_checker())
+    asyncio.create_task(auto_enable_internet_access())
 
 # Helper: автоматическая проверка объективных заданий
 async def auto_grade_attempt(db, attempt_id: str, snapshot_tasks_json: str):
