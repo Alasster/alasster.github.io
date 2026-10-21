@@ -613,9 +613,9 @@
        ========================================================================= -->
   <div id="screen-error" class="student-screen student-container" style="display: none;">
     <div class="card" style="text-align: center; padding: 3rem 2rem;">
-      <h2 style="margin-bottom: 0.5rem;">Внимание</h2>
+      <div id="status-icon" style="width: 56px; height: 56px; margin: 0 auto 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FEF3C7; color: #B45309; font-size: 1.7rem;">i</div>
+      <h2 id="error-title" style="margin-bottom: 0.5rem;">Текущий статус</h2>
       <p id="error-msg" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
-      <a href="/" class="btn btn-secondary">Перейти на сайт</a>
     </div>
   </div>
 
@@ -630,6 +630,6 @@
     }
   </style>
   <script src="/static/js/exam-content-guard.js?v=20261018"></script>
-  <script src="/static/js/student.js?v=20261021-teacher-explanation"></script>
+  <script src="/static/js/student.js?v=20261021-status-screen"></script>
 </body>
 </html>

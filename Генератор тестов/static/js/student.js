@@ -113,15 +113,13 @@ async function loadLaunchPublicInfo() {
     const res = await fetch(`/api/student/check/${launchId}`);
     if (!res.ok) {
       const err = await res.json();
-      showScreen("screen-error");
-      document.getElementById("error-msg").textContent = err.detail || "Работа не найдена";
+      showStudentStatus("Вход закрыт", "Вход на эту работу уже закрыт учителем.");
       return;
     }
     launchInfo = await res.json();
     populateLaunchInfoOnScreens();
   } catch (err) {
-    showScreen("screen-error");
-    document.getElementById("error-msg").textContent = "Ошибка подключения к серверу";
+    showStudentStatus("Не удалось открыть работу", "Проверьте соединение и попробуйте ещё раз.");
   }
 }
 
@@ -420,7 +418,7 @@ document.getElementById("join-form").addEventListener("submit", async (e) => {
     setStudentToken(data.attempt_token);
     await checkExistingAttempt();
   } catch (err) {
-    alert(err.message);
+    showStudentStatusForError(err.message);
     joinBtn.disabled = false;
     joinBtn.textContent = "Подтвердить и продолжить";
   }
@@ -444,7 +442,7 @@ document.getElementById("btn-start-exam").addEventListener("click", async () => 
     // Загружаем полные актуальные данные попытки с заданиями с сервера
     await checkExistingAttempt();
   } catch (err) {
-    alert(err.message);
+    showStudentStatusForError(err.message);
     btn.disabled = false;
     btn.textContent = "Начать выполнение работы";
   }
@@ -1345,6 +1343,25 @@ function showScreen(screenId) {
   document.querySelectorAll(".student-screen").forEach(s => s.style.display = "none");
   const el = document.getElementById(screenId);
   if (el) el.style.display = "block";
+}
+
+function showStudentStatus(title, message) {
+  const titleEl = document.getElementById("error-title");
+  const msgEl = document.getElementById("error-msg");
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl) msgEl.textContent = message;
+  showScreen("screen-error");
+}
+
+function showStudentStatusForError(rawMessage) {
+  const message = String(rawMessage || "");
+  if (message.includes("Проведение работы уже завершено")) {
+    showStudentStatus("Работа завершена", "Проведение работы уже завершено.");
+  } else if (message.includes("Вход на работу уже закрыт")) {
+    showStudentStatus("Вход закрыт", "Вход на эту работу уже закрыт учителем.");
+  } else {
+    showStudentStatus("Не удалось продолжить", message || "Попробуйте ещё раз.");
+  }
 }
 
 function escapeHtml(str) {
