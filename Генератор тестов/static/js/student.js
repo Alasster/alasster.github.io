@@ -1080,9 +1080,28 @@ function updateCalcDisplay() {
 // ОТПРАВКА РАБОТЫ И МГНОВЕННЫЙ ПОКАЗ РЕЗУЛЬТАТОВ
 // =========================================================================
 document.getElementById("btn-submit-exam").addEventListener("click", () => {
-  // Отправляем сразу: итоговый экран покажет, что проведение завершено.
-  submitWork(false);
+  const unanswered = currentTasks.filter(t => {
+    const d = localDrafts[t.id];
+    return !d || d.answer === null || d.answer === "" || (Array.isArray(d.answer) && d.answer.length === 0);
+  }).length;
+  const message = unanswered > 0
+    ? `Осталось неотвеченных заданий: ${unanswered}. После отправки изменить ответы будет нельзя.`
+    : "После отправки изменить ответы будет нельзя.";
+  const msgEl = document.getElementById("student-submit-confirm-message");
+  const modal = document.getElementById("student-submit-confirm-modal");
+  if (msgEl) msgEl.textContent = message;
+  if (modal) modal.style.display = "flex";
 });
+
+function hideSubmitConfirm() {
+  const modal = document.getElementById("student-submit-confirm-modal");
+  if (modal) modal.style.display = "none";
+}
+
+function confirmStudentSubmit() {
+  hideSubmitConfirm();
+  submitWork(false);
+}
 
 // Сбор всех ответов для надёжной атомарной сдачи
 function collectAllAnswers() {
