@@ -619,6 +619,16 @@
     </div>
   </div>
 
+  <!-- Небольшое уведомление о статусе проведения без системного alert -->
+  <div id="student-status-modal" role="status" aria-live="polite" style="display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 1rem; background: rgba(15, 23, 42, 0.22); backdrop-filter: blur(3px);">
+    <div style="width: min(390px, 100%); border: 1px solid rgba(148, 163, 184, 0.35); border-radius: 16px; padding: 1.35rem 1.35rem 1.15rem; background: rgba(255, 255, 255, 0.97); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2); text-align: center;">
+      <div id="student-status-modal-icon" style="width: 42px; height: 42px; margin: 0 auto 0.7rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FEF3C7; color: #B45309; font-size: 1.25rem; font-weight: 800;">!</div>
+      <div id="student-status-modal-title" style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">Текущий статус</div>
+      <div id="student-status-modal-message" style="margin-top: 0.45rem; color: #64748B; font-size: 0.92rem; line-height: 1.45;"></div>
+      <button type="button" class="btn btn-secondary" onclick="hideStudentStatus()" style="margin-top: 1rem; min-width: 96px;">Понятно</button>
+    </div>
+  </div>
+
   <!-- KaTeX скрипты -->
   <script src="/static/vendor/katex.min.js"></script>
   <script src="/static/vendor/auto-render.min.js"></script>
@@ -630,6 +640,6 @@
     }
   </style>
   <script src="/static/js/exam-content-guard.js?v=20261018"></script>
-  <script src="/static/js/student.js?v=20261021-status-screen"></script>
+  <script src="/static/js/student.js?v=20261021-status-modal"></script>
 </body>
 </html>

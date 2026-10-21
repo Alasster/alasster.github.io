@@ -1346,11 +1346,18 @@ function showScreen(screenId) {
 }
 
 function showStudentStatus(title, message) {
-  const titleEl = document.getElementById("error-title");
-  const msgEl = document.getElementById("error-msg");
-  if (titleEl) titleEl.textContent = title;
-  if (msgEl) msgEl.textContent = message;
-  showScreen("screen-error");
+  const modal = document.getElementById("student-status-modal");
+  const titleEl = document.getElementById("student-status-modal-title");
+  const msgEl = document.getElementById("student-status-modal-message");
+  if (!modal || !titleEl || !msgEl) return;
+  titleEl.textContent = title;
+  msgEl.textContent = message;
+  modal.style.display = "flex";
+}
+
+function hideStudentStatus() {
+  const modal = document.getElementById("student-status-modal");
+  if (modal) modal.style.display = "none";
 }
 
 function showStudentStatusForError(rawMessage) {
