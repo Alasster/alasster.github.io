@@ -9,15 +9,33 @@ function Test-BagalauHealth([string]$BaseUrl) {
     } catch { return $false }
 }
 
+function Get-LocalStudentUrls {
+    $urls = @()
+    [System.Net.NetworkInformation.NetworkInterface]::GetAllNetworkInterfaces() |
+        Where-Object { $_.OperationalStatus -eq 'Up' -and $_.NetworkInterfaceType -ne 'Loopback' } |
+        ForEach-Object {
+            $_.GetIPProperties().UnicastAddresses |
+                Where-Object { $_.Address.AddressFamily -eq 'InterNetwork' -and $_.Address.ToString() -notlike '169.254.*' -and $_.Address.ToString() -notlike '127.*' } |
+                ForEach-Object { $urls += ('http://' + $_.Address + ':8000/exam/') }
+        }
+    return $urls | Select-Object -Unique
+}
+
 try {
+    $runtime = Join-Path $PSScriptRoot '.runtime'
+    New-Item -ItemType Directory -Path $runtime -Force | Out-Null
     $tailscale = Get-Command tailscale.exe -ErrorAction SilentlyContinue
     $exe = if ($tailscale) { $tailscale.Source } else { 'C:\Program Files\Tailscale\tailscale.exe' }
-    if (-not (Test-Path -LiteralPath $exe)) { throw 'Установите Tailscale на ПК учителя и войдите в свою учётную запись.' }
-    $stateJson = & $exe status --json
-    if ($LASTEXITCODE -ne 0) { throw 'Не удалось проверить Tailscale. Откройте приложение Tailscale и повторите запуск.' }
-    $state = $stateJson | ConvertFrom-Json
-    if ($state.BackendState -ne 'Running' -or -not $state.Self.Online) { throw 'Tailscale не подключён. Откройте Tailscale и войдите в свою учётную запись.' }
-    $url = 'https://' + $state.Self.DNSName.TrimEnd('.')
+    $state = $null
+    if (Test-Path -LiteralPath $exe) {
+        try {
+            $stateJson = & $exe status --json 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                $candidateState = $stateJson | ConvertFrom-Json
+                if ($candidateState.BackendState -eq 'Running' -and $candidateState.Self.Online) { $state = $candidateState }
+            }
+        } catch { $state = $null }
+    }
 
     # Reuse the running server; never interrupt a lesson or launch a second copy.
     $localReady = Test-BagalauHealth 'http://127.0.0.1:8000'
@@ -25,8 +43,6 @@ try {
     if ($localReady -and -not $studentReady) {
         throw 'Сервер работает без ученического интернет-входа на порту 8001. После окончания текущей работы перезапустите start_server.bat и повторите запуск.'
     }
-    $runtime = Join-Path $PSScriptRoot '.runtime'
-    New-Item -ItemType Directory -Path $runtime -Force | Out-Null
     if (-not $localReady) {
         if ($studentReady) { throw 'Порт 8001 занят, но основной сервер недоступен. Проверьте уже запущенный сервер.' }
         Write-Host 'Запускается сервер. Повторный запуск при работающем сервере не требуется.'
@@ -45,24 +61,58 @@ try {
         if (-not ($localReady -and $studentReady)) { throw 'Сервер ещё не готов. Проверьте .runtime/phone-server-error.log и повторите запуск.' }
     }
 
-    Write-Host 'Публикуется только ученический вход. Кабинет учителя остаётся в локальной сети.'
-    Write-Host 'Если Tailscale покажет ссылку включения Funnel, откройте её и разрешите доступ в своей учётной записи.'
-    $ErrorActionPreference = 'Continue'
-    & $exe funnel --bg --https=443 http://127.0.0.1:8001
-    $result = $LASTEXITCODE
-    $ErrorActionPreference = 'Stop'
-    if ($result -ne 0) { throw 'Внешний доступ не включён. Выполните инструкции Tailscale выше.' }
     $publicReady = $false
-    for ($attempt = 0; $attempt -lt 6; $attempt++) {
-        if (Test-BagalauHealth $url) { $publicReady = $true; break }
-        Start-Sleep -Seconds 1
+    $publicUrl = $null
+
+    if ($state) {
+        $url = 'https://' + $state.Self.DNSName.TrimEnd('.')
+        Write-Host 'Публикуется ученический вход через Tailscale Funnel.'
+        $ErrorActionPreference = 'Continue'
+        & $exe funnel --bg --https=443 http://127.0.0.1:8001
+        $result = $LASTEXITCODE
+        $ErrorActionPreference = 'Stop'
+        if ($result -eq 0) {
+            for ($attempt = 0; $attempt -lt 8; $attempt++) {
+                if (Test-BagalauHealth $url) { $publicReady = $true; $publicUrl = $url; break }
+                Start-Sleep -Seconds 1
+            }
+        }
     }
-    if (-not $publicReady) { throw 'Внешняя ссылка пока не отвечает. Проверьте интернет на ПК учителя и повторите запуск. Локальный сервер продолжает работать.' }
-    [IO.File]::WriteAllText((Join-Path $runtime 'public_url.txt'), $url, [Text.UTF8Encoding]::new($false))
-    Write-Host ('Проверено: сервер доступен через интернет. Внешний адрес: ' + $url)
+
+    if (-not $publicReady) {
+        $cloudflared = Get-Command cloudflared.exe -ErrorAction SilentlyContinue
+        if ($cloudflared) {
+            $cfLog = Join-Path $runtime 'cloudflared.log'
+            $cfErr = Join-Path $runtime 'cloudflared-error.log'
+            Remove-Item -LiteralPath $cfLog, $cfErr -Force -ErrorAction SilentlyContinue
+            Start-Process $cloudflared.Source -ArgumentList 'tunnel --no-autoupdate --url http://127.0.0.1:8001' -WindowStyle Hidden `
+                -RedirectStandardOutput $cfLog -RedirectStandardError $cfErr | Out-Null
+            for ($attempt = 0; $attempt -lt 15; $attempt++) {
+                if (Test-Path -LiteralPath $cfLog) {
+                    $match = Select-String -LiteralPath $cfLog -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' -AllMatches | Select-Object -Last 1
+                    if ($match) { $publicUrl = $match.Matches[0].Value; $publicReady = $true; break }
+                }
+                if (Test-Path -LiteralPath $cfErr) {
+                    $match = Select-String -LiteralPath $cfErr -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' -AllMatches | Select-Object -Last 1
+                    if ($match) { $publicUrl = $match.Matches[0].Value; $publicReady = $true; break }
+                }
+                Start-Sleep -Seconds 1
+            }
+        }
+    }
+
+    if ($publicReady) {
+        [IO.File]::WriteAllText((Join-Path $runtime 'public_url.txt'), $publicUrl, [Text.UTF8Encoding]::new($false))
+        Write-Host ('Проверено: сервер доступен через интернет. Внешний адрес: ' + $publicUrl)
+    } else {
+        Remove-Item -LiteralPath (Join-Path $runtime 'public_url.txt') -Force -ErrorAction SilentlyContinue
+        Write-Host 'Внешний туннель недоступен. Показываю адреса локальной сети; они работают только в той же сети.' -ForegroundColor Yellow
+        Get-LocalStudentUrls | ForEach-Object { Write-Host ('  ' + $_) }
+    }
     Write-Host 'Кабинет учителя: http://127.0.0.1:8000/teacher'
     Write-Host 'В кабинете учителя заново откройте мониторинг работы и скопируйте ссылку ученикам.'
-    Write-Host 'Телефон открывает её через мобильный интернет или любой Wi-Fi. IP телефона и установка Tailscale ученику не нужны.'
+    if ($publicReady) { Write-Host 'Ученикам Tailscale не нужен: ссылка работает через интернет.' }
+    else { Write-Host 'Для доступа из другой сети установите Tailscale или cloudflared на ПК учителя.' }
     Write-Host 'Урок пересоздавать не нужно: отправьте ученику прямую HTTPS-ссылку на ту же работу.'
     Write-Host 'Это окно можно закрыть: сервер продолжит принимать ответы.'
     Write-Host 'Сервер и Tailscale на ПК учителя должны оставаться включёнными.'

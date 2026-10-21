@@ -1289,10 +1289,19 @@ async function loadStudentResults() {
       return;
     }
 
-    if (data.publish_answers || data.publish_comments) {
+    if (data.publish_answers || data.publish_comments || data.publish_scores) {
       box.style.display = "block";
-      let html = `<div style="margin-top: 1.5rem; text-align: left;"><h4 style="margin-bottom: 1rem;">Разбор заданий:</h4>`;
+      let html = `<div style="margin-top: 1.5rem; text-align: left;">
+        <button type="button" id="btn-show-published-results" class="btn btn-primary" onclick="togglePublishedResults()">Посмотреть ответы</button>
+        <div id="published-results-details" style="display: none; margin-top: 1rem;">
+        <h4 style="margin-bottom: 1rem;">Разбор заданий:</h4>`;
       data.tasks.forEach(t => {
+        const studentAnswer = t.student_answer === null || t.student_answer === undefined || t.student_answer === ""
+          ? "Нет ответа"
+          : escapeHtml(formatPublishedValue(t.student_answer));
+        const correctAnswer = t.correct_answer === null || t.correct_answer === undefined
+          ? ""
+          : `<strong>Правильный ответ:</strong> <span style="color: var(--success); font-weight: 600;">${escapeHtml(formatPublishedValue(t.correct_answer))}</span><br>`;
         html += `
           <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
             <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.5rem;">
@@ -1301,18 +1310,35 @@ async function loadStudentResults() {
             </div>
             <p style="margin-bottom: 0.5rem;">${escapeHtml(t.question_text)}</p>
             <div style="font-size: 0.9rem; color: var(--text-muted);">
-              <strong>Ваш ответ:</strong> ${t.student_answer ? escapeHtml(JSON.stringify(t.student_answer)) : 'Нет ответа'}<br>
-              ${t.correct_answer ? `<strong>Правильный ответ:</strong> <span style="color: var(--success); font-weight: 600;">${escapeHtml(JSON.stringify(t.correct_answer))}</span><br>` : ''}
+              <strong>Ваш ответ:</strong> ${studentAnswer}<br>
+              ${correctAnswer}
               ${t.explanation ? `<strong>Пояснение:</strong> ${escapeHtml(t.explanation)}<br>` : ''}
               ${t.teacher_comment ? `<strong>Комментарий учителя:</strong> <em>${escapeHtml(t.teacher_comment)}</em>` : ''}
             </div>
           </div>
         `;
       });
-      html += `</div>`;
+      html += `</div></div>`;
       box.innerHTML = html;
     }
   } catch (e) {}
+}
+
+function formatPublishedValue(value) {
+  if (Array.isArray(value)) return value.join(", ");
+  if (value && typeof value === "object") {
+    return Object.entries(value).map(([key, val]) => `${key} → ${val}`).join(", ");
+  }
+  return String(value);
+}
+
+function togglePublishedResults() {
+  const details = document.getElementById("published-results-details");
+  const button = document.getElementById("btn-show-published-results");
+  if (!details || !button) return;
+  const visible = details.style.display !== "none";
+  details.style.display = visible ? "none" : "block";
+  button.textContent = visible ? "Посмотреть ответы" : "Скрыть ответы";
 }
 
 function clearStudentSession() {

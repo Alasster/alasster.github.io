@@ -69,7 +69,10 @@ function closeLogoutModal() {
 
 async function performLogout() {
   try {
-    await fetch("/api/teacher/logout", { method: "POST" });
+    await Promise.race([
+      fetch("/api/teacher/logout", { method: "POST" }),
+      new Promise(resolve => setTimeout(resolve, 2000))
+    ]);
   } catch (e) {}
   window.location.href = "/teacher/login";
 }
@@ -1730,8 +1733,8 @@ function renderStudentPreviewContent() {
       <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span style="font-weight: 700; font-size: 0.9rem;">Предпросмотр:</span>
         <div class="btn-group" style="display: inline-flex; border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;">
-          <button type="button" class="btn btn-sm ${previewVariant === '1' ? 'btn-primary' : 'btn-secondary'}" onclick="openStudentPreview('1')" style="padding: 4px 10px;">🌸 Вариант 1</button>
-          <button type="button" class="btn btn-sm ${previewVariant === '2' ? 'btn-primary' : 'btn-secondary'}" onclick="openStudentPreview('2')" style="padding: 4px 10px;">🍃 Вариант 2</button>
+          <button type="button" class="btn btn-sm ${previewVariant === '1' ? 'btn-primary' : 'btn-secondary'}" onclick="openStudentPreview('1')" style="padding: 4px 10px;">Вариант 1</button>
+          <button type="button" class="btn btn-sm ${previewVariant === '2' ? 'btn-primary' : 'btn-secondary'}" onclick="openStudentPreview('2')" style="padding: 4px 10px;">Вариант 2</button>
         </div>
       </div>
       <div>
@@ -2175,6 +2178,7 @@ async function openLiveMonitoring(launchId) {
     }
     document.getElementById("live-public-url").value = `${studentOrigin}/exam/${activeLaunch.id}`;
     updateLiveStatusBadge(activeLaunch.status);
+    updatePublishResultsButton();
 
     document.getElementById("set-manual-approval").checked = !!activeLaunch.manual_approval;
     document.getElementById("set-duration").value = activeLaunch.duration_minutes || 0;
@@ -2212,8 +2216,32 @@ function switchLaunchTab(tabId) {
     if (elScores) elScores.checked = !!activeLaunch.publish_scores;
     if (elAnswers) elAnswers.checked = !!activeLaunch.publish_answers;
     if (elComments) elComments.checked = !!activeLaunch.publish_comments;
+    updatePublishResultsButton();
   }
 }
+
+function updatePublishResultsButton() {
+  const btn = document.getElementById("btn-toggle-publish-results");
+  const input = document.getElementById("publish-results-toggle-input");
+  const label = document.getElementById("publish-results-toggle-label");
+  if (!btn || !input) return;
+  const published = !!(activeLaunch && (activeLaunch.publish_scores || activeLaunch.publish_answers || activeLaunch.publish_comments));
+  input.checked = published;
+  btn.title = published ? "Скрыть результаты от учеников" : "Выдать результаты ученикам";
+  if (label) label.textContent = published ? "Результаты выданы" : "Выдать результаты";
+}
+
+async function togglePublishResults(enabled = null) {
+  if (!activeLaunch) return;
+  const published = !!(activeLaunch.publish_scores || activeLaunch.publish_answers || activeLaunch.publish_comments);
+  const nextState = enabled === null ? !published : !!enabled;
+  ["set-pub-scores", "set-pub-answers", "set-pub-comments"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = nextState;
+  });
+  await saveLaunchSettings();
+}
+window.togglePublishResults = togglePublishResults;
 
 async function saveLaunchSettings() {
   if (!activeLaunch) {
@@ -2256,6 +2284,7 @@ async function saveLaunchSettings() {
     activeLaunch.publish_scores = pubScores;
     activeLaunch.publish_answers = pubAnswers;
     activeLaunch.publish_comments = pubComments;
+    updatePublishResultsButton();
 
     if (durationInput) durationInput.value = durationMinutes;
 
@@ -2307,8 +2336,8 @@ function renderLiveStudentsTable() {
 
     const vStr = String(s.variant || "1");
     const varBadge = vStr === "2"
-      ? '<span class="badge" style="background: #E6F4EA; color: #166534; font-weight: 700;">🍃 Вар. 2</span>'
-      : '<span class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700;">🌸 Вар. 1</span>';
+      ? '<span class="badge" style="background: #E6F4EA; color: #166534; font-weight: 700; white-space: nowrap; display: inline-block;">Вар. 2</span>'
+      : '<span class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700; white-space: nowrap; display: inline-block;">Вар. 1</span>';
 
     tr.innerHTML = `
       <td><strong>${escapeHtml(s.student_name)}</strong></td>
@@ -2339,11 +2368,15 @@ function renderLiveStudentsTable() {
   document.getElementById("cnt-submitted").textContent = submitted;
 }
 
-async function deleteStudentAttempt(attemptId, studentName) {
+async function deleteStudentAttempt(attemptId, studentName, permanent = false) {
   if (!activeLaunch) return;
-  if (!confirm(`Удалить попытку ученика «${studentName}»?\nВсе его ответы будут стёрты, а ученик сможет войти и сдать работу заново.`)) return;
+  const message = permanent
+    ? `Удалить результат ученика «${studentName}» навсегда?\nЭта операция удалит ответы из результатов и Excel.`
+    : `Убрать ученика «${studentName}» из live-проведения?\nЕго попытка и ответы останутся в результатах, а ученик сможет войти заново.`;
+  if (!confirm(message)) return;
   try {
-    const res = await fetch(`/api/launches/${activeLaunch.id}/students/${attemptId}`, { method: "DELETE" });
+    const suffix = permanent ? "?permanent=true" : "";
+    const res = await fetch(`/api/launches/${activeLaunch.id}/students/${attemptId}${suffix}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Не удалось удалить попытку");
     await refreshStudentsList();
     await loadGradingData();
@@ -2819,8 +2852,8 @@ function renderGradingView() {
   attempts.forEach(att => {
     const vStr = String(att.variant || "1");
     const varBadge = vStr === "2"
-      ? '<span class="badge" style="background: #E6F4EA; color: #166534; font-weight: 700;">🍃 Вар. 2</span>'
-      : '<span class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700;">🌸 Вар. 1</span>';
+      ? '<span class="badge" style="background: #E6F4EA; color: #166534; font-weight: 700; white-space: nowrap; display: inline-block;">Вар. 2</span>'
+      : '<span class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700; white-space: nowrap; display: inline-block;">Вар. 1</span>';
 
     const studentTasks = tasks.filter(t => {
       const tv = String(t.variant || "1");
@@ -2848,7 +2881,7 @@ function renderGradingView() {
             <button type="button" class="btn btn-primary btn-sm" onclick="printStudentSheet('${att.id}')" title="Печать бланка в PDF">
               🖨 Печать в PDF
             </button>
-            <button type="button" class="btn btn-danger btn-sm" onclick="deleteStudentAttempt('${att.id}', '${escapeHtml(att.student_name)}')" title="Удалить попытку и разрешить пересдачу">
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteStudentAttempt('${att.id}', '${escapeHtml(att.student_name)}', true)" title="Удалить результат навсегда">
               🗑
             </button>
           </div>

@@ -59,6 +59,20 @@ app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), na
 # SSE event bus for teacher live updates: launch_id -> set of asyncio.Queue
 LIVE_STREAMS: Dict[str, List[asyncio.Queue]] = {}
 
+
+def attempt_deadline_expired(attempt: dict, grace_seconds: int = 10) -> bool:
+    """Return whether a student's server-side deadline has passed."""
+    deadline = attempt.get("server_deadline")
+    if not deadline:
+        return False
+    try:
+        deadline_dt = datetime.fromisoformat(deadline)
+        if deadline_dt.tzinfo is None:
+            deadline_dt = deadline_dt.replace(tzinfo=timezone.utc)
+        return datetime.now(timezone.utc) > deadline_dt + timedelta(seconds=grace_seconds)
+    except (TypeError, ValueError):
+        return False
+
 def broadcast_live_event(launch_id: str, event_type: str, data: Any):
     if launch_id in LIVE_STREAMS:
         payload = json.dumps({"event": event_type, "data": data, "timestamp": datetime.now().isoformat()})
@@ -103,7 +117,7 @@ async def background_timer_and_heartbeat_checker():
                             UPDATE student_attempts
                             SET status = 'time_expired', submitted_at = ?, confirmation_code = ?
                             WHERE id = ? AND status = 'in_progress'
-                        """, (datetime.now().isoformat(), conf_code, att_id))
+                        """, (datetime.now(timezone.utc).isoformat(), conf_code, att_id))
                         
                         # Проводим объективную автопроверку сохраненных ответов
                         await auto_grade_attempt(db, att_id, row["snapshot_tasks_json"])
@@ -814,7 +828,7 @@ async def update_launch_status(launch_id: str, req: UpdateLaunchStatusRequest, t
     if req.status not in valid_statuses:
         raise HTTPException(status_code=400, detail="Недопустимый статус проведения")
 
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     async with get_db() as db:
         cursor = await db.execute("SELECT * FROM launches WHERE id = ? AND teacher_id = ?", (launch_id, teacher["id"]))
         launch = await cursor.fetchone()
@@ -945,7 +959,12 @@ async def delete_launch(launch_id: str, teacher: dict = Depends(get_current_teac
     return {"deleted": True, "message": "Сессия проведения успешно удалена"}
 
 @app.delete("/api/launches/{launch_id}/students/{attempt_id}")
-async def delete_student_attempt_endpoint(launch_id: str, attempt_id: str, teacher: dict = Depends(get_current_teacher)):
+async def delete_student_attempt_endpoint(
+    launch_id: str,
+    attempt_id: str,
+    permanent: bool = Query(False),
+    teacher: dict = Depends(get_current_teacher)
+):
     async with get_db() as db:
         await db.execute("BEGIN IMMEDIATE")
         c = await db.execute("""
@@ -958,8 +977,20 @@ async def delete_student_attempt_endpoint(launch_id: str, attempt_id: str, teach
 
         await record_retake_permission(db, launch_id, attempt)
         
-        await db.execute("DELETE FROM student_answers WHERE attempt_id = ?", (attempt_id,))
-        await db.execute("DELETE FROM student_attempts WHERE id = ? AND launch_id = ?", (attempt_id, launch_id))
+        if permanent:
+            await db.execute("DELETE FROM student_answers WHERE attempt_id = ?", (attempt_id,))
+            await db.execute("DELETE FROM student_attempts WHERE id = ? AND launch_id = ?", (attempt_id, launch_id))
+        else:
+            # Keep the attempt and its answers as a result record. Mark it
+            # removed from the live roster so the identity/IP can be reused.
+            removed_at = datetime.now(timezone.utc).isoformat()
+            await db.execute("""
+                UPDATE student_attempts
+                SET status = 'removed', submitted_at = COALESCE(submitted_at, ?),
+                    server_deadline = NULL,
+                    confirmation_code = COALESCE(confirmation_code, ?)
+                WHERE id = ? AND launch_id = ?
+            """, (removed_at, f"REM-{secrets.token_hex(3).upper()}", attempt_id, launch_id))
         await db.commit()
     
     broadcast_live_event(launch_id, "student_removed", {"attempt_id": attempt_id})
@@ -1005,7 +1036,7 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
                    SUM(COALESCE(ans.final_score, 0)) as total_score
             FROM student_attempts sa
             LEFT JOIN student_answers ans ON sa.id = ans.attempt_id
-            WHERE sa.launch_id = ?
+            WHERE sa.launch_id = ? AND sa.status != 'removed'
             GROUP BY sa.id
             ORDER BY sa.created_at DESC
         """, (launch_id,))
@@ -1062,7 +1093,14 @@ async def teacher_student_action(
             await db.execute("UPDATE student_attempts SET status = 'approved' WHERE id = ?", (attempt_id,))
         elif action == "remove":
             await record_retake_permission(db, launch_id, row)
-            await db.execute("DELETE FROM student_attempts WHERE id = ?", (attempt_id,))
+            removed_at = datetime.now(timezone.utc).isoformat()
+            await db.execute("""
+                UPDATE student_attempts
+                SET status = 'removed', submitted_at = COALESCE(submitted_at, ?),
+                    server_deadline = NULL,
+                    confirmation_code = COALESCE(confirmation_code, ?)
+                WHERE id = ?
+            """, (removed_at, f"REM-{secrets.token_hex(3).upper()}", attempt_id))
         elif action == "block":
             await db.execute("UPDATE student_attempts SET status = 'blocked' WHERE id = ?", (attempt_id,))
         elif action == "unblock":
@@ -1488,10 +1526,10 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
             ORDER BY created_at DESC, rowid DESC
         """, (launch_id,))
         attempts = await cursor.fetchall()
-        matching = [a for a in attempts if a["attempt_token"] in tokens or (
+        matching = [a for a in attempts if a["status"] != "removed" and (a["attempt_token"] in tokens or (
             normalize_student_identity(a["student_name"]),
             normalize_student_identity(a["student_class"])
-        ) == identity]
+        ) == identity)]
         extra_allowed = False
         if matching:
             existing = matching[0]
@@ -1800,16 +1838,8 @@ async def student_save_answer(req: SaveAnswerRequest, attempt: dict = Depends(ge
     if attempt["status"] != "in_progress":
         raise HTTPException(status_code=403, detail="Сохранение невозможно: попытка не активна")
 
-    # Проверка серверного таймера
-    if attempt.get("server_deadline"):
-        try:
-            dl = datetime.fromisoformat(attempt["server_deadline"])
-            if dl.tzinfo is None:
-                dl = dl.replace(tzinfo=timezone.utc)
-            if datetime.now(timezone.utc) > dl + timedelta(seconds=10):
-                raise HTTPException(status_code=403, detail="Время на выполнение работы истекло")
-        except Exception:
-            pass
+    if attempt_deadline_expired(attempt):
+        raise HTTPException(status_code=403, detail="Время на выполнение работы истекло")
 
     now = datetime.now().isoformat()
     ans_json = json.dumps(req.answer, ensure_ascii=False)
@@ -1849,6 +1879,8 @@ async def student_batch_save(req: BatchSaveAnswersRequest, attempt: dict = Depen
     """Пакетное сохранение для синхронизации локального черновика при восстановлении интернета"""
     if attempt["status"] != "in_progress":
         raise HTTPException(status_code=403, detail="Попытка не активна")
+    if attempt_deadline_expired(attempt):
+        raise HTTPException(status_code=403, detail="Время на выполнение работы истекло")
 
     now = datetime.now().isoformat()
     saved_versions = {}
@@ -1906,7 +1938,7 @@ async def student_heartbeat(attempt: dict = Depends(get_current_student_attempt)
 @app.post("/api/student/submit")
 async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_current_student_attempt)):
     """Атомарная сдача работы: фиксация ответов, автопроверка, расчет баллов и времени строго по варианту ученика"""
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
 
     async with get_db() as db:
         await db.execute("BEGIN IMMEDIATE")
@@ -1914,6 +1946,8 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
         if not current:
             raise HTTPException(status_code=404, detail="Попытка не найдена")
         attempt.update(dict(current))
+        if attempt["status"] == "in_progress" and attempt_deadline_expired(attempt):
+            raise HTTPException(status_code=403, detail="Время на выполнение работы истекло")
         # Если уже сдана, возвращаем существующие подсчитанные результаты
         if attempt["status"] in ["submitted", "time_expired"]:
             conf_code = attempt.get("confirmation_code") or f"BAG-{secrets.token_hex(3).upper()}"
