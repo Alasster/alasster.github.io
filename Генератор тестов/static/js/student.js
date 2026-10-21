@@ -1073,23 +1073,8 @@ function updateCalcDisplay() {
 // ОТПРАВКА РАБОТЫ И МГНОВЕННЫЙ ПОКАЗ РЕЗУЛЬТАТОВ
 // =========================================================================
 document.getElementById("btn-submit-exam").addEventListener("click", () => {
-  const total = currentTasks.length;
-  let unanswered = 0;
-  currentTasks.forEach(t => {
-    const d = localDrafts[t.id];
-    if (!d || d.answer === null || d.answer === "" || (Array.isArray(d.answer) && d.answer.length === 0)) {
-      unanswered++;
-    }
-  });
-
-  let msg = "Вы уверены, что хотите завершить и отправить работу?";
-  if (unanswered > 0) {
-    msg = `ВНИМАНИЕ: У вас осталось ${unanswered} неотвеченных заданий.\n\nВы уверены, что хотите отправить работу?`;
-  }
-
-  if (confirm(msg)) {
-    submitWork(false);
-  }
+  // Отправляем сразу: итоговый экран покажет, что проведение завершено.
+  submitWork(false);
 });
 
 // Сбор всех ответов для надёжной атомарной сдачи
