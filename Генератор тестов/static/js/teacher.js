@@ -2285,6 +2285,7 @@ async function saveLaunchSettings() {
     activeLaunch.publish_answers = pubAnswers;
     activeLaunch.publish_comments = pubComments;
     updatePublishResultsButton();
+    await refreshStudentsList();
 
     if (durationInput) durationInput.value = durationMinutes;
 

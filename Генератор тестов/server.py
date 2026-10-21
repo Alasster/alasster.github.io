@@ -926,6 +926,9 @@ async def update_launch_settings(launch_id: str, req: UpdateLaunchSettingsReques
 
         updates = []
         params = []
+        publish_settings_changed = any(value is not None for value in (
+            req.publish_scores, req.publish_answers, req.publish_comments
+        ))
         if req.manual_approval is not None:
             updates.append("manual_approval = ?")
             params.append(1 if req.manual_approval else 0)
@@ -954,6 +957,15 @@ async def update_launch_settings(launch_id: str, req: UpdateLaunchSettingsReques
         if updates:
             params.append(launch_id)
             await db.execute(f"UPDATE launches SET {', '.join(updates)} WHERE id = ?", params)
+
+            # Общая публикация должна иметь приоритет над прежними ручными
+            # решениями по отдельным ученикам. Следующий индивидуальный
+            # тумблер снова создаст персональное переопределение.
+            if publish_settings_changed:
+                await db.execute(
+                    "UPDATE student_attempts SET publish_results_override = NULL WHERE launch_id = ?",
+                    (launch_id,)
+                )
 
             # Если изменена продолжительность, пересчитываем дедлайн для учеников, решающих работу сейчас
             if req.duration_minutes is not None:
