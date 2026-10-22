@@ -7,80 +7,63 @@ const accessNav = document.getElementById('access-nav');
 const usersList = document.getElementById('users-list');
 const adminMessage = document.getElementById('admin-message');
 const workspaceRole = document.getElementById('workspace-role');
+const appShell = document.querySelector('.app-shell');
 const sidebar = document.querySelector('.sidebar');
-const sidebarIndicator = document.querySelector('.sidebar-liquid-indicator');
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const themeLabel = document.getElementById('theme-label');
+const logoutModal = document.getElementById('logout-modal');
+const logoutCancel = document.getElementById('logout-cancel');
+const logoutConfirm = document.getElementById('logout-confirm');
+const summaryStatus = document.getElementById('site-summary-status');
+const summaryLessons = document.getElementById('summary-lessons');
+const summaryClasses = document.getElementById('summary-classes');
+const summaryUsers = document.getElementById('summary-users');
+const summaryVisitors = document.getElementById('summary-visitors');
+const summaryClassesList = document.getElementById('summary-classes-list');
+const summaryTrafficNote = document.getElementById('summary-traffic-note');
+const summaryTrafficList = document.getElementById('summary-traffic-list');
 const roles = ['user', 'teacher', 'admin', 'superadmin'];
-let sidebarIndicatorY = null;
-const sidebarOutline = sidebarIndicator?.querySelector('path');
-let sidebarLiquidFrame = 0;
-let sidebarLiquidWidth = 52;
-let sidebarLiquidMotion = null;
-let sidebarLiquidState = null;
-let sidebarOpeningTimer = 0;
-let sidebarOpeningPlayed = false;
-const sidebarIndicatorBaseSize = 52;
 
-function playSidebarOpeningAnimation() {
-  if (!sidebar || sidebarOpeningPlayed) return;
-  sidebarOpeningPlayed = true;
-  window.clearTimeout(sidebarOpeningTimer);
-  sidebar.classList.remove('is-opening');
-  void sidebar.offsetWidth;
-  sidebar.classList.add('is-opening');
-  sidebarOpeningTimer = window.setTimeout(() => sidebar.classList.remove('is-opening'), 920);
+const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(Number(value) || 0);
+
+function appendSummaryRow(list, label, value) {
+  const row = document.createElement('li');
+  const labelNode = document.createElement('span');
+  const valueNode = document.createElement('strong');
+  labelNode.textContent = label;
+  valueNode.textContent = formatNumber(value);
+  row.append(labelNode, valueNode);
+  list.append(row);
 }
 
-sidebar?.addEventListener('pointerenter', playSidebarOpeningAnimation, { passive: true });
-sidebar?.addEventListener('focusin', () => {
-  if (!sidebar.matches(':hover')) playSidebarOpeningAnimation();
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  themeToggle?.setAttribute('aria-pressed', String(isDark));
+  if (themeIcon) themeIcon.textContent = isDark ? '☼' : '☾';
+  if (themeLabel) themeLabel.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+}
+
+applyTheme(localStorage.getItem('personal-cabinet-theme') || 'light');
+themeToggle?.addEventListener('click', () => {
+  const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('personal-cabinet-theme', nextTheme);
+  applyTheme(nextTheme);
 });
-function resetSidebarOpeningState() {
-  if (!sidebar || sidebar.matches(':hover') || sidebar.matches(':focus-within')) return;
-  window.clearTimeout(sidebarOpeningTimer);
-  sidebar.classList.remove('is-opening');
-  sidebarOpeningPlayed = false;
-}
-sidebar?.addEventListener('pointerleave', resetSidebarOpeningState);
-sidebar?.addEventListener('focusout', resetSidebarOpeningState);
 
-function moveSidebarIndicator(link, animate = true) {
-  if (!link || !sidebarOutline) return;
-  const y = link.offsetTop + Math.max(0, (link.offsetHeight - sidebarIndicatorBaseSize) / 2);
-  if (animate && sidebarIndicatorY === y) return;
-  const now = performance.now();
-  const current = sidebarLiquidMotion ? CabinetLiquid.sample(sidebarLiquidMotion,now,sidebarLiquidWidth) : sidebarLiquidState;
-  if (!animate || sidebarIndicatorY === null) {
-    sidebarIndicatorY = y;
-    sidebarLiquidMotion = null;
-    sidebarLiquidState = CabinetLiquid.resting(y+26,sidebarLiquidWidth);
-    sidebarOutline.setAttribute('d',CabinetLiquid.path(sidebarLiquidState));
-    return;
+function setSidebarExpanded(expanded) {
+  appShell?.classList.toggle('is-sidebar-expanded', expanded);
+}
+
+sidebar?.addEventListener('click', (event) => {
+  if (!event.target.closest('a, button')) {
+    setSidebarExpanded(!appShell.classList.contains('is-sidebar-expanded'));
   }
-  sidebarIndicatorY = y;
-  let initial=current;
-  // A completed transfer is represented by one source capsule again.
-  if(initial.source.r<.03&&initial.head.r>0)initial={source:initial.head,head:{y:initial.head.y,r:0,length:0},neck:0};
-  sidebarLiquidMotion = {initial,target:y+26,start:now,duration:620};
-  if (!sidebarLiquidFrame) sidebarLiquidFrame = requestAnimationFrame(animateLiquidOutline);
-}
-
-function animateLiquidOutline(now) {
-  sidebarLiquidFrame = 0;
-  if(!sidebarLiquidMotion)return;
-  sidebarLiquidState=CabinetLiquid.sample(sidebarLiquidMotion,now,sidebarLiquidWidth);
-  sidebarOutline.setAttribute('d',CabinetLiquid.path(sidebarLiquidState));
-  if (now < sidebarLiquidMotion.start + sidebarLiquidMotion.duration) {
-    sidebarLiquidFrame = requestAnimationFrame(animateLiquidOutline);
-  } else sidebarLiquidMotion=null;
-}
-
-if (sidebarIndicator) new ResizeObserver(([entry]) => {
-  sidebarLiquidWidth = entry.contentRect.width;
-  if (sidebarIndicatorY!==null) {
-    sidebarLiquidState=sidebarLiquidMotion?CabinetLiquid.sample(sidebarLiquidMotion,performance.now(),sidebarLiquidWidth):CabinetLiquid.resting(sidebarIndicatorY+26,sidebarLiquidWidth);
-    sidebarOutline.setAttribute('d',CabinetLiquid.path(sidebarLiquidState));
-  }
-}).observe(sidebarIndicator);
+});
+document.addEventListener('click', (event) => {
+  if (!sidebar?.contains(event.target)) setSidebarExpanded(false);
+});
 
 function syncSidebarActive() {
   const hash = window.location.hash || '#overview';
@@ -91,21 +74,14 @@ function syncSidebarActive() {
 }
 
 document.querySelectorAll('.sidebar-link').forEach((link) => {
-  link.addEventListener('pointerenter', () => moveSidebarIndicator(link), { passive: true });
-  link.addEventListener('focus', () => moveSidebarIndicator(link));
   link.addEventListener('click', () => {
     document.querySelectorAll('.sidebar-link').forEach((item) => item.classList.remove('active'));
     link.classList.add('active');
   });
 });
-document.querySelector('.sidebar-nav')?.addEventListener('pointerleave', () => moveSidebarIndicator(syncSidebarActive()));
 
-window.addEventListener('hashchange', () => {
-  const link = syncSidebarActive();
-  if (link) moveSidebarIndicator(link);
-});
-window.addEventListener('resize', () => moveSidebarIndicator(document.querySelector('.sidebar-link.active'), false));
-requestAnimationFrame(() => moveSidebarIndicator(syncSidebarActive(), false));
+window.addEventListener('hashchange', syncSidebarActive);
+syncSidebarActive();
 
 async function loadCurrentUser() {
   const response = await fetch('/api/me');
@@ -173,7 +149,53 @@ async function loadUsers() {
   });
 }
 
-logoutButton.addEventListener('click', async () => {
+async function loadSiteOverview() {
+  const response = await fetch('/api/site-overview');
+  if (!response.ok) throw new Error('Не удалось загрузить сводку сайта.');
+  const data = await response.json();
+  summaryLessons.textContent = formatNumber(data.lessons);
+  summaryClasses.textContent = formatNumber(data.classes.length);
+  summaryUsers.textContent = formatNumber(data.users);
+  summaryClassesList.replaceChildren();
+  data.classes.forEach((item) => appendSummaryRow(summaryClassesList, item.name, item.lessons));
+
+  const traffic = data.traffic;
+  summaryTrafficList.replaceChildren();
+  if (traffic.available) {
+    summaryVisitors.textContent = formatNumber(traffic.unique_visitors);
+    summaryTrafficNote.textContent = 'Данные GitHub за последние 14 дней.';
+    traffic.daily.slice(-5).forEach((item) => appendSummaryRow(summaryTrafficList, item.date, item.views));
+    summaryStatus.textContent = 'GitHub подключён';
+  } else {
+    summaryVisitors.textContent = '—';
+    summaryTrafficNote.textContent = 'Посещаемость GitHub появится после подключения GITHUB_TOKEN.';
+    summaryStatus.textContent = 'Локальные данные';
+  }
+}
+
+function closeLogoutModal() {
+  logoutModal.hidden = true;
+  logoutModal.style.display = 'none';
+}
+
+closeLogoutModal();
+window.addEventListener('pageshow', closeLogoutModal);
+
+logoutButton.addEventListener('click', () => {
+  logoutModal.hidden = false;
+  logoutModal.style.display = 'grid';
+  logoutConfirm.focus();
+});
+logoutCancel.addEventListener('click', closeLogoutModal);
+logoutModal.addEventListener('click', (event) => {
+  if (event.target === logoutModal) closeLogoutModal();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !logoutModal.hidden) closeLogoutModal();
+});
+
+logoutConfirm.addEventListener('click', async () => {
+  closeLogoutModal();
   logoutButton.disabled = true;
   try {
     await fetch('/api/logout', { method: 'POST' });
@@ -183,3 +205,7 @@ logoutButton.addEventListener('click', async () => {
 });
 
 loadCurrentUser().catch(() => window.location.replace('/login'));
+loadSiteOverview().catch(() => {
+  summaryStatus.textContent = 'Нет данных';
+  summaryTrafficNote.textContent = 'Сводка сайта временно недоступна.';
+});

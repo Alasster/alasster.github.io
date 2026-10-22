@@ -3,18 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#4f46e5">
+  <meta name="theme-color" content="#e5e9f2">
   <title>Личный кабинет</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=liquid-morph-3">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=overview-grid-1">
 </head>
 <body>
-  <div class="ambient-orb orb-1" aria-hidden="true"></div>
-  <div class="ambient-orb orb-2" aria-hidden="true"></div>
-  <div class="ambient-orb orb-3" aria-hidden="true"></div>
-
   <div class="app-shell">
     <aside class="sidebar glass-card">
       <a class="brand" href="#overview" aria-label="Личный кабинет">
@@ -23,7 +19,6 @@
       </a>
 
       <nav class="sidebar-nav" aria-label="Разделы кабинета">
-        <span class="sidebar-liquid-indicator" aria-hidden="true"><svg class="sidebar-liquid-svg"><path class="sidebar-liquid-outline"/></svg></span>
         <a class="sidebar-link active" href="#overview"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="sidebar-label">Обзор</span></a>
         <a class="sidebar-link" href="#profile"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span><span class="sidebar-label">Профиль</span></a>
         <a class="sidebar-link" href="#lessons"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15M8 7h8M8 11h8"/></svg></span><span class="sidebar-label">Уроки и классы</span></a>
@@ -34,6 +29,7 @@
       </nav>
 
       <div class="sidebar-footer">
+        <button class="button button-ghost theme-toggle" id="theme-toggle" type="button" aria-pressed="false"><span class="theme-icon" id="theme-icon" aria-hidden="true">☾</span><span class="sidebar-label" id="theme-label">Тёмная тема</span></button>
         <button class="button button-ghost logout-button" id="logout-button" type="button" aria-label="Выйти"><span class="logout-icon" aria-hidden="true"></span><span class="sidebar-label">Выйти</span></button>
       </div>
     </aside>
@@ -46,6 +42,33 @@
         </div>
         <div class="workspace-role" id="workspace-role">Личный кабинет</div>
       </header>
+
+      <section class="site-summary glass-card" aria-labelledby="site-summary-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">ALASSTER.SITE</p>
+            <h2 id="site-summary-title">Общая информация о сайте</h2>
+          </div>
+          <span class="status-chip" id="site-summary-status">Обновление...</span>
+        </div>
+        <div class="summary-stats">
+          <article class="summary-stat"><span class="summary-stat-value" id="summary-lessons">—</span><span class="summary-stat-label">уроков и страниц</span></article>
+          <article class="summary-stat"><span class="summary-stat-value" id="summary-classes">—</span><span class="summary-stat-label">учебных разделов</span></article>
+          <article class="summary-stat"><span class="summary-stat-value" id="summary-users">—</span><span class="summary-stat-label">пользователей кабинета</span></article>
+          <article class="summary-stat"><span class="summary-stat-value" id="summary-visitors">—</span><span class="summary-stat-label">уникальных посетителей</span></article>
+        </div>
+        <div class="summary-details">
+          <div>
+            <h3>Учебные разделы</h3>
+            <ul class="summary-list" id="summary-classes-list"><li>Загрузка данных...</li></ul>
+          </div>
+          <div>
+            <h3>Посещаемость</h3>
+            <p class="summary-note" id="summary-traffic-note">Загрузка данных GitHub...</p>
+            <ul class="summary-list summary-traffic-list" id="summary-traffic-list"></ul>
+          </div>
+        </div>
+      </section>
 
       <section class="card-grid" aria-label="Разделы кабинета">
         <article class="glass-card feature-card feature-indigo" id="profile">
@@ -99,7 +122,16 @@
     </main>
   </div>
 
-  <script src="/static/liquid-outline.js?v=liquid-phases-4"></script>
-  <script src="/static/dashboard.js?v=liquid-phases-4"></script>
+  <div class="modal-backdrop" id="logout-modal" hidden>
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+      <h2 id="logout-modal-title">Выйти из кабинета?</h2>
+      <div class="modal-actions">
+        <button class="button button-ghost" id="logout-cancel" type="button">Остаться</button>
+        <button class="button button-primary" id="logout-confirm" type="button">Выйти</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="/static/dashboard.js?v=overview-grid-2"></script>
 </body>
 </html>

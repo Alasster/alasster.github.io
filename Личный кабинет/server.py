@@ -13,6 +13,9 @@ import os
 import re
 import secrets
 import sqlite3
+import json
+import urllib.error
+import urllib.request
 from contextlib import closing
 from pathlib import Path
 
@@ -23,11 +26,32 @@ from pydantic import BaseModel
 
 
 BASE_DIR = Path(__file__).resolve().parent
+
+
+def load_local_env() -> None:
+    env_path = BASE_DIR / ".env"
+    if not env_path.is_file():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and value:
+            os.environ.setdefault(key, value)
+
+
+load_local_env()
+
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
 SESSION_TTL = 60 * 60 * 24 * 7
 PBKDF2_ITERATIONS = 310_000
 SUPERADMIN_EMAIL = os.environ.get("PERSONAL_CABINET_SUPERADMIN_EMAIL", "alasster@yandex.ru").strip().lower()
+GITHUB_REPO = os.environ.get("ALASSTER_GITHUB_REPO", "Alasster/alasster.github.io").strip()
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 ALLOWED_ROLES = {"user", "teacher", "admin", "superadmin"}
 
 app = FastAPI(title="Личный кабинет", docs_url=None, redoc_url=None)
@@ -144,6 +168,45 @@ def page(filename: str) -> str:
     return (BASE_DIR / filename).read_text(encoding="utf-8")
 
 
+def site_content_summary() -> dict:
+    excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов"}
+    class_rows = []
+    for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name):
+        if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
+            continue
+        lesson_count = len(list(directory.rglob("*.html")))
+        if lesson_count:
+            class_rows.append({"name": directory.name, "lessons": lesson_count})
+    return {
+        "lessons": sum(row["lessons"] for row in class_rows),
+        "classes": class_rows,
+    }
+
+
+def github_traffic_summary() -> dict:
+    empty = {"available": False, "views": None, "unique_visitors": None, "daily": []}
+    if not GITHUB_TOKEN or not GITHUB_REPO:
+        return empty
+    request = urllib.request.Request(
+        f"https://api.github.com/repos/{GITHUB_REPO}/traffic/views",
+        headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {GITHUB_TOKEN}", "User-Agent": "alasster-personal-cabinet"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=4) as response:
+            payload = json.load(response)
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, json.JSONDecodeError):
+        return empty
+    return {
+        "available": True,
+        "views": payload.get("count", 0),
+        "unique_visitors": payload.get("uniques", 0),
+        "daily": [
+            {"date": item.get("timestamp", "")[:10], "views": item.get("count", 0), "unique_visitors": item.get("uniques", 0)}
+            for item in payload.get("views", [])
+        ],
+    }
+
+
 @app.on_event("startup")
 def startup() -> None:
     init_db()
@@ -160,14 +223,14 @@ def dashboard(request: Request):
 def login_page(request: Request):
     if get_user_from_request(request) is not None:
         return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-    return page("login.html")
+    return page("auth.html")
 
 
 @app.get("/register", response_class=HTMLResponse)
 def register_page(request: Request):
     if get_user_from_request(request) is not None:
         return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-    return page("register.html")
+    return page("auth.html")
 
 
 @app.get("/api/me")
@@ -176,6 +239,24 @@ def current_user(request: Request):
     if user is None:
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
     return dict(user)
+
+
+@app.get("/api/site-overview")
+def site_overview(request: Request):
+    user = get_user_from_request(request)
+    if user is None:
+        return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
+    with closing(open_db()) as db:
+        users_count = db.execute("SELECT COUNT(*) AS count FROM users").fetchone()["count"]
+    content = site_content_summary()
+    return {
+        "site": "alasster.site",
+        "repository": GITHUB_REPO,
+        "lessons": content["lessons"],
+        "classes": content["classes"],
+        "users": users_count,
+        "traffic": github_traffic_summary(),
+    }
 
 
 @app.post("/api/login")

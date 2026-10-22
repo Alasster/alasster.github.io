@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e7ebf3">
+  <title>Вход — Личный кабинет</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=neumorphism-18">
+</head>
+<body class="auth-page">
+  <main class="auth-card glass-card" id="auth-card">
+    <div class="auth-shell">
+      <section class="auth-promo" aria-live="polite">
+        <div class="promo-content" data-promo-content="login">
+          <div class="brand-mark" aria-hidden="true">ALASSTER</div>
+          <h1>Рады видеть вас!</h1>
+          <p>Войдите в личный кабинет, чтобы продолжить работу с уроками, классами и материалами.</p>
+          <button class="button button-ghost promo-switch" type="button" data-auth-switch="register">Зарегистрироваться</button>
+        </div>
+        <div class="promo-content" data-promo-content="register" hidden>
+          <div class="brand-mark" aria-hidden="true">ALASSTER</div>
+          <h1>Добро пожаловать!</h1>
+          <p>Уже есть аккаунт? Вернитесь к входу и продолжите работу в кабинете.</p>
+          <button class="button button-ghost promo-switch" type="button" data-auth-switch="login">Войти</button>
+        </div>
+      </section>
+
+      <section class="auth-form-panel">
+        <div class="auth-views">
+          <div class="auth-view is-active" data-auth-view="login" aria-labelledby="login-title">
+            <h2 id="login-title">Вход в аккаунт</h2>
+            <div class="alert alert-error" data-auth-alert="login" role="alert" hidden></div>
+            <form id="login-form" novalidate>
+              <input class="field" id="login-username" name="username" type="email" autocomplete="username" aria-label="Email" required autofocus placeholder="Введите email">
+              <input class="field" id="login-password" name="password" type="password" autocomplete="current-password" aria-label="Пароль" required placeholder="Введите пароль">
+              <button class="button button-primary" id="login-submit" type="submit">Войти в кабинет</button>
+            </form>
+          </div>
+
+          <div class="auth-view" data-auth-view="register" aria-labelledby="register-title" hidden>
+            <h2 id="register-title">Регистрация</h2>
+            <div class="alert alert-error" data-auth-alert="register" role="alert" hidden></div>
+            <form id="register-form" novalidate>
+              <input class="field" id="first-name" name="first_name" type="text" autocomplete="given-name" aria-label="Имя" required placeholder="Введите имя">
+              <input class="field" id="last-name" name="last_name" type="text" autocomplete="family-name" aria-label="Фамилия" required placeholder="Введите фамилию">
+              <input class="field" id="register-email" name="email" type="email" autocomplete="email" aria-label="Email" required placeholder="Введите email">
+              <input class="field" id="register-password" name="password" type="password" autocomplete="new-password" aria-label="Пароль" minlength="8" required placeholder="Введите пароль">
+              <input class="field" id="register-password-confirm" name="password_confirm" type="password" autocomplete="new-password" aria-label="Подтверждение пароля" minlength="8" required placeholder="Повторите пароль">
+              <button class="button button-primary" id="register-submit" type="submit">Создать аккаунт</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/static/auth.js?v=auth-switch-4"></script>
+</body>
+</html>
