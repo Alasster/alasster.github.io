@@ -194,6 +194,18 @@ class AttemptGuardTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await student.delete(path)).status_code, 401)
         deleted = await self.teacher_client.delete(path, headers=self.teacher_headers)
         self.assertEqual(deleted.status_code, 200)
+        grading = await self.teacher_client.get(
+            f"/api/launches/{self.launch}/grading", headers=self.teacher_headers)
+        self.assertEqual(grading.status_code, 200, grading.text)
+        self.assertEqual(grading.json()["attempts"], [])
+        async with database.get_db() as db:
+            removed = await (await db.execute(
+                "SELECT status, submitted_at, confirmation_code FROM student_attempts WHERE id = ?",
+                (joined["attempt_id"],)
+            )).fetchone()
+            self.assertEqual(removed["status"], "removed")
+            self.assertIsNone(removed["submitted_at"])
+            self.assertIsNone(removed["confirmation_code"])
         retake = await self.join(student, variant="2")
         self.assertEqual(retake.status_code, 200, retake.text)
         self.assertEqual(retake.json()["status"], "approved")

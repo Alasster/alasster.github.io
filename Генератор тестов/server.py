@@ -825,8 +825,8 @@ async def list_launches(test_id: Optional[str] = None, teacher: dict = Depends(g
             # Подсчет статистики учеников
             sc = await db.execute("""
                 SELECT 
-                    COUNT(*) as total_attempts,
-                    SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as submitted_count,
+                    SUM(CASE WHEN status != 'removed' THEN 1 ELSE 0 END) as total_attempts,
+                    SUM(CASE WHEN status IN ('submitted', 'time_expired') THEN 1 ELSE 0 END) as submitted_count,
                     SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
                     SUM(CASE WHEN status IN ('in_waiting', 'waiting_approval') THEN 1 ELSE 0 END) as waiting_count
                 FROM student_attempts WHERE launch_id = ?
@@ -1028,16 +1028,14 @@ async def delete_student_attempt_endpoint(
             await db.execute("DELETE FROM student_answers WHERE attempt_id = ?", (attempt_id,))
             await db.execute("DELETE FROM student_attempts WHERE id = ? AND launch_id = ?", (attempt_id, launch_id))
         else:
-            # Keep the attempt and its answers as a result record. Mark it
-            # removed from the live roster so the identity/IP can be reused.
-            removed_at = datetime.now(timezone.utc).isoformat()
+            # Keep the attempt row for the retake guard, but exclude it from
+            # the live roster and from teacher results. Do not fabricate a
+            # submission timestamp or confirmation code for an unfinished try.
             await db.execute("""
                 UPDATE student_attempts
-                SET status = 'removed', submitted_at = COALESCE(submitted_at, ?),
-                    server_deadline = NULL,
-                    confirmation_code = COALESCE(confirmation_code, ?)
+                SET status = 'removed', server_deadline = NULL
                 WHERE id = ? AND launch_id = ?
-            """, (removed_at, f"REM-{secrets.token_hex(3).upper()}", attempt_id, launch_id))
+            """, (attempt_id, launch_id))
         await db.commit()
     
     broadcast_live_event(launch_id, "student_removed", {"attempt_id": attempt_id})
@@ -1172,14 +1170,11 @@ async def teacher_student_action(
             await db.execute("UPDATE student_attempts SET status = 'approved' WHERE id = ?", (attempt_id,))
         elif action == "remove":
             await record_retake_permission(db, launch_id, row)
-            removed_at = datetime.now(timezone.utc).isoformat()
             await db.execute("""
                 UPDATE student_attempts
-                SET status = 'removed', submitted_at = COALESCE(submitted_at, ?),
-                    server_deadline = NULL,
-                    confirmation_code = COALESCE(confirmation_code, ?)
+                SET status = 'removed', server_deadline = NULL
                 WHERE id = ?
-            """, (removed_at, f"REM-{secrets.token_hex(3).upper()}", attempt_id))
+            """, (attempt_id,))
         elif action == "block":
             await db.execute("UPDATE student_attempts SET status = 'blocked' WHERE id = ?", (attempt_id,))
         elif action == "unblock":
@@ -1259,13 +1254,17 @@ async def get_launch_grading_data(launch_id: str, teacher: dict = Depends(get_cu
 
         tasks = json.loads(row["snapshot_tasks_json"])
 
-        cur_att = await db.execute("SELECT * FROM student_attempts WHERE launch_id = ? ORDER BY student_name ASC", (launch_id,))
+        cur_att = await db.execute("""
+            SELECT * FROM student_attempts
+            WHERE launch_id = ? AND status IN ('submitted', 'time_expired')
+            ORDER BY student_name ASC
+        """, (launch_id,))
         attempts = [dict(a) for a in await cur_att.fetchall()]
 
         cur_ans = await db.execute("""
             SELECT ans.* FROM student_answers ans
             JOIN student_attempts sa ON ans.attempt_id = sa.id
-            WHERE sa.launch_id = ?
+            WHERE sa.launch_id = ? AND sa.status IN ('submitted', 'time_expired')
         """, (launch_id,))
         answers = [dict(a) for a in await cur_ans.fetchall()]
 
@@ -1348,10 +1347,20 @@ async def export_xlsx(launch_id: str, teacher: dict = Depends(get_current_teache
             raise HTTPException(status_code=404, detail="Запуск не найден")
 
         tasks = json.loads(launch_row["snapshot_tasks_json"])
-        cur_att = await db.execute("SELECT * FROM student_attempts WHERE launch_id = ? ORDER BY student_class ASC, student_name ASC", (launch_id,))
+        cur_att = await db.execute("""
+            SELECT * FROM student_attempts
+            WHERE launch_id = ? AND status IN ('submitted', 'time_expired')
+            ORDER BY student_class ASC, student_name ASC
+        """, (launch_id,))
         attempts = [dict(a) for a in await cur_att.fetchall()]
 
-        cur_ans = await db.execute("SELECT * FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE launch_id = ?)", (launch_id,))
+        cur_ans = await db.execute("""
+            SELECT * FROM student_answers
+            WHERE attempt_id IN (
+                SELECT id FROM student_attempts
+                WHERE launch_id = ? AND status IN ('submitted', 'time_expired')
+            )
+        """, (launch_id,))
         raw_ans = await cur_ans.fetchall()
         answers_by_attempt = {}
         for a in raw_ans:
@@ -1385,10 +1394,20 @@ async def export_csv(launch_id: str, teacher: dict = Depends(get_current_teacher
             raise HTTPException(status_code=404, detail="Запуск не найден")
 
         tasks = json.loads(launch_row["snapshot_tasks_json"])
-        cur_att = await db.execute("SELECT * FROM student_attempts WHERE launch_id = ? ORDER BY student_class ASC, student_name ASC", (launch_id,))
+        cur_att = await db.execute("""
+            SELECT * FROM student_attempts
+            WHERE launch_id = ? AND status IN ('submitted', 'time_expired')
+            ORDER BY student_class ASC, student_name ASC
+        """, (launch_id,))
         attempts = [dict(a) for a in await cur_att.fetchall()]
 
-        cur_ans = await db.execute("SELECT * FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE launch_id = ?)", (launch_id,))
+        cur_ans = await db.execute("""
+            SELECT * FROM student_answers
+            WHERE attempt_id IN (
+                SELECT id FROM student_attempts
+                WHERE launch_id = ? AND status IN ('submitted', 'time_expired')
+            )
+        """, (launch_id,))
         raw_ans = await cur_ans.fetchall()
         answers_by_attempt = {}
         for a in raw_ans:

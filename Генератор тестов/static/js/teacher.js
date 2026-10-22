@@ -2399,7 +2399,7 @@ async function deleteStudentAttempt(attemptId, studentName, permanent = false) {
   if (!activeLaunch) return;
   const message = permanent
     ? `Удалить результат ученика «${studentName}» навсегда?\nЭта операция удалит ответы из результатов и Excel.`
-    : `Убрать ученика «${studentName}» из live-проведения?\nЕго попытка и ответы останутся в результатах, а ученик сможет войти заново.`;
+    : `Убрать ученика «${studentName}» из live-проведения?\nЕго попытка будет исключена из результатов, а ученик сможет войти заново.`;
   if (!confirm(message)) return;
   try {
     const suffix = permanent ? "?permanent=true" : "";
