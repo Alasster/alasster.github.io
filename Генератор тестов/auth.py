@@ -84,7 +84,7 @@ async def get_current_student_attempt(request: Request) -> dict:
                    l.bg_color, l.bg_color_v1, l.bg_color_v2
             FROM student_attempts sa
             JOIN launches l ON sa.launch_id = l.id
-            WHERE sa.attempt_token = ?
+            WHERE sa.attempt_token = ? AND sa.status != 'removed'
         """, (token,))
         attempt = await cursor.fetchone()
         if not attempt:

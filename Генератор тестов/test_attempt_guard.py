@@ -93,14 +93,34 @@ class AttemptGuardTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_guard_survives_logout_and_identity_block_survives_cooldown(self):
         student = self.client("192.0.2.2")
-        await self.join(student)
+        first = (await self.join(student)).json()
         student.cookies.delete("bagalau_student_token")  # same action as logout
         self.assertEqual((await self.join(student, variant="2")).status_code, 409)
-        self.assertEqual((await self.join(student, name="Подменённое имя")).status_code, 409)
+        replacement = await self.join(student, name="Подменённое имя")
+        self.assertEqual(replacement.status_code, 200, replacement.text)
+        self.assertEqual(replacement.json()["status"], "waiting_approval")
+        self.assertNotEqual(replacement.json()["attempt_id"], first["attempt_id"])
         await self.age_attempts(created_at=(datetime.now() - timedelta(days=2)).isoformat())
         clean_browser = self.client("192.0.2.200")  # no cookies, different IP, Cyrillic case/spacing
         duplicate = await self.join(clean_browser, name="  ӘЛИЕВ   АРМАН ", student_class="10 а")
         self.assertEqual(duplicate.status_code, 409, duplicate.text)
+
+    async def test_same_browser_identity_conflict_is_visible_to_teacher(self):
+        student = self.client("192.0.2.3")
+        await self.join(student, name="Первый ученик")
+        replacement = await self.join(student, name="Второй ученик")
+        self.assertEqual(replacement.status_code, 200, replacement.text)
+        joined = replacement.json()
+        self.assertEqual(joined["status"], "waiting_approval")
+
+        visible = await self.teacher_client.get(
+            f"/api/launches/{self.launch}/students", headers=self.teacher_headers)
+        self.assertEqual(visible.status_code, 200, visible.text)
+        rows = {row["id"]: row for row in visible.json()}
+        self.assertIn(joined["attempt_id"], rows)
+        self.assertEqual(rows[joined["attempt_id"]]["student_name"], "Второй ученик")
+        self.assertEqual(rows[joined["attempt_id"]]["status"], "waiting_approval")
+        self.assertEqual(rows[joined["attempt_id"]]["is_duplicate_flag"], 1)
 
     async def test_shared_ip_requires_teacher_and_has_no_task_access(self):
         first = self.client("198.51.100.1")

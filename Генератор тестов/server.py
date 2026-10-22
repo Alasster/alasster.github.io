@@ -1610,6 +1610,7 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
             normalize_student_identity(a["student_class"])
         ) == identity)]
         extra_allowed = False
+        device_conflict = False
         if matching:
             existing = matching[0]
             same_identity = (
@@ -1617,8 +1618,11 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
                 normalize_student_identity(existing["student_class"])
             ) == identity
             if not same_identity:
-                raise HTTPException(status_code=409, detail="В этом браузере уже зарегистрирована попытка. Для нового входа обратитесь к учителю: он должен удалить попытку и разрешить пересдачу.")
-            if existing["allow_extra_attempt"] == 1:
+                # Keep a new registration visible to the teacher instead of
+                # rejecting it before an attempt is created. The teacher can
+                # verify and admit this student from the live cabinet.
+                device_conflict = True
+            elif existing["allow_extra_attempt"] == 1:
                 extra_allowed = True
                 await db.execute("UPDATE student_attempts SET allow_extra_attempt = 0 WHERE id = ?", (existing["id"],))
             elif str(existing["variant"] or "1") != student_variant:
@@ -1642,9 +1646,9 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
                     break
 
         now_utc = datetime.now(timezone.utc)
-        ip_review_required = not extra_allowed and any(
+        ip_review_required = device_conflict or (not extra_allowed and any(
             recent_attempt_from_ip(a, client_ip, now_utc) for a in attempts
-        )
+        ))
         is_duplicate = 1 if ip_review_required else 0
 
         # Определяем начальный статус попытки
