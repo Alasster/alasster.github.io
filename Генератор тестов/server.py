@@ -1625,13 +1625,16 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
             elif existing["allow_extra_attempt"] == 1:
                 extra_allowed = True
                 await db.execute("UPDATE student_attempts SET allow_extra_attempt = 0 WHERE id = ?", (existing["id"],))
-            elif str(existing["variant"] or "1") != student_variant:
-                raise HTTPException(status_code=409, detail="Вариант уже закреплён за вашей попыткой. Сменить вариант можно только после удаления попытки учителем.")
             elif existing["attempt_token"] in tokens:
                 # A retry/refresh resumes the original attempt, deadline and receipt.
+                if str(existing["variant"] or "1") != student_variant:
+                    raise HTTPException(status_code=409, detail="Вариант уже закреплён за вашей попыткой. Для смены варианта удалите текущую попытку учителем.")
                 return student_join_response(response, existing, launch_id)
             elif existing["status"] == "waiting_approval":
-                raise HTTPException(status_code=409, detail="Заявка на вход уже ожидает допуска учителя.")
+                # Repeated submissions without the old browser token should stay
+                # visible in the teacher cabinet and reuse the pending registration
+                # instead of showing a misleading variant conflict.
+                return student_join_response(response, existing, launch_id)
             else:
                 # The browser may have lost its token (new browser, cleared cookies,
                 # or a changed hostname), while the student identity already has an

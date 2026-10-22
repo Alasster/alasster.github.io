@@ -2422,6 +2422,8 @@ async function studentAction(attemptId, action) {
     if (res.ok) refreshStudentsList();
   } catch (e) {}
 }
+window.deleteStudentAttempt = deleteStudentAttempt;
+window.studentAction = studentAction;
 
 async function setLaunchStatus(status) {
   if (!activeLaunch) return;
