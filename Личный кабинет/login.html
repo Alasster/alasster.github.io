@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Вход — Личный кабинет</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="auth-page">
+  <div class="ambient-orb orb-1" aria-hidden="true"></div>
+  <div class="ambient-orb orb-2" aria-hidden="true"></div>
+  <div class="ambient-orb orb-3" aria-hidden="true"></div>
+
+  <main class="auth-card glass-card">
+    <div class="brand-mark" aria-hidden="true">ЖК</div>
+    <p class="eyebrow">ALASSTER · ДОСТУП</p>
+    <h1>Личный кабинет</h1>
+
+    <div id="error-alert" class="alert alert-error" role="alert" hidden></div>
+
+    <form id="login-form" novalidate>
+      <input class="field" id="username" name="username" type="email" autocomplete="username" aria-label="Email" required autofocus placeholder="Введите email">
+      <input class="field" id="password" name="password" type="password" autocomplete="current-password" aria-label="Пароль" required placeholder="Введите пароль">
+
+      <button class="button button-primary" id="submit-button" type="submit">Войти в кабинет</button>
+    </form>
+    <p class="auth-switch">Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+  </main>
+
+  <script src="/static/login.js"></script>
+</body>
+</html>

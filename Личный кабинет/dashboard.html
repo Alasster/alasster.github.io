@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Личный кабинет</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=liquid-morph-3">
+</head>
+<body>
+  <div class="ambient-orb orb-1" aria-hidden="true"></div>
+  <div class="ambient-orb orb-2" aria-hidden="true"></div>
+  <div class="ambient-orb orb-3" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar glass-card">
+      <a class="brand" href="#overview" aria-label="Личный кабинет">
+        <span class="brand-mark brand-mark-small" aria-hidden="true">ЖК</span>
+        <span><strong>ALASSTER</strong><small>личный кабинет</small></span>
+      </a>
+
+      <nav class="sidebar-nav" aria-label="Разделы кабинета">
+        <span class="sidebar-liquid-indicator" aria-hidden="true"><svg class="sidebar-liquid-svg"><path class="sidebar-liquid-outline"/></svg></span>
+        <a class="sidebar-link active" href="#overview"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="sidebar-label">Обзор</span></a>
+        <a class="sidebar-link" href="#profile"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span><span class="sidebar-label">Профиль</span></a>
+        <a class="sidebar-link" href="#lessons"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15M8 7h8M8 11h8"/></svg></span><span class="sidebar-label">Уроки и классы</span></a>
+        <a class="sidebar-link" href="#tests"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.3 2.3 4.8-5"/></svg></span><span class="sidebar-label">Тесты и задания</span></a>
+        <a class="sidebar-link" href="#materials"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2 2h9v9a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2z"/><path d="M2.5 7.5v-2a2 2 0 0 1 2-2h5l2 2h5"/></svg></span><span class="sidebar-label">Мои материалы</span></a>
+        <a class="sidebar-link" href="#settings"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.3 5a7.6 7.6 0 0 1 2.1.9l1.9-.5 1.4 2.4-1.4 1.4a7.8 7.8 0 0 1 0 2.4l1.4 1.4-1.4 2.4-1.9-.5a7.6 7.6 0 0 1-2.1.9L12 18.5l-2.7-1.6a7.6 7.6 0 0 1-2.1-.9l-1.9.5-1.4-2.4 1.4-1.4a7.8 7.8 0 0 1 0-2.4L3.9 8l1.4-2.4 1.9.5a7.6 7.6 0 0 1 2.1-.9z"/><circle cx="12" cy="10.8" r="2.6"/></svg></span><span class="sidebar-label">Настройки профиля</span></a>
+        <a class="sidebar-link" id="access-nav" href="#admin-panel" hidden><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.2c0 4.2-2.8 7.8-7 9.3-4.2-1.5-7-5.1-7-9.3V6z"/><circle cx="12" cy="10" r="2"/><path d="M8.5 16a3.8 3.8 0 0 1 7 0"/></svg></span><span class="sidebar-label">Пользователи и роли</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="button button-ghost logout-button" id="logout-button" type="button" aria-label="Выйти"><span class="logout-icon" aria-hidden="true"></span><span class="sidebar-label">Выйти</span></button>
+      </div>
+    </aside>
+
+    <main class="workspace" id="overview">
+      <header class="workspace-header">
+        <div>
+          <p class="eyebrow">ОБЗОР КАБИНЕТА</p>
+          <h1>Рабочая область</h1>
+        </div>
+        <div class="workspace-role" id="workspace-role">Личный кабинет</div>
+      </header>
+
+      <section class="card-grid" aria-label="Разделы кабинета">
+        <article class="glass-card feature-card feature-indigo" id="profile">
+          <span class="feature-icon" aria-hidden="true">01</span>
+          <h2>Профиль</h2>
+          <p><strong id="display-name">...</strong><br><span id="profile-email">...</span></p>
+          <span class="feature-state" id="profile-role">Профиль пользователя</span>
+        </article>
+        <article class="glass-card feature-card feature-teal" id="lessons">
+          <span class="feature-icon" aria-hidden="true">02</span>
+          <h2>Уроки и классы</h2>
+          <p>Быстрый доступ к классам, урокам и учебным материалам сайта.</p>
+          <span class="feature-state">Можно подключить к разделам сайта</span>
+        </article>
+        <article class="glass-card feature-card feature-amber" id="tests">
+          <span class="feature-icon" aria-hidden="true">03</span>
+          <h2>Тесты и задания</h2>
+          <p>Место для работ, проверок и инструментов генератора заданий.</p>
+          <span class="feature-state">Можно подключить отдельно</span>
+        </article>
+        <article class="glass-card feature-card feature-indigo" id="materials">
+          <span class="feature-icon" aria-hidden="true">04</span>
+          <h2>Мои материалы</h2>
+          <p>Документы, ссылки и личные заметки в одном разделе.</p>
+          <span class="feature-state">Раздел готов к наполнению</span>
+        </article>
+        <article class="glass-card feature-card feature-teal" id="settings">
+          <span class="feature-icon" aria-hidden="true">05</span>
+          <h2>Настройки профиля</h2>
+          <p>Управление отображаемым именем и параметрами доступа.</p>
+          <span class="feature-state">Раздел готов к наполнению</span>
+        </article>
+      </section>
+
+      <section class="admin-panel glass-card" id="admin-panel" hidden>
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">УПРАВЛЕНИЕ ДОСТУПОМ</p>
+            <h2>Пользователи и роли</h2>
+          </div>
+          <span class="status-chip">Супер-админ</span>
+        </div>
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead><tr><th>Пользователь</th><th>Email</th><th>Роль</th></tr></thead>
+            <tbody id="users-list"></tbody>
+          </table>
+        </div>
+        <p class="panel-message" id="admin-message" role="status"></p>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/liquid-outline.js?v=liquid-phases-4"></script>
+  <script src="/static/dashboard.js?v=liquid-phases-4"></script>
+</body>
+</html>

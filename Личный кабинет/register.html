@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Регистрация — Личный кабинет</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="auth-page">
+  <div class="ambient-orb orb-1" aria-hidden="true"></div>
+  <div class="ambient-orb orb-2" aria-hidden="true"></div>
+  <div class="ambient-orb orb-3" aria-hidden="true"></div>
+
+  <main class="auth-card glass-card">
+    <div class="brand-mark" aria-hidden="true">ЖК</div>
+    <p class="eyebrow">ALASSTER · НОВЫЙ ПРОФИЛЬ</p>
+    <h1>Регистрация</h1>
+
+    <div id="error-alert" class="alert alert-error" role="alert" hidden></div>
+
+    <form id="register-form" novalidate>
+      <input class="field" id="first-name" name="first_name" type="text" autocomplete="given-name" aria-label="Имя" required autofocus placeholder="Введите имя">
+      <input class="field" id="last-name" name="last_name" type="text" autocomplete="family-name" aria-label="Фамилия" required placeholder="Введите фамилию">
+      <input class="field" id="email" name="email" type="email" autocomplete="email" aria-label="Email" required placeholder="Введите email">
+      <input class="field" id="password" name="password" type="password" autocomplete="new-password" aria-label="Пароль" minlength="8" required placeholder="Введите пароль (минимум 8 символов)">
+
+      <button class="button button-primary" id="submit-button" type="submit">Создать аккаунт</button>
+    </form>
+    <p class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></p>
+  </main>
+
+  <script src="/static/register.js"></script>
+</body>
+</html>

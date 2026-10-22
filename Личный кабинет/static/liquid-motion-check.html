@@ -1,0 +1,31 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><title>Проверка фаз жидкого контура</title>
+<style>
+body{margin:20px;background:#e9edff;color:#263256;font:16px system-ui;overflow-x:hidden}h1{font-size:20px}#samples{display:flex;gap:12px;height:245px}figure{flex:1;min-width:0;margin:0;padding:10px;background:#fff9;border-radius:18px;text-align:center}figure svg{display:block;width:100%;height:200px}output{display:block;background:white;border-radius:16px;padding:16px;min-height:85px;margin:16px 0}iframe{width:100%;height:640px;border:0;pointer-events:none}
+</style>
+<h1>Удержание → вытягивание → перемычка → разрыв → пружина → посадка</h1><div id="samples"></div><output id="report" role="status">Проверка выполняется</output><iframe id="cabinet" src="/#profile" title="Проверяемый кабинет"></iframe>
+<script src="/static/liquid-outline.js?v=liquid-phases-4"></script>
+<script>
+const compact=new URLSearchParams(location.search).has('compact');
+const width=compact?52:232;
+const initial=CabinetLiquid.resting(32,width),motion={initial,target:97,start:0,duration:620};
+const phases=[['Начало',0],['Растяжение',.25],['Перемычка',.4],['Разрыв',.57],['Пружина',.84],['Посадка',1]];
+for(const [label,t] of phases){
+ const f=document.createElement('figure'),s=document.createElementNS('http://www.w3.org/2000/svg','svg'),p=document.createElementNS(s.namespaceURI,'path');
+ s.setAttribute('viewBox',`-6 -4 ${width+14} 144`);p.setAttribute('d',CabinetLiquid.path(CabinetLiquid.sample(motion,620*t,width)));p.setAttribute('fill','none');p.setAttribute('stroke','#6366f1');p.setAttribute('stroke-width','1.5');s.append(p);f.append(s,document.createTextNode(label));samples.append(f);
+}
+cabinet.onload=async()=>{
+ const w=cabinet.contentWindow,d=w.document;
+ await Promise.race([d.fonts.ready,new Promise(r=>setTimeout(r,2000))]);
+ const links=[...d.querySelectorAll('.sidebar-link')].filter(l=>!l.hidden),outline=d.querySelector('.sidebar-liquid-outline');
+ const aside=d.querySelector('.sidebar'),indicator=d.querySelector('.sidebar-liquid-indicator');
+ aside.style.cssText+=`;transition:none;width:${compact?76:260}px`;indicator.style.cssText+=`;transition:none;width:${width}px`;
+ await new Promise(r=>w.requestAnimationFrame(()=>w.requestAnimationFrame(r)));
+ const wait=ms=>new Promise(r=>setTimeout(r,ms));const gaps=[];let previous=0,running=true,maxHeight=0,distinct=new Set(),fragments=0;
+ function measure(t){if(!running)return;if(previous)gaps.push(t-previous);previous=t;const path=outline.getAttribute('d');distinct.add(path);maxHeight=Math.max(maxHeight,outline.getBBox().height);fragments=Math.max(fragments,(path.match(/M /g)||[]).length);w.requestAnimationFrame(measure)}
+ w.moveSidebarIndicator(links[0],false);w.requestAnimationFrame(measure);w.moveSidebarIndicator(links[1]);await wait(720);
+ w.moveSidebarIndicator(links[4]);await wait(120);w.moveSidebarIndicator(links[2]);await wait(720);
+ w.moveSidebarIndicator(links[5]);await wait(720);w.moveSidebarIndicator(links[0]);await wait(720);
+ running=false;gaps.sort((a,b)=>a-b);const b=outline.getBBox();
+ report.textContent=JSON.stringify({checks:{oneSvgPath:indicator.querySelectorAll('path').length===1,changesShape:maxHeight>70,settles:Math.abs(b.height-52)<.1&&Math.abs(b.width-width)<.1,finite:[...distinct].every(p=>!p.includes('NaN')&&!p.includes('Infinity'))},frames:gaps.length,medianGap:gaps[Math.floor(gaps.length/2)],maxGap:Math.max(...gaps),distinctShapes:distinct.size,mostContoursDuringBreak:fragments,finalWidth:b.width,finalHeight:b.height});
+};
+</script></html>
