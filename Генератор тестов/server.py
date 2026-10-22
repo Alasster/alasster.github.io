@@ -1630,8 +1630,14 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
             elif existing["attempt_token"] in tokens:
                 # A retry/refresh resumes the original attempt, deadline and receipt.
                 return student_join_response(response, existing, launch_id)
+            elif existing["status"] == "waiting_approval":
+                raise HTTPException(status_code=409, detail="Заявка на вход уже ожидает допуска учителя.")
             else:
-                raise HTTPException(status_code=409, detail="Для этого ученика уже есть попытка. Пересдача возможна только с разрешения учителя. Обратитесь к учителю для восстановления доступа или удаления попытки.")
+                # The browser may have lost its token (new browser, cleared cookies,
+                # or a changed hostname), while the student identity already has an
+                # attempt. Keep the registration visible so the teacher can verify
+                # and admit it instead of hiding it behind a 409 response.
+                device_conflict = True
 
         if not matching:
             permissions = await db.execute("""

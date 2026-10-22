@@ -103,7 +103,18 @@ class AttemptGuardTests(unittest.IsolatedAsyncioTestCase):
         await self.age_attempts(created_at=(datetime.now() - timedelta(days=2)).isoformat())
         clean_browser = self.client("192.0.2.200")  # no cookies, different IP, Cyrillic case/spacing
         duplicate = await self.join(clean_browser, name="  ӘЛИЕВ   АРМАН ", student_class="10 а")
-        self.assertEqual(duplicate.status_code, 409, duplicate.text)
+        self.assertEqual(duplicate.status_code, 200, duplicate.text)
+        self.assertEqual(duplicate.json()["status"], "waiting_approval")
+
+        visible = await self.teacher_client.get(
+            f"/api/launches/{self.launch}/students", headers=self.teacher_headers)
+        self.assertEqual(visible.status_code, 200, visible.text)
+        self.assertTrue(any(
+            row["student_name"] == "ӘЛИЕВ   АРМАН" and
+            row["status"] == "waiting_approval" and
+            row["is_duplicate_flag"] == 1
+            for row in visible.json()
+        ))
 
     async def test_same_browser_identity_conflict_is_visible_to_teacher(self):
         student = self.client("192.0.2.3")
@@ -184,17 +195,21 @@ class AttemptGuardTests(unittest.IsolatedAsyncioTestCase):
     async def test_racing_joins_and_extra_permission_create_only_one_attempt(self):
         clients = [self.client("203.0.113.8") for _ in range(8)]
         responses = await asyncio.gather(*(self.join(c, variant=str(i % 2 + 1)) for i, c in enumerate(clients)))
-        self.assertEqual(sum(r.status_code == 200 for r in responses), 1)
-        joined = next(r.json() for r in responses if r.status_code == 200)
-        action_path = f'/api/launches/{self.launch}/students/{joined["attempt_id"]}/action'
+        successful = [r.json() for r in responses if r.status_code == 200]
+        self.assertEqual(len(successful), 2)
+        self.assertEqual(sorted(item["status"] for item in successful), ["approved", "waiting_approval"])
+        pending = next(item for item in successful if item["status"] == "waiting_approval")
+        action_path = f'/api/launches/{self.launch}/students/{pending["attempt_id"]}/action'
         await self.teacher_client.post(action_path, headers=self.teacher_headers,
                                        json={"action": "allow_extra_attempt"})
         clean = [self.client("203.0.113.9") for _ in range(8)]
         responses = await asyncio.gather(*(self.join(c, variant="2") for c in clean))
-        self.assertEqual(sum(r.status_code == 200 for r in responses), 1)
+        successful = [r.json() for r in responses if r.status_code == 200]
+        self.assertEqual(len(successful), 2)
+        self.assertEqual(sorted(item["status"] for item in successful), ["approved", "waiting_approval"])
         async with database.get_db() as db:
             row = await (await db.execute("SELECT COUNT(*) AS n FROM student_attempts")).fetchone()
-            self.assertEqual(row["n"], 2)
+            self.assertEqual(row["n"], 4)
 
     async def test_delete_cannot_target_attempt_in_another_launch(self):
         student = self.client("203.0.113.12")
