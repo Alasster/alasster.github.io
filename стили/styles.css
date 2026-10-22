@@ -991,7 +991,7 @@ body.modal-open { overflow: hidden; }
 .modal-lessons-scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c7d2fe transparent; padding: 20px 28px 28px; display: flex; flex-direction: column; gap: 12px; }
 .lesson-row-card { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid rgba(255,255,255,.95); border-radius: 20px; background: rgba(255,255,255,.78); box-shadow: 0 4px 16px rgba(99,102,241,.04); transition: background .2s, box-shadow .2s, border-color .2s; }
 .lesson-row-card:hover, .lesson-row-card:focus-within { background: white; border-color: rgba(99,102,241,.25); box-shadow: 0 8px 20px rgba(99,102,241,.1); }
-.lesson-badge-id { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#eef2ff,#e0f2fe); color: var(--primary); font: 600 .8rem var(--font-mono); }
+.lesson-badge-id { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; min-width: 62px; padding: 0 9px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#eef2ff,#e0f2fe); color: var(--primary); font: 600 .8rem var(--font-mono); line-height: 1; white-space: nowrap; }
 .lesson-title-label { flex: 1; min-width: 0; font-size: .9rem; font-weight: 600; color: var(--text); line-height: 1.5; }
 .btn-launch-lesson { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 10px 14px; min-height: 42px; border-radius: var(--radius-full); background: var(--primary-light); color: var(--primary); font-size: .9rem; font-weight: 700; transition: background .2s, color .2s; }
 .btn-launch-lesson:hover { background: var(--primary); color: white; }
@@ -1049,8 +1049,8 @@ body.modal-open { overflow: hidden; }
   .modal-glass-container { max-height: 90dvh; border-radius: 28px; transform: translateY(48px); }
   .modal-header-bar { padding: 22px 20px 18px; }
   .modal-lessons-scroll { padding: 16px; }
-  .lesson-row-card { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 14px; border-radius: 18px; }
-  .lesson-badge-id { width: 32px; height: 32px; }
+  .lesson-row-card { display: grid; grid-template-columns: minmax(62px, auto) minmax(0, 1fr); gap: 10px; padding: 14px; border-radius: 18px; }
+  .lesson-badge-id { min-width: 62px; width: auto; height: 32px; padding-inline: 8px; }
   .lesson-title-label { font-size: .86rem; }
   .btn-launch-lesson { grid-column: 2; justify-self: start; padding: 8px 14px; min-height: 40px; }
   .glass-stats-bar { padding: 14px 10px; gap: 6px; }
