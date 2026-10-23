@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=analytics-ga4-2">
+  <link rel="stylesheet" href="/static/styles.css?v=profile-management-7">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar glass-card">
-      <a class="brand" href="#overview" aria-label="Личный кабинет">
-        <span class="brand-mark brand-mark-small" aria-hidden="true">ЖК</span>
-        <span><strong>ALASSTER</strong><small>личный кабинет</small></span>
+      <a class="brand" href="https://alasster.site/" aria-label="ALASSTER.SITE">
+        <span class="brand-mark brand-mark-small brand-logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C9.4 4.8 6.2 4.5 3 5.4v12.1c3.2-.9 6.4-.6 9 1.1m0-12.1c2.6-1.7 5.8-2 9-1.1v12.1c-3.2-.9-6.4-.6-9 1.1m0-12.1v12.1" /></svg></span>
+        <span><strong>ALASSTER</strong><small>.SITE</small></span>
       </a>
 
       <nav class="sidebar-nav" aria-label="Разделы кабинета">
@@ -24,8 +24,6 @@
         <a class="sidebar-link" href="#lessons"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15M8 7h8M8 11h8"/></svg></span><span class="sidebar-label">Уроки и классы</span></a>
         <a class="sidebar-link" href="#tests"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.3 2.3 4.8-5"/></svg></span><span class="sidebar-label">Тесты и задания</span></a>
         <a class="sidebar-link" href="#materials"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2 2h9v9a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2z"/><path d="M2.5 7.5v-2a2 2 0 0 1 2-2h5l2 2h5"/></svg></span><span class="sidebar-label">Мои материалы</span></a>
-        <a class="sidebar-link" href="#settings"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 13.3 5a7.6 7.6 0 0 1 2.1.9l1.9-.5 1.4 2.4-1.4 1.4a7.8 7.8 0 0 1 0 2.4l1.4 1.4-1.4 2.4-1.9-.5a7.6 7.6 0 0 1-2.1.9L12 18.5l-2.7-1.6a7.6 7.6 0 0 1-2.1-.9l-1.9.5-1.4-2.4 1.4-1.4a7.8 7.8 0 0 1 0-2.4L3.9 8l1.4-2.4 1.9.5a7.6 7.6 0 0 1 2.1-.9z"/><circle cx="12" cy="10.8" r="2.6"/></svg></span><span class="sidebar-label">Настройки профиля</span></a>
-        <a class="sidebar-link" id="access-nav" href="#admin-panel" hidden><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.2c0 4.2-2.8 7.8-7 9.3-4.2-1.5-7-5.1-7-9.3V6z"/><circle cx="12" cy="10" r="2"/><path d="M8.5 16a3.8 3.8 0 0 1 7 0"/></svg></span><span class="sidebar-label">Пользователи и роли</span></a>
       </nav>
 
       <div class="sidebar-footer">
@@ -85,11 +83,20 @@
       </section>
 
       <section class="card-grid" id="section-cards" aria-label="Раздел кабинета" hidden>
-        <article class="glass-card feature-card feature-indigo" id="profile" data-cabinet-section="profile">
-          <span class="feature-icon" aria-hidden="true">01</span>
-          <h2>Профиль</h2>
-          <p><strong id="display-name">...</strong><br><span id="profile-email">...</span></p>
-          <span class="feature-state" id="profile-role">Профиль пользователя</span>
+        <article class="glass-card feature-card profile-editor feature-indigo" id="profile" data-cabinet-section="profile">
+          <form id="profile-form" class="profile-form" autocomplete="off">
+            <div class="profile-form-grid">
+              <label class="profile-field"><span>Имя</span><input class="field" id="profile-first-name" name="first_name" maxlength="80" required></label>
+              <label class="profile-field"><span>Фамилия</span><input class="field" id="profile-last-name" name="last_name" maxlength="80" required></label>
+              <label class="profile-field profile-field-wide"><span>Email / логин</span><input class="field" id="profile-email-edit" name="email" type="email" maxlength="160" required></label>
+              <label class="profile-field"><span>Новый пароль</span><input class="field" id="profile-password" name="new_password" type="password" minlength="8" autocomplete="new-password"></label>
+              <label class="profile-field"><span>Подтверждение пароля</span><input class="field" id="profile-password-confirm" name="new_password_confirm" type="password" minlength="8" autocomplete="new-password"></label>
+            </div>
+            <div class="profile-form-actions">
+              <button class="button button-primary" id="profile-save" type="submit">Сохранить изменения</button>
+              <p class="panel-message" id="profile-message" role="status"></p>
+            </div>
+          </form>
         </article>
         <article class="glass-card feature-card feature-teal" id="lessons" data-cabinet-section="lessons">
           <span class="feature-icon" aria-hidden="true">02</span>
@@ -109,25 +116,17 @@
           <p>Документы, ссылки и личные заметки в одном разделе.</p>
           <span class="feature-state">Раздел готов к наполнению</span>
         </article>
-        <article class="glass-card feature-card feature-teal" id="settings" data-cabinet-section="settings">
-          <span class="feature-icon" aria-hidden="true">05</span>
-          <h2>Настройки профиля</h2>
-          <p>Управление отображаемым именем и параметрами доступа.</p>
-          <span class="feature-state">Раздел готов к наполнению</span>
-        </article>
       </section>
 
-      <section class="admin-panel glass-card" id="admin-panel" data-cabinet-section="admin-panel" hidden>
+      <section class="admin-panel glass-card" id="admin-panel" data-cabinet-section="profile" hidden>
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">УПРАВЛЕНИЕ ДОСТУПОМ</p>
             <h2>Пользователи и роли</h2>
           </div>
-          <span class="status-chip">Супер-админ</span>
         </div>
         <div class="users-table-wrap">
           <table class="users-table">
-            <thead><tr><th>Пользователь</th><th>Email</th><th>Роль</th></tr></thead>
+            <thead><tr><th>Пользователь</th><th>Email / логин</th><th>Роль</th><th>Пароль</th></tr></thead>
             <tbody id="users-list"></tbody>
           </table>
         </div>
@@ -146,6 +145,43 @@
     </section>
   </div>
 
-  <script src="/static/dashboard.js?v=analytics-ga4-2"></script>
+  <div class="modal-backdrop" id="profile-confirm-modal" hidden>
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="profile-confirm-title">
+      <p class="eyebrow">ПОДТВЕРЖДЕНИЕ</p>
+      <h2 id="profile-confirm-title">Сохранить изменения?</h2>
+      <p class="modal-text">Данные профиля и новый пароль будут обновлены в базе данных.</p>
+      <div class="modal-actions">
+        <button class="button button-ghost" id="profile-confirm-cancel" type="button">Отмена</button>
+        <button class="button button-primary" id="profile-confirm-save" type="button">Подтвердить</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="unsaved-profile-modal" hidden>
+    <section class="confirm-modal unsaved-confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="unsaved-profile-title">
+      <h2 id="unsaved-profile-title">Сохранить изменения?</h2>
+      <div class="modal-actions modal-actions-3">
+        <button class="button button-ghost" id="unsaved-profile-discard" type="button">Не сохранять</button>
+        <button class="button button-ghost" id="unsaved-profile-cancel" type="button">Отмена</button>
+        <button class="button button-primary" id="unsaved-profile-save" type="button">Сохранить</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="admin-password-modal" hidden>
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="admin-password-title">
+      <p class="eyebrow">ДОСТУП ПОЛЬЗОВАТЕЛЯ</p>
+      <h2 id="admin-password-title">Задать новый пароль</h2>
+      <p class="modal-text" id="admin-password-user"></p>
+      <input class="field modal-field" id="admin-new-password" type="password" minlength="8" autocomplete="new-password" placeholder="Новый пароль">
+      <input class="field modal-field" id="admin-new-password-confirm" type="password" minlength="8" autocomplete="new-password" placeholder="Повторите пароль">
+      <div class="modal-actions">
+        <button class="button button-ghost" id="admin-password-cancel" type="button">Отмена</button>
+        <button class="button button-primary" id="admin-password-confirm" type="button">Сохранить</button>
+      </div>
+    </section>
+  </div>
+
+    <script src="/static/dashboard.js?v=profile-management-5"></script>
 </body>
 </html>

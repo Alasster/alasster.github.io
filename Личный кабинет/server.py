@@ -113,6 +113,19 @@ class RegisterRequest(BaseModel):
     password: str
 
 
+class ProfileUpdateRequest(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    new_password: str = ""
+    new_password_confirm: str = ""
+
+
+class AdminPasswordResetRequest(BaseModel):
+    new_password: str
+    new_password_confirm: str
+
+
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
@@ -344,6 +357,54 @@ def current_user(request: Request):
     return dict(user)
 
 
+@app.patch("/api/me")
+def update_current_user(payload: ProfileUpdateRequest, request: Request):
+    user = get_user_from_request(request)
+    if user is None:
+        return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
+
+    first_name = payload.first_name.strip()
+    last_name = payload.last_name.strip()
+    email = payload.email.strip().lower()
+    new_password = payload.new_password
+
+    if not first_name or not last_name:
+        return JSONResponse({"detail": "Введите имя и фамилию"}, status_code=400)
+    if len(first_name) > 80 or len(last_name) > 80:
+        return JSONResponse({"detail": "Имя и фамилия слишком длинные"}, status_code=400)
+    if not EMAIL_PATTERN.fullmatch(email):
+        return JSONResponse({"detail": "Введите корректный email"}, status_code=400)
+    if new_password and len(new_password) < 8:
+        return JSONResponse({"detail": "Новый пароль должен содержать минимум 8 символов"}, status_code=400)
+    if new_password != payload.new_password_confirm:
+        return JSONResponse({"detail": "Пароли не совпадают"}, status_code=400)
+
+    display_name = f"{first_name} {last_name}"
+    with closing(open_db()) as db:
+        duplicate = db.execute(
+            "SELECT id FROM users WHERE username = ? AND id != ?",
+            (email, user["id"]),
+        ).fetchone()
+        if duplicate is not None:
+            return JSONResponse({"detail": "Пользователь с таким email уже зарегистрирован"}, status_code=409)
+        if new_password:
+            db.execute(
+                "UPDATE users SET username = ?, display_name = ?, first_name = ?, last_name = ?, password_hash = ? WHERE id = ?",
+                (email, display_name, first_name, last_name, hash_password(new_password), user["id"]),
+            )
+        else:
+            db.execute(
+                "UPDATE users SET username = ?, display_name = ?, first_name = ?, last_name = ? WHERE id = ?",
+                (email, display_name, first_name, last_name, user["id"]),
+            )
+        db.commit()
+        updated = db.execute(
+            "SELECT id, username, display_name, first_name, last_name, role FROM users WHERE id = ?",
+            (user["id"],),
+        ).fetchone()
+    return dict(updated)
+
+
 @app.get("/api/site-overview")
 def site_overview(request: Request):
     user = get_user_from_request(request)
@@ -457,7 +518,8 @@ def list_users(request: Request):
         return access
     with closing(open_db()) as db:
         rows = db.execute(
-            "SELECT id, first_name, last_name, username, display_name, role, created_at FROM users ORDER BY id"
+            "SELECT id, first_name, last_name, username, display_name, role, created_at FROM users WHERE id != ? ORDER BY id",
+            (access["id"],),
         ).fetchall()
     return {"users": [dict(row) for row in rows]}
 
@@ -474,6 +536,30 @@ def update_user_role(user_id: int, payload: dict, request: Request):
         return JSONResponse({"detail": "Нельзя снять роль с текущего супер-админа"}, status_code=400)
     with closing(open_db()) as db:
         cursor = db.execute("UPDATE users SET role = ? WHERE id = ?", (role, user_id))
+        db.commit()
+    if cursor.rowcount == 0:
+        return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)
+    return {"ok": True}
+
+
+@app.post("/api/users/{user_id}/password")
+def reset_user_password(user_id: int, payload: AdminPasswordResetRequest, request: Request):
+    access = require_superadmin(request)
+    if isinstance(access, JSONResponse):
+        return access
+    if user_id == access["id"]:
+        return JSONResponse({"detail": "Для своего пароля используйте раздел профиля"}, status_code=400)
+    if len(payload.new_password) < 8:
+        return JSONResponse({"detail": "Пароль должен содержать минимум 8 символов"}, status_code=400)
+    if payload.new_password != payload.new_password_confirm:
+        return JSONResponse({"detail": "Пароли не совпадают"}, status_code=400)
+
+    with closing(open_db()) as db:
+        cursor = db.execute(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            (hash_password(payload.new_password), user_id),
+        )
+        db.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
         db.commit()
     if cursor.rowcount == 0:
         return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)

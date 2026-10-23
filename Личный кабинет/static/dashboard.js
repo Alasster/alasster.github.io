@@ -1,11 +1,27 @@
-const displayName = document.getElementById('display-name');
-const profileEmail = document.getElementById('profile-email');
-const profileRole = document.getElementById('profile-role');
+const profileForm = document.getElementById('profile-form');
+const profileFirstName = document.getElementById('profile-first-name');
+const profileLastName = document.getElementById('profile-last-name');
+const profileEmailEdit = document.getElementById('profile-email-edit');
+const profilePassword = document.getElementById('profile-password');
+const profilePasswordConfirm = document.getElementById('profile-password-confirm');
+const profileMessage = document.getElementById('profile-message');
+const profileConfirmModal = document.getElementById('profile-confirm-modal');
+const profileConfirmCancel = document.getElementById('profile-confirm-cancel');
+const profileConfirmSave = document.getElementById('profile-confirm-save');
+const unsavedProfileModal = document.getElementById('unsaved-profile-modal');
+const unsavedProfileDiscard = document.getElementById('unsaved-profile-discard');
+const unsavedProfileCancel = document.getElementById('unsaved-profile-cancel');
+const unsavedProfileSave = document.getElementById('unsaved-profile-save');
 const logoutButton = document.getElementById('logout-button');
 const adminPanel = document.getElementById('admin-panel');
-const accessNav = document.getElementById('access-nav');
 const usersList = document.getElementById('users-list');
 const adminMessage = document.getElementById('admin-message');
+const adminPasswordModal = document.getElementById('admin-password-modal');
+const adminPasswordUser = document.getElementById('admin-password-user');
+const adminNewPassword = document.getElementById('admin-new-password');
+const adminNewPasswordConfirm = document.getElementById('admin-new-password-confirm');
+const adminPasswordCancel = document.getElementById('admin-password-cancel');
+const adminPasswordConfirm = document.getElementById('admin-password-confirm');
 const workspaceRole = document.getElementById('workspace-role');
 const appShell = document.querySelector('.app-shell');
 const sidebar = document.querySelector('.sidebar');
@@ -29,6 +45,15 @@ const trafficModes = [...document.querySelectorAll('[data-traffic-mode]')];
 const sectionCards = document.getElementById('section-cards');
 const sectionViews = [...document.querySelectorAll('[data-cabinet-section]')];
 const roles = ['user', 'teacher', 'admin', 'superadmin'];
+let canManageUsers = false;
+let currentDisplayName = 'Рабочая область';
+let pendingProfileChanges = null;
+let resetPasswordUserId = null;
+let profileSnapshot = null;
+let profileDirty = false;
+let currentSection = 'overview';
+let allowHashChange = false;
+let pendingNavigation = null;
 
 const sectionHeadings = {
   overview: ['ОБЗОР КАБИНЕТА', 'Рабочая область'],
@@ -36,8 +61,6 @@ const sectionHeadings = {
   lessons: ['УРОКИ И КЛАССЫ', 'Учебные разделы'],
   tests: ['ТЕСТЫ И ЗАДАНИЯ', 'Задания и проверки'],
   materials: ['МОИ МАТЕРИАЛЫ', 'Личные материалы'],
-  settings: ['НАСТРОЙКИ ПРОФИЛЯ', 'Настройки доступа'],
-  'admin-panel': ['УПРАВЛЕНИЕ ДОСТУПОМ', 'Пользователи и роли'],
 };
 
 const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(Number(value) || 0);
@@ -94,13 +117,16 @@ function syncSidebarActive() {
 
 function showCabinetSection(section) {
   const selectedSection = sectionHeadings[section] ? section : 'overview';
+  currentSection = selectedSection;
   sectionViews.forEach((view) => {
-    view.hidden = view.dataset.cabinetSection !== selectedSection;
+    const isAdminOnly = view.id === 'admin-panel';
+    view.hidden = view.dataset.cabinetSection !== selectedSection || (isAdminOnly && !canManageUsers);
   });
   if (sectionCards) sectionCards.hidden = !sectionViews.some(
     (view) => view.closest('#section-cards') && !view.hidden,
   );
-  const [eyebrow, title] = sectionHeadings[selectedSection];
+  const [eyebrow, sectionTitle] = sectionHeadings[selectedSection];
+  const title = selectedSection === 'overview' ? currentDisplayName : sectionTitle;
   const eyebrowNode = document.querySelector('.workspace-header .eyebrow');
   const titleNode = document.querySelector('.workspace-header h1');
   if (eyebrowNode) eyebrowNode.textContent = eyebrow;
@@ -108,14 +134,23 @@ function showCabinetSection(section) {
 }
 
 document.querySelectorAll('.sidebar-link').forEach((link) => {
-  link.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar-link').forEach((item) => item.classList.remove('active'));
-    link.classList.add('active');
-    showCabinetSection(link.getAttribute('href').slice(1));
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    requestSectionNavigation(link.getAttribute('href').slice(1));
   });
 });
 
-window.addEventListener('hashchange', syncSidebarActive);
+window.addEventListener('hashchange', () => {
+  const requestedSection = (window.location.hash || '#overview').slice(1);
+  if (!allowHashChange && requestedSection !== currentSection && profileHasUnsavedChanges()) {
+    allowHashChange = true;
+    window.location.hash = currentSection;
+    openUnsavedProfileModal({ type: 'section', section: requestedSection });
+    return;
+  }
+  allowHashChange = false;
+  syncSidebarActive();
+});
 syncSidebarActive();
 
 async function loadCurrentUser() {
@@ -126,16 +161,18 @@ async function loadCurrentUser() {
   }
   if (!response.ok) throw new Error('Не удалось загрузить профиль.');
   const user = await response.json();
-  displayName.textContent = user.display_name || user.username;
-  profileEmail.textContent = user.username;
-  profileRole.textContent = user.role === 'superadmin' ? 'Супер-админ' : user.role;
+  currentDisplayName = user.display_name || user.username;
   workspaceRole.textContent = user.role === 'superadmin' ? 'Супер-админ' : user.role;
+  profileFirstName.value = user.first_name || '';
+  profileLastName.value = user.last_name || '';
+  profileEmailEdit.value = user.username || '';
+  profileSnapshot = collectProfileChanges();
+  profileDirty = false;
   if (user.role === 'superadmin') {
-    adminPanel.hidden = false;
-    accessNav.hidden = false;
-    syncSidebarActive();
+    canManageUsers = true;
     await loadUsers();
   }
+  syncSidebarActive();
 }
 
 async function loadUsers() {
@@ -143,6 +180,16 @@ async function loadUsers() {
   if (!response.ok) throw new Error('Не удалось загрузить пользователей.');
   const data = await response.json();
   usersList.replaceChildren();
+  if (!data.users.length) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 4;
+    cell.className = 'table-empty';
+    cell.textContent = 'Других зарегистрированных пользователей пока нет.';
+    row.append(cell);
+    usersList.append(row);
+    return;
+  }
   data.users.forEach((user) => {
     const row = document.createElement('tr');
     const nameCell = document.createElement('td');
@@ -180,10 +227,257 @@ async function loadUsers() {
       }
     });
     roleCell.append(select);
-    row.append(nameCell, emailCell, roleCell);
+    const passwordCell = document.createElement('td');
+    const resetButton = document.createElement('button');
+    resetButton.className = 'button button-ghost table-action';
+    resetButton.type = 'button';
+    resetButton.textContent = 'Задать новый';
+    resetButton.addEventListener('click', () => openAdminPasswordModal(user));
+    passwordCell.append(resetButton);
+    row.append(nameCell, emailCell, roleCell, passwordCell);
     usersList.append(row);
   });
 }
+
+function showModal(modal) {
+  modal.hidden = false;
+  modal.style.display = 'grid';
+}
+
+function hideModal(modal) {
+  modal.hidden = true;
+  modal.style.display = 'none';
+}
+
+function collectProfileChanges() {
+  const newPassword = profilePassword?.value || '';
+  return {
+    first_name: profileFirstName?.value.trim() || '',
+    last_name: profileLastName?.value.trim() || '',
+    email: profileEmailEdit?.value.trim().toLowerCase() || '',
+    new_password: newPassword,
+    new_password_confirm: newPassword ? (profilePasswordConfirm?.value || '') : '',
+  };
+}
+
+function profileHasUnsavedChanges() {
+  return profileDirty
+    && profileSnapshot !== null
+    && JSON.stringify(profileSnapshot) !== JSON.stringify(collectProfileChanges());
+}
+
+function validateProfileChanges(changes) {
+  if (!changes.first_name || !changes.last_name || !changes.email) {
+    return 'Заполните имя, фамилию и email.';
+  }
+  if (changes.new_password !== changes.new_password_confirm) {
+    return 'Пароли не совпадают.';
+  }
+  if (changes.new_password && changes.new_password.length < 8) {
+    return 'Новый пароль должен содержать минимум 8 символов.';
+  }
+  return '';
+}
+
+function restoreProfileSnapshot() {
+  if (!profileSnapshot) return;
+  profileFirstName.value = profileSnapshot.first_name;
+  profileLastName.value = profileSnapshot.last_name;
+  profileEmailEdit.value = profileSnapshot.email;
+  profilePassword.value = '';
+  profilePasswordConfirm.value = '';
+  profileMessage.textContent = '';
+  profileDirty = false;
+}
+
+function closeUnsavedProfileModal() {
+  hideModal(unsavedProfileModal);
+  pendingNavigation = null;
+}
+
+function openUnsavedProfileModal(action) {
+  pendingNavigation = action;
+  showModal(unsavedProfileModal);
+  unsavedProfileSave.focus();
+}
+
+function continuePendingNavigation() {
+  const action = pendingNavigation;
+  pendingNavigation = null;
+  if (!action) return;
+  if (action.type === 'section') {
+    allowHashChange = true;
+    window.location.hash = action.section;
+  } else if (action.type === 'external') {
+    window.location.assign(action.href);
+  } else if (action.type === 'logout') {
+    performLogout();
+  }
+}
+
+function requestSectionNavigation(section) {
+  if (section === currentSection) return;
+  if (profileHasUnsavedChanges()) {
+    openUnsavedProfileModal({ type: 'section', section });
+    return;
+  }
+  allowHashChange = true;
+  window.location.hash = section;
+}
+
+unsavedProfileCancel?.addEventListener('click', closeUnsavedProfileModal);
+unsavedProfileDiscard?.addEventListener('click', () => {
+  const action = pendingNavigation;
+  restoreProfileSnapshot();
+  closeUnsavedProfileModal();
+  pendingNavigation = action;
+  continuePendingNavigation();
+});
+unsavedProfileModal?.addEventListener('click', (event) => {
+  if (event.target === unsavedProfileModal) closeUnsavedProfileModal();
+});
+
+document.querySelector('.brand')?.addEventListener('click', (event) => {
+  if (!profileHasUnsavedChanges()) return;
+  event.preventDefault();
+  openUnsavedProfileModal({ type: 'external', href: event.currentTarget.href });
+});
+
+function closeProfileConfirmModal() {
+  hideModal(profileConfirmModal);
+  pendingProfileChanges = null;
+}
+
+profileForm?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  profileMessage.textContent = '';
+  const changes = collectProfileChanges();
+  const validationError = validateProfileChanges(changes);
+  if (validationError) {
+    profileMessage.textContent = validationError;
+    return;
+  }
+  pendingProfileChanges = changes;
+  showModal(profileConfirmModal);
+  profileConfirmSave.focus();
+});
+
+profileForm?.addEventListener('input', () => {
+  profileDirty = true;
+});
+
+profileConfirmCancel?.addEventListener('click', closeProfileConfirmModal);
+profileConfirmModal?.addEventListener('click', (event) => {
+  if (event.target === profileConfirmModal) closeProfileConfirmModal();
+});
+
+async function saveProfileChanges(changes) {
+  const response = await fetch('/api/me', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(changes),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Не удалось сохранить профиль.');
+  currentDisplayName = result.display_name || result.username;
+  workspaceRole.textContent = result.role === 'superadmin' ? 'Супер-админ' : result.role;
+  profileFirstName.value = result.first_name || '';
+  profileLastName.value = result.last_name || '';
+  profileEmailEdit.value = result.username || '';
+  profilePassword.value = '';
+  profilePasswordConfirm.value = '';
+  profileSnapshot = collectProfileChanges();
+  profileDirty = false;
+  return result;
+}
+
+unsavedProfileSave?.addEventListener('click', async () => {
+  const changes = collectProfileChanges();
+  const validationError = validateProfileChanges(changes);
+  if (validationError) {
+    profileMessage.textContent = validationError;
+    return;
+  }
+  const action = pendingNavigation;
+  unsavedProfileSave.disabled = true;
+  try {
+    await saveProfileChanges(changes);
+    profileMessage.textContent = 'Профиль сохранён в базе.';
+    closeUnsavedProfileModal();
+    pendingNavigation = action;
+    continuePendingNavigation();
+  } catch (error) {
+    profileMessage.textContent = error.message;
+  } finally {
+    unsavedProfileSave.disabled = false;
+  }
+});
+
+profileConfirmSave?.addEventListener('click', async () => {
+  if (!pendingProfileChanges) return;
+  profileConfirmSave.disabled = true;
+  try {
+    await saveProfileChanges(pendingProfileChanges);
+    profileMessage.textContent = 'Профиль сохранён в базе.';
+    closeProfileConfirmModal();
+    syncSidebarActive();
+  } catch (error) {
+    profileMessage.textContent = error.message;
+    hideModal(profileConfirmModal);
+    pendingProfileChanges = null;
+  } finally {
+    profileConfirmSave.disabled = false;
+  }
+});
+
+function closeAdminPasswordModal() {
+  hideModal(adminPasswordModal);
+  resetPasswordUserId = null;
+  adminNewPassword.value = '';
+  adminNewPasswordConfirm.value = '';
+}
+
+function openAdminPasswordModal(user) {
+  resetPasswordUserId = user.id;
+  adminPasswordUser.textContent = `${user.display_name || user.username} · ${user.username}`;
+  showModal(adminPasswordModal);
+  adminNewPassword.focus();
+}
+
+adminPasswordCancel?.addEventListener('click', closeAdminPasswordModal);
+adminPasswordModal?.addEventListener('click', (event) => {
+  if (event.target === adminPasswordModal) closeAdminPasswordModal();
+});
+
+adminPasswordConfirm?.addEventListener('click', async () => {
+  if (!resetPasswordUserId) return;
+  const password = adminNewPassword.value;
+  const confirmation = adminNewPasswordConfirm.value;
+  if (password.length < 8) {
+    adminMessage.textContent = 'Пароль должен содержать минимум 8 символов.';
+    return;
+  }
+  if (password !== confirmation) {
+    adminMessage.textContent = 'Пароли не совпадают.';
+    return;
+  }
+  adminPasswordConfirm.disabled = true;
+  try {
+    const response = await fetch(`/api/users/${resetPasswordUserId}/password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ new_password: password, new_password_confirm: confirmation }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.detail || 'Не удалось изменить пароль.');
+    adminMessage.textContent = 'Новый пароль сохранён. Передайте его пользователю.';
+    closeAdminPasswordModal();
+  } catch (error) {
+    adminMessage.textContent = error.message;
+  } finally {
+    adminPasswordConfirm.disabled = false;
+  }
+});
 
 async function loadSiteOverview() {
   const response = await fetch('/api/site-overview');
@@ -206,7 +500,13 @@ async function loadSiteOverview() {
 function renderTrafficChart(mode) {
   const points = (trafficSeries[mode] || []).slice(-14);
   if (!points.length) {
-    trafficChart.hidden = true;
+    trafficChartY.replaceChildren();
+    const zeroLabel = document.createElement('span');
+    zeroLabel.textContent = '0';
+    trafficChartY.append(zeroLabel);
+    trafficChartBars.replaceChildren();
+    trafficChartLabels.replaceChildren();
+    trafficChart.hidden = false;
     return;
   }
 
@@ -260,10 +560,26 @@ function closeLogoutModal() {
 closeLogoutModal();
 window.addEventListener('pageshow', closeLogoutModal);
 
-logoutButton.addEventListener('click', () => {
+function openLogoutModal() {
   logoutModal.hidden = false;
   logoutModal.style.display = 'grid';
   logoutConfirm.focus();
+}
+
+function performLogout() {
+  closeLogoutModal();
+  logoutButton.disabled = true;
+  fetch('/api/logout', { method: 'POST' }).finally(() => {
+    window.location.replace('/login');
+  });
+}
+
+logoutButton.addEventListener('click', () => {
+  if (profileHasUnsavedChanges()) {
+    openUnsavedProfileModal({ type: 'logout' });
+    return;
+  }
+  openLogoutModal();
 });
 logoutCancel.addEventListener('click', closeLogoutModal);
 logoutModal.addEventListener('click', (event) => {
@@ -273,14 +589,12 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && !logoutModal.hidden) closeLogoutModal();
 });
 
-logoutConfirm.addEventListener('click', async () => {
-  closeLogoutModal();
-  logoutButton.disabled = true;
-  try {
-    await fetch('/api/logout', { method: 'POST' });
-  } finally {
-    window.location.replace('/login');
-  }
+logoutConfirm.addEventListener('click', performLogout);
+
+window.addEventListener('beforeunload', (event) => {
+  if (!profileHasUnsavedChanges()) return;
+  event.preventDefault();
+  event.returnValue = '';
 });
 
 loadCurrentUser().catch(() => window.location.replace('/login'));
