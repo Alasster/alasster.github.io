@@ -66,6 +66,7 @@ load_local_env()
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
 SESSION_TTL = 60 * 60 * 24 * 7
+ONLINE_WINDOW = 60 * 5
 GA4_PROPERTY_ID = os.environ.get("GA4_PROPERTY_ID", "560432914").strip()
 GA4_SERVICE_ACCOUNT_FILE = os.environ.get("GA4_SERVICE_ACCOUNT_FILE", "ga4-service-account.json").strip()
 PBKDF2_ITERATIONS = 310_000
@@ -350,6 +351,15 @@ def site_overview(request: Request):
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
     with closing(open_db()) as db:
         users_count = db.execute("SELECT COUNT(*) AS count FROM users").fetchone()["count"]
+        cabinet_online_users = db.execute(
+            """
+            SELECT COUNT(DISTINCT user_id) AS count
+            FROM sessions
+            WHERE expires_at > strftime('%s', 'now')
+              AND last_seen >= strftime('%s', 'now') - ?
+            """,
+            (ONLINE_WINDOW,),
+        ).fetchone()["count"]
     content = site_content_summary()
     analytics = ga4_summary()
     return {
@@ -357,6 +367,7 @@ def site_overview(request: Request):
         "lessons": content["lessons"],
         "classes": content["classes"],
         "users": users_count,
+        "cabinet_online_users": cabinet_online_users,
         "online_users": analytics["online_users"],
         "analytics_available": analytics["available"],
         "traffic": analytics["traffic"],

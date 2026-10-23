@@ -191,7 +191,7 @@ async function loadSiteOverview() {
   const data = await response.json();
   summaryLessons.textContent = formatNumber(data.lessons);
   summaryClasses.textContent = formatNumber(data.classes.length);
-  summaryUsers.textContent = formatNumber(data.users);
+  summaryUsers.textContent = formatNumber(data.cabinet_online_users);
   summaryOnlineUsers.textContent = data.online_users == null ? '—' : formatNumber(data.online_users);
   summaryClassesList.replaceChildren();
   data.classes.forEach((item) => appendSummaryRow(summaryClassesList, item.name, item.lessons));

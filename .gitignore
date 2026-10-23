@@ -1,3 +1,5 @@
 Личный кабинет/.env
 Личный кабинет/alasster.env
 Личный кабинет/ga4-service-account.json
+__pycache__/
+*.py[cod]
