@@ -1,3 +1,8 @@
+const analytics = document.createElement('script');
+analytics.src = '/скрипты/analytics.js';
+analytics.async = true;
+document.head.appendChild(analytics);
+
 let lastModalTrigger = null;
 
 document.querySelector('.mobile-burger-btn').addEventListener('click', toggleNavMenu);

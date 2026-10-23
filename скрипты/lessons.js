@@ -3,6 +3,13 @@
    ========================================================================== */
 
 (function () {
+  const analytics = document.createElement('script');
+  analytics.src = '/скрипты/analytics.js';
+  analytics.async = true;
+  document.head.appendChild(analytics);
+})();
+
+(function () {
   'use strict';
 
   const LESSONS_DATABASE = {
