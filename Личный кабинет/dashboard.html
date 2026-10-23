@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=overview-grid-1">
+  <link rel="stylesheet" href="/static/styles.css?v=analytics-ga4-2">
 </head>
 <body>
   <div class="app-shell">
@@ -43,7 +43,7 @@
         <div class="workspace-role" id="workspace-role">Личный кабинет</div>
       </header>
 
-      <section class="site-summary glass-card" aria-labelledby="site-summary-title">
+      <section class="site-summary glass-card" data-cabinet-section="overview" aria-labelledby="site-summary-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">ALASSTER.SITE</p>
@@ -55,7 +55,7 @@
           <article class="summary-stat"><span class="summary-stat-value" id="summary-lessons">—</span><span class="summary-stat-label">уроков и страниц</span></article>
           <article class="summary-stat"><span class="summary-stat-value" id="summary-classes">—</span><span class="summary-stat-label">учебных разделов</span></article>
           <article class="summary-stat"><span class="summary-stat-value" id="summary-users">—</span><span class="summary-stat-label">пользователей кабинета</span></article>
-          <article class="summary-stat"><span class="summary-stat-value" id="summary-visitors">—</span><span class="summary-stat-label">уникальных посетителей</span></article>
+          <article class="summary-stat"><span class="summary-stat-value" id="summary-online-users">—</span><span class="summary-stat-label">посетителей сайта онлайн</span></article>
         </div>
         <div class="summary-details">
           <div>
@@ -63,39 +63,53 @@
             <ul class="summary-list" id="summary-classes-list"><li>Загрузка данных...</li></ul>
           </div>
           <div>
-            <h3>Посещаемость</h3>
-            <p class="summary-note" id="summary-traffic-note">Загрузка данных GitHub...</p>
-            <ul class="summary-list summary-traffic-list" id="summary-traffic-list"></ul>
+            <div class="traffic-toolbar">
+              <div>
+                <h3>Посещаемость</h3>
+              </div>
+              <div class="traffic-switcher" role="group" aria-label="Период графика">
+                <button class="traffic-mode is-active" type="button" data-traffic-mode="daily" aria-pressed="true">По дням</button>
+                <button class="traffic-mode" type="button" data-traffic-mode="monthly" aria-pressed="false">По месяцам</button>
+              </div>
+            </div>
+            <div class="traffic-chart" id="traffic-chart" role="img" aria-label="График посещаемости" hidden>
+              <div class="traffic-chart-y" id="traffic-chart-y" aria-hidden="true"></div>
+              <div class="traffic-chart-main">
+                <div class="traffic-chart-grid" aria-hidden="true"></div>
+                <div class="traffic-chart-bars" id="traffic-chart-bars"></div>
+                <div class="traffic-chart-labels" id="traffic-chart-labels"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="card-grid" aria-label="Разделы кабинета">
-        <article class="glass-card feature-card feature-indigo" id="profile">
+      <section class="card-grid" id="section-cards" aria-label="Раздел кабинета" hidden>
+        <article class="glass-card feature-card feature-indigo" id="profile" data-cabinet-section="profile">
           <span class="feature-icon" aria-hidden="true">01</span>
           <h2>Профиль</h2>
           <p><strong id="display-name">...</strong><br><span id="profile-email">...</span></p>
           <span class="feature-state" id="profile-role">Профиль пользователя</span>
         </article>
-        <article class="glass-card feature-card feature-teal" id="lessons">
+        <article class="glass-card feature-card feature-teal" id="lessons" data-cabinet-section="lessons">
           <span class="feature-icon" aria-hidden="true">02</span>
           <h2>Уроки и классы</h2>
           <p>Быстрый доступ к классам, урокам и учебным материалам сайта.</p>
           <span class="feature-state">Можно подключить к разделам сайта</span>
         </article>
-        <article class="glass-card feature-card feature-amber" id="tests">
+        <article class="glass-card feature-card feature-amber" id="tests" data-cabinet-section="tests">
           <span class="feature-icon" aria-hidden="true">03</span>
           <h2>Тесты и задания</h2>
           <p>Место для работ, проверок и инструментов генератора заданий.</p>
           <span class="feature-state">Можно подключить отдельно</span>
         </article>
-        <article class="glass-card feature-card feature-indigo" id="materials">
+        <article class="glass-card feature-card feature-indigo" id="materials" data-cabinet-section="materials">
           <span class="feature-icon" aria-hidden="true">04</span>
           <h2>Мои материалы</h2>
           <p>Документы, ссылки и личные заметки в одном разделе.</p>
           <span class="feature-state">Раздел готов к наполнению</span>
         </article>
-        <article class="glass-card feature-card feature-teal" id="settings">
+        <article class="glass-card feature-card feature-teal" id="settings" data-cabinet-section="settings">
           <span class="feature-icon" aria-hidden="true">05</span>
           <h2>Настройки профиля</h2>
           <p>Управление отображаемым именем и параметрами доступа.</p>
@@ -103,7 +117,7 @@
         </article>
       </section>
 
-      <section class="admin-panel glass-card" id="admin-panel" hidden>
+      <section class="admin-panel glass-card" id="admin-panel" data-cabinet-section="admin-panel" hidden>
         <div class="panel-heading">
           <div>
             <p class="eyebrow">УПРАВЛЕНИЕ ДОСТУПОМ</p>
@@ -132,6 +146,6 @@
     </section>
   </div>
 
-  <script src="/static/dashboard.js?v=overview-grid-2"></script>
+  <script src="/static/dashboard.js?v=analytics-ga4-2"></script>
 </body>
 </html>

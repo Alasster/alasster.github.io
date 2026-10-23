@@ -19,13 +19,30 @@ const summaryStatus = document.getElementById('site-summary-status');
 const summaryLessons = document.getElementById('summary-lessons');
 const summaryClasses = document.getElementById('summary-classes');
 const summaryUsers = document.getElementById('summary-users');
-const summaryVisitors = document.getElementById('summary-visitors');
+const summaryOnlineUsers = document.getElementById('summary-online-users');
 const summaryClassesList = document.getElementById('summary-classes-list');
-const summaryTrafficNote = document.getElementById('summary-traffic-note');
-const summaryTrafficList = document.getElementById('summary-traffic-list');
+const trafficChart = document.getElementById('traffic-chart');
+const trafficChartY = document.getElementById('traffic-chart-y');
+const trafficChartBars = document.getElementById('traffic-chart-bars');
+const trafficChartLabels = document.getElementById('traffic-chart-labels');
+const trafficModes = [...document.querySelectorAll('[data-traffic-mode]')];
+const sectionCards = document.getElementById('section-cards');
+const sectionViews = [...document.querySelectorAll('[data-cabinet-section]')];
 const roles = ['user', 'teacher', 'admin', 'superadmin'];
 
+const sectionHeadings = {
+  overview: ['ОБЗОР КАБИНЕТА', 'Рабочая область'],
+  profile: ['ПРОФИЛЬ', 'Профиль пользователя'],
+  lessons: ['УРОКИ И КЛАССЫ', 'Учебные разделы'],
+  tests: ['ТЕСТЫ И ЗАДАНИЯ', 'Задания и проверки'],
+  materials: ['МОИ МАТЕРИАЛЫ', 'Личные материалы'],
+  settings: ['НАСТРОЙКИ ПРОФИЛЯ', 'Настройки доступа'],
+  'admin-panel': ['УПРАВЛЕНИЕ ДОСТУПОМ', 'Пользователи и роли'],
+};
+
 const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(Number(value) || 0);
+let trafficSeries = { daily: [], monthly: [] };
+let selectedTrafficMode = 'daily';
 
 function appendSummaryRow(list, label, value) {
   const row = document.createElement('li');
@@ -66,17 +83,35 @@ document.addEventListener('click', (event) => {
 });
 
 function syncSidebarActive() {
-  const hash = window.location.hash || '#overview';
-  const link = document.querySelector(`.sidebar-link[href="${hash}"]`);
-  if (!link) return null;
+  const requestedSection = (window.location.hash || '#overview').slice(1);
+  const requestedLink = document.querySelector(`.sidebar-link[href="#${requestedSection}"]`);
+  const section = requestedLink && !requestedLink.hidden ? requestedSection : 'overview';
+  const link = document.querySelector(`.sidebar-link[href="#${section}"]`);
   document.querySelectorAll('.sidebar-link').forEach((item) => item.classList.toggle('active', item === link));
+  showCabinetSection(section);
   return link;
+}
+
+function showCabinetSection(section) {
+  const selectedSection = sectionHeadings[section] ? section : 'overview';
+  sectionViews.forEach((view) => {
+    view.hidden = view.dataset.cabinetSection !== selectedSection;
+  });
+  if (sectionCards) sectionCards.hidden = !sectionViews.some(
+    (view) => view.closest('#section-cards') && !view.hidden,
+  );
+  const [eyebrow, title] = sectionHeadings[selectedSection];
+  const eyebrowNode = document.querySelector('.workspace-header .eyebrow');
+  const titleNode = document.querySelector('.workspace-header h1');
+  if (eyebrowNode) eyebrowNode.textContent = eyebrow;
+  if (titleNode) titleNode.textContent = title;
 }
 
 document.querySelectorAll('.sidebar-link').forEach((link) => {
   link.addEventListener('click', () => {
     document.querySelectorAll('.sidebar-link').forEach((item) => item.classList.remove('active'));
     link.classList.add('active');
+    showCabinetSection(link.getAttribute('href').slice(1));
   });
 });
 
@@ -98,6 +133,7 @@ async function loadCurrentUser() {
   if (user.role === 'superadmin') {
     adminPanel.hidden = false;
     accessNav.hidden = false;
+    syncSidebarActive();
     await loadUsers();
   }
 }
@@ -156,22 +192,65 @@ async function loadSiteOverview() {
   summaryLessons.textContent = formatNumber(data.lessons);
   summaryClasses.textContent = formatNumber(data.classes.length);
   summaryUsers.textContent = formatNumber(data.users);
+  summaryOnlineUsers.textContent = data.online_users == null ? '—' : formatNumber(data.online_users);
   summaryClassesList.replaceChildren();
   data.classes.forEach((item) => appendSummaryRow(summaryClassesList, item.name, item.lessons));
 
-  const traffic = data.traffic;
-  summaryTrafficList.replaceChildren();
-  if (traffic.available) {
-    summaryVisitors.textContent = formatNumber(traffic.unique_visitors);
-    summaryTrafficNote.textContent = 'Данные GitHub за последние 14 дней.';
-    traffic.daily.slice(-5).forEach((item) => appendSummaryRow(summaryTrafficList, item.date, item.views));
-    summaryStatus.textContent = 'GitHub подключён';
-  } else {
-    summaryVisitors.textContent = '—';
-    summaryTrafficNote.textContent = 'Посещаемость GitHub появится после подключения GITHUB_TOKEN.';
-    summaryStatus.textContent = 'Локальные данные';
-  }
+  trafficSeries = data.traffic || { daily: [], monthly: [] };
+  const analyticsAvailable = Boolean(data.analytics_available);
+  trafficModes.forEach((button) => { button.disabled = !analyticsAvailable; });
+  summaryStatus.textContent = analyticsAvailable ? 'GA4 подключён' : 'Ожидание GA4';
+  renderTrafficChart(selectedTrafficMode);
 }
+
+function renderTrafficChart(mode) {
+  const points = (trafficSeries[mode] || []).slice(-14);
+  if (!points.length) {
+    trafficChart.hidden = true;
+    return;
+  }
+
+  const values = points.map((point) => Number(point.value) || 0);
+  const maxValue = Math.max(...values, 1);
+  trafficChartY.replaceChildren();
+  [maxValue, Math.round(maxValue * 2 / 3), Math.round(maxValue / 3), 0].forEach((value) => {
+    const label = document.createElement('span');
+    label.textContent = formatNumber(value);
+    trafficChartY.append(label);
+  });
+  trafficChartBars.replaceChildren();
+  trafficChartLabels.replaceChildren();
+  points.forEach((point, index) => {
+    const slot = document.createElement('div');
+    slot.className = 'traffic-bar-slot';
+    const bar = document.createElement('div');
+    bar.className = 'traffic-bar';
+    bar.style.height = `${Math.max((values[index] / maxValue) * 100, 2)}%`;
+    bar.title = `${point.label}: ${formatNumber(point.value)}`;
+    bar.setAttribute('aria-label', bar.title);
+    slot.append(bar);
+    trafficChartBars.append(slot);
+
+    const label = document.createElement('span');
+    label.className = 'traffic-chart-label';
+    label.textContent = mode === 'daily' ? point.label.slice(5) : point.label;
+    label.title = point.label;
+    trafficChartLabels.append(label);
+  });
+  trafficChart.hidden = false;
+}
+
+trafficModes.forEach((button) => {
+  button.addEventListener('click', () => {
+    selectedTrafficMode = button.dataset.trafficMode;
+    trafficModes.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+    renderTrafficChart(selectedTrafficMode);
+  });
+});
 
 function closeLogoutModal() {
   logoutModal.hidden = true;
@@ -207,5 +286,7 @@ logoutConfirm.addEventListener('click', async () => {
 loadCurrentUser().catch(() => window.location.replace('/login'));
 loadSiteOverview().catch(() => {
   summaryStatus.textContent = 'Нет данных';
-  summaryTrafficNote.textContent = 'Сводка сайта временно недоступна.';
 });
+window.setInterval(() => {
+  loadSiteOverview().catch(() => {});
+}, 60_000);

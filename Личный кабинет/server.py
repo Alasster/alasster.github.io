@@ -9,14 +9,13 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import os
 import re
 import secrets
 import sqlite3
-import json
-import urllib.error
-import urllib.request
 from contextlib import closing
+from functools import lru_cache
 from pathlib import Path
 
 from fastapi import FastAPI, Request, Response, status
@@ -24,23 +23,42 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+try:
+    from google.analytics.data_v1beta import BetaAnalyticsDataClient
+    from google.analytics.data_v1beta.types import (
+        DateRange,
+        Dimension,
+        Metric,
+        MinuteRange,
+        RunRealtimeReportRequest,
+        RunReportRequest,
+    )
+    from google.oauth2 import service_account
+except ImportError:  # pragma: no cover - dependency is installed from requirements.txt
+    BetaAnalyticsDataClient = None
+    DateRange = Dimension = Metric = MinuteRange = None
+    RunRealtimeReportRequest = RunReportRequest = None
+    service_account = None
+
 
 BASE_DIR = Path(__file__).resolve().parent
+LOGGER = logging.getLogger("personal_cabinet.ga4")
 
 
 def load_local_env() -> None:
-    env_path = BASE_DIR / ".env"
-    if not env_path.is_file():
-        return
-    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
+    for env_name in (".env", "alasster.env"):
+        env_path = BASE_DIR / env_name
+        if not env_path.is_file():
             continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key and value:
-            os.environ.setdefault(key, value)
+        for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and value:
+                os.environ.setdefault(key, value)
 
 
 load_local_env()
@@ -48,14 +66,38 @@ load_local_env()
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
 SESSION_TTL = 60 * 60 * 24 * 7
+GA4_PROPERTY_ID = os.environ.get("GA4_PROPERTY_ID", "560432914").strip()
+GA4_SERVICE_ACCOUNT_FILE = os.environ.get("GA4_SERVICE_ACCOUNT_FILE", "ga4-service-account.json").strip()
 PBKDF2_ITERATIONS = 310_000
 SUPERADMIN_EMAIL = os.environ.get("PERSONAL_CABINET_SUPERADMIN_EMAIL", "alasster@yandex.ru").strip().lower()
-GITHUB_REPO = os.environ.get("ALASSTER_GITHUB_REPO", "Alasster/alasster.github.io").strip()
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 ALLOWED_ROLES = {"user", "teacher", "admin", "superadmin"}
 
 app = FastAPI(title="Личный кабинет", docs_url=None, redoc_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    # Исходные шаблоны хранятся на сервере и доступны только через
+    # контролируемые маршруты /login, /register и /. Прямые обращения к
+    # именам файлов не должны становиться альтернативным способом доступа.
+    if request.url.path.lower().endswith(".html"):
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "same-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; base-uri 'none'; object-src 'none'; "
+        "frame-ancestors 'none'; form-action 'self'; script-src 'self'; "
+        "style-src 'self' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; connect-src 'self'; "
+        "img-src 'self' data:"
+    )
+    return response
 
 
 class LoginRequest(BaseModel):
@@ -117,10 +159,14 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS sessions (
                 token_hash TEXT PRIMARY KEY,
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                expires_at INTEGER NOT NULL
+                expires_at INTEGER NOT NULL,
+                last_seen INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
             );
             """
         )
+        session_columns = {row["name"] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
+        if "last_seen" not in session_columns:
+            db.execute("ALTER TABLE sessions ADD COLUMN last_seen INTEGER NOT NULL DEFAULT 0")
         columns = {row["name"] for row in db.execute("PRAGMA table_info(users)").fetchall()}
         for column, definition in (("first_name", "TEXT NOT NULL DEFAULT ''"), ("last_name", "TEXT NOT NULL DEFAULT ''"), ("role", "TEXT NOT NULL DEFAULT 'user'")):
             if column not in columns:
@@ -161,6 +207,12 @@ def get_user_from_request(request: Request) -> sqlite3.Row | None:
         if row is None:
             db.execute("DELETE FROM sessions WHERE token_hash = ?", (token_digest(token),))
             db.commit()
+        else:
+            db.execute(
+                "UPDATE sessions SET last_seen = strftime('%s', 'now') WHERE token_hash = ?",
+                (token_digest(token),),
+            )
+            db.commit()
         return row
 
 
@@ -183,28 +235,78 @@ def site_content_summary() -> dict:
     }
 
 
-def github_traffic_summary() -> dict:
-    empty = {"available": False, "views": None, "unique_visitors": None, "daily": []}
-    if not GITHUB_TOKEN or not GITHUB_REPO:
-        return empty
-    request = urllib.request.Request(
-        f"https://api.github.com/repos/{GITHUB_REPO}/traffic/views",
-        headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {GITHUB_TOKEN}", "User-Agent": "alasster-personal-cabinet"},
+def ga4_credentials_path() -> Path:
+    path = Path(GA4_SERVICE_ACCOUNT_FILE)
+    return path if path.is_absolute() else BASE_DIR / path
+
+
+@lru_cache(maxsize=1)
+def ga4_client():
+    if BetaAnalyticsDataClient is None or service_account is None:
+        raise RuntimeError("Пакет Google Analytics Data API не установлен")
+    key_path = ga4_credentials_path()
+    if not key_path.is_file():
+        raise FileNotFoundError("Файл ключа Google Analytics не найден")
+    credentials = service_account.Credentials.from_service_account_file(
+        str(key_path),
+        scopes=["https://www.googleapis.com/auth/analytics.readonly"],
     )
+    return BetaAnalyticsDataClient(credentials=credentials)
+
+
+def ga4_realtime_users() -> int:
+    response = ga4_client().run_realtime_report(
+        RunRealtimeReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            metrics=[Metric(name="activeUsers")],
+            minute_ranges=[MinuteRange(start_minutes_ago=4)],
+        ),
+        timeout=10,
+    )
+    if not response.rows:
+        return 0
+    return int(response.rows[0].metric_values[0].value or 0)
+
+
+def ga4_traffic(mode: str) -> list[dict]:
+    dimension_name = "date" if mode == "daily" else "yearMonth"
+    start_date = "30daysAgo" if mode == "daily" else "365daysAgo"
+    response = ga4_client().run_report(
+        RunReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            dimensions=[Dimension(name=dimension_name)],
+            metrics=[Metric(name="activeUsers")],
+            date_ranges=[DateRange(start_date=start_date, end_date="today")],
+        ),
+        timeout=10,
+    )
+    points = []
+    for row in response.rows:
+        key = row.dimension_values[0].value
+        if mode == "daily" and len(key) == 8:
+            label = f"{key[:4]}-{key[4:6]}-{key[6:]}"
+        elif mode == "monthly" and len(key) == 6:
+            label = f"{key[:4]}-{key[4:]}"
+        else:
+            label = key
+        points.append({"key": key, "label": label, "value": int(row.metric_values[0].value or 0)})
+    return sorted(points, key=lambda item: item["key"])
+
+
+def ga4_summary() -> dict:
+    result = {"online_users": None, "traffic": {"daily": [], "monthly": []}, "available": False}
     try:
-        with urllib.request.urlopen(request, timeout=4) as response:
-            payload = json.load(response)
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, json.JSONDecodeError):
-        return empty
-    return {
-        "available": True,
-        "views": payload.get("count", 0),
-        "unique_visitors": payload.get("uniques", 0),
-        "daily": [
-            {"date": item.get("timestamp", "")[:10], "views": item.get("count", 0), "unique_visitors": item.get("uniques", 0)}
-            for item in payload.get("views", [])
-        ],
-    }
+        result["online_users"] = ga4_realtime_users()
+        result["available"] = True
+    except Exception:
+        LOGGER.exception("Не удалось получить realtime-данные GA4")
+    for mode in ("daily", "monthly"):
+        try:
+            result["traffic"][mode] = ga4_traffic(mode)
+            result["available"] = True
+        except Exception:
+            LOGGER.exception("Не удалось получить график GA4: %s", mode)
+    return result
 
 
 @app.on_event("startup")
@@ -249,13 +351,15 @@ def site_overview(request: Request):
     with closing(open_db()) as db:
         users_count = db.execute("SELECT COUNT(*) AS count FROM users").fetchone()["count"]
     content = site_content_summary()
+    analytics = ga4_summary()
     return {
         "site": "alasster.site",
-        "repository": GITHUB_REPO,
         "lessons": content["lessons"],
         "classes": content["classes"],
         "users": users_count,
-        "traffic": github_traffic_summary(),
+        "online_users": analytics["online_users"],
+        "analytics_available": analytics["available"],
+        "traffic": analytics["traffic"],
     }
 
 
@@ -276,7 +380,7 @@ def login(payload: LoginRequest, response: Response):
 
         token = secrets.token_urlsafe(32)
         db.execute(
-            "INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, strftime('%s', 'now') + ?)",
+            "INSERT INTO sessions (token_hash, user_id, expires_at, last_seen) VALUES (?, ?, strftime('%s', 'now') + ?, strftime('%s', 'now'))",
             (token_digest(token), user["id"], SESSION_TTL),
         )
         db.commit()

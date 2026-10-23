@@ -171,6 +171,24 @@ button.theme-toggle:hover { color: var(--primary-dark); box-shadow: var(--shadow
 .summary-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; padding: 10px 12px; border-radius: 14px; color: var(--muted); background: var(--surface); box-shadow: var(--shadow-in); font-size: .78rem; }
 .summary-list li strong { color: var(--text); white-space: nowrap; }
 .summary-note { min-height: 2.7em; margin: 0 0 10px; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.traffic-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.traffic-toolbar h3 { margin-bottom: 4px; }
+.traffic-switcher { display: inline-flex; flex: 0 0 auto; gap: 3px; padding: 4px; border-radius: 13px; background: var(--surface); box-shadow: var(--shadow-in); transform: translateY(-4px); }
+.traffic-mode { padding: 7px 10px; border: 0; border-radius: 9px; color: var(--muted); background: transparent; font-size: .7rem; font-weight: 800; }
+.traffic-mode:disabled { cursor: not-allowed; opacity: .55; }
+.traffic-mode.is-active { color: var(--primary-dark); background: var(--page); box-shadow: var(--shadow-soft); }
+.traffic-chart { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; height: 214px; margin: 4px 0 16px; padding: 16px 12px 0 0; border-radius: 20px; background: linear-gradient(145deg, rgba(255, 255, 255, .22), rgba(83, 109, 254, .06)); box-shadow: var(--shadow-in); }
+.traffic-chart-y { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; padding-bottom: 29px; color: var(--muted); font-size: .58rem; line-height: 1; }
+.traffic-chart-main { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) 29px; min-width: 0; }
+.traffic-chart-grid { position: absolute; inset: 0 0 29px; border-bottom: 1px solid rgba(116, 128, 151, .22); background: repeating-linear-gradient(to bottom, rgba(116, 128, 151, .14) 0 1px, transparent 1px 33.333%); }
+.traffic-chart-bars, .traffic-chart-labels { position: relative; z-index: 1; display: flex; gap: clamp(4px, 1vw, 12px); min-width: 0; padding-inline: 4px; }
+.traffic-chart-bars { align-items: flex-end; height: 100%; }
+.traffic-bar-slot { display: flex; align-items: flex-end; justify-content: center; flex: 1 1 0; min-width: 0; height: 100%; }
+.traffic-bar { width: min(34px, 78%); min-height: 4px; border-radius: 9px 9px 3px 3px; background: linear-gradient(180deg, var(--primary), var(--teal)); box-shadow: 3px 3px 7px rgba(83, 109, 254, .22), -2px -2px 6px rgba(255, 255, 255, .48); transition: height .35s ease, filter .2s ease, transform .2s ease; }
+.traffic-bar:hover { filter: saturate(1.25) brightness(1.06); transform: translateY(-3px); }
+.traffic-chart-labels { align-items: flex-start; padding-top: 7px; }
+.traffic-chart-label { flex: 1 1 0; min-width: 0; overflow: hidden; color: var(--muted); font-size: .58rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.traffic-empty { margin: 12px 0 16px; padding: 22px 12px; border-radius: 18px; color: var(--muted); background: var(--surface); box-shadow: var(--shadow-in); font-size: .78rem; text-align: center; }
 .feature-card { min-height: 230px; padding: 26px; border-radius: 26px; box-shadow: var(--shadow-soft); transition: box-shadow .2s ease, transform .2s ease; }
 .feature-card:hover { box-shadow: 8px 8px 18px rgba(163, 174, 195, .55), -8px -8px 18px rgba(255, 255, 255, .88); }
 .feature-card p { min-height: 52px; color: var(--muted); font-size: .9rem; }
@@ -194,5 +212,6 @@ button.theme-toggle:hover { color: var(--primary-dark); box-shadow: var(--shadow
 @media (max-width: 700px) { .sidebar { position: sticky; top: 10px; z-index: 50; display: flex; flex-direction: row; align-items: center; gap: 8px; padding: 10px; } .sidebar .brand, .app-shell.is-sidebar-expanded .sidebar .brand { flex: 0 0 42px; width: 42px; min-width: 42px; height: 42px; padding: 0; border-bottom: 0; } .sidebar-nav, .app-shell.is-sidebar-expanded .sidebar .sidebar-nav { flex: 1 1 auto; gap: 5px; width: auto; min-width: 0; padding: 0; overflow-x: auto; scrollbar-width: none; } .sidebar-nav::-webkit-scrollbar { display: none; } .sidebar-link, .app-shell.is-sidebar-expanded .sidebar .sidebar-link { justify-content: center; flex: 0 0 42px; width: 42px; min-width: 42px; height: 42px; min-height: 42px; padding: 5px; } .sidebar-label, .sidebar .brand > span:last-child { display: none !important; } .sidebar-footer, .app-shell.is-sidebar-expanded .sidebar .sidebar-footer { flex: 0 0 auto; display: flex; gap: 5px; width: auto; min-width: 0; margin: 0; padding: 0; border-top: 0; } .theme-toggle, .app-shell.is-sidebar-expanded .sidebar .theme-toggle, .logout-button, .app-shell.is-sidebar-expanded .sidebar .logout-button { justify-content: center; flex: 0 0 42px; width: 42px; min-width: 42px; height: 42px; min-height: 42px; padding: 5px; } .sidebar-footer > .button { align-self: center; margin: 0; } }
 @media (max-width: 700px) { .sidebar { border-radius: 18px; box-shadow: 5px 5px 10px rgba(163, 174, 195, .42), -5px -5px 10px rgba(255, 255, 255, .72); } }
 @media (max-width: 700px) { :root[data-theme="dark"] .sidebar { box-shadow: 5px 5px 10px rgba(11, 15, 25, .44), -5px -5px 10px rgba(190, 205, 235, .1); } }
+@media (max-width: 700px) { .traffic-toolbar { flex-direction: column; } .traffic-switcher { align-self: stretch; } .traffic-mode { flex: 1; } .traffic-chart { height: 200px; } }
 @media (max-width: 700px) { .auth-card { width: min(100%, 460px); } .auth-shell { display: flex; flex-direction: column; min-height: 0; } .auth-promo, .auth-form-panel { transform: none !important; } .auth-promo { order: 2; min-height: 300px; } .auth-form-panel { order: 1; } .auth-card.is-register .auth-promo { order: 1; } .auth-card.is-register .auth-form-panel { order: 2; } }
 @media (max-width: 420px) { .auth-page { padding: 14px; } .auth-card { border-radius: 24px; } .auth-promo, .auth-form-panel { padding: 28px; } .auth-views { min-height: 430px; } .workspace-role { align-self: stretch; text-align: center; } }
