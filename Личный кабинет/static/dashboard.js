@@ -526,6 +526,7 @@ function renderTrafficChart(mode) {
     const bar = document.createElement('div');
     bar.className = 'traffic-bar';
     bar.style.height = `${Math.max((values[index] / maxValue) * 100, 2)}%`;
+    bar.textContent = formatNumber(point.value);
     bar.title = `${point.label}: ${formatNumber(point.value)}`;
     bar.setAttribute('aria-label', bar.title);
     slot.append(bar);
