@@ -37,6 +37,9 @@ const summaryClasses = document.getElementById('summary-classes');
 const summaryUsers = document.getElementById('summary-users');
 const summaryOnlineUsers = document.getElementById('summary-online-users');
 const summaryClassesList = document.getElementById('summary-classes-list');
+const lessonCatalogStatus = document.getElementById('lesson-catalog-status');
+const lessonCatalogGrid = document.getElementById('lesson-catalog-grid');
+const lessonCatalogRetry = document.getElementById('lesson-catalog-retry');
 const trafficChart = document.getElementById('traffic-chart');
 const trafficChartY = document.getElementById('traffic-chart-y');
 const trafficChartBars = document.getElementById('traffic-chart-bars');
@@ -66,6 +69,7 @@ const sectionHeadings = {
 const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(Number(value) || 0);
 let trafficSeries = { daily: [], monthly: [] };
 let selectedTrafficMode = 'daily';
+let lessonCatalogRequest = null;
 
 function appendSummaryRow(list, label, value) {
   const row = document.createElement('li');
@@ -112,6 +116,7 @@ function syncSidebarActive() {
   const link = document.querySelector(`.sidebar-link[href="#${section}"]`);
   document.querySelectorAll('.sidebar-link').forEach((item) => item.classList.toggle('active', item === link));
   showCabinetSection(section);
+  if (section === 'lessons') loadLessonsCatalog();
   return link;
 }
 
@@ -496,6 +501,95 @@ async function loadSiteOverview() {
   summaryStatus.textContent = analyticsAvailable ? 'GA4 подключён' : 'Ожидание GA4';
   renderTrafficChart(selectedTrafficMode);
 }
+
+function renderLessonsCatalog(classes) {
+  lessonCatalogGrid.replaceChildren();
+  let totalLessons = 0;
+  const syncOpenClassLayout = () => {
+    const openCount = lessonCatalogGrid.querySelectorAll('.lesson-class-card[open]').length;
+    lessonCatalogGrid.classList.toggle('is-single-open', openCount === 1);
+  };
+  classes.forEach((item) => {
+    totalLessons += item.lessons;
+    const card = document.createElement('details');
+    card.className = 'lesson-class-card';
+    card.open = lessonCatalogGrid.childElementCount === 0;
+    card.addEventListener('toggle', syncOpenClassLayout);
+
+    const summary = document.createElement('summary');
+    const name = document.createElement('strong');
+    const count = document.createElement('span');
+    name.textContent = item.name;
+    count.className = 'lesson-class-count';
+    count.textContent = `${formatNumber(item.lessons)} уроков`;
+    summary.append(name, count);
+    card.append(summary);
+
+    item.groups.forEach((group) => {
+      const groupSection = document.createElement('section');
+      groupSection.className = 'lesson-topic-group';
+      const heading = document.createElement('h3');
+      heading.textContent = group.name;
+      const links = document.createElement('div');
+      links.className = 'lesson-topic-list';
+      group.lessons.forEach((lesson) => {
+        const row = document.createElement('div');
+        row.className = 'lesson-topic-row';
+        const link = document.createElement('a');
+        link.className = 'lesson-topic-link';
+        link.href = lesson.href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        const number = document.createElement('span');
+        number.className = 'lesson-topic-number';
+        number.textContent = lesson.number == null ? '•' : formatNumber(lesson.number);
+        const title = document.createElement('span');
+        title.textContent = lesson.title;
+        link.append(number, title);
+        row.append(link);
+        if (item.name !== 'Python основы') {
+          const kspButton = document.createElement('button');
+          kspButton.className = 'button button-ghost lesson-ksp-button';
+          kspButton.type = 'button';
+          kspButton.disabled = true;
+          kspButton.textContent = 'КСП';
+          kspButton.title = 'Генератор КСП будет добавлен позже';
+          kspButton.setAttribute('aria-label', `КСП: ${lesson.title} — скоро`);
+          row.append(kspButton);
+        }
+        links.append(row);
+      });
+      groupSection.append(heading, links);
+      card.append(groupSection);
+    });
+    lessonCatalogGrid.append(card);
+  });
+  syncOpenClassLayout();
+  lessonCatalogStatus.textContent = `${formatNumber(classes.length)} классов · ${formatNumber(totalLessons)} уроков`;
+  lessonCatalogRetry.hidden = true;
+}
+
+async function loadLessonsCatalog() {
+  if (lessonCatalogRequest) return lessonCatalogRequest;
+  lessonCatalogStatus.textContent = 'Обновление списка...';
+  lessonCatalogRetry.hidden = true;
+  lessonCatalogRequest = (async () => {
+    try {
+      const response = await fetch('/api/lessons-catalog');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Не удалось загрузить уроки.');
+      renderLessonsCatalog(data.classes);
+    } catch (error) {
+      lessonCatalogStatus.textContent = error.message || 'Не удалось загрузить уроки.';
+      lessonCatalogRetry.hidden = false;
+    } finally {
+      lessonCatalogRequest = null;
+    }
+  })();
+  return lessonCatalogRequest;
+}
+
+lessonCatalogRetry.addEventListener('click', loadLessonsCatalog);
 
 function renderTrafficChart(mode) {
   const points = (trafficSeries[mode] || []).slice(-14);

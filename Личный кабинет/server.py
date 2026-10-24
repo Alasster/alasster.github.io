@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+from html import unescape
 import logging
 import os
 import re
@@ -17,6 +18,7 @@ import sqlite3
 from contextlib import closing
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -249,6 +251,65 @@ def site_content_summary() -> dict:
     }
 
 
+def site_lesson_catalog() -> list[dict]:
+    excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов"}
+    catalog = []
+    for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name.casefold()):
+        if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
+            continue
+        lesson_files = sorted(
+            directory.rglob("*.html"),
+            key=lambda item: re.sub(
+                r"\d+", lambda match: match.group().zfill(10),
+                item.relative_to(directory).as_posix().casefold(),
+            ),
+        )
+        if not lesson_files:
+            continue
+
+        groups = {}
+        for lesson_file in lesson_files:
+            content = lesson_file.read_text(encoding="utf-8")
+            heading = re.search(r"<h1\b[^>]*>(.*?)</h1\s*>", content, re.IGNORECASE | re.DOTALL)
+            title = heading.group(1) if heading else ""
+            title = re.sub(r"<[^>]*>", " ", title)
+            title = re.sub(r"\s+", " ", unescape(title)).strip()
+            if not title:
+                page_title = re.search(r"<title\b[^>]*>(.*?)</title\s*>", content, re.IGNORECASE | re.DOTALL)
+                title = re.sub(r"\s+", " ", unescape(page_title.group(1))).strip() if page_title else ""
+            if not title:
+                title = lesson_file.stem
+
+            relative_path = lesson_file.relative_to(BASE_DIR.parent).as_posix()
+            group_name = lesson_file.parent.name if lesson_file.parent != directory else "Темы"
+            groups.setdefault(group_name, []).append({
+                "number": int(lesson_file.stem.split(maxsplit=1)[0].split(".", 1)[0])
+                    if re.match(r"^\d+", lesson_file.stem) else None,
+                "title": title,
+                "href": f"https://alasster.site/{quote(relative_path, safe='/')}",
+            })
+
+        catalog.append({
+            "name": directory.name,
+            "lessons": len(lesson_files),
+            "groups": [
+                {
+                    "name": name,
+                    "lessons": sorted(
+                        lessons,
+                        key=lambda lesson: (
+                            lesson["number"] is None,
+                            lesson["number"] if lesson["number"] is not None else 0,
+                            lesson["title"].casefold(),
+                        ),
+                    ),
+                }
+                for name, lessons in groups.items()
+            ],
+        })
+    return catalog
+
+
 def ga4_credentials_path() -> Path:
     path = Path(GA4_SERVICE_ACCOUNT_FILE)
     return path if path.is_absolute() else BASE_DIR / path
@@ -433,6 +494,13 @@ def site_overview(request: Request):
         "analytics_available": analytics["available"],
         "traffic": analytics["traffic"],
     }
+
+
+@app.get("/api/lessons-catalog")
+def lessons_catalog(request: Request):
+    if get_user_from_request(request) is None:
+        return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
+    return {"classes": site_lesson_catalog()}
 
 
 @app.post("/api/login")
