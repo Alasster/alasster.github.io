@@ -237,4 +237,84 @@ def evaluate_answer(
         fraction = correct_cnt / total_items
         return float(round(fraction * max_score, 2)), True
 
+    # 11. Исключение лишнего (Odd One Out)
+    if task_type == "odd_one_out":
+        k_list = answer_key if isinstance(answer_key, list) else [answer_key]
+        k_clean = {normalize_text(str(x)).lower() for x in k_list if x is not None and str(x).strip()}
+        s_list = student_answer if isinstance(student_answer, list) else [student_answer]
+        s_clean = {normalize_text(str(x)).lower() for x in s_list if x is not None and str(x).strip()}
+        if not k_clean:
+            return 0.0, True
+        if check_method == "all_or_nothing":
+            return (float(max_score), True) if s_clean == k_clean else (0.0, True)
+        correct_picked = len(s_clean.intersection(k_clean))
+        wrong_picked = len(s_clean - k_clean)
+        fraction = max(0.0, (correct_picked - wrong_picked) / len(k_clean))
+        return float(round(fraction * max_score, 2)), True
+
+    # 12. Вставка из банка слов (Word Bank Cloze)
+    if task_type == "word_bank_cloze":
+        if not isinstance(answer_key, dict) or not isinstance(student_answer, dict):
+            return 0.0, True
+        total_slots = len(answer_key)
+        if total_slots == 0:
+            return 0.0, True
+        correct_cnt = 0
+        for slot, expected in answer_key.items():
+            s_val = normalize_text(str(student_answer.get(slot, ""))).lower()
+            if isinstance(expected, list):
+                exp_list = [normalize_text(str(x)).lower() for x in expected]
+            else:
+                exp_list = [normalize_text(x).lower() for x in str(expected).split(";")]
+            if s_val in exp_list and s_val != "":
+                correct_cnt += 1
+        fraction = correct_cnt / total_slots
+        return float(round(fraction * max_score, 2)), True
+
+    # 13. Таблица соответствий / Матрица утверждений (Boolean / Choice Matrix)
+    if task_type == "boolean_matrix":
+        if not isinstance(answer_key, dict) or not isinstance(student_answer, dict):
+            return 0.0, True
+        total_rows = len(answer_key)
+        if total_rows == 0:
+            return 0.0, True
+        correct_cnt = 0
+        for row_key, expected in answer_key.items():
+            s_val = normalize_text(str(student_answer.get(row_key, ""))).lower()
+            k_val = normalize_text(str(expected)).lower()
+            if s_val == k_val and s_val != "":
+                correct_cnt += 1
+        fraction = correct_cnt / total_rows
+        return float(round(fraction * max_score, 2)), True
+
+    # 14. Метки на схеме / Интерактивные точки (Hotspot)
+    if task_type == "hotspot":
+        k_list = answer_key if isinstance(answer_key, list) else [answer_key]
+        k_clean = {normalize_text(str(x)).lower() for x in k_list if x is not None and str(x).strip()}
+        s_list = student_answer if isinstance(student_answer, list) else [student_answer]
+        s_clean = {normalize_text(str(x)).lower() for x in s_list if x is not None and str(x).strip()}
+        if not k_clean:
+            return 0.0, True
+        if check_method == "all_or_nothing":
+            return (float(max_score), True) if s_clean == k_clean else (0.0, True)
+        correct_picked = len(s_clean.intersection(k_clean))
+        wrong_picked = len(s_clean - k_clean)
+        fraction = max(0.0, (correct_picked - wrong_picked) / len(k_clean))
+        return float(round(fraction * max_score, 2)), True
+
+    # 15. Выделение слов в тексте (Highlight Words)
+    if task_type == "highlight_words":
+        k_list = answer_key if isinstance(answer_key, list) else [answer_key]
+        k_clean = {normalize_text(str(x)).lower() for x in k_list if x is not None and str(x).strip()}
+        s_list = student_answer if isinstance(student_answer, list) else [student_answer]
+        s_clean = {normalize_text(str(x)).lower() for x in s_list if x is not None and str(x).strip()}
+        if not k_clean:
+            return 0.0, True
+        if check_method == "all_or_nothing":
+            return (float(max_score), True) if s_clean == k_clean else (0.0, True)
+        correct_picked = len(s_clean.intersection(k_clean))
+        wrong_picked = len(s_clean - k_clean)
+        fraction = max(0.0, (correct_picked - wrong_picked) / len(k_clean))
+        return float(round(fraction * max_score, 2)), True
+
     return 0.0, True

@@ -1546,13 +1546,23 @@ const TASK_TYPES = {
 
   true_false: "6. Верно / Неверно",
 
-  ordering: "7. Восстановление последовательности",
+  ordering: "7. Восстановление последовательности (Drag & Drop)",
 
-  matching: "8. Сопоставление пар (термин — определение)",
+  matching: "8. Сопоставление пар (интерактивные стрелочки)",
 
   dropdown: "9. Выпадающий список в предложении",
 
-  group_classification: "10. Распределение по двум категориям"
+  group_classification: "10. Распределение по категориям (корзины)",
+
+  odd_one_out: "11. Исключение лишнего (Найди лишнее)",
+
+  word_bank_cloze: "12. Вставка из банка слов (Drag & Drop)",
+
+  boolean_matrix: "13. Таблица утверждений (Сетка Да / Нет)",
+
+  hotspot: "14. Метки на схеме (Интерактивные точки)",
+
+  highlight_words: "15. Выделение слов в тексте"
 
 };
 
@@ -2015,58 +2025,178 @@ function renderTaskEditorForm() {
 
   }
 
-  // 10. Распределение по 2 категориям
-
+  // 10. Распределение по категориям (корзины с добавлением любого числа категорий)
   else if (t.question_type === "group_classification") {
-
-    const cats = t.categories && t.categories.length >= 2 ? t.categories : ["Категория 1", "Категория 2"];
-
+    const cats = Array.isArray(t.categories) && t.categories.length >= 2 ? t.categories : ["Категория 1", "Категория 2"];
     const pairs = (t.answer_key && typeof t.answer_key === "object") ? t.answer_key : {};
 
-    let rows = Object.entries(pairs).map(([item, cat], idx) => `
-
-      <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
-
-        <input type="text" class="form-control" value="${escapeHtml(item)}" oninput="updateClassItemText(${idx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Элемент...">
-
-        <select class="form-control class-item-cat-select" onchange="updateClassItemCatByIdx(${idx}, this.value); saveCurrentTask(true);">
-
-          <option value="${escapeHtml(cats[0])}" ${cat === cats[0] ? 'selected' : ''}>${escapeHtml(cats[0])}</option>
-
-          <option value="${escapeHtml(cats[1])}" ${cat === cats[1] ? 'selected' : ''}>${escapeHtml(cats[1])}</option>
-
-        </select>
-
-        <button type="button" class="btn btn-secondary btn-sm" onclick="removeClassItemByIdx(${idx})">✕</button>
-
+    let catInputs = cats.map((cat, catIdx) => `
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem;">
+        <input type="text" class="form-control" value="${escapeHtml(cat)}" oninput="updateCatName(${catIdx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Категория ${catIdx + 1}">
+        ${cats.length > 2 ? `<button type="button" class="btn btn-secondary btn-sm" onclick="removeCategory(${catIdx})" title="Удалить категорию">✕</button>` : ''}
       </div>
+    `).join("");
 
+    let rows = Object.entries(pairs).map(([item, cat], idx) => `
+      <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+        <input type="text" class="form-control" value="${escapeHtml(item)}" oninput="updateClassItemText(${idx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Элемент...">
+        <select class="form-control class-item-cat-select" onchange="updateClassItemCatByIdx(${idx}, this.value); saveCurrentTask(true);">
+          ${cats.map(c => `<option value="${escapeHtml(c)}" ${cat === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join("")}
+        </select>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeClassItemByIdx(${idx})">✕</button>
+      </div>
     `).join("");
 
     typeSpecificHtml = `
-
       <div class="form-group" style="margin-top: 1rem;">
-
-        <label class="form-label">Названия двух категорий (корзин):</label>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-
-          <input type="text" class="form-control" value="${escapeHtml(cats[0])}" oninput="updateCatName(0, this.value)" onblur="saveCurrentTask(true)" placeholder="Категория 1">
-
-          <input type="text" class="form-control" value="${escapeHtml(cats[1])}" oninput="updateCatName(1, this.value)" onblur="saveCurrentTask(true)" placeholder="Категория 2">
-
-        </div>
+        <label class="form-label">Категории (корзины):</label>
+        <div>${catInputs}</div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-bottom: 0.85rem;" onclick="addCategory()">+ Добавить категорию</button>
 
         <label class="form-label">Элементы для распределения:</label>
-
         <div>${rows}</div>
-
         <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.4rem;" onclick="addClassItem()">+ Добавить элемент</button>
-
       </div>
-
     `;
+  }
+  // 11. Исключение лишнего (Odd One Out)
+  else if (t.question_type === "odd_one_out") {
+    const items = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["Элемент 1", "Элемент 2", "Элемент 3", "Лишний элемент"];
+    const key = t.answer_key || items[items.length - 1];
 
+    let rows = items.map((item, idx) => `
+      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 0.6rem; margin-bottom: 0.5rem; align-items: center;">
+        <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: ${key === item ? '#ef4444' : 'var(--text-muted)'};">
+          <input type="radio" name="odd_key" ${key === item ? 'checked' : ''} onchange="activeTask.answer_key = activeTask.options[${idx}]; scheduleAutoSaveTask(50); renderTaskEditor();">
+          <span>Лишнее</span>
+        </label>
+        <input type="text" class="form-control" value="${escapeHtml(item)}" oninput="updateOddItem(${idx}, this.value)" onblur="saveCurrentTask(true)">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeOddItem(${idx})">✕</button>
+      </div>
+    `).join("");
+
+    typeSpecificHtml = `
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Варианты (отметьте, какой из них ЛИШНИЙ):</label>
+        <div>${rows}</div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.4rem;" onclick="addOddItem()">+ Добавить элемент</button>
+      </div>
+    `;
+  }
+  // 12. Вставка из банка слов (Word Bank Cloze)
+  else if (t.question_type === "word_bank_cloze") {
+    const pairs = (t.answer_key && typeof t.answer_key === "object") ? t.answer_key : { "1": "слово" };
+    const distractors = Array.isArray(t.options) ? t.options.filter(w => !Object.values(pairs).includes(w)) : [];
+
+    let slotRows = Object.entries(pairs).map(([slot, word], idx) => `
+      <div style="display: grid; grid-template-columns: 80px 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+        <span style="font-weight: 700;">[${escapeHtml(slot)}]</span>
+        <input type="text" class="form-control" value="${escapeHtml(word)}" oninput="updateClozeSlot('${slot}', this.value)" onblur="saveCurrentTask(true)" placeholder="Правильное слово для слота [${slot}]">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeClozeSlot('${slot}')">✕</button>
+      </div>
+    `).join("");
+
+    let distRows = distractors.map((w, idx) => `
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem;">
+        <input type="text" class="form-control" value="${escapeHtml(w)}" oninput="updateClozeDistractor(${idx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Дистрактор (лишнее слово)...">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeClozeDistractor(${idx})">✕</button>
+      </div>
+    `).join("");
+
+    typeSpecificHtml = `
+      <div class="form-group" style="margin-top: 1rem;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">В тексте задания выше используйте маркеры <code>[1]</code>, <code>[2]</code> для обозначения мест пропусков.</div>
+        <label class="form-label">Правильные слова для пропусков:</label>
+        <div>${slotRows}</div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.3rem; margin-bottom: 0.9rem;" onclick="addClozeSlot()">+ Добавить пропуск [слот]</button>
+
+        <label class="form-label">Дополнительные лишние слова в банке (дистракторы):</label>
+        <div>${distRows}</div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.3rem;" onclick="addClozeDistractor()">+ Добавить лишнее слово</button>
+      </div>
+    `;
+  }
+  // 13. Таблица утверждений (Boolean Matrix)
+  else if (t.question_type === "boolean_matrix") {
+    const cols = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["Верно", "Неверно"];
+    const pairs = (t.answer_key && typeof t.answer_key === "object") ? t.answer_key : { "Утверждение 1": cols[0], "Утверждение 2": cols[1] || cols[0] };
+
+    let colInputs = cols.map((col, cIdx) => `
+      <div style="display: flex; gap: 0.35rem; align-items: center;">
+        <input type="text" class="form-control" value="${escapeHtml(col)}" oninput="updateMatrixCol(${cIdx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Колонка ${cIdx+1}">
+        ${cols.length > 2 ? `<button type="button" class="btn btn-secondary btn-sm" onclick="removeMatrixCol(${cIdx})">✕</button>` : ''}
+      </div>
+    `).join("");
+
+    let stmtRows = Object.entries(pairs).map(([stmt, correctCol], sIdx) => `
+      <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+        <input type="text" class="form-control" value="${escapeHtml(stmt)}" oninput="updateMatrixStmtText(${sIdx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Текст утверждения...">
+        <select class="form-control" onchange="updateMatrixStmtCol(${sIdx}, this.value); saveCurrentTask(true);">
+          ${cols.map(c => `<option value="${escapeHtml(c)}" ${correctCol === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join("")}
+        </select>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeMatrixStmt(${sIdx})">✕</button>
+      </div>
+    `).join("");
+
+    typeSpecificHtml = `
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Варианты колонок:</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0.6rem;">
+          ${colInputs}
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-bottom: 0.9rem;" onclick="addMatrixCol()">+ Добавить колонку</button>
+
+        <label class="form-label">Утверждения и верный выбор:</label>
+        <div>${stmtRows}</div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.4rem;" onclick="addMatrixStmt()">+ Добавить утверждение</button>
+      </div>
+    `;
+  }
+  // 14. Метки на схеме (Hotspot)
+  else if (t.question_type === "hotspot") {
+    const pins = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["1", "2", "3", "4"];
+    const key = t.answer_key || "1";
+
+    let pinRows = pins.map((p, idx) => `
+      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 0.5rem; margin-bottom: 0.4rem; align-items: center;">
+        <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: ${key === p ? 'var(--primary)' : 'var(--text-muted)'};">
+          <input type="radio" name="hotspot_key" ${key === p ? 'checked' : ''} onchange="activeTask.answer_key = activeTask.options[${idx}]; scheduleAutoSaveTask(50); renderTaskEditor();">
+          <span>Верно</span>
+        </label>
+        <input type="text" class="form-control" value="${escapeHtml(p)}" oninput="updateHotspotPin(${idx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Обозначение метки (1, A, ...)">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeHotspotPin(${idx})">✕</button>
+      </div>
+    `).join("");
+
+    typeSpecificHtml = `
+      <div class="form-group" style="margin-top: 1rem;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Загрузите изображение схемы ниже и укажите метки (цифры или буквы), отметив верную:</div>
+        <label class="form-label">Метки на схеме:</label>
+        <div>${pinRows}</div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.4rem;" onclick="addHotspotPin()">+ Добавить метку</button>
+      </div>
+    `;
+  }
+  // 15. Выделение слов в тексте (Highlight Words)
+  else if (t.question_type === "highlight_words") {
+    const text = t.question_text || (t.options && t.options[0]) || "";
+    const key = Array.isArray(t.answer_key) ? t.answer_key : [];
+    const tokens = text.split(/\s+/).filter(Boolean);
+
+    let clickableTokens = tokens.map((tok, idx) => {
+      const clean = tok.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
+      const isCorrect = key.includes(clean);
+      return `<span class="highlight-token ${isCorrect ? 'is-highlighted' : ''}" style="cursor: pointer;" onclick="toggleEditorHighlightWord('${escapeHtml(clean)}')">${escapeHtml(tok)}</span>`;
+    }).join(" ");
+
+    typeSpecificHtml = `
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Кликните по словам, которые ученик должен выделить как правильные:</label>
+        <div class="highlight-words-passage" style="margin-top: 0.5rem; background: var(--surface);">
+          ${clickableTokens || '<span style="color: var(--text-muted);">Введите текст задания выше, чтобы выбрать слова для выделения</span>'}
+        </div>
+      </div>
+    `;
   }
 
   // Блок управления картинкой (скрыт по умолчанию, пока не нажата кнопка)
@@ -2885,6 +3015,261 @@ function removeClassItem(item) {
 
 }
 
+// =========================================================================
+// INTERACTIVE TASK EDITOR HANDLERS (Dynamic Categories, Cloze, Matrix, etc.)
+// =========================================================================
+
+function addCategory() {
+  pushTaskUndoSnapshot();
+  if (!activeTask.categories || !Array.isArray(activeTask.categories)) {
+    activeTask.categories = ["Категория 1", "Категория 2"];
+  }
+  const nextNum = activeTask.categories.length + 1;
+  activeTask.categories.push(`Категория ${nextNum}`);
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeCategory(catIdx) {
+  pushTaskUndoSnapshot();
+  if (!activeTask.categories || activeTask.categories.length <= 2) {
+    showToast("Должно остаться минимум 2 категории", "warning");
+    return;
+  }
+  const removedCat = activeTask.categories.splice(catIdx, 1)[0];
+  const fallbackCat = activeTask.categories[0];
+  if (activeTask.answer_key && typeof activeTask.answer_key === "object") {
+    for (const [k, v] of Object.entries(activeTask.answer_key)) {
+      if (v === removedCat) activeTask.answer_key[k] = fallbackCat;
+    }
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function addOddItem() {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  const num = activeTask.options.length + 1;
+  activeTask.options.push(`Элемент ${num}`);
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeOddItem(idx) {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) return;
+  const removed = activeTask.options.splice(idx, 1)[0];
+  if (activeTask.answer_key === removed) {
+    activeTask.answer_key = activeTask.options[0] || "";
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateOddItem(idx, val) {
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  const oldVal = activeTask.options[idx];
+  activeTask.options[idx] = val;
+  if (activeTask.answer_key === oldVal) {
+    activeTask.answer_key = val;
+  }
+  scheduleAutoSaveTask(50);
+}
+
+function addClozeSlot() {
+  pushTaskUndoSnapshot();
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") activeTask.answer_key = {};
+  const currentSlots = Object.keys(activeTask.answer_key);
+  const nextSlotNum = currentSlots.length + 1;
+  const newWord = `слово ${nextSlotNum}`;
+  activeTask.answer_key[String(nextSlotNum)] = newWord;
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  if (!activeTask.options.includes(newWord)) activeTask.options.push(newWord);
+  if (activeTask.question_text && !activeTask.question_text.includes(`[${nextSlotNum}]`)) {
+    activeTask.question_text += ` [${nextSlotNum}]`;
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeClozeSlot(slot) {
+  pushTaskUndoSnapshot();
+  if (activeTask.answer_key && typeof activeTask.answer_key === "object") {
+    delete activeTask.answer_key[slot];
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateClozeSlot(slot, val) {
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") activeTask.answer_key = {};
+  const oldVal = activeTask.answer_key[slot];
+  activeTask.answer_key[slot] = val;
+  if (Array.isArray(activeTask.options)) {
+    const optIdx = activeTask.options.indexOf(oldVal);
+    if (optIdx >= 0) activeTask.options[optIdx] = val;
+    else if (!activeTask.options.includes(val)) activeTask.options.push(val);
+  }
+  scheduleAutoSaveTask(50);
+}
+
+function addClozeDistractor() {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  const num = activeTask.options.length + 1;
+  activeTask.options.push(`дистрактор ${num}`);
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeClozeDistractor(idx) {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) return;
+  const dists = activeTask.options.filter(w => !Object.values(activeTask.answer_key || {}).includes(w));
+  const targetWord = dists[idx];
+  if (targetWord) {
+    const fullIdx = activeTask.options.indexOf(targetWord);
+    if (fullIdx >= 0) activeTask.options.splice(fullIdx, 1);
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateClozeDistractor(idx, val) {
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  const dists = activeTask.options.filter(w => !Object.values(activeTask.answer_key || {}).includes(w));
+  const targetWord = dists[idx];
+  if (targetWord) {
+    const fullIdx = activeTask.options.indexOf(targetWord);
+    if (fullIdx >= 0) activeTask.options[fullIdx] = val;
+  }
+  scheduleAutoSaveTask(50);
+}
+
+function addMatrixCol() {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) activeTask.options = ["Верно", "Неверно"];
+  const num = activeTask.options.length + 1;
+  activeTask.options.push(`Колонка ${num}`);
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeMatrixCol(cIdx) {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options) || activeTask.options.length <= 2) {
+    showToast("Минимум 2 колонки", "warning");
+    return;
+  }
+  const removed = activeTask.options.splice(cIdx, 1)[0];
+  const fallback = activeTask.options[0];
+  if (activeTask.answer_key && typeof activeTask.answer_key === "object") {
+    for (const [k, v] of Object.entries(activeTask.answer_key)) {
+      if (v === removed) activeTask.answer_key[k] = fallback;
+    }
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateMatrixCol(cIdx, val) {
+  if (!Array.isArray(activeTask.options)) activeTask.options = ["Верно", "Неверно"];
+  const oldVal = activeTask.options[cIdx];
+  activeTask.options[cIdx] = val;
+  if (activeTask.answer_key && typeof activeTask.answer_key === "object") {
+    for (const [k, v] of Object.entries(activeTask.answer_key)) {
+      if (v === oldVal) activeTask.answer_key[k] = val;
+    }
+  }
+  scheduleAutoSaveTask(50);
+}
+
+function addMatrixStmt() {
+  pushTaskUndoSnapshot();
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") activeTask.answer_key = {};
+  const cols = activeTask.options && activeTask.options.length > 0 ? activeTask.options : ["Верно", "Неверно"];
+  const num = Object.keys(activeTask.answer_key).length + 1;
+  activeTask.answer_key[`Утверждение ${num}`] = cols[0];
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeMatrixStmt(sIdx) {
+  pushTaskUndoSnapshot();
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") return;
+  const entries = Object.entries(activeTask.answer_key);
+  entries.splice(sIdx, 1);
+  activeTask.answer_key = Object.fromEntries(entries);
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateMatrixStmtText(sIdx, val) {
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") return;
+  const entries = Object.entries(activeTask.answer_key);
+  if (entries[sIdx]) {
+    const col = entries[sIdx][1];
+    entries[sIdx] = [val, col];
+    activeTask.answer_key = Object.fromEntries(entries);
+    scheduleAutoSaveTask(50);
+  }
+}
+
+function updateMatrixStmtCol(sIdx, val) {
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") return;
+  const entries = Object.entries(activeTask.answer_key);
+  if (entries[sIdx]) {
+    entries[sIdx][1] = val;
+    activeTask.answer_key = Object.fromEntries(entries);
+    scheduleAutoSaveTask(50);
+  }
+}
+
+function addHotspotPin() {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  const num = activeTask.options.length + 1;
+  activeTask.options.push(String(num));
+  if (!activeTask.answer_key) activeTask.answer_key = String(num);
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function removeHotspotPin(idx) {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.options)) return;
+  const removed = activeTask.options.splice(idx, 1)[0];
+  if (activeTask.answer_key === removed) {
+    activeTask.answer_key = activeTask.options[0] || "1";
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateHotspotPin(idx, val) {
+  if (!Array.isArray(activeTask.options)) activeTask.options = [];
+  const oldVal = activeTask.options[idx];
+  activeTask.options[idx] = val;
+  if (activeTask.answer_key === oldVal) {
+    activeTask.answer_key = val;
+  }
+  scheduleAutoSaveTask(50);
+}
+
+function toggleEditorHighlightWord(word) {
+  pushTaskUndoSnapshot();
+  if (!Array.isArray(activeTask.answer_key)) activeTask.answer_key = [];
+  const idx = activeTask.answer_key.indexOf(word);
+  if (idx >= 0) {
+    activeTask.answer_key.splice(idx, 1);
+  } else {
+    activeTask.answer_key.push(word);
+  }
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
 // Serialize writes so an earlier blur save cannot overwrite a newer edit.
 
 let taskSaveQueue = Promise.resolve();
@@ -3277,6 +3662,117 @@ function setPreviewGroupClass(taskId, item, cat) {
 
 }
 
+// Preview Interactive Handlers
+let previewSelectedNode = null;
+let previewClozeSelectedChip = null;
+
+function handlePreviewOrderDragStart(e, taskId, itemIdx) {
+  e.dataTransfer.setData("text/plain", String(itemIdx));
+}
+function handlePreviewOrderDragOver(e) {
+  e.preventDefault();
+}
+function handlePreviewOrderDrop(e, taskId, targetIdx) {
+  e.preventDefault();
+  const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10);
+  if (isNaN(fromIdx) || fromIdx === targetIdx) return;
+  const t = (activeTest.tasks || []).find(x => x.id === taskId);
+  let order = Array.isArray(previewStudentAnswers[taskId]) ? [...previewStudentAnswers[taskId]] : (Array.isArray(t?.answer_key) ? [...t.answer_key] : [...(t?.options || [])]);
+  const [moved] = order.splice(fromIdx, 1);
+  order.splice(targetIdx, 0, moved);
+  previewStudentAnswers[taskId] = order;
+  renderStudentPreviewContent();
+}
+
+function handlePreviewMatchingCardClick(taskId, item, side) {
+  if (!previewSelectedNode) {
+    previewSelectedNode = { taskId, item, side };
+    return;
+  }
+  if (previewSelectedNode.taskId !== taskId || previewSelectedNode.side === side) {
+    previewSelectedNode = { taskId, item, side };
+    return;
+  }
+  const leftItem = previewSelectedNode.side === "left" ? previewSelectedNode.item : item;
+  const rightItem = previewSelectedNode.side === "right" ? previewSelectedNode.item : item;
+  if (!previewStudentAnswers[taskId] || typeof previewStudentAnswers[taskId] !== "object") {
+    previewStudentAnswers[taskId] = {};
+  }
+  previewStudentAnswers[taskId][leftItem] = rightItem;
+  previewSelectedNode = null;
+  renderStudentPreviewContent();
+}
+
+function clearPreviewMatchingPair(taskId, leftItem) {
+  if (previewStudentAnswers[taskId] && typeof previewStudentAnswers[taskId] === "object") {
+    delete previewStudentAnswers[taskId][leftItem];
+  }
+  renderStudentPreviewContent();
+}
+
+function handlePreviewCategorizeDrop(e, taskId, cat) {
+  e.preventDefault();
+  const item = e.dataTransfer.getData("text/plain");
+  if (!item) return;
+  setPreviewGroupClass(taskId, item, cat);
+}
+
+function handlePreviewCategorizeCardClick(taskId, item) {
+  const t = (activeTest.tasks || []).find(x => x.id === taskId);
+  const cats = Array.isArray(t?.categories) && t.categories.length >= 2 ? t.categories : ["Категория 1", "Категория 2"];
+  setPreviewGroupClass(taskId, item, cats[0]);
+}
+
+function handlePreviewClozeDrop(e, taskId, slotId) {
+  e.preventDefault();
+  const word = e.dataTransfer.getData("text/plain");
+  if (!word) return;
+  if (!previewStudentAnswers[taskId] || typeof previewStudentAnswers[taskId] !== "object") {
+    previewStudentAnswers[taskId] = {};
+  }
+  previewStudentAnswers[taskId][slotId] = word;
+  renderStudentPreviewContent();
+}
+
+function handlePreviewClozeChipClick(taskId, word) {
+  previewClozeSelectedChip = { taskId, word };
+  showToast(`Слово "${word}" выбрано. Теперь кликните пропуск [слот] для вставки.`, "info");
+}
+
+function handlePreviewClozeSlotClick(taskId, slotId) {
+  if (!previewStudentAnswers[taskId] || typeof previewStudentAnswers[taskId] !== "object") {
+    previewStudentAnswers[taskId] = {};
+  }
+  if (previewClozeSelectedChip && previewClozeSelectedChip.taskId === taskId) {
+    previewStudentAnswers[taskId][slotId] = previewClozeSelectedChip.word;
+    previewClozeSelectedChip = null;
+  } else {
+    delete previewStudentAnswers[taskId][slotId];
+  }
+  renderStudentPreviewContent();
+}
+
+function setPreviewMatrixChoice(taskId, stmt, col) {
+  if (!previewStudentAnswers[taskId] || typeof previewStudentAnswers[taskId] !== "object") {
+    previewStudentAnswers[taskId] = {};
+  }
+  previewStudentAnswers[taskId][stmt] = col;
+  renderStudentPreviewContent();
+}
+
+function togglePreviewHighlightWord(taskId, word) {
+  if (!Array.isArray(previewStudentAnswers[taskId])) {
+    previewStudentAnswers[taskId] = [];
+  }
+  const idx = previewStudentAnswers[taskId].indexOf(word);
+  if (idx >= 0) {
+    previewStudentAnswers[taskId].splice(idx, 1);
+  } else {
+    previewStudentAnswers[taskId].push(word);
+  }
+  renderStudentPreviewContent();
+}
+
 function evaluatePreviewAnswers() {
 
   previewEvaluationResult = {};
@@ -3370,23 +3866,43 @@ function evaluatePreviewAnswers() {
       earned = totalPairs > 0 ? (matched / totalPairs) * maxSc : 0;
 
     } else if (t.question_type === "group_classification") {
-
       const itemMap = (typeof key === "object" && key) ? key : {};
-
       const studentMap = (typeof ans === "object" && ans) ? ans : {};
-
       let matched = 0;
-
       const totalItems = Object.keys(itemMap).length;
-
       for (const [item, cat] of Object.entries(itemMap)) {
-
         if (studentMap[item] === cat) matched++;
-
       }
-
       earned = totalItems > 0 ? (matched / totalItems) * maxSc : 0;
-
+    } else if (t.question_type === "odd_one_out") {
+      if (ans && String(ans).trim() === String(key).trim()) earned = maxSc;
+    } else if (t.question_type === "word_bank_cloze") {
+      const keyMap = (typeof key === "object" && key) ? key : {};
+      const stuMap = (typeof ans === "object" && ans) ? ans : {};
+      let matched = 0;
+      const totalSlots = Object.keys(keyMap).length;
+      for (const [slot, word] of Object.entries(keyMap)) {
+        if (String(stuMap[slot] || "").trim() === String(word).trim()) matched++;
+      }
+      earned = totalSlots > 0 ? (matched / totalSlots) * maxSc : 0;
+    } else if (t.question_type === "boolean_matrix") {
+      const keyMap = (typeof key === "object" && key) ? key : {};
+      const stuMap = (typeof ans === "object" && ans) ? ans : {};
+      let matched = 0;
+      const totalStmts = Object.keys(keyMap).length;
+      for (const [stmt, col] of Object.entries(keyMap)) {
+        if (String(stuMap[stmt] || "").trim() === String(col).trim()) matched++;
+      }
+      earned = totalStmts > 0 ? (matched / totalStmts) * maxSc : 0;
+    } else if (t.question_type === "hotspot") {
+      if (ans && String(ans).trim() === String(key).trim()) earned = maxSc;
+    } else if (t.question_type === "highlight_words") {
+      const keyArr = Array.isArray(key) ? key.map(String) : [];
+      const stuArr = Array.isArray(ans) ? ans.map(String) : [];
+      const correctCount = stuArr.filter(x => keyArr.includes(x)).length;
+      const wrongCount = stuArr.filter(x => !keyArr.includes(x)).length;
+      const net = Math.max(0, correctCount - wrongCount);
+      earned = keyArr.length > 0 ? (net / keyArr.length) * maxSc : 0;
     }
 
     earned = Math.round(earned * 100) / 100;
@@ -3661,152 +4177,258 @@ function renderStudentPreviewContent() {
 
     }
 
-    // 7. Ordering
-
+    // 7. Ordering (Drag & Drop + ▲▼)
     else if (t.question_type === "ordering") {
-
-      let currentOrder = Array.isArray(saved) && saved.length > 0 ? saved : (Array.isArray(t.answer_key) ? t.answer_key : (t.options || []));
-
-      inputHtml = `<div class="ordering-container">`;
-
+      let currentOrder = Array.isArray(saved) && saved.length > 0 ? saved : (Array.isArray(t.answer_key) ? [...t.answer_key] : [...(t.options || [])]);
+      inputHtml = `<div class="ordering-container" id="preview-order-${t.id}">`;
       currentOrder.forEach((item, itemIdx) => {
-
         inputHtml += `
-
-          <div class="ordering-item">
-
+          <div class="ordering-item" draggable="true"
+               ondragstart="handlePreviewOrderDragStart(event, '${t.id}', ${itemIdx})"
+               ondragover="handlePreviewOrderDragOver(event)"
+               ondrop="handlePreviewOrderDrop(event, '${t.id}', ${itemIdx})">
+            <span class="ordering-drag-handle">☰</span>
             <span class="ordering-index">${itemIdx + 1}.</span>
-
             <span class="ordering-text">${escapeHtml(item)}</span>
-
             <div class="ordering-btns">
-
               <button type="button" class="ordering-btn" ${itemIdx === 0 ? 'disabled' : ''} onclick="movePreviewOrderItem('${t.id}', ${itemIdx}, -1)">▲</button>
-
               <button type="button" class="ordering-btn" ${itemIdx === currentOrder.length - 1 ? 'disabled' : ''} onclick="movePreviewOrderItem('${t.id}', ${itemIdx}, 1)">▼</button>
-
             </div>
-
           </div>
-
         `;
-
       });
-
       inputHtml += `</div>`;
-
     }
-
-    // 8. Matching
-
+    // 8. Matching (Интерактивное сопоставление)
     else if (t.question_type === "matching") {
-
-      const pairs = (t.answer_key && typeof t.answer_key === "object") ? t.answer_key : {};
-
-      const leftItems = Object.keys(pairs);
-
-      const rightItems = Object.values(pairs);
-
       const currentPairs = (saved && typeof saved === "object") ? saved : {};
-
-      inputHtml = `<table class="matching-table"><tbody>`;
-
-      leftItems.forEach(left => {
-
-        const curRight = currentPairs[left] || "";
-
-        inputHtml += `
-
-          <tr class="matching-row">
-
-            <td class="matching-left">${escapeHtml(left)}</td>
-
-            <td>
-
-              <select class="form-control" onchange="setPreviewMatching('${t.id}', '${escapeHtml(left)}', this.value)">
-
-                <option value="">-- Выберите соответствие --</option>
-
-                ${rightItems.map(r => `<option value="${escapeHtml(r)}" ${curRight === r ? 'selected' : ''}>${escapeHtml(r)}</option>`).join('')}
-
-              </select>
-
-            </td>
-
-          </tr>
-
-        `;
-
-      });
-
-      inputHtml += `</tbody></table>`;
-
-    }
-
-    // 9. Dropdown
-
-    else if (t.question_type === "dropdown") {
+      const pairs = (t.answer_key && typeof t.answer_key === "object") ? t.answer_key : {};
+      const leftItems = t.match_items_left || Object.keys(pairs);
+      const rightItems = t.match_items_right || Object.values(pairs);
 
       inputHtml = `
-
-        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-
-          <span>Выберите верный вариант:</span>
-
-          <select class="inline-select" onchange="setPreviewAnswer('${t.id}', this.value)">
-
-            <option value="">-- Выберите вариант --</option>
-
-            ${(t.options || []).map(opt => `<option value="${escapeHtml(opt)}" ${saved === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
-
-          </select>
-
-        </div>
-
-      `;
-
-    }
-
-    // 10. Classification
-
-    else if (t.question_type === "group_classification") {
-
-      const curClasses = (saved && typeof saved === "object") ? saved : {};
-
-      const cats = t.categories && t.categories.length >= 2 ? t.categories : ["Категория 1", "Категория 2"];
-
-      const items = (t.answer_key && typeof t.answer_key === "object") ? Object.keys(t.answer_key) : (t.options || []);
-
-      inputHtml = `<div class="classification-container">`;
-
-      items.forEach(item => {
-
-        const assigned = curClasses[item] || "";
-
-        inputHtml += `
-
-          <div class="classification-item">
-
-            <div class="classification-text">${escapeHtml(item)}</div>
-
-            <div class="classification-buttons">
-
-              <button type="button" class="class-btn ${assigned === cats[0] ? 'active' : ''}" onclick="setPreviewGroupClass('${t.id}', '${escapeHtml(item)}', '${escapeHtml(cats[0])}')">${escapeHtml(cats[0])}</button>
-
-              <button type="button" class="class-btn ${assigned === cats[1] ? 'active' : ''}" onclick="setPreviewGroupClass('${t.id}', '${escapeHtml(item)}', '${escapeHtml(cats[1])}')">${escapeHtml(cats[1])}</button>
-
-            </div>
-
+        <div class="matching-interactive-wrap" id="preview-matching-${t.id}">
+          <div class="matching-column left-col">
+            ${leftItems.map(left => `
+              <div class="matching-card ${currentPairs[left] ? 'is-connected' : ''}" onclick="handlePreviewMatchingCardClick('${t.id}', '${escapeHtml(left)}', 'left')">
+                <span class="matching-text">${escapeHtml(left)}</span>
+                <span class="matching-pin right-pin" data-item="${escapeHtml(left)}">●</span>
+                ${currentPairs[left] ? `<button type="button" class="matching-clear-btn" onclick="event.stopPropagation(); clearPreviewMatchingPair('${t.id}', '${escapeHtml(left)}')">✕</button>` : ''}
+              </div>
+            `).join('')}
           </div>
+          <div class="matching-svg-container" style="flex: 1; min-height: 120px; display: flex; flex-direction: column; justify-content: space-around; align-items: center;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">Кликните элемент слева, затем справа для соединения</div>
+          </div>
+          <div class="matching-column right-col">
+            ${rightItems.map(right => {
+              const isConn = Object.values(currentPairs).includes(right);
+              return `
+                <div class="matching-card ${isConn ? 'is-connected' : ''}" onclick="handlePreviewMatchingCardClick('${t.id}', '${escapeHtml(right)}', 'right')">
+                  <span class="matching-pin left-pin" data-item="${escapeHtml(right)}">●</span>
+                  <span class="matching-text">${escapeHtml(right)}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+    // 9. Dropdown
+    else if (t.question_type === "dropdown") {
+      inputHtml = `
+        <div class="form-group" style="max-width: 320px;">
+          <select class="form-control" onchange="setPreviewAnswer('${t.id}', this.value)">
+            <option value="">-- Выберите вариант --</option>
+            ${(t.options || []).map(opt => `<option value="${escapeHtml(opt)}" ${saved === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+          </select>
+        </div>
+      `;
+    }
+    // 10. Classification (Корзины категорий с Drag & Drop и кликом)
+    else if (t.question_type === "group_classification") {
+      const curClasses = (saved && typeof saved === "object") ? saved : {};
+      const cats = Array.isArray(t.categories) && t.categories.length >= 2 ? t.categories : ["Категория 1", "Категория 2"];
+      const allItems = (t.answer_key && typeof t.answer_key === "object") ? Object.keys(t.answer_key) : (t.options || []);
+      const unassigned = allItems.filter(item => !curClasses[item]);
 
+      inputHtml = `
+        <div class="categorize-interactive-wrap">
+          <div class="categorize-buckets-grid">
+            ${cats.map(cat => {
+              const bItems = allItems.filter(item => curClasses[item] === cat);
+              return `
+                <div class="categorize-bucket"
+                     ondragover="event.preventDefault()"
+                     ondrop="handlePreviewCategorizeDrop(event, '${t.id}', '${escapeHtml(cat)}')">
+                  <div class="categorize-bucket-header">
+                    <span class="bucket-name">${escapeHtml(cat)}</span>
+                    <span class="bucket-count">${bItems.length}</span>
+                  </div>
+                  <div class="categorize-bucket-items">
+                    ${bItems.map(item => `
+                      <div class="categorize-card" onclick="setPreviewGroupClass('${t.id}', '${escapeHtml(item)}', '')" title="Нажмите, чтобы вернуть в банк">
+                        <span>${escapeHtml(item)}</span>
+                        <span class="card-remove-badge">✕</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          ${unassigned.length > 0 ? `
+            <div class="categorize-deck">
+              <div class="deck-title">Элементы для распределения (перетащите в корзину или кликните):</div>
+              <div class="deck-cards">
+                ${unassigned.map(item => `
+                  <div class="categorize-card deck-card"
+                       draggable="true"
+                       ondragstart="event.dataTransfer.setData('text/plain', '${escapeHtml(item)}')"
+                       onclick="handlePreviewCategorizeCardClick('${t.id}', '${escapeHtml(item)}')">
+                    <span>${escapeHtml(item)}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : '<div style="font-size: 0.82rem; color: #10B981; font-weight: 600; margin-top: 0.5rem;">Все элементы распределены!</div>'}
+        </div>
+      `;
+    }
+    // 11. Odd One Out (Исключение лишнего)
+    else if (t.question_type === "odd_one_out") {
+      const items = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["Элемент 1", "Элемент 2", "Элемент 3", "Лишний элемент"];
+      inputHtml = `
+        <div class="odd-cards-grid">
+          ${items.map(item => {
+            const isChosen = saved === item;
+            return `
+              <div class="odd-card ${isChosen ? 'selected' : ''}" onclick="setPreviewAnswer('${t.id}', '${escapeHtml(item)}')">
+                <span class="odd-card-radio">${isChosen ? '●' : '○'}</span>
+                <span class="odd-card-text">${escapeHtml(item)}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+    // 12. Word Bank Cloze (Вставка из банка слов)
+    else if (t.question_type === "word_bank_cloze") {
+      const savedSlots = (saved && typeof saved === "object") ? saved : {};
+      const keyMap = (t.answer_key && typeof t.answer_key === "object") ? t.answer_key : {};
+      const bankWords = Array.isArray(t.options) && t.options.length > 0 ? t.options : Object.values(keyMap);
+      const text = t.question_text || "";
+
+      const renderedText = text.replace(/\[(\d+)\]/g, (match, slotId) => {
+        const filled = savedSlots[slotId];
+        return `
+          <span class="cloze-slot ${filled ? 'filled' : ''}"
+                ondragover="event.preventDefault()"
+                ondrop="handlePreviewClozeDrop(event, '${t.id}', '${slotId}')"
+                onclick="handlePreviewClozeSlotClick('${t.id}', '${slotId}')">
+            ${filled ? `<span>${escapeHtml(filled)}</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 4px;">✕</span>` : `[ ${slotId} ]`}
+          </span>
         `;
-
       });
 
-      inputHtml += `</div>`;
+      const usedWords = Object.values(savedSlots);
+      const availableWords = bankWords.filter(w => !usedWords.includes(w));
 
+      inputHtml = `
+        <div class="cloze-wrap">
+          <div class="cloze-passage-wrap">${renderedText}</div>
+          <div class="cloze-bank-wrap">
+            <div class="cloze-bank-title">Банк слов (перетащите в пропуск или кликните):</div>
+            <div class="cloze-chips">
+              ${availableWords.map(word => `
+                <div class="cloze-chip"
+                     draggable="true"
+                     ondragstart="event.dataTransfer.setData('text/plain', '${escapeHtml(word)}')"
+                     onclick="handlePreviewClozeChipClick('${t.id}', '${escapeHtml(word)}')">
+                  ${escapeHtml(word)}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
     }
+    // 13. Boolean Matrix (Таблица утверждений)
+    else if (t.question_type === "boolean_matrix") {
+      const savedMap = (saved && typeof saved === "object") ? saved : {};
+      const columns = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["Верно", "Неверно"];
+      const statements = (t.answer_key && typeof t.answer_key === "object") ? Object.keys(t.answer_key) : [];
 
+      inputHtml = `
+        <div class="matrix-table-wrap">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Утверждение</th>
+                ${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${statements.map(stmt => {
+                const curVal = savedMap[stmt];
+                return `
+                  <tr>
+                    <td>${escapeHtml(stmt)}</td>
+                    ${columns.map(col => {
+                      const isChecked = curVal === col;
+                      return `
+                        <td style="text-align: center;">
+                          <div class="matrix-choice ${isChecked ? 'selected' : ''}" onclick="setPreviewMatrixChoice('${t.id}', '${escapeHtml(stmt)}', '${escapeHtml(col)}')">
+                            <span>${isChecked ? '●' : '○'}</span>
+                          </div>
+                        </td>
+                      `;
+                    }).join('')}
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    // 14. Hotspot (Метки на схеме)
+    else if (t.question_type === "hotspot") {
+      const pins = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["1", "2", "3", "4"];
+      inputHtml = `
+        <div class="hotspot-wrap">
+          <div class="hotspot-pins-row">
+            ${pins.map(pin => {
+              const isSelected = saved === pin;
+              return `
+                <button type="button" class="hotspot-pin-btn ${isSelected ? 'selected' : ''}" onclick="setPreviewAnswer('${t.id}', '${escapeHtml(pin)}')">
+                  <span class="hotspot-pin-badge">${escapeHtml(pin)}</span>
+                  <span>Метка ${escapeHtml(pin)}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+    // 15. Highlight Words (Выделение слов)
+    else if (t.question_type === "highlight_words") {
+      const savedList = Array.isArray(saved) ? saved : [];
+      const text = t.question_text || (t.options && t.options[0]) || "";
+      const tokens = text.split(/\s+/).filter(Boolean);
+
+      inputHtml = `
+        <div class="highlight-words-passage">
+          ${tokens.map(token => {
+            const clean = token.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
+            const isHigh = savedList.includes(clean);
+            return `
+              <span class="highlight-token ${isHigh ? 'is-highlighted' : ''}" onclick="togglePreviewHighlightWord('${t.id}', '${escapeHtml(clean)}')">${escapeHtml(token)}</span>
+            `;
+          }).join(' ')}
+        </div>
+      `;
+    }
     let imgPreview = "";
 
     if (t.image_url && t.image_url.trim()) {
@@ -5293,8 +5915,178 @@ function formatQuestionReviewHtml(t, ans, isPrint = false) {
 
   }
 
-  // Default: short_text, fill_blank, number, text_manual
+  // 10. Распределение по категориям
+  if (qType === "group_classification") {
+    const keyMap = (typeof correctKey === "object" && correctKey) ? correctKey : {};
+    const stuMap = (typeof studentAns === "object" && studentAns) ? studentAns : {};
+    const allItems = Object.keys(keyMap);
+    let rowsHtml = allItems.map(item => {
+      const stuCat = stuMap[item] || "—";
+      const corCat = keyMap[item] || "—";
+      const isMatch = stuCat !== "—" && stuCat === corCat;
+      return `
+        <tr style="background: ${isMatch ? '#F0FDF4' : '#FEF2F2'}; border-bottom: 1px solid #CBD5E1;">
+          <td style="padding: 7px 10px; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(item)}</td>
+          <td style="padding: 7px 10px; border: 1px solid #CBD5E1;">${escapeHtml(stuCat)}</td>
+          <td style="padding: 7px 10px; color: #047857; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(corCat)}</td>
+          <td style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; color: ${isMatch ? '#059669' : '#DC2626'}; font-weight: 700;">
+            ${isMatch ? '✔ Верно' : '✖ Неверно'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+    return `
+      <div style="overflow-x: auto; margin-top: 6px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="background: #F1F5F9; border-bottom: 1.5px solid #CBD5E1;">
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Элемент</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Выбор ученика</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Правильная корзина</th>
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 95px;">Результат</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+  }
 
+  // 11. Исключение лишнего
+  if (qType === "odd_one_out") {
+    const options = Array.isArray(t.options) ? t.options : [];
+    const isMatch = studentAns && String(studentAns).trim() === String(correctKey).trim();
+    let rowsHtml = options.map(opt => {
+      const isChosen = studentAns === opt;
+      const isKey = String(correctKey) === opt;
+      let badge = "";
+      let bg = "#F8FAFC";
+      let border = "1px solid #E2E8F0";
+      if (isChosen && isKey) {
+        bg = "#ECFDF5"; border = "1.5px solid #10B981"; badge = '<span style="color:#059669; font-weight:700;">✔ Верно исключено</span>';
+      } else if (isChosen && !isKey) {
+        bg = "#FEF2F2"; border = "1.5px solid #EF4444"; badge = '<span style="color:#DC2626; font-weight:700;">✖ Ошибочно исключено</span>';
+      } else if (isKey) {
+        bg = "#F0FDF4"; border = "1.5px dashed #10B981"; badge = '<span style="color:#047857; font-weight:700;">✔ Должно быть исключено</span>';
+      }
+      return `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: ${bg}; border: ${border}; border-radius: 6px; margin-bottom: 5px;">
+          <span>${isChosen ? '●' : '○'} ${escapeHtml(opt)}</span>
+          ${badge}
+        </div>
+      `;
+    }).join('');
+    return `<div style="margin-top: 6px;">${rowsHtml}</div>`;
+  }
+
+  // 12. Вставка из банка слов
+  if (qType === "word_bank_cloze") {
+    const keyMap = (typeof correctKey === "object" && correctKey) ? correctKey : {};
+    const stuMap = (typeof studentAns === "object" && studentAns) ? studentAns : {};
+    let rowsHtml = Object.entries(keyMap).map(([slot, word]) => {
+      const stuWord = stuMap[slot] || "—";
+      const isMatch = stuWord !== "—" && stuWord === word;
+      return `
+        <tr style="background: ${isMatch ? '#F0FDF4' : '#FEF2F2'}; border-bottom: 1px solid #CBD5E1;">
+          <td style="padding: 7px 10px; font-weight: 700; border: 1px solid #CBD5E1; text-align: center;">[${escapeHtml(slot)}]</td>
+          <td style="padding: 7px 10px; border: 1px solid #CBD5E1;">${escapeHtml(stuWord)}</td>
+          <td style="padding: 7px 10px; color: #047857; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(word)}</td>
+          <td style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; color: ${isMatch ? '#059669' : '#DC2626'}; font-weight: 700;">
+            ${isMatch ? '✔ Верно' : '✖ Неверно'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+    return `
+      <div style="overflow-x: auto; margin-top: 6px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="background: #F1F5F9; border-bottom: 1.5px solid #CBD5E1;">
+              <th style="padding: 7px 10px; width: 80px; text-align: center; border: 1px solid #CBD5E1;">Пропуск</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Слово ученика</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Правильное слово</th>
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 95px;">Результат</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // 13. Таблица утверждений
+  if (qType === "boolean_matrix") {
+    const keyMap = (typeof correctKey === "object" && correctKey) ? correctKey : {};
+    const stuMap = (typeof studentAns === "object" && studentAns) ? studentAns : {};
+    let rowsHtml = Object.entries(keyMap).map(([stmt, col]) => {
+      const stuCol = stuMap[stmt] || "—";
+      const isMatch = stuCol !== "—" && stuCol === col;
+      return `
+        <tr style="background: ${isMatch ? '#F0FDF4' : '#FEF2F2'}; border-bottom: 1px solid #CBD5E1;">
+          <td style="padding: 7px 10px; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(stmt)}</td>
+          <td style="padding: 7px 10px; border: 1px solid #CBD5E1;">${escapeHtml(stuCol)}</td>
+          <td style="padding: 7px 10px; color: #047857; font-weight: 600; border: 1px solid #CBD5E1;">${escapeHtml(col)}</td>
+          <td style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; color: ${isMatch ? '#059669' : '#DC2626'}; font-weight: 700;">
+            ${isMatch ? '✔ Верно' : '✖ Неверно'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+    return `
+      <div style="overflow-x: auto; margin-top: 6px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="background: #F1F5F9; border-bottom: 1.5px solid #CBD5E1;">
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Утверждение</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Выбор ученика</th>
+              <th style="padding: 7px 10px; text-align: left; border: 1px solid #CBD5E1;">Правильный выбор</th>
+              <th style="padding: 7px 10px; text-align: center; border: 1px solid #CBD5E1; width: 95px;">Результат</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // 14. Метки на схеме
+  if (qType === "hotspot") {
+    const isMatch = studentAns && String(studentAns).trim() === String(correctKey).trim();
+    return `
+      <div style="background: ${isMatch ? '#ECFDF5' : '#FEF2F2'}; border: 1.5px solid ${isMatch ? '#10B981' : '#EF4444'}; border-radius: 8px; padding: 10px 14px; margin-top: 6px; font-size: 0.9rem;">
+        <div>Выбор ученика: <strong>Метка ${escapeHtml(studentAns || '— (не выбрано)')}</strong> — <span style="color: ${isMatch ? '#059669' : '#DC2626'}; font-weight: 700;">${isMatch ? '✔ Верно' : '✖ Неверно'}</span></div>
+        <div style="color: #047857; margin-top: 4px;">Правильная метка: <strong>Метка ${escapeHtml(correctKey || '—')}</strong></div>
+      </div>
+    `;
+  }
+
+  // 15. Выделение слов в тексте
+  if (qType === "highlight_words") {
+    const text = t.question_text || (t.options && t.options[0]) || "";
+    const keyArr = Array.isArray(correctKey) ? correctKey : [];
+    const stuArr = Array.isArray(studentAns) ? studentAns : [];
+    const tokens = text.split(/\s+/).filter(Boolean);
+
+    let passage = tokens.map(tok => {
+      const clean = tok.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
+      const isStu = stuArr.includes(clean);
+      const isKey = keyArr.includes(clean);
+      let colorStyle = "";
+      if (isStu && isKey) colorStyle = "background: #10B981; color: #fff;";
+      else if (isStu && !isKey) colorStyle = "background: #EF4444; color: #fff;";
+      else if (isKey) colorStyle = "border-bottom: 2px solid #10B981; font-weight: 700;";
+      return `<span style="padding: 2px 4px; border-radius: 4px; ${colorStyle}">${escapeHtml(tok)}</span>`;
+    }).join(' ');
+
+    return `
+      <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 10px 14px; margin-top: 6px; font-size: 0.95rem; line-height: 1.6;">
+        <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 6px;">Зеленый фон — правильно выделено, Красный — ошибочно выделено, Подчеркнуто — пропущено:</div>
+        <div>${passage}</div>
+      </div>
+    `;
+  }
+
+  // Default: short_text, fill_blank, number, text_manual
   const score = ans?.final_score !== null && ans?.final_score !== undefined ? parseFloat(ans.final_score) : 0;
 
   const tMax = parseFloat(t.max_score || 1);

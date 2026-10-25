@@ -603,13 +603,26 @@ function renderTasks() {
         </div>`;
       }).join('') + '</div>';
     }
-    // 7. Восстановление последовательности (Ordering)
+    // 7. Восстановление последовательности (Ordering с Drag-and-Drop)
     else if (t.question_type === "ordering") {
       let currentOrder = Array.isArray(saved) && saved.length > 0 ? saved : (t.options || []);
       inputHtml = `<div class="ordering-container" id="ordering-list-${t.id}">`;
       currentOrder.forEach((item, itemIdx) => {
         inputHtml += `
-          <div class="ordering-item">
+          <div class="ordering-item" draggable="true" data-index="${itemIdx}" data-task-id="${t.id}"
+               ondragstart="handleOrderingDragStart(event, '${t.id}', ${itemIdx})"
+               ondragover="handleOrderingDragOver(event)"
+               ondragenter="handleOrderingDragEnter(event)"
+               ondragleave="handleOrderingDragLeave(event)"
+               ondrop="handleOrderingDrop(event, '${t.id}', ${itemIdx})"
+               ondragend="handleOrderingDragEnd(event)">
+            <div class="ordering-drag-handle" title="Потяните для изменения порядка">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/>
+                <circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/>
+                <circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/>
+              </svg>
+            </div>
             <span class="ordering-index">${itemIdx + 1}.</span>
             <span class="ordering-text">${escapeHtml(item)}</span>
             <div class="ordering-btns">
@@ -621,28 +634,34 @@ function renderTasks() {
       });
       inputHtml += `</div>`;
     }
-    // 8. Сопоставление пар (Matching)
+    // 8. Сопоставление пар (Matching со стрелочками и соединительными точками)
     else if (t.question_type === "matching") {
       const currentPairs = (saved && typeof saved === "object") ? saved : {};
       const leftItems = t.match_items_left || [];
       const rightItems = t.match_items_right || [];
 
-      inputHtml = `<table class="matching-table"><tbody>`;
-      leftItems.forEach(left => {
-        const curRight = currentPairs[left] || "";
-        inputHtml += `
-          <tr class="matching-row">
-            <td class="matching-left">${escapeHtml(left)}</td>
-            <td>
-              <select class="form-control" onchange="handleMatchingChange('${t.id}', '${escapeHtml(left)}', this.value)">
-                <option value="">-- Выберите соответствие --</option>
-                ${rightItems.map(r => `<option value="${escapeHtml(r)}" ${curRight === r ? 'selected' : ''}>${escapeHtml(r)}</option>`).join('')}
-              </select>
-            </td>
-          </tr>
-        `;
-      });
-      inputHtml += `</tbody></table>`;
+      inputHtml = `
+        <div class="matching-interactive-wrap" id="matching-wrap-${t.id}" data-task-id="${t.id}">
+          <svg class="matching-svg" id="matching-svg-${t.id}"></svg>
+          <div class="matching-col matching-col-left">
+            ${leftItems.map((left, idx) => `
+              <div class="matching-card matching-card-left" id="m-left-${t.id}-${idx}" data-task-id="${t.id}" data-item="${escapeHtml(left)}" data-side="left" onclick="handleMatchingCardClick('${t.id}', '${escapeHtml(left)}', 'left')">
+                <span class="matching-text">${escapeHtml(left)}</span>
+                <div class="matching-pin matching-pin-right" data-task-id="${t.id}" data-item="${escapeHtml(left)}" data-side="left" onpointerdown="startMatchingDrag(event, '${t.id}', '${escapeHtml(left)}', 'left')"></div>
+                ${currentPairs[left] ? `<button type="button" class="matching-clear-btn" onclick="event.stopPropagation(); removeMatchingConnection('${t.id}', '${escapeHtml(left)}')" title="Разорвать связь">✕</button>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          <div class="matching-col matching-col-right">
+            ${rightItems.map((right, idx) => `
+              <div class="matching-card matching-card-right" id="m-right-${t.id}-${idx}" data-task-id="${t.id}" data-item="${escapeHtml(right)}" data-side="right" onclick="handleMatchingCardClick('${t.id}', '${escapeHtml(right)}', 'right')">
+                <div class="matching-pin matching-pin-left" data-task-id="${t.id}" data-item="${escapeHtml(right)}" data-side="right" onpointerdown="startMatchingDrag(event, '${t.id}', '${escapeHtml(right)}', 'right')"></div>
+                <span class="matching-text">${escapeHtml(right)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
     // 9. Выпадающий список в тексте (Dropdown)
     else if (t.question_type === "dropdown") {
@@ -656,26 +675,202 @@ function renderTasks() {
         </div>
       `;
     }
-    // 10. Распределение по 2 категориям (Group classification)
+    // 10. Распределение по категориям (Group classification с перетаскиванием в корзины)
     else if (t.question_type === "group_classification") {
       const curClasses = (saved && typeof saved === "object") ? saved : {};
       const cats = t.categories && t.categories.length >= 2 ? t.categories : ["Категория А", "Категория Б"];
       const items = t.options || [];
 
-      inputHtml = `<div class="classification-container">`;
-      items.forEach(item => {
-        const assigned = curClasses[item] || "";
-        inputHtml += `
-          <div class="classification-item">
-            <div class="classification-text">${escapeHtml(item)}</div>
-            <div class="classification-buttons">
-              <button type="button" class="class-btn ${assigned === cats[0] ? 'active' : ''}" onclick="handleGroupAssign('${t.id}', '${escapeHtml(item)}', '${escapeHtml(cats[0])}')">${escapeHtml(cats[0])}</button>
-              <button type="button" class="class-btn ${assigned === cats[1] ? 'active' : ''}" onclick="handleGroupAssign('${t.id}', '${escapeHtml(item)}', '${escapeHtml(cats[1])}')">${escapeHtml(cats[1])}</button>
+      inputHtml = `
+        <div class="categorize-wrap" id="categorize-wrap-${t.id}">
+          <div class="categorize-buckets-grid">
+            ${cats.map((cat, catIdx) => {
+              const bItems = items.filter(it => curClasses[it] === cat);
+              return `
+                <div class="categorize-bucket" id="cat-bucket-${t.id}-${catIdx}" data-task-id="${t.id}" data-cat="${escapeHtml(cat)}"
+                     ondragover="handleCategoryDragOver(event)"
+                     ondragleave="handleCategoryDragLeave(event)"
+                     ondrop="handleCategoryDrop(event, '${t.id}', '${escapeHtml(cat)}')"
+                     onclick="handleCategoryBucketClick('${t.id}', '${escapeHtml(cat)}')">
+                  <div class="categorize-bucket-header">
+                    <span class="categorize-bucket-title">${escapeHtml(cat)}</span>
+                    <span class="categorize-bucket-badge">${bItems.length}</span>
+                  </div>
+                  <div class="categorize-bucket-dropzone">
+                    ${bItems.map(item => `
+                      <div class="categorize-card in-bucket" draggable="true" data-item="${escapeHtml(item)}"
+                           ondragstart="handleCardDragStart(event, '${t.id}', '${escapeHtml(item)}')">
+                        <span>${escapeHtml(item)}</span>
+                        <button type="button" class="categorize-remove-btn" onclick="event.stopPropagation(); handleGroupAssign('${t.id}', '${escapeHtml(item)}', '')" title="Убрать из категории">✕</button>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="categorize-deck" id="cat-deck-${t.id}"
+               ondragover="handleCategoryDragOver(event)"
+               ondragleave="handleCategoryDragLeave(event)"
+               ondrop="handleCategoryDrop(event, '${t.id}', '')">
+            <div class="categorize-deck-title">Перетащите карточки в корзины категорий (или кликните карточку, затем корзину):</div>
+            <div class="categorize-deck-cards">
+              ${items.filter(it => !curClasses[it]).map(item => `
+                <div class="categorize-card unassigned ${selectedClassCard && selectedClassCard.taskId === t.id && selectedClassCard.item === item ? 'selected-for-move' : ''}"
+                     draggable="true" data-item="${escapeHtml(item)}"
+                     ondragstart="handleCardDragStart(event, '${t.id}', '${escapeHtml(item)}')"
+                     onclick="handleClassCardClick('${t.id}', '${escapeHtml(item)}')">
+                  <span>${escapeHtml(item)}</span>
+                </div>
+              `).join('')}
+              ${items.filter(it => !curClasses[it]).length === 0 ? '<div style="font-size: 0.85rem; color: #10b981; font-weight: 700;">Все карточки распределены! 🎉</div>' : ''}
             </div>
+          </div>
+        </div>
+      `;
+    }
+    // 11. Исключение лишнего (Odd One Out)
+    else if (t.question_type === "odd_one_out") {
+      const items = t.options || [];
+      const isMulti = t.check_method === "partial" || Array.isArray(saved);
+      inputHtml = `<div class="odd-cards-grid">`;
+      items.forEach(item => {
+        const isSelected = Array.isArray(saved) ? saved.includes(item) : saved === item;
+        inputHtml += `
+          <div class="odd-card ${isSelected ? 'is-selected' : ''}" onclick="handleOddOneOutChoice('${t.id}', '${escapeHtml(item)}', ${isMulti})">
+            <span>${escapeHtml(item)}</span>
+            ${isSelected ? '<span class="odd-card-badge">✕ Лишнее</span>' : ''}
           </div>
         `;
       });
       inputHtml += `</div>`;
+    }
+    // 12. Вставка из банка слов (Word Bank Cloze)
+    else if (t.question_type === "word_bank_cloze") {
+      const savedSlots = (saved && typeof saved === "object") ? saved : {};
+      const bankWords = t.options || [];
+      const text = t.question_text || "";
+      
+      // Рендерим текст с заменяемыми слотами [1], [2]...
+      const renderedText = text.replace(/\[(\d+)\]/g, (match, slotId) => {
+        const filled = savedSlots[slotId];
+        return `
+          <span class="cloze-slot ${filled ? 'filled' : ''}" data-slot="${slotId}" data-task-id="${t.id}"
+                ondragover="handleClozeSlotDragOver(event)"
+                ondragleave="handleClozeSlotDragLeave(event)"
+                ondrop="handleClozeSlotDrop(event, '${t.id}', '${slotId}')"
+                onclick="handleClozeSlotClick('${t.id}', '${slotId}')">
+            ${filled ? `<span>${escapeHtml(filled)}</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 4px;">✕</span>` : `[ ${slotId} ]`}
+          </span>
+        `;
+      });
+
+      inputHtml = `
+        <div class="cloze-wrap" id="cloze-wrap-${t.id}">
+          <div class="cloze-passage-wrap">${renderedText}</div>
+          <div class="cloze-bank-wrap">
+            <div class="cloze-bank-title">Банк слов (перетащите в пропуски или нажмите на слово, затем на пропуск):</div>
+            <div class="cloze-bank-chips">
+              ${bankWords.map(word => {
+                const isUsed = Object.values(savedSlots).includes(word);
+                const isSelected = selectedClozeChip && selectedClozeChip.taskId === t.id && selectedClozeChip.word === word;
+                return `
+                  <div class="cloze-chip ${isUsed ? 'used' : ''} ${isSelected ? 'selected-chip' : ''}"
+                       draggable="${!isUsed}" data-word="${escapeHtml(word)}"
+                       ondragstart="handleClozeChipDragStart(event, '${t.id}', '${escapeHtml(word)}')"
+                       onclick="handleClozeChipClick('${t.id}', '${escapeHtml(word)}')">
+                    ${escapeHtml(word)}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    // 13. Таблица утверждений (Boolean Matrix)
+    else if (t.question_type === "boolean_matrix") {
+      const savedMap = (saved && typeof saved === "object") ? saved : {};
+      const columns = t.options && t.options.length > 0 ? t.options : ["Верно", "Неверно"];
+      const statements = t.categories && t.categories.length > 0 ? t.categories : (Array.isArray(t.answer_key) ? t.answer_key : Object.keys(t.answer_key || {}));
+
+      inputHtml = `
+        <div class="matrix-table-wrap">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Утверждение</th>
+                ${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${statements.map(stmt => {
+                const curVal = savedMap[stmt] || "";
+                return `
+                  <tr>
+                    <td>${escapeHtml(stmt)}</td>
+                    ${columns.map(col => {
+                      const isChecked = curVal === col;
+                      return `
+                        <td>
+                          <div class="matrix-pill ${isChecked ? 'selected' : ''}"
+                               onclick="handleMatrixChoice('${t.id}', '${escapeHtml(stmt)}', '${escapeHtml(col)}')">
+                            ${isChecked ? '✓' : ''}
+                          </div>
+                        </td>
+                      `;
+                    }).join('')}
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    // 14. Метки на схеме (Hotspot)
+    else if (t.question_type === "hotspot") {
+      const pins = t.options && t.options.length > 0 ? t.options : ["1", "2", "3", "4"];
+      const isMulti = Array.isArray(t.answer_key);
+      inputHtml = `
+        <div class="hotspot-wrap">
+          ${t.image_url ? `
+            <div class="hotspot-image-container">
+              <img src="${generatorImageUrl(t.image_url)}" class="task-img-protected">
+            </div>
+          ` : ''}
+          <div class="hotspot-pins-row">
+            ${pins.map(pin => {
+              const isSelected = Array.isArray(saved) ? saved.includes(pin) : saved === pin;
+              return `
+                <button type="button" class="hotspot-pin-btn ${isSelected ? 'selected' : ''}" onclick="handleHotspotChoice('${t.id}', '${escapeHtml(pin)}', ${isMulti})">
+                  <span class="hotspot-pin-number">${escapeHtml(pin)}</span>
+                  <span>Метка ${escapeHtml(pin)}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+    // 15. Выделение слов в тексте (Highlight Words)
+    else if (t.question_type === "highlight_words") {
+      const savedList = Array.isArray(saved) ? saved : [];
+      const text = t.question_text || (t.options && t.options[0]) || "";
+      const tokens = text.split(/\s+/).filter(Boolean);
+
+      inputHtml = `
+        <div class="highlight-words-passage">
+          ${tokens.map(token => {
+            const clean = token.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
+            const isHigh = savedList.includes(clean);
+            return `
+              <span class="highlight-token ${isHigh ? 'is-highlighted' : ''}" onclick="handleHighlightWordToggle('${t.id}', '${escapeHtml(clean)}')">${escapeHtml(token)}</span>
+            `;
+          }).join(' ')}
+        </div>
+      `;
     }
     // Ручной ввод развернутого ответа (резервный)
     else {
@@ -756,6 +951,426 @@ function handleTrueFalseChoice(taskId, val) {
   saveAnswer(taskId, val);
   renderTasks();
 }
+
+
+// =========================================================================
+// INTERACTIVE TASK LOGIC (Drag & Drop, Bézier Matching, Categorization, etc)
+// =========================================================================
+
+// Matching state
+let matchingDragState = null;
+let selectedMatchingNode = null;
+const MATCHING_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#6366f1'];
+
+function handleMatchingCardClick(taskId, item, side) {
+  if (!selectedMatchingNode) {
+    selectedMatchingNode = { taskId, item, side };
+    highlightMatchingNode(taskId, item, side, true);
+    return;
+  }
+
+  if (selectedMatchingNode.taskId !== taskId || selectedMatchingNode.side === side) {
+    // Switch selection to new node
+    highlightMatchingNode(selectedMatchingNode.taskId, selectedMatchingNode.item, selectedMatchingNode.side, false);
+    selectedMatchingNode = { taskId, item, side };
+    highlightMatchingNode(taskId, item, side, true);
+    return;
+  }
+
+  // Connect left and right!
+  const leftItem = selectedMatchingNode.side === "left" ? selectedMatchingNode.item : item;
+  const rightItem = selectedMatchingNode.side === "right" ? selectedMatchingNode.item : item;
+
+  let pairs = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  pairs[leftItem] = rightItem;
+
+  highlightMatchingNode(selectedMatchingNode.taskId, selectedMatchingNode.item, selectedMatchingNode.side, false);
+  selectedMatchingNode = null;
+
+  saveAnswer(taskId, pairs);
+  renderTasks();
+  setTimeout(() => drawMatchingLines(taskId), 30);
+}
+
+function highlightMatchingNode(taskId, item, side, isSelected) {
+  const wrap = document.getElementById(`matching-wrap-${taskId}`);
+  if (!wrap) return;
+  const card = wrap.querySelector(`.matching-card[data-item="${CSS.escape(item)}"][data-side="${side}"]`);
+  if (card) {
+    card.classList.toggle("selected-node", isSelected);
+  }
+}
+
+function removeMatchingConnection(taskId, leftItem) {
+  let pairs = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  delete pairs[leftItem];
+  saveAnswer(taskId, pairs);
+  renderTasks();
+  setTimeout(() => drawMatchingLines(taskId), 30);
+}
+
+function startMatchingDrag(e, taskId, item, side) {
+  e.preventDefault();
+  matchingDragState = { taskId, item, side, startX: e.clientX, startY: e.clientY };
+  
+  const moveHandler = (ev) => {
+    if (!matchingDragState) return;
+    drawMatchingDragPreview(taskId, item, side, ev.clientX, ev.clientY);
+  };
+
+  const upHandler = (ev) => {
+    window.removeEventListener("pointermove", moveHandler);
+    window.removeEventListener("pointerup", upHandler);
+    
+    // Clear drag preview line
+    const wrap = document.getElementById(`matching-wrap-${taskId}`);
+    if (wrap) {
+      const p = wrap.querySelector(".matching-drag-preview");
+      if (p) p.remove();
+    }
+
+    if (!matchingDragState) return;
+    const targetEl = document.elementFromPoint(ev.clientX, ev.clientY);
+    const targetCard = targetEl ? targetEl.closest(".matching-card") : null;
+    
+    if (targetCard && targetCard.dataset.taskId === taskId) {
+      const targetSide = targetCard.dataset.side;
+      const targetItem = targetCard.dataset.item;
+      if (targetSide !== side) {
+        const leftItem = side === "left" ? item : targetItem;
+        const rightItem = side === "right" ? item : targetItem;
+        let pairs = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+        pairs[leftItem] = rightItem;
+        saveAnswer(taskId, pairs);
+        renderTasks();
+        setTimeout(() => drawMatchingLines(taskId), 30);
+      }
+    }
+    matchingDragState = null;
+  };
+
+  window.addEventListener("pointermove", moveHandler);
+  window.addEventListener("pointerup", upHandler);
+}
+
+function drawMatchingDragPreview(taskId, item, side, mouseX, mouseY) {
+  const wrap = document.getElementById(`matching-wrap-${taskId}`);
+  const svg = document.getElementById(`matching-svg-${taskId}`);
+  if (!wrap || !svg) return;
+
+  const pin = wrap.querySelector(`.matching-pin[data-item="${CSS.escape(item)}"][data-side="${side}"]`);
+  if (!pin) return;
+
+  const wRect = wrap.getBoundingClientRect();
+  const pRect = pin.getBoundingClientRect();
+  const x1 = pRect.left + pRect.width / 2 - wRect.left;
+  const y1 = pRect.top + pRect.height / 2 - wRect.top;
+  const x2 = mouseX - wRect.left;
+  const y2 = mouseY - wRect.top;
+
+  const dx = Math.max(30, Math.abs(x2 - x1) * 0.45);
+  const d = side === "left" 
+    ? `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`
+    : `M ${x1} ${y1} C ${x1 - dx} ${y1}, ${x2 + dx} ${y2}, ${x2} ${y2}`;
+
+  let previewPath = svg.querySelector(".matching-drag-preview");
+  if (!previewPath) {
+    previewPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    previewPath.setAttribute("class", "matching-drag-preview");
+    previewPath.setAttribute("stroke", "#3b82f6");
+    previewPath.setAttribute("stroke-width", "3");
+    previewPath.setAttribute("stroke-dasharray", "6 4");
+    previewPath.setAttribute("stroke-linecap", "round");
+    previewPath.setAttribute("fill", "none");
+    svg.appendChild(previewPath);
+  }
+  previewPath.setAttribute("d", d);
+}
+
+function drawMatchingLines(taskId) {
+  const wrap = document.getElementById(`matching-wrap-${taskId}`);
+  const svg = document.getElementById(`matching-svg-${taskId}`);
+  if (!wrap || !svg) return;
+
+  const pairs = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? localDrafts[taskId].answer : {};
+  svg.innerHTML = "";
+
+  const wRect = wrap.getBoundingClientRect();
+  svg.setAttribute("viewBox", `0 0 ${wRect.width} ${wRect.height}`);
+
+  let colorIdx = 0;
+  for (const [leftItem, rightItem] of Object.entries(pairs)) {
+    if (!rightItem) continue;
+    const leftPin = wrap.querySelector(`.matching-pin[data-item="${CSS.escape(leftItem)}"][data-side="left"]`);
+    const rightPin = wrap.querySelector(`.matching-pin[data-item="${CSS.escape(rightItem)}"][data-side="right"]`);
+    if (!leftPin || !rightPin) continue;
+
+    const lpRect = leftPin.getBoundingClientRect();
+    const rpRect = rightPin.getBoundingClientRect();
+
+    const x1 = lpRect.left + lpRect.width / 2 - wRect.left;
+    const y1 = lpRect.top + lpRect.height / 2 - wRect.top;
+    const x2 = rpRect.left + rpRect.width / 2 - wRect.left;
+    const y2 = rpRect.top + rpRect.height / 2 - wRect.top;
+
+    const dx = Math.max(35, (x2 - x1) * 0.45);
+    const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+
+    const color = MATCHING_COLORS[colorIdx % MATCHING_COLORS.length];
+    colorIdx++;
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", d);
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", "3.5");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("fill", "none");
+    path.setAttribute("title", "Нажмите, чтобы удалить связь");
+    path.onclick = () => removeMatchingConnection(taskId, leftItem);
+    svg.appendChild(path);
+  }
+}
+
+// Window resize listener for matching lines
+window.addEventListener("resize", () => {
+  document.querySelectorAll(".matching-interactive-wrap").forEach(wrap => {
+    const tid = wrap.dataset.taskId;
+    if (tid) drawMatchingLines(tid);
+  });
+});
+
+// Ordering Drag and Drop
+let orderingDragSrc = null;
+
+function handleOrderingDragStart(e, taskId, idx) {
+  orderingDragSrc = { taskId, idx };
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", idx);
+  e.currentTarget.classList.add("dragging");
+}
+
+function handleOrderingDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+}
+
+function handleOrderingDragEnter(e) {
+  e.preventDefault();
+  const item = e.currentTarget.closest(".ordering-item");
+  if (item) item.classList.add("drag-over");
+}
+
+function handleOrderingDragLeave(e) {
+  const item = e.currentTarget.closest(".ordering-item");
+  if (item) item.classList.remove("drag-over");
+}
+
+function handleOrderingDrop(e, taskId, targetIdx) {
+  e.preventDefault();
+  const item = e.currentTarget.closest(".ordering-item");
+  if (item) item.classList.remove("drag-over");
+  if (!orderingDragSrc || orderingDragSrc.taskId !== taskId) return;
+  const srcIdx = orderingDragSrc.idx;
+  if (srcIdx === targetIdx) return;
+
+  const t = currentTasks.find(x => x.id === taskId);
+  if (!t) return;
+  let cur = localDrafts[taskId] && Array.isArray(localDrafts[taskId].answer) ? [...localDrafts[taskId].answer] : [...(t.options || [])];
+  const moved = cur.splice(srcIdx, 1)[0];
+  cur.splice(targetIdx, 0, moved);
+
+  saveAnswer(taskId, cur);
+  renderTasks();
+}
+
+function handleOrderingDragEnd(e) {
+  e.currentTarget.classList.remove("dragging");
+  document.querySelectorAll(".ordering-item.drag-over").forEach(el => el.classList.remove("drag-over"));
+  orderingDragSrc = null;
+}
+
+// Categorization (Group Classification)
+let selectedClassCard = null;
+
+function handleCardDragStart(e, taskId, item) {
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", JSON.stringify({ taskId, item }));
+  e.currentTarget.classList.add("dragging");
+}
+
+function handleCategoryDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  const bucket = e.currentTarget.closest(".categorize-bucket");
+  if (bucket) bucket.classList.add("drag-over");
+}
+
+function handleCategoryDragLeave(e) {
+  const bucket = e.currentTarget.closest(".categorize-bucket");
+  if (bucket) bucket.classList.remove("drag-over");
+}
+
+function handleCategoryDrop(e, taskId, categoryName) {
+  e.preventDefault();
+  const bucket = e.currentTarget.closest(".categorize-bucket");
+  if (bucket) bucket.classList.remove("drag-over");
+
+  let data = null;
+  try {
+    data = JSON.parse(e.dataTransfer.getData("text/plain"));
+  } catch (err) {
+    return;
+  }
+  if (!data || data.taskId !== taskId) return;
+
+  let classes = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  if (categoryName) {
+    classes[data.item] = categoryName;
+  } else {
+    delete classes[data.item];
+  }
+  saveAnswer(taskId, classes);
+  renderTasks();
+}
+
+function handleClassCardClick(taskId, item) {
+  if (selectedClassCard && selectedClassCard.taskId === taskId && selectedClassCard.item === item) {
+    selectedClassCard = null;
+  } else {
+    selectedClassCard = { taskId, item };
+  }
+  renderTasks();
+}
+
+function handleCategoryBucketClick(taskId, catName) {
+  if (!selectedClassCard || selectedClassCard.taskId !== taskId) return;
+  let classes = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  classes[selectedClassCard.item] = catName;
+  selectedClassCard = null;
+  saveAnswer(taskId, classes);
+  renderTasks();
+}
+
+// Odd One Out
+function handleOddOneOutChoice(taskId, item, isMulti = false) {
+  let saved = localDrafts[taskId]?.answer;
+  if (isMulti) {
+    let arr = Array.isArray(saved) ? [...saved] : (saved ? [saved] : []);
+    if (arr.includes(item)) {
+      arr = arr.filter(x => x !== item);
+    } else {
+      arr.push(item);
+    }
+    saveAnswer(taskId, arr);
+  } else {
+    const val = saved === item ? null : item;
+    saveAnswer(taskId, val);
+  }
+  renderTasks();
+}
+
+// Word Bank Cloze
+let selectedClozeChip = null;
+
+function handleClozeChipDragStart(e, taskId, word) {
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", JSON.stringify({ taskId, word }));
+  e.currentTarget.classList.add("dragging");
+}
+
+function handleClozeSlotDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  e.currentTarget.classList.add("drag-over");
+}
+
+function handleClozeSlotDragLeave(e) {
+  e.currentTarget.classList.remove("drag-over");
+}
+
+function handleClozeSlotDrop(e, taskId, slotId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove("drag-over");
+  let data = null;
+  try {
+    data = JSON.parse(e.dataTransfer.getData("text/plain"));
+  } catch (err) {
+    return;
+  }
+  if (!data || data.taskId !== taskId) return;
+
+  let saved = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  saved[slotId] = data.word;
+  saveAnswer(taskId, saved);
+  renderTasks();
+}
+
+function handleClozeChipClick(taskId, word) {
+  if (selectedClozeChip && selectedClozeChip.taskId === taskId && selectedClozeChip.word === word) {
+    selectedClozeChip = null;
+  } else {
+    selectedClozeChip = { taskId, word };
+  }
+  renderTasks();
+}
+
+function handleClozeSlotClick(taskId, slotId) {
+  let saved = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  if (saved[slotId]) {
+    // Remove filled word
+    delete saved[slotId];
+    saveAnswer(taskId, saved);
+    renderTasks();
+    return;
+  }
+  if (selectedClozeChip && selectedClozeChip.taskId === taskId) {
+    saved[slotId] = selectedClozeChip.word;
+    selectedClozeChip = null;
+    saveAnswer(taskId, saved);
+    renderTasks();
+  }
+}
+
+// Boolean Matrix
+function handleMatrixChoice(taskId, statement, column) {
+  let saved = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? { ...localDrafts[taskId].answer } : {};
+  saved[statement] = column;
+  saveAnswer(taskId, saved);
+  renderTasks();
+}
+
+// Hotspot
+function handleHotspotChoice(taskId, pin, isMulti = false) {
+  let saved = localDrafts[taskId]?.answer;
+  if (isMulti) {
+    let arr = Array.isArray(saved) ? [...saved] : (saved ? [saved] : []);
+    if (arr.includes(pin)) {
+      arr = arr.filter(x => x !== pin);
+    } else {
+      arr.push(pin);
+    }
+    saveAnswer(taskId, arr);
+  } else {
+    const val = saved === pin ? null : pin;
+    saveAnswer(taskId, val);
+  }
+  renderTasks();
+}
+
+// Highlight Words
+function handleHighlightWordToggle(taskId, word) {
+  let saved = Array.isArray(localDrafts[taskId]?.answer) ? [...localDrafts[taskId].answer] : [];
+  if (saved.includes(word)) {
+    saved = saved.filter(w => w !== word);
+  } else {
+    saved.push(word);
+  }
+  saveAnswer(taskId, saved);
+  renderTasks();
+}
+
+// Draw matching lines after renderTasks
+const origRenderTasks = window.renderTasks;
 
 function moveOrderItem(taskId, itemIdx, direction) {
   const t = currentTasks.find(x => x.id === taskId);
