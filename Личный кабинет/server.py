@@ -51,7 +51,12 @@ except ImportError:  # pragma: no cover - dependency is installed from requireme
 BASE_DIR = Path(__file__).resolve().parent
 GENERATOR_DIR = BASE_DIR / "generator"
 GENERATOR_DATA_DIR = GENERATOR_DIR / "data"
-MATERIALS_DIR = BASE_DIR.parent / "materials"
+# Materials directory located on Google Drive OUTSIDE the git repository
+drive_root = BASE_DIR.parent.parent
+if (drive_root / "alasster.github.io").exists():
+    MATERIALS_DIR = drive_root / "Мои материалы"
+else:
+    MATERIALS_DIR = Path("G:/Мой диск/Мои материалы")
 MATERIALS_DIR.mkdir(parents=True, exist_ok=True)
 (MATERIALS_DIR / "Общие").mkdir(parents=True, exist_ok=True)
 LOGGER = logging.getLogger("personal_cabinet.ga4")
@@ -873,18 +878,18 @@ def build_material_links(item: dict, base_url: str) -> dict:
     gid = item.get("google_drive_id") or ""
     title = item.get("title") or fname or "Материал"
 
-    site_direct_link = f"https://alasster.site/materials/{quote(folder)}/{quote(fname)}" if fname else ""
+    # Working direct URL via cabinet server
     local_direct_link = f"{base_url}/materials/{quote(folder)}/{quote(fname)}" if fname else ""
 
-    if gid:
+    # Real Google Drive links (only if real cloud ID is present)
+    if gid and not gid.startswith("local-"):
         google_drive_link = f"https://drive.google.com/file/d/{gid}/view?usp=sharing"
-        google_drive_direct = f"https://drive.google.com/uc?export=view&id={gid}"
-    elif fname:
-        google_drive_link = f"https://drive.google.com/drive/search?q={quote(fname)}"
-        google_drive_direct = ""
+        google_drive_direct = f"https://lh3.googleusercontent.com/d/{gid}"
+        primary_image_url = google_drive_direct
     else:
         google_drive_link = ""
         google_drive_direct = ""
+        primary_image_url = local_direct_link
 
     if media_type == "video" and yid:
         watch_link = f"https://youtu.be/{yid}"
@@ -894,15 +899,15 @@ def build_material_links(item: dict, base_url: str) -> dict:
         preview_url = item.get("youtube_thumbnail") or f"https://img.youtube.com/vi/{yid}/hqdefault.jpg"
     else:
         watch_link = ""
-        embed_code = f'<img src="{site_direct_link}" alt="{title}" />'
-        markdown_code = f'![{title}]({site_direct_link})'
-        bbcode = f'[img]{site_direct_link}[/img]'
-        preview_url = local_direct_link or site_direct_link
+        embed_code = f'<img src="{primary_image_url}" alt="{title}" />'
+        markdown_code = f'![{title}]({primary_image_url})'
+        bbcode = f'[img]{primary_image_url}[/img]'
+        preview_url = local_direct_link
 
     return {
         "google_drive_link": google_drive_link,
         "google_drive_direct": google_drive_direct,
-        "site_direct_link": site_direct_link,
+        "site_direct_link": local_direct_link,
         "local_direct_link": local_direct_link,
         "html_code": embed_code,
         "markdown_code": markdown_code,

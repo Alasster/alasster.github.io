@@ -1,5 +1,6 @@
 /**
  * Materials Manager (ImgBB-style Media Hosting & Google Drive Cloud Storage)
+ * 100% Neumorphic Theme matching Cabinet & Generator
  */
 
 (function () {
@@ -12,6 +13,7 @@
     stats: {},
     activeItem: null,
     isInitialized: false,
+    pollTimer: null,
   };
 
   // Helper: Format bytes to human readable string
@@ -47,7 +49,6 @@
       }, 1800);
     }).catch(err => {
       console.error("Ошибка копирования в буфер:", err);
-      // Fallback prompt
       window.prompt("Скопируйте ссылку вручную (Ctrl+C):", text);
     });
   };
@@ -117,23 +118,49 @@
       materialsState.stats = data.stats || {};
 
       renderMaterialsUI();
+
+      // Check if any image is still syncing to Google Drive
+      const hasUnsynced = materialsState.items.some(it => it.media_type === "image" && !it.google_drive_id);
+      if (hasUnsynced) {
+        scheduleSyncPoll();
+      } else {
+        clearSyncPoll();
+      }
     } catch (e) {
       console.error("Error loading materials:", e);
       grid.innerHTML = `
-        <div class="materials-empty-state">
+        <div class="materials-empty-container">
           <div class="materials-empty-icon">⚠️</div>
           <div class="materials-empty-title">Ошибка загрузки материалов</div>
           <p>${escapeHtml(e.message)}</p>
-          <button class="button button-primary" onclick="window.initMaterialsManager()">Повторить попытку</button>
+          <button class="btn btn-primary" onclick="window.initMaterialsManager()" style="margin-top: 14px;">Повторить попытку</button>
         </div>
       `;
+    }
+  }
+
+  function scheduleSyncPoll() {
+    if (materialsState.pollTimer) return;
+    materialsState.pollTimer = setTimeout(async () => {
+      materialsState.pollTimer = null;
+      // Only poll if materials section is visible
+      if (window.location.hash === "#materials") {
+        await loadMaterials();
+      }
+    }, 4000);
+  }
+
+  function clearSyncPoll() {
+    if (materialsState.pollTimer) {
+      clearTimeout(materialsState.pollTimer);
+      materialsState.pollTimer = null;
     }
   }
 
   // Render Full UI
   function renderMaterialsUI() {
     renderStats();
-    renderAlbums();
+    renderAlbumDropdown();
     renderCards();
   }
 
@@ -144,66 +171,32 @@
 
     const s = materialsState.stats;
     statsContainer.innerHTML = `
-      <div class="materials-stat-card">
-        <span class="materials-stat-label">Всего файлов</span>
-        <span class="materials-stat-val">${s.total_count || 0}</span>
-      </div>
-      <div class="materials-stat-card">
-        <span class="materials-stat-label">Изображения</span>
-        <span class="materials-stat-val">${s.images_count || 0}</span>
-      </div>
-      <div class="materials-stat-card">
-        <span class="materials-stat-label">YouTube видео</span>
-        <span class="materials-stat-val">${s.videos_count || 0}</span>
-      </div>
-      <div class="materials-stat-card">
-        <span class="materials-stat-label">Альбомы</span>
-        <span class="materials-stat-val">${s.folders_count || 1}</span>
-      </div>
-      <div class="materials-stat-card">
-        <span class="materials-stat-label">Google Диск</span>
-        <span class="materials-stat-val" style="font-size: 1.1rem; color: #10b981;">${formatBytes(s.total_size || 0)}</span>
-      </div>
+      <span>Всего файлов: <strong>${s.total_count || 0}</strong></span>
+      <span>•</span>
+      <span>Изображений: <strong>${s.images_count || 0}</strong></span>
+      <span>•</span>
+      <span>Видео: <strong>${s.videos_count || 0}</strong></span>
+      <span>•</span>
+      <span>Альбомов: <strong>${s.folders_count || 1}</strong></span>
+      <span>•</span>
+      <span>Объём: <strong style="color: var(--teal);">${formatBytes(s.total_size || 0)}</strong></span>
     `;
   }
 
-  // 2. Render Album Navigation Pills
-  function renderAlbums() {
-    const container = document.getElementById("materials-albums");
-    if (!container) return;
+  // 2. Render Album Dropdown Filter
+  function renderAlbumDropdown() {
+    const sel = document.getElementById("materials-album-select-filter");
+    if (!sel) return;
 
-    const allActive = materialsState.folder === "";
-    const totalCount = materialsState.stats.total_count || 0;
-
-    let html = `
-      <div class="materials-album-pill ${allActive ? 'active' : ''}" onclick="window.selectMaterialFolder('')">
-        <span>📁 Все материалы</span>
-        <span class="materials-album-count">${totalCount}</span>
-      </div>
-    `;
+    const current = materialsState.folder;
+    let html = `<option value="" ${current === "" ? "selected" : ""}>📁 Все альбомы (${materialsState.stats.total_count || 0})</option>`;
 
     materialsState.folders.forEach(f => {
-      const isActive = materialsState.folder === f.name;
-      // count items in this folder
       const count = materialsState.items.filter(it => it.folder_name === f.name).length;
-      html += `
-        <div class="materials-album-pill ${isActive ? 'active' : ''}" onclick="window.selectMaterialFolder('${escapeHtml(f.name)}')">
-          <span>📁 ${escapeHtml(f.name)}</span>
-          <span class="materials-album-count">${count}</span>
-          ${f.name !== 'Общие' ? `
-            <span class="materials-album-delete-btn" title="Удалить альбом" onclick="event.stopPropagation(); window.deleteMaterialFolder('${escapeHtml(f.name)}')">✕</span>
-          ` : ''}
-        </div>
-      `;
+      html += `<option value="${escapeHtml(f.name)}" ${current === f.name ? "selected" : ""}>📁 ${escapeHtml(f.name)} (${count})</option>`;
     });
 
-    html += `
-      <button type="button" class="materials-album-add-btn" onclick="window.openCreateAlbumModal()">
-        + Новый альбом
-      </button>
-    `;
-
-    container.innerHTML = html;
+    sel.innerHTML = html;
   }
 
   // 3. Render Cards Grid (ImgBB style)
@@ -213,13 +206,21 @@
 
     if (materialsState.items.length === 0) {
       grid.innerHTML = `
-        <div class="materials-empty-state">
-          <div class="materials-empty-icon">📁</div>
-          <div class="materials-empty-title">Здесь пока нет файлов</div>
-          <p>Загрузите изображения со своего устройства, вставьте ссылку на картинку или добавьте YouTube видео.</p>
-          <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.25rem;">
-            <button class="button button-primary" onclick="window.openUploadModal()">+ Загрузить файл</button>
-            <button class="button button-ghost" onclick="window.openAddUrlModal()">+ Добавить по ссылке</button>
+        <div class="materials-empty-container">
+          <div class="materials-empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="materials-empty-title">В этом разделе пока нет файлов</div>
+          <p style="margin: 0 0 18px 0; font-size: 0.86rem;">Загрузите изображения со своего устройства, вставьте ссылку на картинку или добавьте YouTube видео.</p>
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="window.openUploadModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Загрузить файл</span>
+            </button>
+            <button class="btn btn-secondary" onclick="window.openAddUrlModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>По ссылке</span>
+            </button>
           </div>
         </div>
       `;
@@ -230,44 +231,53 @@
       const links = it.links || {};
       const isVideo = it.media_type === "video";
       const sizeStr = isVideo ? "YouTube HD" : formatBytes(it.file_size);
-      const gidBadge = it.google_drive_id ? `<span title="Синхронизировано с Google Диском" style="color: #10b981; font-weight: 800;">✓ Google Диск</span>` : `<span title="Синхронизируется..." style="color: #f59e0b;">⏳ Google Диск</span>`;
+      
+      const gdriveBadge = isVideo
+        ? `<span class="materials-gdrive-status" style="color: #ef4444;">▶ YouTube видео</span>`
+        : (it.google_drive_id && !it.google_drive_id.startsWith("local-"))
+          ? `<span class="materials-gdrive-status gdrive-synced"><span style="font-size:1rem;">✓</span> Google Диск</span>`
+          : `<span class="materials-gdrive-status gdrive-syncing">⏳ Синхронизация с Google Диске...</span>`;
+
+      const directUrl = links.google_drive_direct || links.local_direct_link || links.watch_link || "";
 
       return `
         <div class="materials-card" data-item-id="${it.id}">
           <div class="materials-thumb-wrap" onclick="window.openMaterialViewer('${it.id}')">
-            <span class="materials-card-badge-type ${isVideo ? 'badge-video' : 'badge-image'}">
-              ${isVideo ? '▶ ВИДЕО' : '🖼 ФОТО'}
+            <span class="materials-card-badge ${isVideo ? 'badge-video' : 'badge-image'}">
+              ${isVideo ? 'ВИДЕО' : 'ФОТО'}
             </span>
             <img src="${escapeHtml(links.preview_url)}" class="materials-thumb-img" alt="${escapeHtml(it.title)}" loading="lazy">
-            ${isVideo ? '<div class="materials-video-overlay">▶</div>' : ''}
+            ${isVideo ? `
+              <div class="materials-video-play-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+            ` : ''}
           </div>
 
-          <div class="materials-card-content">
+          <div class="materials-card-body">
             <div class="materials-card-title" title="${escapeHtml(it.title)}" onclick="window.openMaterialViewer('${it.id}')">
               ${escapeHtml(it.title)}
             </div>
 
             <div class="materials-card-meta">
-              <span class="materials-card-folder">📁 ${escapeHtml(it.folder_name || 'Общие')}</span>
+              <span class="materials-folder-badge">📁 ${escapeHtml(it.folder_name || 'Общие')}</span>
               <span>${sizeStr}</span>
             </div>
 
-            <div style="font-size: 0.74rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
-              ${gidBadge}
-              <span style="color: var(--text-muted);">${(it.created_at || '').slice(0, 10)}</span>
-            </div>
+            ${gdriveBadge}
 
             <div class="materials-card-actions">
-              <button type="button" class="materials-btn-links" onclick="window.openImgbbLinksModal('${it.id}')">
-                <span>🔗</span> <span>Ссылки (ImgBB)</span>
+              <button type="button" class="btn btn-primary materials-btn-links" onclick="window.openImgbbLinksModal('${it.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <span>Ссылки (ImgBB)</span>
               </button>
 
-              <button type="button" class="materials-btn-icon" title="Скопировать прямую ссылку" onclick="window.copyMaterialCode('${escapeHtml(links.site_direct_link || links.google_drive_link || '')}', this)">
-                📋
+              <button type="button" class="btn btn-secondary materials-btn-icon" title="Скопировать прямую ссылку" onclick="window.copyMaterialCode('${escapeHtml(directUrl)}', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               </button>
 
-              <button type="button" class="materials-btn-icon materials-btn-danger" title="Удалить файл" onclick="window.deleteMaterialItem('${it.id}')">
-                🗑
+              <button type="button" class="btn btn-ghost materials-btn-icon" style="color: #ef4444;" title="Удалить файл" onclick="window.deleteMaterialItem('${it.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               </button>
             </div>
           </div>
@@ -285,7 +295,8 @@
   // Filter by Type
   window.filterMaterialsByType = function (type) {
     materialsState.mediaType = type;
-    document.querySelectorAll(".materials-filter-btn").forEach(b => {
+    document.querySelectorAll(".materials-type-btn").forEach(b => {
+      b.classList.toggle("is-active", b.dataset.type === type);
       b.classList.toggle("active", b.dataset.type === type);
     });
     loadMaterials();
@@ -310,20 +321,25 @@
 
     const links = item.links || {};
     const isVideo = item.media_type === "video";
+    const hasGdrive = item.google_drive_id && !item.google_drive_id.startsWith("local-");
 
     const titleEl = document.getElementById("imgbb-modal-title");
-    if (titleEl) titleEl.textContent = `Коды и ссылки: ${item.title}`;
+    if (titleEl) {
+      titleEl.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span>Коды и ссылки: ${escapeHtml(item.title)}</span>
+      `;
+    }
 
     const previewEl = document.getElementById("imgbb-modal-preview");
     if (previewEl) {
       previewEl.innerHTML = `
-        <div class="imgbb-preview-row">
+        <div class="imgbb-preview-card">
           <img src="${escapeHtml(links.preview_url)}" class="imgbb-preview-thumb" alt="${escapeHtml(item.title)}">
-          <div class="imgbb-preview-info">
+          <div class="imgbb-preview-meta">
             <h4>${escapeHtml(item.title)}</h4>
-            <p><strong>Альбом:</strong> ${escapeHtml(item.folder_name || 'Общие')}</p>
-            <p><strong>Тип:</strong> ${isVideo ? 'YouTube Видео' : 'Изображение'} | <strong>Размер:</strong> ${isVideo ? 'HD' : formatBytes(item.file_size)}</p>
-            ${item.google_drive_id ? `<p style="color: #10b981; font-weight: 700;">✓ Синхронизировано на вашем Google Диске</p>` : `<p style="color: #f59e0b;">⏳ Google Диск (файл в локальной папке, ожидает синхронизации)</p>`}
+            <p>Альбом: <strong>${escapeHtml(item.folder_name || 'Общие')}</strong> | Размер: <strong>${isVideo ? 'HD' : formatBytes(item.file_size)}</strong></p>
+            ${isVideo ? `<p style="color: #ef4444; font-weight: 800;">YouTube видео</p>` : (hasGdrive ? `<p style="color: var(--teal); font-weight: 800;">✓ Синхронизировано на Google Диске</p>` : `<p style="color: var(--amber); font-weight: 800;">⏳ Ожидает облачной синхронизации Google Диска...</p>`)}
           </div>
         </div>
       `;
@@ -332,72 +348,100 @@
     const rowsEl = document.getElementById("imgbb-modal-rows");
     if (rowsEl) {
       rowsEl.innerHTML = `
-        <!-- 1. Ссылка на Google Диск -->
-        <div class="imgbb-copy-group">
-          <div class="imgbb-copy-label">
-            <span>🔹 Ссылка на Google Диск (Share Link):</span>
-            <span style="font-size: 0.74rem; color: #10b981; font-weight: 600;">Открывается на Google Диске</span>
+        ${!isVideo ? `
+          <!-- 1. Google Drive Share Link -->
+          <div class="imgbb-copy-row">
+            <div class="imgbb-copy-header">
+              <span class="imgbb-copy-title">Ссылка на Google Диск (Просмотр)</span>
+              <span class="imgbb-copy-desc">${hasGdrive ? 'Открывается на Google Диске' : 'Будет доступна после синхронизации'}</span>
+            </div>
+            <div class="imgbb-input-group">
+              <input type="text" readonly class="form-control" value="${escapeHtml(links.google_drive_link || '')}" placeholder="Синхронизируется..." id="inp-gdrive">
+              <button type="button" class="btn btn-primary imgbb-copy-action-btn" ${!hasGdrive ? 'disabled' : ''} onclick="window.copyMaterialCode(document.getElementById('inp-gdrive').value, this)">Скопировать</button>
+            </div>
           </div>
-          <div class="imgbb-copy-input-wrap">
-            <input type="text" readonly class="imgbb-copy-input" value="${escapeHtml(links.google_drive_link || links.site_direct_link)}" id="copy-inp-gdrive">
-            <button type="button" class="imgbb-copy-btn" onclick="window.copyMaterialCode(document.getElementById('copy-inp-gdrive').value, this)">Скопировать</button>
+
+          <!-- 2. Google Direct URL -->
+          <div class="imgbb-copy-row">
+            <div class="imgbb-copy-header">
+              <span class="imgbb-copy-title">Прямая ссылка Google Диск (CDN)</span>
+              <span class="imgbb-copy-desc">Для сайтов и вставки в документы</span>
+            </div>
+            <div class="imgbb-input-group">
+              <input type="text" readonly class="form-control" value="${escapeHtml(links.google_drive_direct || '')}" placeholder="Синхронизируется..." id="inp-gdrive-direct">
+              <button type="button" class="btn btn-primary imgbb-copy-action-btn" ${!hasGdrive ? 'disabled' : ''} onclick="window.copyMaterialCode(document.getElementById('inp-gdrive-direct').value, this)">Скопировать</button>
+            </div>
+          </div>
+        ` : `
+          <!-- YouTube Watch Link -->
+          <div class="imgbb-copy-row">
+            <div class="imgbb-copy-header">
+              <span class="imgbb-copy-title">Ссылка на YouTube видео</span>
+              <span class="imgbb-copy-desc">Для просмотра в браузере</span>
+            </div>
+            <div class="imgbb-input-group">
+              <input type="text" readonly class="form-control" value="${escapeHtml(links.watch_link || '')}" id="inp-yt">
+              <button type="button" class="btn btn-primary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-yt').value, this)">Скопировать</button>
+            </div>
+          </div>
+        `}
+
+        <!-- 3. Local direct URL -->
+        <div class="imgbb-copy-row">
+          <div class="imgbb-copy-header">
+            <span class="imgbb-copy-title">Прямая ссылка сервера (Локальная)</span>
+            <span class="imgbb-copy-desc">Для тестов и учеников в школьной сети</span>
+          </div>
+          <div class="imgbb-input-group">
+            <input type="text" readonly class="form-control" value="${escapeHtml(links.local_direct_link || '')}" id="inp-local">
+            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-local').value, this)">Скопировать</button>
           </div>
         </div>
 
-        <!-- 2. Прямая ссылка на сайт / CDN -->
-        <div class="imgbb-copy-group">
-          <div class="imgbb-copy-label">
-            <span>🌐 Прямая ссылка (Direct URL):</span>
-            <span style="font-size: 0.74rem; color: var(--text-muted);">Для сайтов и браузера</span>
+        <!-- 4. HTML Code -->
+        <div class="imgbb-copy-row">
+          <div class="imgbb-copy-header">
+            <span class="imgbb-copy-title">HTML код для вставки</span>
+            <span class="imgbb-copy-desc">&lt;img&gt; или &lt;iframe&gt;</span>
           </div>
-          <div class="imgbb-copy-input-wrap">
-            <input type="text" readonly class="imgbb-copy-input" value="${escapeHtml(links.site_direct_link || links.preview_url)}" id="copy-inp-direct">
-            <button type="button" class="imgbb-copy-btn" onclick="window.copyMaterialCode(document.getElementById('copy-inp-direct').value, this)">Скопировать</button>
-          </div>
-        </div>
-
-        <!-- 3. HTML код для вставки -->
-        <div class="imgbb-copy-group">
-          <div class="imgbb-copy-label">
-            <span>💻 HTML код (Встраивание &lt;img&gt; / &lt;iframe&gt;):</span>
-            <span style="font-size: 0.74rem; color: var(--text-muted);">Для уроков и страниц сайта</span>
-          </div>
-          <div class="imgbb-copy-input-wrap">
-            <input type="text" readonly class="imgbb-copy-input" value="${escapeHtml(links.html_code)}" id="copy-inp-html">
-            <button type="button" class="imgbb-copy-btn" onclick="window.copyMaterialCode(document.getElementById('copy-inp-html').value, this)">Скопировать</button>
+          <div class="imgbb-input-group">
+            <input type="text" readonly class="form-control" value="${escapeHtml(links.html_code || '')}" id="inp-html">
+            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-html').value, this)">Скопировать</button>
           </div>
         </div>
 
-        <!-- 4. Markdown код -->
-        <div class="imgbb-copy-group">
-          <div class="imgbb-copy-label">
-            <span>📝 Markdown (для тестов, конспектов и GitHub):</span>
+        <!-- 5. Markdown Code -->
+        <div class="imgbb-copy-row">
+          <div class="imgbb-copy-header">
+            <span class="imgbb-copy-title">Markdown код</span>
+            <span class="imgbb-copy-desc">Для генератора тестов и заметок</span>
           </div>
-          <div class="imgbb-copy-input-wrap">
-            <input type="text" readonly class="imgbb-copy-input" value="${escapeHtml(links.markdown_code)}" id="copy-inp-md">
-            <button type="button" class="imgbb-copy-btn" onclick="window.copyMaterialCode(document.getElementById('copy-inp-md').value, this)">Скопировать</button>
+          <div class="imgbb-input-group">
+            <input type="text" readonly class="form-control" value="${escapeHtml(links.markdown_code || '')}" id="inp-md">
+            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-md').value, this)">Скопировать</button>
           </div>
         </div>
 
-        <!-- 5. BBCode -->
-        <div class="imgbb-copy-group">
-          <div class="imgbb-copy-label">
-            <span>💬 BBCode (для форумов):</span>
+        <!-- 6. BBCode -->
+        <div class="imgbb-copy-row">
+          <div class="imgbb-copy-header">
+            <span class="imgbb-copy-title">BBCode</span>
+            <span class="imgbb-copy-desc">[img] или [video]</span>
           </div>
-          <div class="imgbb-copy-input-wrap">
-            <input type="text" readonly class="imgbb-copy-input" value="${escapeHtml(links.bbcode)}" id="copy-inp-bb">
-            <button type="button" class="imgbb-copy-btn" onclick="window.copyMaterialCode(document.getElementById('copy-inp-bb').value, this)">Скопировать</button>
+          <div class="imgbb-input-group">
+            <input type="text" readonly class="form-control" value="${escapeHtml(links.bbcode || '')}" id="inp-bb">
+            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-bb').value, this)">Скопировать</button>
           </div>
         </div>
       `;
     }
 
-    modal.classList.add("is-open");
+    modal.classList.add("open");
   };
 
   window.closeImgbbLinksModal = function () {
     const modal = document.getElementById("imgbb-links-modal");
-    if (modal) modal.classList.remove("is-open");
+    if (modal) modal.classList.remove("open");
   };
 
   // =========================================================================
@@ -421,12 +465,12 @@
 
     selectedFilesQueue = [];
     renderUploadQueue();
-    modal.classList.add("is-open");
+    modal.classList.add("open");
   };
 
   window.closeUploadModal = function () {
     const modal = document.getElementById("materials-upload-modal");
-    if (modal) modal.classList.remove("is-open");
+    if (modal) modal.classList.remove("open");
   };
 
   window.handleFilesChosen = function (files) {
@@ -451,16 +495,16 @@
     if (submitBtn) submitBtn.disabled = false;
 
     queueEl.innerHTML = `
-      <div style="font-size: 0.84rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">
+      <div style="font-size: 0.82rem; font-weight: 800; color: var(--text); margin-bottom: 8px;">
         Выбрано файлов: ${selectedFilesQueue.length}
       </div>
-      <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 180px; overflow-y: auto;">
+      <div style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
         ${selectedFilesQueue.map((f, idx) => `
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; background: var(--bg-muted, #f8fafc); border-radius: 8px; font-size: 0.82rem;">
-            <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">${escapeHtml(f.name)}</span>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="color: var(--text-muted);">${formatBytes(f.size)}</span>
-              <button type="button" style="border:none; background:transparent; color:#ef4444; cursor:pointer;" onclick="window.removeQueuedFile(${idx})">✕</button>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface); box-shadow: var(--shadow-in); border-radius: 12px; font-size: 0.82rem;">
+            <span style="font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">${escapeHtml(f.name)}</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="color: var(--muted); font-weight: 700;">${formatBytes(f.size)}</span>
+              <button type="button" style="border:none; background:transparent; color:#ef4444; font-weight:800; cursor:pointer;" onclick="window.removeQueuedFile(${idx})">✕</button>
             </div>
           </div>
         `).join('')}
@@ -483,7 +527,7 @@
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = "Загрузка в Google Диск...";
+      submitBtn.textContent = "Сохранение на Google Диск...";
     }
     if (progressEl) {
       progressEl.textContent = `Загружаем ${selectedFilesQueue.length} файлов...`;
@@ -519,7 +563,7 @@
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Загрузить";
+        submitBtn.textContent = "Загрузить на Google Диск";
       }
       if (progressEl) progressEl.textContent = "";
     }
@@ -545,12 +589,12 @@
     document.getElementById("add-url-input").value = "";
     document.getElementById("add-url-title-input").value = "";
     document.getElementById("add-url-preview-box").style.display = "none";
-    modal.classList.add("is-open");
+    modal.classList.add("open");
   };
 
   window.closeAddUrlModal = function () {
     const modal = document.getElementById("materials-add-url-modal");
-    if (modal) modal.classList.remove("is-open");
+    if (modal) modal.classList.remove("open");
   };
 
   window.handleUrlInputPreview = function (val) {
@@ -578,7 +622,7 @@
     // Check Image URL
     if (val.startsWith("http://") || val.startsWith("https://")) {
       pImg.src = val;
-      pTitle.textContent = "Изображение по ссылке (будет скачано на Google Диск)";
+      pTitle.textContent = "Изображение (скачивается на Google Диск)";
       pBox.style.display = "flex";
       return;
     }
@@ -598,7 +642,7 @@
     }
 
     btn.disabled = true;
-    btn.textContent = "Сохранение...";
+    btn.textContent = "Сохранение на Google Диск...";
 
     try {
       const isYoutube = url.includes("youtu.be") || url.includes("youtube.com");
@@ -607,7 +651,7 @@
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: json_stringify({ url, title, folder }),
+        body: JSON.stringify({ url, title, folder }),
       });
 
       if (!res.ok) {
@@ -629,10 +673,6 @@
       btn.textContent = "Добавить материал";
     }
   };
-
-  function json_stringify(obj) {
-    return JSON.stringify(obj);
-  }
 
   // =========================================================================
   // Albums Management
@@ -688,7 +728,8 @@
   // Sync Google Drive IDs
   window.syncGoogleDriveLinks = function () {
     const btn = document.getElementById("materials-sync-btn");
-    if (btn) btn.innerHTML = "⏳ Синхронизация...";
+    const origHtml = btn ? btn.innerHTML : "";
+    if (btn) btn.innerHTML = "<span>⏳ Проверка...</span>";
 
     fetch("/api/materials/sync-drive", {
       method: "POST"
@@ -698,7 +739,7 @@
       await loadMaterials();
     }).catch(e => alert("Ошибка синхронизации: " + e.message))
     .finally(() => {
-      if (btn) btn.innerHTML = "🔄 Обновить Google ссылки";
+      if (btn) btn.innerHTML = origHtml;
     });
   };
 
@@ -716,7 +757,7 @@
 
     if (item.media_type === "video" && item.youtube_id) {
       content.innerHTML = `
-        <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 14px; overflow: hidden;">
+        <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft);">
           <iframe style="position: absolute; top:0; left:0; width:100%; height:100%; border:0;"
                   src="https://www.youtube.com/embed/${item.youtube_id}?autoplay=1"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -725,21 +766,21 @@
         </div>
       `;
     } else {
-      const url = item.links ? (item.links.local_direct_link || item.links.preview_url) : "";
+      const url = item.links ? (item.links.google_drive_direct || item.links.local_direct_link || item.links.preview_url) : "";
       content.innerHTML = `
-        <div style="text-align: center;">
-          <img src="${escapeHtml(url)}" style="max-width: 100%; max-height: 72vh; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25);" alt="${escapeHtml(item.title)}">
+        <div style="text-align: center; width: 100%;">
+          <img src="${escapeHtml(url)}" style="max-width: 100%; max-height: 72vh; border-radius: 16px; box-shadow: var(--shadow-soft);" alt="${escapeHtml(item.title)}">
         </div>
       `;
     }
 
-    modal.classList.add("is-open");
+    modal.classList.add("open");
   };
 
   window.closeMaterialViewer = function () {
     const modal = document.getElementById("materials-viewer-modal");
     const content = document.getElementById("materials-viewer-content");
-    if (modal) modal.classList.remove("is-open");
+    if (modal) modal.classList.remove("open");
     if (content) content.innerHTML = "";
   };
 
