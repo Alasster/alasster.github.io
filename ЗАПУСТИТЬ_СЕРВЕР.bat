@@ -1,9 +1,11 @@
 @echo off
 cd /d "%~dp0"
-title Alasster Unified Server
+title Alasster Server
+
+taskkill /F /IM python.exe >nul 2>&1
+timeout /t 1 /nobreak >nul
 
 set "PYTHON="
-
 if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PYTHON=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
 if not defined PYTHON (
     for %%V in (Python313 Python312 Python311 Python310) do (
@@ -21,10 +23,6 @@ if not defined PYTHON (
     python --version >nul 2>&1
     if not errorlevel 1 set "PYTHON=python"
 )
-if not defined PYTHON (
-    py -3 --version >nul 2>&1
-    if not errorlevel 1 set "PYTHON=py -3"
-)
 
 if not defined PYTHON (
     echo [ERROR] Python 3.10+ not found!
@@ -33,5 +31,9 @@ if not defined PYTHON (
     exit /b 1
 )
 
-"%PYTHON%" "start_runner.py"
-if errorlevel 1 pause
+cd "Личный кабинет"
+"%PYTHON%" server.py
+
+echo.
+echo Server has stopped.
+pause
