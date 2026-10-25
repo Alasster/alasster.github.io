@@ -1040,7 +1040,7 @@ textarea.form-control {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 2;
+  z-index: 5;
   overflow: visible;
 }
 .matching-svg path {
@@ -1720,4 +1720,9 @@ textarea.form-control {
   background: #bbf7d0 !important;
   color: #166534 !important;
   font-weight: 700;
+}
+
+.matching-pin.is-connected {
+  background: var(--primary, #3b82f6) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
 }

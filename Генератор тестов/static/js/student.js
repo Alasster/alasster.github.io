@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   launchId = pathParts[pathParts.length - 1];
 
   const urlParams = new URLSearchParams(window.location.search);
-  const recoveryToken = urlParams.get("recovery_token");
+  const recoveryToken = urlParams.get("recovery_token") || urlParams.get("token");
   if (recoveryToken) {
     setStudentToken(recoveryToken);
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -506,10 +506,13 @@ async function startExamSession() {
   }
 
   currentTasks = (currentAttempt && currentAttempt.tasks) ? currentAttempt.tasks : [];
-  renderTasks();
-  updateProgressIndicator();
+  // 1. Немедленно запускаем таймер и опрос статуса до рендеринга DOM
   startTimer(currentAttempt?.server_deadline, currentAttempt?.started_at);
   startHeartbeatAndPoll();
+
+  // 2. Отрисовываем задания и прогресс
+  renderTasks();
+  updateProgressIndicator();
 
   if (window.renderMathInElement) {
     renderMathInElement(document.getElementById("tasks-container"), {
@@ -525,9 +528,11 @@ async function startExamSession() {
 // Рендеринг всех 10 типов заданий
 function renderTasks() {
   const container = document.getElementById("tasks-container");
+  if (!container) return;
   container.innerHTML = "";
 
   currentTasks.forEach((t, idx) => {
+    try {
     const card = document.createElement("div");
     card.className = "card";
     card.id = `task-card-${t.id}`;
@@ -581,14 +586,7 @@ function renderTasks() {
         </div>
       `;
     }
-    // 5. Заполни пропуск (Fill blank)
-    else if (t.question_type === "fill_blank") {
-      inputHtml = `
-        <div>
-          <input type="text" class="form-control" style="font-weight: 600;" placeholder="Впишите пропущенное слово..." value="${saved !== null ? escapeHtml(saved) : ''}" oninput="handleAnswerChange('${t.id}', this.value, 'fill_blank')">
-        </div>
-      `;
-    }
+
     // 6. Верно / Неверно (True / False)
     else if (t.question_type === "true_false") {
       const isTrue = saved === "Верно" || saved === true || saved === "true";
@@ -630,36 +628,47 @@ function renderTasks() {
       });
       inputHtml += `</div>`;
     }
-    // 8. Сопоставление пар (Matching со стрелочками и соединительными точками)
+    // 7. Сопоставление пар (Matching с интерактивными SVG линиями и пинами)
     else if (t.question_type === "matching") {
       const currentPairs = (saved && typeof saved === "object") ? saved : {};
-      const leftItems = t.match_items_left || [];
-      const rightItems = t.match_items_right || [];
+      const leftItems = (t.match_items_left && t.match_items_left.length > 0) 
+        ? t.match_items_left 
+        : ((t.answer_key && typeof t.answer_key === "object" && !Array.isArray(t.answer_key)) ? Object.keys(t.answer_key) : ["Элемент А", "Элемент Б"]);
+      const rightItems = (t.match_items_right && t.match_items_right.length > 0) 
+        ? t.match_items_right 
+        : ((t.answer_key && typeof t.answer_key === "object" && !Array.isArray(t.answer_key)) ? Object.values(t.answer_key) : ["Значение 1", "Значение 2"]);
+      const connectedRights = Object.values(currentPairs);
 
       inputHtml = `
         <div class="matching-interactive-wrap" id="matching-wrap-${t.id}" data-task-id="${t.id}">
           <svg class="matching-svg" id="matching-svg-${t.id}"></svg>
           <div class="matching-col matching-col-left">
-            ${leftItems.map((left, idx) => `
-              <div class="matching-card matching-card-left" id="m-left-${t.id}-${idx}" data-task-id="${t.id}" data-item="${escapeHtml(left)}" data-side="left" onclick="handleMatchingCardClick('${t.id}', '${escapeHtml(left)}', 'left')">
-                <span class="matching-text">${escapeHtml(left)}</span>
-                <div class="matching-pin matching-pin-right" data-task-id="${t.id}" data-item="${escapeHtml(left)}" data-side="left" onpointerdown="startMatchingDrag(event, '${t.id}', '${escapeHtml(left)}', 'left')"></div>
-                ${currentPairs[left] ? `<button type="button" class="matching-clear-btn" onclick="event.stopPropagation(); removeMatchingConnection('${t.id}', '${escapeHtml(left)}')" title="Разорвать связь">✕</button>` : ''}
-              </div>
-            `).join('')}
+            ${leftItems.map((left, idx) => {
+              const isConn = Boolean(currentPairs[left]);
+              return `
+                <div class="matching-card matching-card-left ${isConn ? 'is-connected' : ''}" id="m-left-${t.id}-${idx}" data-task-id="${t.id}" data-item="${escapeHtml(left)}" data-side="left" onclick="handleMatchingCardClick('${t.id}', '${escapeHtml(left)}', 'left')">
+                  <span class="matching-text">${escapeHtml(left)}</span>
+                  <div class="matching-pin matching-pin-right ${isConn ? 'is-connected' : ''}" data-task-id="${t.id}" data-item="${escapeHtml(left)}" data-side="left" onpointerdown="startMatchingDrag(event, '${t.id}', '${escapeHtml(left)}', 'left')"></div>
+                  ${isConn ? `<button type="button" class="matching-clear-btn" onclick="event.stopPropagation(); removeMatchingConnection('${t.id}', '${escapeHtml(left)}')" title="Разорвать связь">✕</button>` : ''}
+                </div>
+              `;
+            }).join('')}
           </div>
           <div class="matching-col matching-col-right">
-            ${rightItems.map((right, idx) => `
-              <div class="matching-card matching-card-right" id="m-right-${t.id}-${idx}" data-task-id="${t.id}" data-item="${escapeHtml(right)}" data-side="right" onclick="handleMatchingCardClick('${t.id}', '${escapeHtml(right)}', 'right')">
-                <div class="matching-pin matching-pin-left" data-task-id="${t.id}" data-item="${escapeHtml(right)}" data-side="right" onpointerdown="startMatchingDrag(event, '${t.id}', '${escapeHtml(right)}', 'right')"></div>
-                <span class="matching-text">${escapeHtml(right)}</span>
-              </div>
-            `).join('')}
+            ${rightItems.map((right, idx) => {
+              const isConn = connectedRights.includes(right);
+              return `
+                <div class="matching-card matching-card-right ${isConn ? 'is-connected' : ''}" id="m-right-${t.id}-${idx}" data-task-id="${t.id}" data-item="${escapeHtml(right)}" data-side="right" onclick="handleMatchingCardClick('${t.id}', '${escapeHtml(right)}', 'right')">
+                  <div class="matching-pin matching-pin-left ${isConn ? 'is-connected' : ''}" data-task-id="${t.id}" data-item="${escapeHtml(right)}" data-side="right" onpointerdown="startMatchingDrag(event, '${t.id}', '${escapeHtml(right)}', 'right')"></div>
+                  <span class="matching-text">${escapeHtml(right)}</span>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       `;
     }
-    // 9. Выпадающий список в тексте (Dropdown)
+// 9. Выпадающий список в тексте (Dropdown)
     else if (t.question_type === "dropdown") {
       inputHtml = `
         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
@@ -785,11 +794,20 @@ function renderTasks() {
         </div>
       `;
     }
-    // 13. Таблица утверждений (Boolean Matrix)
+    // 12. Таблица утверждений (Boolean Matrix)
     else if (t.question_type === "boolean_matrix") {
       const savedMap = (saved && typeof saved === "object") ? saved : {};
-      const columns = t.options && t.options.length > 0 ? t.options : ["Верно", "Неверно"];
-      const statements = t.categories && t.categories.length > 0 ? t.categories : (Array.isArray(t.answer_key) ? t.answer_key : Object.keys(t.answer_key || {}));
+      const columns = (t.options && t.options.length > 0) ? t.options : ["Верно", "Неверно"];
+      let statements = [];
+      if (t.answer_key && typeof t.answer_key === "object" && !Array.isArray(t.answer_key) && Object.keys(t.answer_key).length > 0) {
+        statements = Object.keys(t.answer_key);
+      } else if (Array.isArray(t.categories) && t.categories.length > 0) {
+        statements = t.categories;
+      } else if (Array.isArray(t.options) && t.options.length > 2) {
+        statements = t.options.slice(2);
+      } else {
+        statements = ["Утверждение 1", "Утверждение 2"];
+      }
 
       inputHtml = `
         <div class="matrix-cards-list">
@@ -822,41 +840,7 @@ function renderTasks() {
         </div>
       `;
     }
-    // 14. Метки на схеме (Hotspot)
-    else if (t.question_type === "hotspot") {
-      const hasCoords = saved && typeof saved === "object" && typeof saved.x === "number" && typeof saved.y === "number";
-      const imgUrl = t.image_url ? generatorImageUrl(t.image_url) : "";
-
-      inputHtml = `
-        <div class="hotspot-wrap" style="text-align: center;">
-          <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.6rem;">
-            📍 Кликните прямо по изображению в нужной области, чтобы установить метку:
-          </div>
-          ${imgUrl ? `
-            <div class="hotspot-canvas-wrap" id="hotspot-wrap-${t.id}" onclick="handleHotspotImageClick(event, '${t.id}')">
-              <img src="${imgUrl}" class="hotspot-img task-img-protected" referrerpolicy="no-referrer" alt="Схема">
-              ${hasCoords ? `
-                <div class="hotspot-student-pin" style="left: ${saved.x}%; top: ${saved.y}%;">
-                  <svg width="32" height="38" viewBox="0 0 24 28" fill="none">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 16 12 16s12-7 12-16c0-6.63-5.37-12-12-12z" fill="#ef4444"/>
-                    <circle cx="12" cy="11" r="5" fill="#ffffff"/>
-                    <circle cx="12" cy="11" r="2.5" fill="#ef4444"/>
-                  </svg>
-                </div>
-              ` : ''}
-            </div>
-            <div style="margin-top: 0.45rem; font-size: 0.82rem; color: var(--text-muted);">
-              ${hasCoords ? `<span style="color: #10b981; font-weight: 700;">✓ Метка установлена</span> (кликните в другое место для перемещения)` : `Метка пока не поставлена`}
-            </div>
-          ` : `
-            <div style="padding: 1.5rem; background: var(--bg); border-radius: 12px; color: var(--text-muted);">
-              Учитель еще не прикрепил изображение схемы для этого задания.
-            </div>
-          `}
-        </div>
-      `;
-    }
-    // 15. Выделение слов в тексте (Инструмент «Маркер» без дублирования текста)
+// 15. Выделение слов в тексте (Инструмент «Маркер» без дублирования текста)
     else if (t.question_type === "highlight_words") {
       const savedList = Array.isArray(saved) ? saved : [];
       const text = t.question_text || (t.options && t.options[0]) || "";
@@ -932,6 +916,9 @@ function renderTasks() {
     `;
 
     container.appendChild(card);
+    } catch (taskErr) {
+      console.error(`Ошибка отрисовки задания #${idx + 1} (${t.id}):`, taskErr);
+    }
   });
 
   // Мгновенная отрисовка линий сопоставления
@@ -1031,7 +1018,8 @@ function handleMatchingCardClick(taskId, item, side) {
 function highlightMatchingNode(taskId, item, side, isSelected) {
   const wrap = document.getElementById(`matching-wrap-${taskId}`);
   if (!wrap) return;
-  const card = wrap.querySelector(`.matching-card[data-item="${CSS.escape(item)}"][data-side="${side}"]`);
+  const cards = Array.from(wrap.querySelectorAll(`.matching-card[data-side="${side}"]`));
+  const card = cards.find(c => c.getAttribute("data-item") === String(item));
   if (card) {
     card.classList.toggle("selected-node", isSelected);
   }
@@ -1094,7 +1082,8 @@ function drawMatchingDragPreview(taskId, item, side, mouseX, mouseY) {
   const svg = document.getElementById(`matching-svg-${taskId}`);
   if (!wrap || !svg) return;
 
-  const pin = wrap.querySelector(`.matching-pin[data-item="${CSS.escape(item)}"][data-side="${side}"]`);
+  const pins = Array.from(wrap.querySelectorAll(`.matching-pin[data-side="${side}"]`));
+  const pin = pins.find(p => p.getAttribute("data-item") === String(item));
   if (!pin) return;
 
   const wRect = wrap.getBoundingClientRect();
@@ -1124,49 +1113,63 @@ function drawMatchingDragPreview(taskId, item, side, mouseX, mouseY) {
 }
 
 function drawMatchingLines(taskId) {
-  const wrap = document.getElementById(`matching-wrap-${taskId}`);
-  const svg = document.getElementById(`matching-svg-${taskId}`);
-  if (!wrap || !svg) return;
+  try {
+    const wrap = document.getElementById(`matching-wrap-${taskId}`);
+    const svg = document.getElementById(`matching-svg-${taskId}`);
+    if (!wrap || !svg) return;
 
-  const pairs = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? localDrafts[taskId].answer : {};
-  svg.innerHTML = "";
+    const pairs = localDrafts[taskId] && typeof localDrafts[taskId].answer === "object" ? localDrafts[taskId].answer : {};
+    svg.innerHTML = "";
 
-  const wRect = wrap.getBoundingClientRect();
-  svg.setAttribute("viewBox", `0 0 ${wRect.width} ${wRect.height}`);
+    const wRect = wrap.getBoundingClientRect();
+    if (!wRect.width || !wRect.height) {
+      setTimeout(() => drawMatchingLines(taskId), 50);
+      return;
+    }
+    svg.setAttribute("viewBox", `0 0 ${wRect.width} ${wRect.height}`);
 
-  let colorIdx = 0;
-  for (const [leftItem, rightItem] of Object.entries(pairs)) {
-    if (!rightItem) continue;
-    const leftPin = wrap.querySelector(`.matching-pin[data-item="${CSS.escape(leftItem)}"][data-side="left"]`);
-    const rightPin = wrap.querySelector(`.matching-pin[data-item="${CSS.escape(rightItem)}"][data-side="right"]`);
-    if (!leftPin || !rightPin) continue;
+    const leftPins = Array.from(wrap.querySelectorAll('.matching-pin[data-side="left"]'));
+    const rightPins = Array.from(wrap.querySelectorAll('.matching-pin[data-side="right"]'));
 
-    const lpRect = leftPin.getBoundingClientRect();
-    const rpRect = rightPin.getBoundingClientRect();
+    let colorIdx = 0;
+    for (const [leftItem, rightItem] of Object.entries(pairs)) {
+      if (!rightItem) continue;
+      const leftPin = leftPins.find(p => p.getAttribute("data-item") === String(leftItem));
+      const rightPin = rightPins.find(p => p.getAttribute("data-item") === String(rightItem));
+      if (!leftPin || !rightPin) continue;
 
-    const x1 = lpRect.left + lpRect.width / 2 - wRect.left;
-    const y1 = lpRect.top + lpRect.height / 2 - wRect.top;
-    const x2 = rpRect.left + rpRect.width / 2 - wRect.left;
-    const y2 = rpRect.top + rpRect.height / 2 - wRect.top;
+      const lpRect = leftPin.getBoundingClientRect();
+      const rpRect = rightPin.getBoundingClientRect();
 
-    const dx = Math.max(35, (x2 - x1) * 0.45);
-    const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+      const x1 = lpRect.left + lpRect.width / 2 - wRect.left;
+      const y1 = lpRect.top + lpRect.height / 2 - wRect.top;
+      const x2 = rpRect.left + rpRect.width / 2 - wRect.left;
+      const y2 = rpRect.top + rpRect.height / 2 - wRect.top;
 
-    const color = MATCHING_COLORS[colorIdx % MATCHING_COLORS.length];
-    colorIdx++;
+      const dx = Math.max(35, Math.abs(x2 - x1) * 0.45);
+      const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", d);
-    path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", "3.5");
-    path.setAttribute("stroke-linecap", "round");
-    path.setAttribute("fill", "none");
-    path.setAttribute("title", "Нажмите, чтобы удалить связь");
-    path.onclick = () => removeMatchingConnection(taskId, leftItem);
-    svg.appendChild(path);
+      const color = MATCHING_COLORS[colorIdx % MATCHING_COLORS.length];
+      colorIdx++;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      path.setAttribute("stroke", color);
+      path.setAttribute("stroke-width", "3.5");
+      path.setAttribute("stroke-linecap", "round");
+      path.setAttribute("fill", "none");
+      path.setAttribute("title", "Нажмите, чтобы удалить связь");
+      path.style.cursor = "pointer";
+      path.onclick = (e) => {
+        e.stopPropagation();
+        removeMatchingConnection(taskId, leftItem);
+      };
+      svg.appendChild(path);
+    }
+  } catch (err) {
+    console.error(`Ошибка отрисовки стрелок для ${taskId}:`, err);
   }
 }
-
 // Window resize listener for matching lines
 window.addEventListener("resize", () => {
   document.querySelectorAll(".matching-interactive-wrap").forEach(wrap => {
@@ -1559,7 +1562,16 @@ function startTimer(serverDeadlineIso, startedAtIso) {
   const pill = document.getElementById("timer-pill");
   if (box) box.style.display = "block";
 
+  let deadline = null;
   if (serverDeadlineIso) {
+    const safeIso = String(serverDeadlineIso).replace(" ", "T");
+    const parsed = new Date(safeIso).getTime();
+    if (!isNaN(parsed) && parsed > 0) {
+      deadline = parsed;
+    }
+  }
+
+  if (deadline !== null) {
     const deadline = new Date(serverDeadlineIso).getTime();
     const update = () => {
       const now = Date.now();

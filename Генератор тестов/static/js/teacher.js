@@ -786,17 +786,15 @@ const TASK_TYPES = {
   multi_choice: "2. Множественный выбор",
   number: "3. Числовой ответ (с погрешностью)",
   short_text: "4. Краткий текст (синонимы)",
-  fill_blank: "5. Заполни пропуск / вставка слова",
-  true_false: "6. Верно / Неверно",
-  ordering: "7. Восстановление последовательности (Drag & Drop)",
-  matching: "8. Сопоставление пар (интерактивные стрелочки)",
-  dropdown: "9. Выпадающий список в предложении",
-  group_classification: "10. Распределение по категориям (корзины)",
-  odd_one_out: "11. Исключение лишнего (Найди лишнее)",
-  word_bank_cloze: "12. Вставка из банка слов (Drag & Drop)",
-  boolean_matrix: "13. Таблица утверждений (Сетка Да / Нет)",
-  hotspot: "14. Метки на схеме (Интерактивные точки)",
-  highlight_words: "15. Выделение слов в тексте"
+  true_false: "5. Верно / Неверно",
+  ordering: "6. Восстановление последовательности (Drag & Drop)",
+  matching: "7. Сопоставление пар (интерактивные стрелочки)",
+  dropdown: "8. Выпадающий список в предложении",
+  group_classification: "9. Распределение по категориям (корзины)",
+  odd_one_out: "10. Исключение лишнего (Найди лишнее)",
+  word_bank_cloze: "11. Вставка из банка слов (Drag & Drop)",
+  boolean_matrix: "12. Таблица утверждений (Сетка Да / Нет)",
+  highlight_words: "13. Выделение слов в тексте"
 };
 
 function renderTaskEditorForm() {
@@ -863,16 +861,7 @@ function renderTaskEditorForm() {
       </div>
     `;
   }
-  // 5. Заполни пропуск
-  else if (t.question_type === "fill_blank") {
-    typeSpecificHtml = `
-      <div class="form-group" style="margin-top: 1rem;">
-        <label class="form-label">Правильное пропущенное слово (или синонимы через точку с запятой):</label>
-        <input type="text" class="form-control" value="${escapeHtml(t.answer_key || '')}" oninput="activeTask.answer_key = this.value; scheduleAutoSaveTask();" onblur="saveCurrentTask(true)" placeholder="Например: процессор; cpu">
-      </div>
-    `;
-  }
-  // 6. Верно / Неверно
+// 6. Верно / Неверно
   else if (t.question_type === "true_false") {
     const isTrue = t.answer_key === "Верно" || t.answer_key === true;
     typeSpecificHtml = `

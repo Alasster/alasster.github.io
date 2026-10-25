@@ -1533,37 +1533,19 @@ async function cloneTaskToOtherVariant(taskId, sameVariant = false) {
 // 10 типов заданий в редакторе учителя
 
 const TASK_TYPES = {
-
   single_choice: "1. Один правильный выбор",
-
   multi_choice: "2. Множественный выбор",
-
   number: "3. Числовой ответ (с погрешностью)",
-
   short_text: "4. Краткий текст (синонимы)",
-
-  fill_blank: "5. Заполни пропуск / вставка слова",
-
-  true_false: "6. Верно / Неверно",
-
-  ordering: "7. Восстановление последовательности (Drag & Drop)",
-
-  matching: "8. Сопоставление пар (интерактивные стрелочки)",
-
-  dropdown: "9. Выпадающий список в предложении",
-
-  group_classification: "10. Распределение по категориям (корзины)",
-
-  odd_one_out: "11. Исключение лишнего (Найди лишнее)",
-
-  word_bank_cloze: "12. Вставка из банка слов (Drag & Drop)",
-
-  boolean_matrix: "13. Таблица утверждений (Сетка Да / Нет)",
-
-  hotspot: "14. Метки на схеме (Интерактивные точки)",
-
-  highlight_words: "15. Выделение слов в тексте"
-
+  true_false: "5. Верно / Неверно",
+  ordering: "6. Восстановление последовательности (Drag & Drop)",
+  matching: "7. Сопоставление пар (интерактивные стрелочки)",
+  dropdown: "8. Выпадающий список в предложении",
+  group_classification: "9. Распределение по категориям (корзины)",
+  odd_one_out: "10. Исключение лишнего (Найди лишнее)",
+  word_bank_cloze: "11. Вставка из банка слов (Drag & Drop)",
+  boolean_matrix: "12. Таблица утверждений (Сетка Да / Нет)",
+  highlight_words: "13. Выделение слов в тексте"
 };
 
 
@@ -1861,23 +1843,7 @@ function renderTaskEditorForm() {
 
   }
 
-  // 5. Заполни пропуск
 
-  else if (t.question_type === "fill_blank") {
-
-    typeSpecificHtml = `
-
-      <div class="form-group" style="margin-top: 1rem;">
-
-        <label class="form-label">Правильное пропущенное слово (или синонимы через точку с запятой):</label>
-
-        <input type="text" class="form-control" value="${escapeHtml(t.answer_key || '')}" oninput="activeTask.answer_key = this.value; scheduleAutoSaveTask();" onblur="saveCurrentTask(true)" placeholder="Например: процессор; cpu">
-
-      </div>
-
-    `;
-
-  }
 
   // 6. Верно / Неверно
 
@@ -2152,43 +2118,7 @@ function renderTaskEditorForm() {
       </div>
     `;
   }
-  // 14. Метки на схеме (Hotspot)
-  else if (t.question_type === "hotspot") {
-    const key = (t.answer_key && typeof t.answer_key === "object" && typeof t.answer_key.x === "number") ? t.answer_key : { x: 50, y: 50, radius: 8 };
-    const imgUrl = t.image_url ? generatorImageUrl(t.image_url) : "";
-
-    typeSpecificHtml = `
-      <div class="form-group" style="margin-top: 1rem;">
-        <label class="form-label">Интерактивная область на схеме (Hotspot):</label>
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-          Кликните по изображению ниже, чтобы задать область правильного ответа (зеленая мишень). Ученик не видит эту область и должен кликнуть в правильное место.
-        </div>
-
-        ${imgUrl ? `
-          <div style="text-align: center; margin-bottom: 1rem;">
-            <div class="hotspot-canvas-wrap" style="position: relative; display: inline-block; cursor: crosshair;" onclick="setEditorHotspotCoords(event)">
-              <img src="${imgUrl}" class="hotspot-img" referrerpolicy="no-referrer" style="max-height: 380px; display: block;" alt="Схема">
-              <div class="hotspot-target-preview" style="left: ${key.x}%; top: ${key.y}%; width: ${(key.radius || 8) * 2}%; height: ${(key.radius || 8) * 2}%;" title="Область правильного ответа (радиус ${key.radius || 8}%)"></div>
-              <div style="position: absolute; left: ${key.x}%; top: ${key.y}%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: #10b981; border: 2.5px solid #fff; border-radius: 50%; pointer-events: none; box-shadow: 0 0 6px rgba(0,0,0,0.5);"></div>
-            </div>
-            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.4rem;">
-              Кликните по схеме для установки центра: (X: <strong>${key.x}%</strong>, Y: <strong>${key.y}%</strong>)
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 1rem; background: var(--surface); padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--border); max-width: 440px; margin: 0 auto 0.75rem;">
-            <label style="font-size: 0.85rem; font-weight: 600; white-space: nowrap;">Радиус допуска (%):</label>
-            <input type="range" min="3" max="25" step="1" value="${key.radius || 8}" oninput="updateEditorHotspotRadius(this.value)" style="flex: 1;">
-            <span style="font-weight: 700; font-size: 0.9rem; min-width: 35px;">${key.radius || 8}%</span>
-          </div>
-        ` : `
-          <div style="padding: 1.25rem; background: var(--bg); border-radius: 12px; font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-            ⚠️ Для этого типа задания необходимо изображение. Прикрепите изображение к заданию ниже (по ссылке или выберите файл).
-          </div>
-        `}
-      </div>
-    `;
-  }
-  else if (t.question_type === "highlight_words") {
+else if (t.question_type === "highlight_words") {
     const text = t.question_text || (t.options && t.options[0]) || "";
     const key = Array.isArray(t.answer_key) ? t.answer_key : [];
     const tokens = text.split(/\s+/).filter(Boolean);
@@ -2626,29 +2556,35 @@ function changeTaskType(newType) {
   activeTask.question_type = newType;
 
   if (newType === "true_false") {
-
     activeTask.options = ["Верно", "Неверно"];
-
     activeTask.answer_key = "Верно";
-
   } else if (newType === "ordering") {
-
     activeTask.options = ["Шаг 1", "Шаг 2", "Шаг 3"];
-
     activeTask.answer_key = ["Шаг 1", "Шаг 2", "Шаг 3"];
-
   } else if (newType === "matching") {
-
+    activeTask.options = [];
     activeTask.answer_key = { "Элемент А": "Значение 1", "Элемент Б": "Значение 2" };
-
   } else if (newType === "group_classification") {
-
     activeTask.categories = ["Категория 1", "Категория 2"];
-
-    activeTask.answer_key = { "Элемент 1": "Категория 1", "Элемент 2": "Категория 2" };
-
     activeTask.options = ["Элемент 1", "Элемент 2"];
-
+    activeTask.answer_key = { "Элемент 1": "Категория 1", "Элемент 2": "Категория 2" };
+  } else if (newType === "boolean_matrix") {
+    activeTask.options = ["Верно", "Неверно"];
+    activeTask.answer_key = { "Утверждение 1": "Верно", "Утверждение 2": "Неверно" };
+  } else if (newType === "odd_one_out") {
+    activeTask.options = ["Элемент 1", "Элемент 2", "Элемент 3", "Лишний элемент"];
+    activeTask.answer_key = "Лишний элемент";
+  } else if (newType === "word_bank_cloze") {
+    if (!activeTask.question_text || !activeTask.question_text.includes("[1]")) {
+      activeTask.question_text = "Текст с первым [1] пропуском и вторым [2] пропуском.";
+    }
+    activeTask.options = ["слово 1", "слово 2", "слово 3"];
+    activeTask.answer_key = { "1": "слово 1", "2": "слово 2" };
+  } else if (newType === "highlight_words") {
+    if (!activeTask.question_text) {
+      activeTask.question_text = "Выделите главные члены предложения в этом тексте.";
+    }
+    activeTask.answer_key = [];
   }
 
   renderTaskEditorForm();
@@ -4488,7 +4424,16 @@ function renderStudentPreviewContent() {
     else if (t.question_type === "boolean_matrix") {
       const savedMap = (saved && typeof saved === "object") ? saved : {};
       const columns = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["Верно", "Неверно"];
-      const statements = (t.answer_key && typeof t.answer_key === "object") ? Object.keys(t.answer_key) : [];
+      let statements = [];
+      if (t.answer_key && typeof t.answer_key === "object" && !Array.isArray(t.answer_key) && Object.keys(t.answer_key).length > 0) {
+        statements = Object.keys(t.answer_key);
+      } else if (Array.isArray(t.categories) && t.categories.length > 0) {
+        statements = t.categories;
+      } else if (Array.isArray(t.options) && t.options.length > 2) {
+        statements = t.options.slice(2);
+      } else {
+        statements = ["Утверждение 1", "Утверждение 2"];
+      }
 
       inputHtml = `
         <div class="matrix-cards-list">
@@ -4521,41 +4466,7 @@ function renderStudentPreviewContent() {
         </div>
       `;
     }
-    // 14. Hotspot (Графический интерактивный Hotspot с кликом по изображению)
-    else if (t.question_type === "hotspot") {
-      const hasCoords = saved && typeof saved === "object" && typeof saved.x === "number" && typeof saved.y === "number";
-      const imgUrl = t.image_url ? generatorImageUrl(t.image_url) : "";
-
-      inputHtml = `
-        <div class="hotspot-wrap" style="text-align: center;">
-          <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.6rem;">
-            📍 Кликните прямо по изображению, чтобы поставить метку:
-          </div>
-          ${imgUrl ? `
-            <div class="hotspot-canvas-wrap" id="preview-hotspot-${t.id}" onclick="handlePreviewHotspotClick(event, '${t.id}')">
-              <img src="${imgUrl}" class="hotspot-img task-img-protected" referrerpolicy="no-referrer" alt="Схема">
-              ${hasCoords ? `
-                <div class="hotspot-student-pin" style="left: ${saved.x}%; top: ${saved.y}%;">
-                  <svg width="32" height="38" viewBox="0 0 24 28" fill="none">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 16 12 16s12-7 12-16c0-6.63-5.37-12-12-12z" fill="#ef4444"/>
-                    <circle cx="12" cy="11" r="5" fill="#ffffff"/>
-                    <circle cx="12" cy="11" r="2.5" fill="#ef4444"/>
-                  </svg>
-                </div>
-              ` : ''}
-            </div>
-            <div style="margin-top: 0.45rem; font-size: 0.82rem; color: var(--text-muted);">
-              ${hasCoords ? `<span style="color: #10b981; font-weight: 700;">✓ Метка установлена</span> (кликните в другое место для перемещения)` : `Метка пока не поставлена`}
-            </div>
-          ` : `
-            <div style="padding: 1.5rem; background: var(--bg); border-radius: 12px; color: var(--text-muted);">
-              Учитель еще не прикрепил изображение схемы для этого задания.
-            </div>
-          `}
-        </div>
-      `;
-    }
-    // 15. Highlight Words (Инструмент «Маркер» без дублирования текста)
+// 15. Highlight Words (Инструмент «Маркер» без дублирования текста)
     else if (t.question_type === "highlight_words") {
       const savedList = Array.isArray(saved) ? saved : [];
       const text = t.question_text || (t.options && t.options[0]) || "";
