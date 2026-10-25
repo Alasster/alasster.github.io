@@ -1,6 +1,12 @@
 @echo off
 cd /d "%~dp0"
-title Alasster Server
+title Alasster Unified Server
+
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process cmd.exe -ArgumentList '/k \"\"%~f0\"\"' -Verb RunAs"
+    exit /b
+)
 
 taskkill /F /IM python.exe >nul 2>&1
 timeout /t 1 /nobreak >nul
