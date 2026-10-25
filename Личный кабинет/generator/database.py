@@ -161,6 +161,7 @@ async def init_db():
             user_agent TEXT,
             is_duplicate_flag INTEGER DEFAULT 0,
             device_name TEXT,
+            hidden_from_live INTEGER DEFAULT 0,
             last_heartbeat TEXT,
             last_saved_at TEXT,
             confirmation_code TEXT,
@@ -231,7 +232,8 @@ async def init_db():
             ("launches", "is_archived", "INTEGER DEFAULT 0"),
             ("student_attempts", "device_name", "TEXT"),
             ("student_attempts", "variant", "TEXT DEFAULT '1'"),
-            ("student_attempts", "publish_results_override", "INTEGER DEFAULT NULL")
+            ("student_attempts", "publish_results_override", "INTEGER DEFAULT NULL"),
+            ("student_attempts", "hidden_from_live", "INTEGER DEFAULT 0")
         ]
         for tbl, col, col_def in migrations:
             try:
