@@ -134,6 +134,9 @@ function showCabinetSection(section) {
   if (selectedSection === 'tests') {
     window.initTestGenerator?.();
   }
+  if (selectedSection === 'materials') {
+    window.initMaterialsManager?.();
+  }
   const [eyebrow, sectionTitle] = sectionHeadings[selectedSection];
   let title = selectedSection === 'overview' ? currentDisplayName : sectionTitle;
   if (selectedSection === 'lessons') title = lessonsSummaryText;

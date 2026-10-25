@@ -24,6 +24,8 @@
 
   <link rel="stylesheet" href="/static/styles.css?v=profile-management-19">
 
+  <link rel="stylesheet" href="/static/materials.css?v=2">
+
 </head>
 
 <body>
@@ -949,16 +951,61 @@
 
         </article>
 
-        <article class="glass-card feature-card feature-indigo" id="materials" data-cabinet-section="materials">
+        <article class="glass-card materials-workspace-card" id="materials" data-cabinet-section="materials">
+          <div class="materials-container">
+            <!-- Header & Actions -->
+            <div class="materials-header">
+              <div class="materials-title-wrap">
+                <h2>
+                  <span>🖼 Мои материалы</span>
+                  <span class="materials-sync-badge">
+                    <span class="materials-sync-dot"></span>
+                    Google Диск Sync
+                  </span>
+                </h2>
+                <div style="font-size: 0.82rem; color: var(--text-muted, #64748b);">
+                  Медиахостинг файлов и видео с автогенерацией прямых ссылок, Markdown и кодов вставки ImgBB
+                </div>
+              </div>
 
-          <span class="feature-icon" aria-hidden="true">04</span>
+              <div class="materials-actions">
+                <button type="button" class="button button-primary" onclick="window.openUploadModal()" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <span>⬆</span>
+                  <span>Загрузить файлы</span>
+                </button>
+                <button type="button" class="button button-ghost" onclick="window.openAddUrlModal()" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <span>🔗</span>
+                  <span>Добавить по ссылке</span>
+                </button>
+                <button type="button" class="button button-ghost" id="materials-sync-btn" onclick="window.syncGoogleDriveLinks()" title="Просканировать Google Диск и обновить ссылки">
+                  🔄 Обновить Google ссылки
+                </button>
+              </div>
+            </div>
 
-          <h2>Мои материалы</h2>
+            <!-- Stats Ribbon -->
+            <div class="materials-stats-grid" id="materials-stats"></div>
 
-          <p>Документы, ссылки и личные заметки в одном разделе.</p>
+            <!-- Albums / Folders Navigation -->
+            <div class="materials-albums-bar" id="materials-albums"></div>
 
-          <span class="feature-state">Раздел готов к наполнению</span>
+            <!-- Toolbar: Search & Filters -->
+            <div class="materials-toolbar">
+              <div class="materials-search-box">
+                <span class="materials-search-icon">🔍</span>
+                <input type="text" class="materials-search-input" placeholder="Поиск по названию или ссылке..." oninput="window.handleMaterialsSearch(this.value)">
+              </div>
 
+              <div class="materials-filters-wrap">
+                <button type="button" class="materials-album-pill materials-filter-btn active" data-type="all" onclick="window.filterMaterialsByType('all')">Все файлы</button>
+                <button type="button" class="materials-album-pill materials-filter-btn" data-type="image" onclick="window.filterMaterialsByType('image')">🖼 Изображения</button>
+                <button type="button" class="materials-album-pill materials-filter-btn" data-type="video" onclick="window.filterMaterialsByType('video')">▶ YouTube видео</button>
+              </div>
+            </div>
+
+            <!-- Media Grid -->
+            <div class="materials-grid" id="materials-grid"></div>
+          </div>
         </article>
 
       </section>
@@ -1592,6 +1639,104 @@
   <script src="/static/vendor/auto-render.min.js"></script>
 
   <script src="/static/test-generator.js?v=33"></script>
+
+    
+  <!-- Modal: ImgBB Links Modal -->
+  <div id="imgbb-links-modal" class="materials-modal-backdrop" onclick="if(event.target === this) window.closeImgbbLinksModal()">
+    <div class="materials-modal" role="dialog" aria-modal="true" aria-labelledby="imgbb-modal-title">
+      <div class="materials-modal-header">
+        <h3 class="materials-modal-title" id="imgbb-modal-title">Коды и ссылки на файл</h3>
+        <button type="button" class="materials-modal-close" onclick="window.closeImgbbLinksModal()">✕</button>
+      </div>
+      <div class="materials-modal-body">
+        <div id="imgbb-modal-preview"></div>
+        <div id="imgbb-modal-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Upload Files (Drag and Drop + Paste) -->
+  <div id="materials-upload-modal" class="materials-modal-backdrop" onclick="if(event.target === this) window.closeUploadModal()">
+    <div class="materials-modal" role="dialog" aria-modal="true" style="max-width: 580px;">
+      <div class="materials-modal-header">
+        <h3 class="materials-modal-title">Загрузка файлов на Google Диск</h3>
+        <button type="button" class="materials-modal-close" onclick="window.closeUploadModal()">✕</button>
+      </div>
+      <div class="materials-modal-body">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Альбом (папка на Google Диске):</label>
+          <select id="upload-album-select" class="field" style="width: 100%;"></select>
+        </div>
+
+        <div class="materials-dropzone" id="materials-dropzone" onclick="document.getElementById('materials-file-input').click()">
+          <input type="file" id="materials-file-input" multiple accept="image/*,video/*" style="display: none;" onchange="window.handleFilesChosen(this.files)">
+          <div class="materials-dropzone-icon">☁️</div>
+          <div class="materials-dropzone-text">Перетащите изображения сюда или кликните для выбора</div>
+          <div class="materials-dropzone-hint">Поддерживается также вставка из буфера обмена (Ctrl + V) в любом месте раздела</div>
+        </div>
+
+        <div id="upload-files-queue" style="margin-bottom: 1rem;"></div>
+        <div id="upload-progress-status" style="font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem;"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" class="button button-ghost" onclick="window.closeUploadModal()">Отмена</button>
+          <button type="button" id="upload-submit-btn" class="button button-primary" onclick="window.submitUploadQueue()" disabled>Загрузить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add by URL / YouTube -->
+  <div id="materials-add-url-modal" class="materials-modal-backdrop" onclick="if(event.target === this) window.closeAddUrlModal()">
+    <div class="materials-modal" role="dialog" aria-modal="true" style="max-width: 580px;">
+      <div class="materials-modal-header">
+        <h3 class="materials-modal-title">Добавить по ссылке (картинка или YouTube)</h3>
+        <button type="button" class="materials-modal-close" onclick="window.closeAddUrlModal()">✕</button>
+      </div>
+      <div class="materials-modal-body">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Альбом для сохранения:</label>
+          <select id="add-url-album-select" class="field" style="width: 100%;"></select>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Ссылка (URL картинки или YouTube ролика):</label>
+          <input type="url" id="add-url-input" class="field" style="width: 100%;" placeholder="https://example.com/image.jpg или https://youtu.be/..." oninput="window.handleUrlInputPreview(this.value)">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Название (необязательно):</label>
+          <input type="text" id="add-url-title-input" class="field" style="width: 100%;" placeholder="Название материала...">
+        </div>
+
+        <div id="add-url-preview-box" style="display: none; align-items: center; gap: 1rem; padding: 0.75rem; background: var(--bg-muted, #f8fafc); border-radius: 12px; margin-bottom: 1rem;">
+          <img id="add-url-preview-img" style="width: 70px; height: 50px; object-fit: cover; border-radius: 6px;">
+          <div>
+            <div id="add-url-preview-type" style="font-size: 0.84rem; font-weight: 700; color: var(--primary);"></div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Будет сохранено на ваш Google Диск</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" class="button button-ghost" onclick="window.closeAddUrlModal()">Отмена</button>
+          <button type="button" id="add-url-submit-btn" class="button button-primary" onclick="window.submitAddUrl()">Добавить материал</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Viewer (Lightbox & Video Player) -->
+  <div id="materials-viewer-modal" class="materials-modal-backdrop" onclick="if(event.target === this) window.closeMaterialViewer()">
+    <div class="materials-modal" role="dialog" aria-modal="true" style="max-width: 860px; background: rgba(15, 23, 42, 0.95); border-color: rgba(255,255,255,0.1);">
+      <div class="materials-modal-header" style="border-bottom-color: rgba(255,255,255,0.1);">
+        <h3 class="materials-modal-title" id="materials-viewer-title" style="color: #ffffff;">Просмотр</h3>
+        <button type="button" class="materials-modal-close" style="color: #ffffff;" onclick="window.closeMaterialViewer()">✕</button>
+      </div>
+      <div class="materials-modal-body" id="materials-viewer-content" style="padding: 1.5rem; display: flex; align-items: center; justify-content: center;"></div>
+    </div>
+  </div>
+
+  <script src="/static/materials.js?v=2"></script>
 
     <script src="/static/dashboard.js?v=profile-management-17"></script>
 
