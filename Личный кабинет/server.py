@@ -535,6 +535,14 @@ class StudentPublicGateway:
         if scope['type'] != 'http':
             await self.app(scope, receive, send)
             return
+        headers = dict(scope.get('headers') or [])
+        xff = headers.get(b'x-forwarded-for') or headers.get(b'x-real-ip')
+        if xff:
+            real_ip = xff.decode('latin-1', errors='ignore').split(',')[0].strip()
+            if real_ip:
+                scope = dict(scope)
+                client_port = scope.get('client')[1] if scope.get('client') else 0
+                scope['client'] = (real_ip, client_port)
         path = scope.get('path', '')
         if path == '/':
             response = HTMLResponse(
@@ -1543,4 +1551,4 @@ if __name__ == "__main__":
 
     host = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
     port = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
-    uvicorn.run("server:app", host=host, port=port, reload=False, access_log=False)
+    uvicorn.run("server:app", host=host, port=port, reload=False, access_log=False, forwarded_allow_ips="*")
