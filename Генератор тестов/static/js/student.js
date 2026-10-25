@@ -508,9 +508,7 @@ async function startExamSession() {
   currentTasks = (currentAttempt && currentAttempt.tasks) ? currentAttempt.tasks : [];
   renderTasks();
   updateProgressIndicator();
-  if (currentAttempt && currentAttempt.server_deadline) {
-    startTimer(currentAttempt.server_deadline);
-  }
+  startTimer(currentAttempt?.server_deadline, currentAttempt?.started_at);
   startHeartbeatAndPoll();
 
   if (window.renderMathInElement) {
@@ -606,15 +604,13 @@ function renderTasks() {
     // 7. Восстановление последовательности (Ordering с Drag-and-Drop)
     else if (t.question_type === "ordering") {
       let currentOrder = Array.isArray(saved) && saved.length > 0 ? saved : (t.options || []);
-      inputHtml = `<div class="ordering-container" id="ordering-list-${t.id}">`;
+      inputHtml = `<div class="ordering-container" id="ordering-list-${t.id}"
+           ondragover="handleOrderingDragOver(event, '${t.id}')"
+           ondrop="handleOrderingDrop(event, '${t.id}')">`;
       currentOrder.forEach((item, itemIdx) => {
         inputHtml += `
           <div class="ordering-item" draggable="true" data-index="${itemIdx}" data-task-id="${t.id}"
                ondragstart="handleOrderingDragStart(event, '${t.id}', ${itemIdx})"
-               ondragover="handleOrderingDragOver(event)"
-               ondragenter="handleOrderingDragEnter(event)"
-               ondragleave="handleOrderingDragLeave(event)"
-               ondrop="handleOrderingDrop(event, '${t.id}', ${itemIdx})"
                ondragend="handleOrderingDragEnd(event)">
             <div class="ordering-drag-handle" title="Потяните для изменения порядка">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -796,79 +792,100 @@ function renderTasks() {
       const statements = t.categories && t.categories.length > 0 ? t.categories : (Array.isArray(t.answer_key) ? t.answer_key : Object.keys(t.answer_key || {}));
 
       inputHtml = `
-        <div class="matrix-table-wrap">
-          <table class="matrix-table">
-            <thead>
-              <tr>
-                <th>Утверждение</th>
-                ${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${statements.map(stmt => {
-                const curVal = savedMap[stmt] || "";
-                return `
-                  <tr>
-                    <td>${escapeHtml(stmt)}</td>
-                    ${columns.map(col => {
-                      const isChecked = curVal === col;
-                      return `
-                        <td>
-                          <div class="matrix-pill ${isChecked ? 'selected' : ''}"
-                               onclick="handleMatrixChoice('${t.id}', '${escapeHtml(stmt)}', '${escapeHtml(col)}')">
-                            ${isChecked ? '✓' : ''}
-                          </div>
-                        </td>
-                      `;
-                    }).join('')}
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+        <div class="matrix-cards-list">
+          <div style="font-size: 0.84rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+            Укажите правильный вариант для каждого утверждения:
+          </div>
+          ${statements.map(stmt => {
+            const curVal = savedMap[stmt] || "";
+            return `
+              <div class="matrix-card-row">
+                <div class="matrix-stmt-text">${escapeHtml(stmt)}</div>
+                <div class="matrix-pills-group">
+                  ${columns.map(col => {
+                    const isSelected = curVal === col;
+                    const colLower = col.toLowerCase();
+                    const isTrue = colLower.includes("верно") || colLower.includes("да") || colLower.includes("истина") || colLower.includes("true");
+                    const isFalse = colLower.includes("неверно") || colLower.includes("нет") || colLower.includes("ложь") || colLower.includes("false");
+                    const typeClass = isTrue ? "is-true" : (isFalse ? "is-false" : "");
+                    return `
+                      <button type="button" class="matrix-pill-btn ${isSelected ? `active ${typeClass}` : ''}"
+                              onclick="handleMatrixChoice('${t.id}', '${escapeHtml(stmt)}', '${escapeHtml(col)}')">
+                        ${escapeHtml(col)}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
     }
     // 14. Метки на схеме (Hotspot)
     else if (t.question_type === "hotspot") {
-      const pins = t.options && t.options.length > 0 ? t.options : ["1", "2", "3", "4"];
-      const isMulti = Array.isArray(t.answer_key);
+      const hasCoords = saved && typeof saved === "object" && typeof saved.x === "number" && typeof saved.y === "number";
+      const imgUrl = t.image_url ? generatorImageUrl(t.image_url) : "";
+
       inputHtml = `
-        <div class="hotspot-wrap">
-          ${t.image_url ? `
-            <div class="hotspot-image-container">
-              <img src="${generatorImageUrl(t.image_url)}" class="task-img-protected">
-            </div>
-          ` : ''}
-          <div class="hotspot-pins-row">
-            ${pins.map(pin => {
-              const isSelected = Array.isArray(saved) ? saved.includes(pin) : saved === pin;
-              return `
-                <button type="button" class="hotspot-pin-btn ${isSelected ? 'selected' : ''}" onclick="handleHotspotChoice('${t.id}', '${escapeHtml(pin)}', ${isMulti})">
-                  <span class="hotspot-pin-number">${escapeHtml(pin)}</span>
-                  <span>Метка ${escapeHtml(pin)}</span>
-                </button>
-              `;
-            }).join('')}
+        <div class="hotspot-wrap" style="text-align: center;">
+          <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.6rem;">
+            📍 Кликните прямо по изображению в нужной области, чтобы установить метку:
           </div>
+          ${imgUrl ? `
+            <div class="hotspot-canvas-wrap" id="hotspot-wrap-${t.id}" onclick="handleHotspotImageClick(event, '${t.id}')">
+              <img src="${imgUrl}" class="hotspot-img task-img-protected" referrerpolicy="no-referrer" alt="Схема">
+              ${hasCoords ? `
+                <div class="hotspot-student-pin" style="left: ${saved.x}%; top: ${saved.y}%;">
+                  <svg width="32" height="38" viewBox="0 0 24 28" fill="none">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 16 12 16s12-7 12-16c0-6.63-5.37-12-12-12z" fill="#ef4444"/>
+                    <circle cx="12" cy="11" r="5" fill="#ffffff"/>
+                    <circle cx="12" cy="11" r="2.5" fill="#ef4444"/>
+                  </svg>
+                </div>
+              ` : ''}
+            </div>
+            <div style="margin-top: 0.45rem; font-size: 0.82rem; color: var(--text-muted);">
+              ${hasCoords ? `<span style="color: #10b981; font-weight: 700;">✓ Метка установлена</span> (кликните в другое место для перемещения)` : `Метка пока не поставлена`}
+            </div>
+          ` : `
+            <div style="padding: 1.5rem; background: var(--bg); border-radius: 12px; color: var(--text-muted);">
+              Учитель еще не прикрепил изображение схемы для этого задания.
+            </div>
+          `}
         </div>
       `;
     }
-    // 15. Выделение слов в тексте (Highlight Words)
+    // 15. Выделение слов в тексте (Инструмент «Маркер» без дублирования текста)
     else if (t.question_type === "highlight_words") {
       const savedList = Array.isArray(saved) ? saved : [];
       const text = t.question_text || (t.options && t.options[0]) || "";
       const tokens = text.split(/\s+/).filter(Boolean);
 
       inputHtml = `
-        <div class="highlight-words-passage">
-          ${tokens.map(token => {
-            const clean = token.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
-            const isHigh = savedList.includes(clean);
-            return `
-              <span class="highlight-token ${isHigh ? 'is-highlighted' : ''}" onclick="handleHighlightWordToggle('${t.id}', '${escapeHtml(clean)}')">${escapeHtml(token)}</span>
-            `;
-          }).join(' ')}
+        <div class="highlight-words-container">
+          <div class="highlight-toolbar">
+            <span class="highlight-tool-btn active">
+              <span>🖍</span> <span>Маркер выделения</span>
+            </span>
+            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 0.5rem;">
+              Кликните по нужным словам в тексте, чтобы выделить или снять выделение:
+            </span>
+            ${savedList.length > 0 ? `
+              <button type="button" class="btn btn-secondary btn-sm" style="margin-left: auto; font-size: 0.78rem; padding: 2px 8px;" onclick="clearHighlightedWords('${t.id}')">
+                Очистить (${savedList.length})
+              </button>
+            ` : ''}
+          </div>
+          <div class="highlight-words-passage" style="line-height: 2.2; font-size: 1.1rem; padding: 1.25rem; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-in); border: 1px solid var(--border);">
+            ${tokens.map(token => {
+              const clean = token.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
+              const isHigh = savedList.includes(clean);
+              return `
+                <span class="highlight-token ${isHigh ? 'is-highlighted' : ''}" onclick="handleHighlightWordToggle('${t.id}', '${escapeHtml(clean)}')">${escapeHtml(token)}</span>
+              `;
+            }).join(' ')}
+          </div>
         </div>
       `;
     }
@@ -909,12 +926,32 @@ function renderTasks() {
         <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">${t.max_score} б.</span>
       </div>
 
-      <div class="task-condition">${escapeHtml(t.question_text)}</div>
+      ${(t.question_type === 'word_bank_cloze' || t.question_type === 'highlight_words') ? '' : `<div class=\"task-condition\">${escapeHtml(t.question_text)}</div>`}
       ${imageHtml}
       <div style="margin-top: 1rem;">${inputHtml}</div>
     `;
 
     container.appendChild(card);
+  });
+
+  // Мгновенная отрисовка линий сопоставления
+  const initMatchingLines = () => {
+    document.querySelectorAll(".matching-interactive-wrap").forEach(w => {
+      const tid = w.dataset.taskId;
+      if (!tid) return;
+      drawMatchingLines(tid);
+      if (window.ResizeObserver && !w._matchingRo) {
+        w._matchingRo = new ResizeObserver(() => drawMatchingLines(tid));
+        w._matchingRo.observe(w);
+      }
+    });
+  };
+  initMatchingLines();
+  requestAnimationFrame(initMatchingLines);
+  setTimeout(initMatchingLines, 50);
+  setTimeout(initMatchingLines, 200);
+  document.querySelectorAll("img").forEach(img => {
+    if (!img.complete) img.addEventListener("load", initMatchingLines, { once: true });
   });
 }
 
@@ -1141,50 +1178,89 @@ window.addEventListener("resize", () => {
 // Ordering Drag and Drop
 let orderingDragSrc = null;
 
+let orderingPlaceholder = null;
+
 function handleOrderingDragStart(e, taskId, idx) {
-  orderingDragSrc = { taskId, idx };
+  orderingDragSrc = { taskId, idx, el: e.currentTarget };
   e.dataTransfer.effectAllowed = "move";
-  e.dataTransfer.setData("text/plain", idx);
-  e.currentTarget.classList.add("dragging");
+  e.dataTransfer.setData("text/plain", String(idx));
+  setTimeout(() => {
+    if (e.target) e.target.classList.add("dragging");
+  }, 0);
+
+  // Создаем элемент «пустой тени» (ghost placeholder)
+  if (!orderingPlaceholder) {
+    orderingPlaceholder = document.createElement("div");
+    orderingPlaceholder.className = "ordering-placeholder";
+  }
 }
 
-function handleOrderingDragOver(e) {
+function handleOrderingDragOver(e, taskId) {
   e.preventDefault();
   e.dataTransfer.dropEffect = "move";
-}
-
-function handleOrderingDragEnter(e) {
-  e.preventDefault();
-  const item = e.currentTarget.closest(".ordering-item");
-  if (item) item.classList.add("drag-over");
-}
-
-function handleOrderingDragLeave(e) {
-  const item = e.currentTarget.closest(".ordering-item");
-  if (item) item.classList.remove("drag-over");
-}
-
-function handleOrderingDrop(e, taskId, targetIdx) {
-  e.preventDefault();
-  const item = e.currentTarget.closest(".ordering-item");
-  if (item) item.classList.remove("drag-over");
   if (!orderingDragSrc || orderingDragSrc.taskId !== taskId) return;
+
+  const container = document.getElementById(`ordering-list-${taskId}`);
+  if (!container || !orderingPlaceholder) return;
+
+  const targetItem = e.target.closest(".ordering-item");
+  if (!targetItem || targetItem === orderingDragSrc.el) return;
+
+  const rect = targetItem.getBoundingClientRect();
+  const midY = rect.top + rect.height / 2;
+
+  if (e.clientY < midY) {
+    container.insertBefore(orderingPlaceholder, targetItem);
+  } else {
+    container.insertBefore(orderingPlaceholder, targetItem.nextSibling);
+  }
+}
+
+function handleOrderingDrop(e, taskId) {
+  e.preventDefault();
+  if (!orderingDragSrc || orderingDragSrc.taskId !== taskId) return;
+
+  const container = document.getElementById(`ordering-list-${taskId}`);
+  if (!container || !orderingPlaceholder || !orderingPlaceholder.parentNode) {
+    handleOrderingDragEnd(e);
+    return;
+  }
+
+  // Находим позицию плейсхолдера среди карточек
+  const items = Array.from(container.children);
+  let targetIdx = items.indexOf(orderingPlaceholder);
+
+  // Если целевая позиция шла после исходной, корректируем индекс
+  if (targetIdx > orderingDragSrc.idx) {
+    targetIdx -= 1;
+  }
+
+  if (orderingPlaceholder.parentNode) {
+    orderingPlaceholder.parentNode.removeChild(orderingPlaceholder);
+  }
+
   const srcIdx = orderingDragSrc.idx;
-  if (srcIdx === targetIdx) return;
+  orderingDragSrc = null;
 
-  const t = currentTasks.find(x => x.id === taskId);
-  if (!t) return;
-  let cur = localDrafts[taskId] && Array.isArray(localDrafts[taskId].answer) ? [...localDrafts[taskId].answer] : [...(t.options || [])];
-  const moved = cur.splice(srcIdx, 1)[0];
-  cur.splice(targetIdx, 0, moved);
-
-  saveAnswer(taskId, cur);
-  renderTasks();
+  if (srcIdx !== targetIdx && targetIdx >= 0) {
+    const t = currentTasks.find(x => x.id === taskId);
+    if (t) {
+      let cur = localDrafts[taskId] && Array.isArray(localDrafts[taskId].answer) ? [...localDrafts[taskId].answer] : [...(t.options || [])];
+      const moved = cur.splice(srcIdx, 1)[0];
+      cur.splice(targetIdx, 0, moved);
+      saveAnswer(taskId, cur);
+      renderTasks();
+    }
+  } else {
+    renderTasks();
+  }
 }
 
 function handleOrderingDragEnd(e) {
-  e.currentTarget.classList.remove("dragging");
-  document.querySelectorAll(".ordering-item.drag-over").forEach(el => el.classList.remove("drag-over"));
+  if (e.target) e.target.classList.remove("dragging");
+  if (orderingPlaceholder && orderingPlaceholder.parentNode) {
+    orderingPlaceholder.parentNode.removeChild(orderingPlaceholder);
+  }
   orderingDragSrc = null;
 }
 
@@ -1476,40 +1552,54 @@ function updateProgressIndicator() {
 }
 
 // Серверный таймер
-function startTimer(serverDeadlineIso) {
+function startTimer(serverDeadlineIso, startedAtIso) {
   if (timerInterval) clearInterval(timerInterval);
-  if (!serverDeadlineIso) {
-    document.getElementById("timer-box").style.display = "none";
-    return;
+  const box = document.getElementById("timer-box");
+  const text = document.getElementById("timer-text");
+  const pill = document.getElementById("timer-pill");
+  if (box) box.style.display = "block";
+
+  if (serverDeadlineIso) {
+    const deadline = new Date(serverDeadlineIso).getTime();
+    const update = () => {
+      const now = Date.now();
+      const diffSec = Math.floor((deadline - now) / 1000);
+      currentRemainingSeconds = diffSec;
+
+      if (diffSec <= 0) {
+        clearInterval(timerInterval);
+        if (text) text.textContent = "00:00";
+        submitWork(true);
+        return;
+      }
+
+      const m = Math.floor(diffSec / 60);
+      const s = diffSec % 60;
+      const str = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+      if (text) text.textContent = str;
+
+      if (pill) {
+        if (diffSec <= 300) pill.classList.add("danger");
+        else pill.classList.remove("danger");
+      }
+    };
+    update();
+    timerInterval = setInterval(update, 1000);
+  } else {
+    // Секундомер потраченного времени (если дедлайн не задан)
+    const startMs = startedAtIso ? new Date(startedAtIso).getTime() : Date.now();
+    const update = () => {
+      const now = Date.now();
+      const diffSec = Math.max(0, Math.floor((now - startMs) / 1000));
+      currentRemainingSeconds = diffSec;
+      const m = Math.floor(diffSec / 60);
+      const s = diffSec % 60;
+      if (text) text.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+      if (pill) pill.classList.remove("danger");
+    };
+    update();
+    timerInterval = setInterval(update, 1000);
   }
-
-  const deadline = new Date(serverDeadlineIso).getTime();
-
-  const update = () => {
-    const now = Date.now();
-    const diffSec = Math.floor((deadline - now) / 1000);
-    currentRemainingSeconds = diffSec;
-
-    if (diffSec <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById("timer-text").textContent = "00:00";
-      submitWork(true);
-      return;
-    }
-
-    const m = Math.floor(diffSec / 60);
-    const s = diffSec % 60;
-    const str = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-    document.getElementById("timer-text").textContent = str;
-
-    const pill = document.getElementById("timer-pill");
-    if (diffSec <= 300) {
-      pill.classList.add("danger");
-    }
-  };
-
-  update();
-  timerInterval = setInterval(update, 1000);
 }
 
 // Фоновый Heartbeat

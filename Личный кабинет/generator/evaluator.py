@@ -287,8 +287,25 @@ def evaluate_answer(
         fraction = correct_cnt / total_rows
         return float(round(fraction * max_score, 2)), True
 
-    # 14. Метки на схеме / Интерактивные точки (Hotspot)
+    # 14. Метки на схеме / Интерактивные точки (Hotspot: координаты клика или метки)
     if task_type == "hotspot":
+        # Координатный хотспот (проверка попадания клика в радиус допуска)
+        if isinstance(answer_key, dict) and "x" in answer_key and "y" in answer_key:
+            if not isinstance(student_answer, dict) or "x" not in student_answer or "y" not in student_answer:
+                return 0.0, True
+            try:
+                kx = float(answer_key["x"])
+                ky = float(answer_key["y"])
+                rad = float(answer_key.get("radius", 8.0))
+                sx = float(student_answer["x"])
+                sy = float(student_answer["y"])
+                dist = math.hypot(sx - kx, sy - ky)
+                if dist <= rad:
+                    return float(max_score), True
+                return 0.0, True
+            except (ValueError, TypeError):
+                return 0.0, True
+
         k_list = answer_key if isinstance(answer_key, list) else [answer_key]
         k_clean = {normalize_text(str(x)).lower() for x in k_list if x is not None and str(x).strip()}
         s_list = student_answer if isinstance(student_answer, list) else [student_answer]

@@ -2154,30 +2154,40 @@ function renderTaskEditorForm() {
   }
   // 14. Метки на схеме (Hotspot)
   else if (t.question_type === "hotspot") {
-    const pins = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["1", "2", "3", "4"];
-    const key = t.answer_key || "1";
-
-    let pinRows = pins.map((p, idx) => `
-      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 0.5rem; margin-bottom: 0.4rem; align-items: center;">
-        <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: ${key === p ? 'var(--primary)' : 'var(--text-muted)'};">
-          <input type="radio" name="hotspot_key" ${key === p ? 'checked' : ''} onchange="activeTask.answer_key = activeTask.options[${idx}]; scheduleAutoSaveTask(50); renderTaskEditor();">
-          <span>Верно</span>
-        </label>
-        <input type="text" class="form-control" value="${escapeHtml(p)}" oninput="updateHotspotPin(${idx}, this.value)" onblur="saveCurrentTask(true)" placeholder="Обозначение метки (1, A, ...)">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="removeHotspotPin(${idx})">✕</button>
-      </div>
-    `).join("");
+    const key = (t.answer_key && typeof t.answer_key === "object" && typeof t.answer_key.x === "number") ? t.answer_key : { x: 50, y: 50, radius: 8 };
+    const imgUrl = t.image_url ? generatorImageUrl(t.image_url) : "";
 
     typeSpecificHtml = `
       <div class="form-group" style="margin-top: 1rem;">
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Загрузите изображение схемы ниже и укажите метки (цифры или буквы), отметив верную:</div>
-        <label class="form-label">Метки на схеме:</label>
-        <div>${pinRows}</div>
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 0.4rem;" onclick="addHotspotPin()">+ Добавить метку</button>
+        <label class="form-label">Интерактивная область на схеме (Hotspot):</label>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Кликните по изображению ниже, чтобы задать область правильного ответа (зеленая мишень). Ученик не видит эту область и должен кликнуть в правильное место.
+        </div>
+
+        ${imgUrl ? `
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <div class="hotspot-canvas-wrap" style="position: relative; display: inline-block; cursor: crosshair;" onclick="setEditorHotspotCoords(event)">
+              <img src="${imgUrl}" class="hotspot-img" referrerpolicy="no-referrer" style="max-height: 380px; display: block;" alt="Схема">
+              <div class="hotspot-target-preview" style="left: ${key.x}%; top: ${key.y}%; width: ${(key.radius || 8) * 2}%; height: ${(key.radius || 8) * 2}%;" title="Область правильного ответа (радиус ${key.radius || 8}%)"></div>
+              <div style="position: absolute; left: ${key.x}%; top: ${key.y}%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: #10b981; border: 2.5px solid #fff; border-radius: 50%; pointer-events: none; box-shadow: 0 0 6px rgba(0,0,0,0.5);"></div>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.4rem;">
+              Кликните по схеме для установки центра: (X: <strong>${key.x}%</strong>, Y: <strong>${key.y}%</strong>)
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem; background: var(--surface); padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--border); max-width: 440px; margin: 0 auto 0.75rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; white-space: nowrap;">Радиус допуска (%):</label>
+            <input type="range" min="3" max="25" step="1" value="${key.radius || 8}" oninput="updateEditorHotspotRadius(this.value)" style="flex: 1;">
+            <span style="font-weight: 700; font-size: 0.9rem; min-width: 35px;">${key.radius || 8}%</span>
+          </div>
+        ` : `
+          <div style="padding: 1.25rem; background: var(--bg); border-radius: 12px; font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            ⚠️ Для этого типа задания необходимо изображение. Прикрепите изображение к заданию ниже (по ссылке или выберите файл).
+          </div>
+        `}
       </div>
     `;
   }
-  // 15. Выделение слов в тексте (Highlight Words)
   else if (t.question_type === "highlight_words") {
     const text = t.question_text || (t.options && t.options[0]) || "";
     const key = Array.isArray(t.answer_key) ? t.answer_key : [];
@@ -2524,7 +2534,7 @@ function renderImagePreview() {
 
       <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem;">Предпросмотр:</div>
 
-      <img src="${escapeHtml(generatorImageUrl(url))}" style="max-width: ${size}; max-height: 380px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); object-fit: contain; box-shadow: 0 2px 6px rgba(0,0,0,0.06);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'color: var(--danger); font-size: 0.85rem; padding: 0.5rem;\\'>⚠️ Не удалось загрузить изображение по указанному адресу. Проверьте правильность ссылки или загрузите файл с компьютера.</div>';">
+      <img src="${escapeHtml(generatorImageUrl(url))}" referrerpolicy="no-referrer" style="max-width: ${size}; max-height: 380px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); object-fit: contain; box-shadow: 0 2px 6px rgba(0,0,0,0.06);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'color: var(--danger); font-size: 0.85rem; padding: 0.5rem;\\'>⚠️ Не удалось загрузить изображение по указанному адресу. Проверьте правильность ссылки или загрузите файл с компьютера.</div>';">
 
     </div>
 
@@ -3257,6 +3267,35 @@ function updateHotspotPin(idx, val) {
   scheduleAutoSaveTask(50);
 }
 
+
+function setEditorHotspotCoords(e) {
+  pushTaskUndoSnapshot();
+  const wrap = e.currentTarget;
+  const img = wrap.querySelector("img");
+  if (!img) return;
+  const rect = img.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+  if (clickX < 0 || clickY < 0 || clickX > rect.width || clickY > rect.height) return;
+
+  const pctX = Math.round((clickX / rect.width) * 1000) / 10;
+  const pctY = Math.round((clickY / rect.height) * 1000) / 10;
+  const currentRadius = (activeTask.answer_key && activeTask.answer_key.radius) || 8;
+
+  activeTask.answer_key = { x: pctX, y: pctY, radius: currentRadius };
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
+function updateEditorHotspotRadius(val) {
+  if (!activeTask.answer_key || typeof activeTask.answer_key !== "object") {
+    activeTask.answer_key = { x: 50, y: 50, radius: 8 };
+  }
+  activeTask.answer_key.radius = parseFloat(val) || 8;
+  renderTaskEditorForm();
+  scheduleAutoSaveTask(50);
+}
+
 function toggleEditorHighlightWord(word) {
   pushTaskUndoSnapshot();
   if (!Array.isArray(activeTask.answer_key)) activeTask.answer_key = [];
@@ -3666,22 +3705,86 @@ function setPreviewGroupClass(taskId, item, cat) {
 let previewSelectedNode = null;
 let previewClozeSelectedChip = null;
 
+let previewOrderingDragSrc = null;
+let previewOrderingPlaceholder = null;
+
 function handlePreviewOrderDragStart(e, taskId, itemIdx) {
+  previewOrderingDragSrc = { taskId, idx: itemIdx, el: e.currentTarget };
+  e.dataTransfer.effectAllowed = "move";
   e.dataTransfer.setData("text/plain", String(itemIdx));
+  setTimeout(() => {
+    if (e.target) e.target.classList.add("dragging");
+  }, 0);
+
+  if (!previewOrderingPlaceholder) {
+    previewOrderingPlaceholder = document.createElement("div");
+    previewOrderingPlaceholder.className = "ordering-placeholder";
+  }
 }
-function handlePreviewOrderDragOver(e) {
+
+function handlePreviewOrderDragOver(e, taskId) {
   e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  if (!previewOrderingDragSrc || previewOrderingDragSrc.taskId !== taskId) return;
+
+  const container = document.getElementById(`preview-order-${taskId}`);
+  if (!container || !previewOrderingPlaceholder) return;
+
+  const targetItem = e.target.closest(".ordering-item");
+  if (!targetItem || targetItem === previewOrderingDragSrc.el) return;
+
+  const rect = targetItem.getBoundingClientRect();
+  const midY = rect.top + rect.height / 2;
+
+  if (e.clientY < midY) {
+    container.insertBefore(previewOrderingPlaceholder, targetItem);
+  } else {
+    container.insertBefore(previewOrderingPlaceholder, targetItem.nextSibling);
+  }
 }
-function handlePreviewOrderDrop(e, taskId, targetIdx) {
+
+function handlePreviewOrderDrop(e, taskId) {
   e.preventDefault();
-  const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10);
-  if (isNaN(fromIdx) || fromIdx === targetIdx) return;
-  const t = (activeTest.tasks || []).find(x => x.id === taskId);
-  let order = Array.isArray(previewStudentAnswers[taskId]) ? [...previewStudentAnswers[taskId]] : (Array.isArray(t?.answer_key) ? [...t.answer_key] : [...(t?.options || [])]);
-  const [moved] = order.splice(fromIdx, 1);
-  order.splice(targetIdx, 0, moved);
-  previewStudentAnswers[taskId] = order;
-  renderStudentPreviewContent();
+  if (!previewOrderingDragSrc || previewOrderingDragSrc.taskId !== taskId) return;
+
+  const container = document.getElementById(`preview-order-${taskId}`);
+  if (!container || !previewOrderingPlaceholder || !previewOrderingPlaceholder.parentNode) {
+    handlePreviewOrderDragEnd(e);
+    return;
+  }
+
+  const items = Array.from(container.children);
+  let targetIdx = items.indexOf(previewOrderingPlaceholder);
+
+  if (targetIdx > previewOrderingDragSrc.idx) {
+    targetIdx -= 1;
+  }
+
+  if (previewOrderingPlaceholder.parentNode) {
+    previewOrderingPlaceholder.parentNode.removeChild(previewOrderingPlaceholder);
+  }
+
+  const fromIdx = previewOrderingDragSrc.idx;
+  previewOrderingDragSrc = null;
+
+  if (fromIdx !== targetIdx && targetIdx >= 0) {
+    const t = (activeTest.tasks || []).find(x => x.id === taskId);
+    let order = Array.isArray(previewStudentAnswers[taskId]) ? [...previewStudentAnswers[taskId]] : (Array.isArray(t?.answer_key) ? [...t.answer_key] : [...(t?.options || [])]);
+    const [moved] = order.splice(fromIdx, 1);
+    order.splice(targetIdx, 0, moved);
+    previewStudentAnswers[taskId] = order;
+    renderStudentPreviewContent();
+  } else {
+    renderStudentPreviewContent();
+  }
+}
+
+function handlePreviewOrderDragEnd(e) {
+  if (e.target) e.target.classList.remove("dragging");
+  if (previewOrderingPlaceholder && previewOrderingPlaceholder.parentNode) {
+    previewOrderingPlaceholder.parentNode.removeChild(previewOrderingPlaceholder);
+  }
+  previewOrderingDragSrc = null;
 }
 
 function handlePreviewMatchingCardClick(taskId, item, side) {
@@ -3770,6 +3873,25 @@ function togglePreviewHighlightWord(taskId, word) {
   } else {
     previewStudentAnswers[taskId].push(word);
   }
+  renderStudentPreviewContent();
+}
+
+
+function handlePreviewHotspotClick(e, taskId) {
+  const wrap = document.getElementById(`preview-hotspot-${taskId}`);
+  const img = wrap ? wrap.querySelector(".hotspot-img") : null;
+  if (!wrap || !img) return;
+
+  const rect = img.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  if (clickX < 0 || clickY < 0 || clickX > rect.width || clickY > rect.height) return;
+
+  const pctX = Math.round((clickX / rect.width) * 1000) / 10;
+  const pctY = Math.round((clickY / rect.height) * 1000) / 10;
+
+  previewStudentAnswers[taskId] = { x: pctX, y: pctY };
   renderStudentPreviewContent();
 }
 
@@ -3895,7 +4017,15 @@ function evaluatePreviewAnswers() {
       }
       earned = totalStmts > 0 ? (matched / totalStmts) * maxSc : 0;
     } else if (t.question_type === "hotspot") {
-      if (ans && String(ans).trim() === String(key).trim()) earned = maxSc;
+      if (key && typeof key === "object" && typeof key.x === "number") {
+        if (ans && typeof ans === "object" && typeof ans.x === "number") {
+          const rad = parseFloat(key.radius || 8);
+          const dist = Math.hypot(ans.x - key.x, ans.y - key.y);
+          if (dist <= rad) earned = maxSc;
+        }
+      } else if (ans && String(ans).trim() === String(key).trim()) {
+        earned = maxSc;
+      }
     } else if (t.question_type === "highlight_words") {
       const keyArr = Array.isArray(key) ? key.map(String) : [];
       const stuArr = Array.isArray(ans) ? ans.map(String) : [];
@@ -4180,13 +4310,14 @@ function renderStudentPreviewContent() {
     // 7. Ordering (Drag & Drop + ▲▼)
     else if (t.question_type === "ordering") {
       let currentOrder = Array.isArray(saved) && saved.length > 0 ? saved : (Array.isArray(t.answer_key) ? [...t.answer_key] : [...(t.options || [])]);
-      inputHtml = `<div class="ordering-container" id="preview-order-${t.id}">`;
+      inputHtml = `<div class="ordering-container" id="preview-order-${t.id}"
+           ondragover="handlePreviewOrderDragOver(event, '${t.id}')"
+           ondrop="handlePreviewOrderDrop(event, '${t.id}')">`;
       currentOrder.forEach((item, itemIdx) => {
         inputHtml += `
-          <div class="ordering-item" draggable="true"
+          <div class="ordering-item" draggable="true" data-idx="${itemIdx}"
                ondragstart="handlePreviewOrderDragStart(event, '${t.id}', ${itemIdx})"
-               ondragover="handlePreviewOrderDragOver(event)"
-               ondrop="handlePreviewOrderDrop(event, '${t.id}', ${itemIdx})">
+               ondragend="handlePreviewOrderDragEnd(event)">
             <span class="ordering-drag-handle">☰</span>
             <span class="ordering-index">${itemIdx + 1}.</span>
             <span class="ordering-text">${escapeHtml(item)}</span>
@@ -4353,79 +4484,107 @@ function renderStudentPreviewContent() {
         </div>
       `;
     }
-    // 13. Boolean Matrix (Таблица утверждений)
+    // 13. Boolean Matrix (Сегментированные адаптивные карточки без горизонтального скролла)
     else if (t.question_type === "boolean_matrix") {
       const savedMap = (saved && typeof saved === "object") ? saved : {};
       const columns = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["Верно", "Неверно"];
       const statements = (t.answer_key && typeof t.answer_key === "object") ? Object.keys(t.answer_key) : [];
 
       inputHtml = `
-        <div class="matrix-table-wrap">
-          <table class="matrix-table">
-            <thead>
-              <tr>
-                <th>Утверждение</th>
-                ${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${statements.map(stmt => {
-                const curVal = savedMap[stmt];
-                return `
-                  <tr>
-                    <td>${escapeHtml(stmt)}</td>
-                    ${columns.map(col => {
-                      const isChecked = curVal === col;
-                      return `
-                        <td style="text-align: center;">
-                          <div class="matrix-choice ${isChecked ? 'selected' : ''}" onclick="setPreviewMatrixChoice('${t.id}', '${escapeHtml(stmt)}', '${escapeHtml(col)}')">
-                            <span>${isChecked ? '●' : '○'}</span>
-                          </div>
-                        </td>
-                      `;
-                    }).join('')}
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-    // 14. Hotspot (Метки на схеме)
-    else if (t.question_type === "hotspot") {
-      const pins = Array.isArray(t.options) && t.options.length > 0 ? t.options : ["1", "2", "3", "4"];
-      inputHtml = `
-        <div class="hotspot-wrap">
-          <div class="hotspot-pins-row">
-            ${pins.map(pin => {
-              const isSelected = saved === pin;
-              return `
-                <button type="button" class="hotspot-pin-btn ${isSelected ? 'selected' : ''}" onclick="setPreviewAnswer('${t.id}', '${escapeHtml(pin)}')">
-                  <span class="hotspot-pin-badge">${escapeHtml(pin)}</span>
-                  <span>Метка ${escapeHtml(pin)}</span>
-                </button>
-              `;
-            }).join('')}
+        <div class="matrix-cards-list">
+          <div style="font-size: 0.84rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+            Укажите правильный вариант для каждого утверждения:
           </div>
+          ${statements.map(stmt => {
+            const curVal = savedMap[stmt] || "";
+            return `
+              <div class="matrix-card-row">
+                <div class="matrix-stmt-text">${escapeHtml(stmt)}</div>
+                <div class="matrix-pills-group">
+                  ${columns.map(col => {
+                    const isSelected = curVal === col;
+                    const colLower = col.toLowerCase();
+                    const isTrue = colLower.includes("верно") || colLower.includes("да") || colLower.includes("истина") || colLower.includes("true");
+                    const isFalse = colLower.includes("неверно") || colLower.includes("нет") || colLower.includes("ложь") || colLower.includes("false");
+                    const typeClass = isTrue ? "is-true" : (isFalse ? "is-false" : "");
+                    return `
+                      <button type="button" class="matrix-pill-btn ${isSelected ? `active ${typeClass}` : ''}"
+                              onclick="setPreviewMatrixChoice('${t.id}', '${escapeHtml(stmt)}', '${escapeHtml(col)}')">
+                        ${escapeHtml(col)}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
     }
-    // 15. Highlight Words (Выделение слов)
+    // 14. Hotspot (Графический интерактивный Hotspot с кликом по изображению)
+    else if (t.question_type === "hotspot") {
+      const hasCoords = saved && typeof saved === "object" && typeof saved.x === "number" && typeof saved.y === "number";
+      const imgUrl = t.image_url ? generatorImageUrl(t.image_url) : "";
+
+      inputHtml = `
+        <div class="hotspot-wrap" style="text-align: center;">
+          <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.6rem;">
+            📍 Кликните прямо по изображению, чтобы поставить метку:
+          </div>
+          ${imgUrl ? `
+            <div class="hotspot-canvas-wrap" id="preview-hotspot-${t.id}" onclick="handlePreviewHotspotClick(event, '${t.id}')">
+              <img src="${imgUrl}" class="hotspot-img task-img-protected" referrerpolicy="no-referrer" alt="Схема">
+              ${hasCoords ? `
+                <div class="hotspot-student-pin" style="left: ${saved.x}%; top: ${saved.y}%;">
+                  <svg width="32" height="38" viewBox="0 0 24 28" fill="none">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 16 12 16s12-7 12-16c0-6.63-5.37-12-12-12z" fill="#ef4444"/>
+                    <circle cx="12" cy="11" r="5" fill="#ffffff"/>
+                    <circle cx="12" cy="11" r="2.5" fill="#ef4444"/>
+                  </svg>
+                </div>
+              ` : ''}
+            </div>
+            <div style="margin-top: 0.45rem; font-size: 0.82rem; color: var(--text-muted);">
+              ${hasCoords ? `<span style="color: #10b981; font-weight: 700;">✓ Метка установлена</span> (кликните в другое место для перемещения)` : `Метка пока не поставлена`}
+            </div>
+          ` : `
+            <div style="padding: 1.5rem; background: var(--bg); border-radius: 12px; color: var(--text-muted);">
+              Учитель еще не прикрепил изображение схемы для этого задания.
+            </div>
+          `}
+        </div>
+      `;
+    }
+    // 15. Highlight Words (Инструмент «Маркер» без дублирования текста)
     else if (t.question_type === "highlight_words") {
       const savedList = Array.isArray(saved) ? saved : [];
       const text = t.question_text || (t.options && t.options[0]) || "";
       const tokens = text.split(/\s+/).filter(Boolean);
 
       inputHtml = `
-        <div class="highlight-words-passage">
-          ${tokens.map(token => {
-            const clean = token.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
-            const isHigh = savedList.includes(clean);
-            return `
-              <span class="highlight-token ${isHigh ? 'is-highlighted' : ''}" onclick="togglePreviewHighlightWord('${t.id}', '${escapeHtml(clean)}')">${escapeHtml(token)}</span>
-            `;
-          }).join(' ')}
+        <div class="highlight-words-container">
+          <div class="highlight-toolbar">
+            <span class="highlight-tool-btn active">
+              <span>🖍</span> <span>Маркер выделения</span>
+            </span>
+            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 0.5rem;">
+              Кликните по нужным словам в тексте, чтобы выделить или снять выделение:
+            </span>
+            ${savedList.length > 0 ? `
+              <button type="button" class="btn btn-secondary btn-sm" style="margin-left: auto; font-size: 0.78rem; padding: 2px 8px;" onclick="previewStudentAnswers['${t.id}'] = []; renderStudentPreviewContent();">
+                Очистить (${savedList.length})
+              </button>
+            ` : ''}
+          </div>
+          <div class="highlight-words-passage" style="line-height: 2.2; font-size: 1.1rem; padding: 1.25rem; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-in); border: 1px solid var(--border);">
+            ${tokens.map(token => {
+              const clean = token.replace(/^[«"'(]+|[.,!?;:»"')]+$/g, "");
+              const isHigh = savedList.includes(clean);
+              return `
+                <span class="highlight-token ${isHigh ? 'is-highlighted' : ''}" onclick="togglePreviewHighlightWord('${t.id}', '${escapeHtml(clean)}')">${escapeHtml(token)}</span>
+              `;
+            }).join(' ')}
+          </div>
         </div>
       `;
     }
@@ -4437,7 +4596,7 @@ function renderStudentPreviewContent() {
 
         <div class="task-image-box align-${t.image_align || 'center'}" style="margin: 0.75rem 0;">
 
-          <img src="${escapeHtml(generatorImageUrl(t.image_url.trim()))}" style="max-width: ${t.image_size || '100%'};" class="task-img-protected">
+          <img src="${escapeHtml(generatorImageUrl(t.image_url.trim()))}" referrerpolicy="no-referrer" style="max-width: ${t.image_size || '100%'};" class="task-img-protected">
 
         </div>
 
@@ -4493,7 +4652,7 @@ function renderStudentPreviewContent() {
 
         </div>
 
-        <div style="margin-bottom: 0.85rem; font-size: 1rem; line-height: 1.5;">${escapeHtml(t.question_text)}</div>
+        ${(t.question_type === 'word_bank_cloze' || t.question_type === 'highlight_words') ? '' : `<div style=\"margin-bottom: 0.85rem; font-size: 1rem; line-height: 1.5;\">${escapeHtml(t.question_text)}</div>`}
 
         ${imgPreview}
 
