@@ -1,12 +1,7 @@
 @echo off
 cd /d "%~dp0"
 title Alasster Unified Server
-
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process cmd.exe -ArgumentList '/k \"\"%~f0\"\"' -Verb RunAs"
-    exit /b
-)
+chcp 65001 >nul
 
 taskkill /F /IM python.exe >nul 2>&1
 timeout /t 1 /nobreak >nul
@@ -37,8 +32,7 @@ if not defined PYTHON (
     exit /b 1
 )
 
-cd "Личный кабинет"
-"%PYTHON%" server.py
+"%PYTHON%" run.py
 
 echo.
 echo Server has stopped.
