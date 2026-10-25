@@ -119,12 +119,18 @@
 
       renderMaterialsUI();
 
-      // Check if any image is still syncing to Google Drive
-      const hasUnsynced = materialsState.items.some(it => it.media_type === "image" && !it.google_drive_id);
+      // Check if any item still needs sync
+      const hasUnsynced = materialsState.items.some(it => it.file_name && (!it.google_drive_id || it.google_drive_id.startsWith("local-")));
       if (hasUnsynced) {
         scheduleSyncPoll();
       } else {
         clearSyncPoll();
+      }
+      if (materialsState.activeItem) {
+        const modal = document.getElementById("imgbb-links-modal");
+        if (modal && modal.classList.contains("open")) {
+          window.openImgbbLinksModal(materialsState.activeItem.id);
+        }
       }
     } catch (e) {
       console.error("Error loading materials:", e);
@@ -230,15 +236,14 @@
     grid.innerHTML = materialsState.items.map(it => {
       const links = it.links || {};
       const isVideo = it.media_type === "video";
-      const sizeStr = isVideo ? "YouTube HD" : formatBytes(it.file_size);
-      
-      const gdriveBadge = isVideo
-        ? `<span class="materials-gdrive-status" style="color: #ef4444;">▶ YouTube видео</span>`
-        : (it.google_drive_id && !it.google_drive_id.startsWith("local-"))
-          ? `<span class="materials-gdrive-status gdrive-synced"><span style="font-size:1rem;">✓</span> Google Диск</span>`
-          : `<span class="materials-gdrive-status gdrive-syncing">⏳ Синхронизация с Google Диске...</span>`;
+      const sizeStr = (isVideo && it.youtube_id) ? "YouTube HD" : formatBytes(it.file_size);
+      const directUrl = links.site_direct_link || links.google_drive_direct || links.local_direct_link || links.watch_link || "";
 
-      const directUrl = links.google_drive_direct || links.local_direct_link || links.watch_link || "";
+      const gdriveBadge = `<span class="materials-gdrive-status gdrive-synced"><span style="font-size:1rem;">✓</span> Прямая ссылка готова</span>`;
+
+      const thumbMedia = (isVideo && !it.youtube_id)
+        ? `<video src="${escapeHtml(links.preview_url)}" class="materials-thumb-img" muted preload="metadata"></video>`
+        : `<img src="${escapeHtml(links.preview_url)}" class="materials-thumb-img" alt="${escapeHtml(it.title)}" loading="lazy">`;
 
       return `
         <div class="materials-card" data-item-id="${it.id}">
@@ -246,7 +251,7 @@
             <span class="materials-card-badge ${isVideo ? 'badge-video' : 'badge-image'}">
               ${isVideo ? 'ВИДЕО' : 'ФОТО'}
             </span>
-            <img src="${escapeHtml(links.preview_url)}" class="materials-thumb-img" alt="${escapeHtml(it.title)}" loading="lazy">
+            ${thumbMedia}
             ${isVideo ? `
               <div class="materials-video-play-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -269,7 +274,7 @@
             <div class="materials-card-actions">
               <button type="button" class="btn btn-primary materials-btn-links" onclick="window.openImgbbLinksModal('${it.id}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                <span>Ссылки (ImgBB)</span>
+                <span>Ссылка для сайта</span>
               </button>
 
               <button type="button" class="btn btn-secondary materials-btn-icon" title="Скопировать прямую ссылку" onclick="window.copyMaterialCode('${escapeHtml(directUrl)}', this)">
@@ -321,25 +326,28 @@
 
     const links = item.links || {};
     const isVideo = item.media_type === "video";
-    const hasGdrive = item.google_drive_id && !item.google_drive_id.startsWith("local-");
+    const directUrl = links.site_direct_link || links.google_drive_direct || links.local_direct_link || links.watch_link || "";
 
     const titleEl = document.getElementById("imgbb-modal-title");
     if (titleEl) {
       titleEl.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <span>Коды и ссылки: ${escapeHtml(item.title)}</span>
+        <span>Прямая ссылка: ${escapeHtml(item.title)}</span>
       `;
     }
 
     const previewEl = document.getElementById("imgbb-modal-preview");
     if (previewEl) {
+      const thumbHtml = (isVideo && !item.youtube_id)
+        ? `<video src="${escapeHtml(links.preview_url)}" class="imgbb-preview-thumb" muted preload="metadata"></video>`
+        : `<img src="${escapeHtml(links.preview_url)}" class="imgbb-preview-thumb" alt="${escapeHtml(item.title)}">`;
       previewEl.innerHTML = `
         <div class="imgbb-preview-card">
-          <img src="${escapeHtml(links.preview_url)}" class="imgbb-preview-thumb" alt="${escapeHtml(item.title)}">
+          ${thumbHtml}
           <div class="imgbb-preview-meta">
             <h4>${escapeHtml(item.title)}</h4>
-            <p>Альбом: <strong>${escapeHtml(item.folder_name || 'Общие')}</strong> | Размер: <strong>${isVideo ? 'HD' : formatBytes(item.file_size)}</strong></p>
-            ${isVideo ? `<p style="color: #ef4444; font-weight: 800;">YouTube видео</p>` : (hasGdrive ? `<p style="color: var(--teal); font-weight: 800;">✓ Синхронизировано на Google Диске</p>` : `<p style="color: var(--amber); font-weight: 800;">⏳ Ожидает облачной синхронизации Google Диска...</p>`)}
+            <p>Альбом: <strong>${escapeHtml(item.folder_name || 'Общие')}</strong> | Размер: <strong>${(isVideo && item.youtube_id) ? 'HD' : formatBytes(item.file_size)}</strong></p>
+            <p style="color: var(--teal); font-weight: 800;">✓ Прямая ссылка готова (открывается сразу без Google Просмотра)</p>
           </div>
         </div>
       `;
@@ -348,89 +356,15 @@
     const rowsEl = document.getElementById("imgbb-modal-rows");
     if (rowsEl) {
       rowsEl.innerHTML = `
-        ${!isVideo ? `
-          <!-- 1. Google Drive Share Link -->
-          <div class="imgbb-copy-row">
-            <div class="imgbb-copy-header">
-              <span class="imgbb-copy-title">Ссылка на Google Диск (Просмотр)</span>
-              <span class="imgbb-copy-desc">${hasGdrive ? 'Открывается на Google Диске' : 'Будет доступна после синхронизации'}</span>
-            </div>
-            <div class="imgbb-input-group">
-              <input type="text" readonly class="form-control" value="${escapeHtml(links.google_drive_link || '')}" placeholder="Синхронизируется..." id="inp-gdrive">
-              <button type="button" class="btn btn-primary imgbb-copy-action-btn" ${!hasGdrive ? 'disabled' : ''} onclick="window.copyMaterialCode(document.getElementById('inp-gdrive').value, this)">Скопировать</button>
-            </div>
-          </div>
-
-          <!-- 2. Google Direct URL -->
-          <div class="imgbb-copy-row">
-            <div class="imgbb-copy-header">
-              <span class="imgbb-copy-title">Прямая ссылка Google Диск (CDN)</span>
-              <span class="imgbb-copy-desc">Для сайтов и вставки в документы</span>
-            </div>
-            <div class="imgbb-input-group">
-              <input type="text" readonly class="form-control" value="${escapeHtml(links.google_drive_direct || '')}" placeholder="Синхронизируется..." id="inp-gdrive-direct">
-              <button type="button" class="btn btn-primary imgbb-copy-action-btn" ${!hasGdrive ? 'disabled' : ''} onclick="window.copyMaterialCode(document.getElementById('inp-gdrive-direct').value, this)">Скопировать</button>
-            </div>
-          </div>
-        ` : `
-          <!-- YouTube Watch Link -->
-          <div class="imgbb-copy-row">
-            <div class="imgbb-copy-header">
-              <span class="imgbb-copy-title">Ссылка на YouTube видео</span>
-              <span class="imgbb-copy-desc">Для просмотра в браузере</span>
-            </div>
-            <div class="imgbb-input-group">
-              <input type="text" readonly class="form-control" value="${escapeHtml(links.watch_link || '')}" id="inp-yt">
-              <button type="button" class="btn btn-primary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-yt').value, this)">Скопировать</button>
-            </div>
-          </div>
-        `}
-
-        <!-- 3. Local direct URL -->
         <div class="imgbb-copy-row">
           <div class="imgbb-copy-header">
-            <span class="imgbb-copy-title">Прямая ссылка сервера (Локальная)</span>
-            <span class="imgbb-copy-desc">Для тестов и учеников в школьной сети</span>
+            <span class="imgbb-copy-title">Прямая ссылка для сайта</span>
+            <span class="imgbb-copy-desc">Открывает само ${isVideo ? 'видео' : 'изображение'} напрямую в любой сети</span>
           </div>
           <div class="imgbb-input-group">
-            <input type="text" readonly class="form-control" value="${escapeHtml(links.local_direct_link || '')}" id="inp-local">
-            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-local').value, this)">Скопировать</button>
-          </div>
-        </div>
-
-        <!-- 4. HTML Code -->
-        <div class="imgbb-copy-row">
-          <div class="imgbb-copy-header">
-            <span class="imgbb-copy-title">HTML код для вставки</span>
-            <span class="imgbb-copy-desc">&lt;img&gt; или &lt;iframe&gt;</span>
-          </div>
-          <div class="imgbb-input-group">
-            <input type="text" readonly class="form-control" value="${escapeHtml(links.html_code || '')}" id="inp-html">
-            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-html').value, this)">Скопировать</button>
-          </div>
-        </div>
-
-        <!-- 5. Markdown Code -->
-        <div class="imgbb-copy-row">
-          <div class="imgbb-copy-header">
-            <span class="imgbb-copy-title">Markdown код</span>
-            <span class="imgbb-copy-desc">Для генератора тестов и заметок</span>
-          </div>
-          <div class="imgbb-input-group">
-            <input type="text" readonly class="form-control" value="${escapeHtml(links.markdown_code || '')}" id="inp-md">
-            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-md').value, this)">Скопировать</button>
-          </div>
-        </div>
-
-        <!-- 6. BBCode -->
-        <div class="imgbb-copy-row">
-          <div class="imgbb-copy-header">
-            <span class="imgbb-copy-title">BBCode</span>
-            <span class="imgbb-copy-desc">[img] или [video]</span>
-          </div>
-          <div class="imgbb-input-group">
-            <input type="text" readonly class="form-control" value="${escapeHtml(links.bbcode || '')}" id="inp-bb">
-            <button type="button" class="btn btn-secondary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-bb').value, this)">Скопировать</button>
+            <input type="text" readonly class="form-control" value="${escapeHtml(directUrl)}" id="inp-site-direct">
+            <button type="button" class="btn btn-primary imgbb-copy-action-btn" onclick="window.copyMaterialCode(document.getElementById('inp-site-direct').value, this)">Скопировать</button>
+            <a href="${escapeHtml(directUrl)}" target="_blank" rel="noopener" class="btn btn-secondary imgbb-copy-action-btn" style="text-decoration: none; display: inline-flex; align-items: center;">Открыть ↗</a>
           </div>
         </div>
       `;
@@ -765,8 +699,15 @@
           </iframe>
         </div>
       `;
+    } else if (item.media_type === "video") {
+      const url = item.links ? (item.links.site_direct_link || item.links.local_direct_link || item.links.preview_url) : "";
+      content.innerHTML = `
+        <div style="text-align: center; width: 100%;">
+          <video src="${escapeHtml(url)}" controls autoplay style="max-width: 100%; max-height: 72vh; border-radius: 16px; box-shadow: var(--shadow-soft);"></video>
+        </div>
+      `;
     } else {
-      const url = item.links ? (item.links.google_drive_direct || item.links.local_direct_link || item.links.preview_url) : "";
+      const url = item.links ? (item.links.site_direct_link || item.links.google_drive_direct || item.links.local_direct_link || item.links.preview_url) : "";
       content.innerHTML = `
         <div style="text-align: center; width: 100%;">
           <img src="${escapeHtml(url)}" style="max-width: 100%; max-height: 72vh; border-radius: 16px; box-shadow: var(--shadow-soft);" alt="${escapeHtml(item.title)}">

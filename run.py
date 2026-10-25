@@ -2,7 +2,10 @@ import os
 import sys
 import socket
 import ctypes
+import warnings
 import runpy
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 if sys.platform == "win32":
     try:

@@ -552,6 +552,7 @@ class StudentPublicGateway:
             or clean_path.startswith('/exam/')
             or clean_path.startswith('/api/student/')
             or clean_path.startswith('/static/')
+            or clean_path.startswith('/materials/')
         )
         if not allowed:
             await JSONResponse({'detail': 'Доступен только вход ученика'}, status_code=404)(scope, receive, send)
@@ -571,6 +572,7 @@ async def start_student_gateway() -> None:
         port=8001,
         lifespan="off",
         log_config=None,
+        access_log=False,
     )
     student_gateway_server = uvicorn.Server(config)
     student_gateway_task = asyncio.create_task(student_gateway_server.serve())
@@ -1014,7 +1016,29 @@ class UpdateMaterialRequest(BaseModel):
     title: str | None = None
     folder_name: str | None = None
 
-def resolve_google_drive_file_id(file_name: str) -> str | None:
+def upload_to_direct_cdn(file_path: Path) -> str | None:
+    import subprocess
+    if not file_path.is_file():
+        return None
+    try:
+        res = subprocess.run(
+            ["curl.exe", "-s", "--max-time", "25", "-F", "reqtype=fileupload", "-F", f"fileToUpload=@{file_path}", "https://catbox.moe/user/api.php"],
+            capture_output=True,
+            text=True,
+            timeout=28,
+        )
+        out = (res.stdout or "").strip()
+        if res.returncode == 0 and out.startswith("https://"):
+            return out
+    except Exception:
+        pass
+    return None
+
+def resolve_google_drive_file_id(file_name: str, full_path: Path | None = None) -> str | None:
+    if full_path is not None and full_path.is_file():
+        cdn_url = upload_to_direct_cdn(full_path)
+        if cdn_url:
+            return cdn_url
     try:
         drivefs_root = Path(os.path.expandvars(r"%LOCALAPPDATA%\Google\DriveFS"))
         if not drivefs_root.exists():
@@ -1023,13 +1047,17 @@ def resolve_google_drive_file_id(file_name: str) -> str | None:
             if acc_dir.is_dir() and acc_dir.name.isdigit():
                 db_path = acc_dir / "metadata_sqlite_db"
                 if db_path.exists():
-                    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+                    conn = sqlite3.connect(str(db_path))
                     conn.text_factory = lambda b: b.decode("utf-8", "ignore")
                     with closing(conn.cursor()) as cur:
-                        cur.execute("SELECT id FROM items WHERE local_title = ? AND trashed = 0 LIMIT 1", (file_name,))
+                        cur.execute(
+                            "SELECT id FROM items WHERE local_title = ? AND trashed = 0 AND id NOT LIKE 'local-%' ORDER BY stable_id DESC LIMIT 1",
+                            (file_name,),
+                        )
                         row = cur.fetchone()
-                        if row:
+                        if row and row[0]:
                             return row[0]
+                    conn.close()
     except Exception:
         pass
     return None
@@ -1050,39 +1078,51 @@ def build_material_links(item: dict, base_url: str) -> dict:
     fname = item.get("file_name") or ""
     media_type = item.get("media_type") or "image"
     yid = item.get("youtube_id") or ""
-    gid = item.get("google_drive_id") or ""
+    gid = (item.get("google_drive_id") or "").strip()
+    src_url = (item.get("source_url") or "").strip()
     title = item.get("title") or fname or "Материал"
 
-    # Working direct URL via cabinet server
+    pub_base = os.environ.get("BAGALAU_PUBLIC_URL", "").rstrip("/") or base_url
     local_direct_link = f"{base_url}/materials/{quote(folder)}/{quote(fname)}" if fname else ""
+    public_server_link = f"{pub_base}/materials/{quote(folder)}/{quote(fname)}" if fname else ""
 
-    # Real Google Drive links (only if real cloud ID is present)
-    if gid and not gid.startswith("local-"):
-        google_drive_link = f"https://drive.google.com/file/d/{gid}/view?usp=sharing"
-        google_drive_direct = f"https://lh3.googleusercontent.com/d/{gid}"
-        primary_image_url = google_drive_direct
+    if gid.startswith("https://"):
+        direct_link = gid
+        google_drive_link = gid
+    elif src_url.startswith("https://") and not yid:
+        direct_link = src_url
+        google_drive_link = src_url
+    elif gid and not gid.startswith("local-"):
+        direct_link = f"https://lh3.googleusercontent.com/d/{gid}"
+        google_drive_link = direct_link
     else:
-        google_drive_link = ""
-        google_drive_direct = ""
-        primary_image_url = local_direct_link
+        direct_link = public_server_link or local_direct_link
+        google_drive_link = direct_link
 
     if media_type == "video" and yid:
-        watch_link = f"https://youtu.be/{yid}"
+        watch_link = f"https://www.youtube.com/embed/{yid}"
+        direct_link = watch_link
         embed_code = f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{yid}" title="{title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
-        markdown_code = f'[![{title}](https://img.youtube.com/vi/{yid}/maxresdefault.jpg)](https://www.youtube.com/watch?v={yid})'
-        bbcode = f'[video]https://www.youtube.com/watch?v={yid}[/video]'
+        markdown_code = watch_link
+        bbcode = f'[video]{watch_link}[/video]'
         preview_url = item.get("youtube_thumbnail") or f"https://img.youtube.com/vi/{yid}/hqdefault.jpg"
+    elif media_type == "video":
+        watch_link = direct_link
+        embed_code = f'<video src="{direct_link}" controls style="max-width:100%;"></video>'
+        markdown_code = direct_link
+        bbcode = f'[video]{direct_link}[/video]'
+        preview_url = local_direct_link or direct_link
     else:
-        watch_link = ""
-        embed_code = f'<img src="{primary_image_url}" alt="{title}" />'
-        markdown_code = f'![{title}]({primary_image_url})'
-        bbcode = f'[img]{primary_image_url}[/img]'
-        preview_url = local_direct_link
+        watch_link = direct_link
+        embed_code = f'<img src="{direct_link}" alt="{title}" />'
+        markdown_code = f'![{title}]({direct_link})'
+        bbcode = f'[img]{direct_link}[/img]'
+        preview_url = local_direct_link or direct_link
 
     return {
         "google_drive_link": google_drive_link,
-        "google_drive_direct": google_drive_direct,
-        "site_direct_link": local_direct_link,
+        "google_drive_direct": direct_link,
+        "site_direct_link": direct_link,
         "local_direct_link": local_direct_link,
         "html_code": embed_code,
         "markdown_code": markdown_code,
@@ -1125,10 +1165,12 @@ def get_materials(request: Request, folder: str = "", media_type: str = "all", s
 
         items = []
         for r in rows:
-            # Auto-check Google Drive ID if missing
-            if r["media_type"] == "image" and r["file_name"] and not r["google_drive_id"]:
-                gid = resolve_google_drive_file_id(r["file_name"])
-                if gid:
+            # Auto-resolve direct CDN link if missing or stuck on local-
+            cur_gid = str(r.get("google_drive_id") or "")
+            if r.get("file_name") and (not cur_gid or cur_gid.startswith("local-") or not cur_gid.startswith("https://")):
+                fpath = MATERIALS_DIR / (r.get("folder_name") or "Общие") / r["file_name"]
+                gid = resolve_google_drive_file_id(r["file_name"], fpath)
+                if gid and gid != cur_gid:
                     r["google_drive_id"] = gid
                     db.execute("UPDATE materials SET google_drive_id = ? WHERE id = ?", (gid, r["id"]))
                     db.commit()
@@ -1185,22 +1227,23 @@ async def upload_materials_endpoint(request: Request, files: list[UploadFile] = 
 
             file_size = len(content)
             mime = upload.content_type or "image/png"
+            is_video = mime.startswith("video/") or ext.lower() in {".mp4", ".webm", ".mov", ".ogg", ".m4v", ".avi", ".mkv"}
+            mtype = "video" if is_video else "image"
             mid = str(uuid.uuid4())
             rel_path = f"{folder}/{clean_name}"
-            title = stem.replace("_", " ").strip() or "Изображение"
+            title = stem.replace("_", " ").strip() or ("Видео" if is_video else "Изображение")
 
-            # Check Google Drive ID
-            gid = resolve_google_drive_file_id(clean_name) or ""
+            gid = await asyncio.to_thread(resolve_google_drive_file_id, clean_name, dest_path) or ""
 
             db.execute("""
                 INSERT INTO materials (id, title, media_type, folder_name, file_name, file_path, file_size, mime_type, google_drive_id, created_at)
-                VALUES (?, ?, 'image', ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """, (mid, title, folder, clean_name, rel_path, file_size, mime, gid))
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """, (mid, title, mtype, folder, clean_name, rel_path, file_size, mime, gid))
 
             item_dict = {
                 "id": mid,
                 "title": title,
-                "media_type": "image",
+                "media_type": mtype,
                 "folder_name": folder,
                 "file_name": clean_name,
                 "file_path": rel_path,
@@ -1500,4 +1543,4 @@ if __name__ == "__main__":
 
     host = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
     port = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
-    uvicorn.run("server:app", host=host, port=port, reload=False)
+    uvicorn.run("server:app", host=host, port=port, reload=False, access_log=False)
