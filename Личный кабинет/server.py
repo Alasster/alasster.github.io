@@ -89,7 +89,7 @@ load_local_env()
 PERSONAL_CABINET_HOST = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
 PERSONAL_CABINET_PORT = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
 os.environ.setdefault("BAGALAU_STUDENT_PORT", "8001")
-os.environ.setdefault("BAGALAU_PUBLIC_URL", "https://6a.tailc56f23.ts.net")
+os.environ.pop("BAGALAU_PUBLIC_URL", None)
 
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
@@ -407,7 +407,7 @@ def ga4_realtime_users() -> int:
             metrics=[Metric(name="activeUsers")],
             minute_ranges=[MinuteRange(start_minutes_ago=4)],
         ),
-        timeout=10,
+        timeout=3,
     )
     if not response.rows:
         return 0
@@ -424,7 +424,7 @@ def ga4_traffic(mode: str) -> list[dict]:
             metrics=[Metric(name="activeUsers")],
             date_ranges=[DateRange(start_date=start_date, end_date="today")],
         ),
-        timeout=10,
+        timeout=3,
     )
     points = []
     for row in response.rows:
@@ -445,13 +445,13 @@ def ga4_summary() -> dict:
         result["online_users"] = ga4_realtime_users()
         result["available"] = True
     except Exception:
-        LOGGER.exception("Не удалось получить realtime-данные GA4")
+        LOGGER.debug("Не удалось получить realtime-данные GA4")
     for mode in ("daily", "monthly"):
         try:
             result["traffic"][mode] = ga4_traffic(mode)
             result["available"] = True
         except Exception:
-            LOGGER.exception("Не удалось получить график GA4: %s", mode)
+            LOGGER.debug("Не удалось получить график GA4: %s", mode)
     return result
 
 
@@ -499,7 +499,7 @@ async def get_generator_teacher(request: Request) -> dict:
 def load_generator_server():
     os.environ["BAGALAU_DB_DIR"] = str(GENERATOR_DATA_DIR)
     os.environ["BAGALAU_STUDENT_PORT"] = "8001"
-    os.environ.setdefault("BAGALAU_PUBLIC_URL", "https://6a.tailc56f23.ts.net")
+    os.environ.pop("BAGALAU_PUBLIC_URL", None)
     generator_path = str(GENERATOR_DIR)
     sys.path.insert(0, generator_path)
     try:
@@ -546,19 +546,12 @@ class StudentPublicGateway:
             await response(scope, receive, send)
             return
 
-        if path.startswith('/generator/'):
-            clean_path = path[len('/generator'):]
-            query = scope.get('query_string', b'').decode('latin-1')
-            if query:
-                clean_path = f"{clean_path}?{query}"
-            await RedirectResponse(clean_path, status_code=307)(scope, receive, send)
-            return
-
+        clean_path = path[len('/generator'):] if path.startswith('/generator/') else path
         allowed = (
-            path == '/api/health'
-            or path.startswith('/exam/')
-            or path.startswith('/api/student/')
-            or path.startswith('/static/')
+            clean_path in ('/api/health', '/health')
+            or clean_path.startswith('/exam/')
+            or clean_path.startswith('/api/student/')
+            or clean_path.startswith('/static/')
         )
         if not allowed:
             await JSONResponse({'detail': 'Доступен только вход ученика'}, status_code=404)(scope, receive, send)
@@ -607,6 +600,123 @@ async def startup() -> None:
         await start_student_gateway()
     except Exception as e:
         LOGGER.warning("Could not bind port 8001: %s", e)
+    try:
+        await start_internet_tunnel()
+    except Exception as e:
+        LOGGER.warning("Could not start internet tunnel: %s", e)
+
+
+internet_tunnel_process = None
+internet_tunnel_task = None
+
+
+def _save_public_url(url: str | None) -> None:
+    if url:
+        url = url.rstrip("/")
+        os.environ["BAGALAU_PUBLIC_URL"] = url
+    else:
+        os.environ.pop("BAGALAU_PUBLIC_URL", None)
+    for rt_dir in (BASE_DIR / ".runtime", GENERATOR_DIR / ".runtime"):
+        try:
+            rt_dir.mkdir(parents=True, exist_ok=True)
+            pub_file = rt_dir / "public_url.txt"
+            if url:
+                pub_file.write_text(url, encoding="utf-8")
+            elif pub_file.exists():
+                pub_file.unlink()
+        except Exception:
+            pass
+
+
+def _probe_url_health(base_url: str, timeout: float = 3.0) -> bool:
+    import urllib.request
+    import ssl
+    try:
+        ctx = ssl.create_default_context()
+        req = urllib.request.Request(f"{base_url.rstrip('/')}/api/health", headers={"User-Agent": "BagalauProbe/1.0"})
+        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
+
+def _try_tailscale_funnel() -> str | None:
+    import subprocess
+    exe = r"C:\Program Files\Tailscale\tailscale.exe"
+    if not os.path.exists(exe):
+        return None
+    try:
+        res = subprocess.run([exe, "status", "--json"], capture_output=True, text=True, timeout=4)
+        if res.returncode != 0:
+            return None
+        data = json.loads(res.stdout)
+        dns_name = (data.get("Self") or {}).get("DNSName", "").rstrip(".")
+        if not dns_name:
+            return None
+        url = f"https://{dns_name}"
+        subprocess.run([exe, "funnel", "--bg", "--https=443", "http://127.0.0.1:8001"], capture_output=True, timeout=6)
+        if _probe_url_health(url, timeout=3.0):
+            return url
+    except Exception:
+        pass
+    return None
+
+
+async def _maintain_ssh_tunnel() -> None:
+    global internet_tunnel_process
+    import re
+    ssh_exe = r"C:\Windows\System32\OpenSSH\ssh.exe"
+    if not os.path.exists(ssh_exe):
+        ssh_exe = "ssh"
+    url_pattern = re.compile(r"https://[a-z0-9-]+\.lhr\.life")
+    while True:
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                ssh_exe,
+                "-o", "StrictHostKeyChecking=no",
+                "-o", "UserKnownHostsFile=NUL",
+                "-o", "ServerAliveInterval=30",
+                "-o", "ServerAliveCountMax=3",
+                "-R", "80:127.0.0.1:8001",
+                "nokey@localhost.run",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+            )
+            internet_tunnel_process = proc
+            while proc.stdout and not proc.stdout.at_eof():
+                line_bytes = await proc.stdout.readline()
+                if not line_bytes:
+                    break
+                line = line_bytes.decode("utf-8", errors="ignore")
+                match = url_pattern.search(line)
+                if match:
+                    pub_url = match.group(0)
+                    if os.environ.get("BAGALAU_PUBLIC_URL") != pub_url:
+                        _save_public_url(pub_url)
+                        print("\n======================================================================", flush=True)
+                        print("  [ИНТЕРНЕТ-ТУННЕЛЬ АКТИВЕН] Ссылка для учеников (любая сеть / телефон):", flush=True)
+                        print(f"  {pub_url}/generator/exam/<ID>", flush=True)
+                        print("======================================================================\n", flush=True)
+            await proc.wait()
+        except asyncio.CancelledError:
+            break
+        except Exception:
+            pass
+        await asyncio.sleep(3)
+
+
+async def start_internet_tunnel() -> None:
+    global internet_tunnel_task
+    _save_public_url(None)
+    ts_url = await asyncio.to_thread(_try_tailscale_funnel)
+    if ts_url:
+        _save_public_url(ts_url)
+        print("\n======================================================================", flush=True)
+        print("  [TAILSCALE FUNNEL АКТИВЕН] Ссылка для учеников (любая сеть / телефон):", flush=True)
+        print(f"  {ts_url}/generator/exam/<ID>", flush=True)
+        print("======================================================================\n", flush=True)
+        return
+    internet_tunnel_task = asyncio.create_task(_maintain_ssh_tunnel())
 
 
 @app.on_event("shutdown")

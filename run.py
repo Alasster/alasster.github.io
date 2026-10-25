@@ -1,12 +1,22 @@
 import os
 import sys
 import socket
+import ctypes
 import runpy
 
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+    try:
+        kernel32 = ctypes.windll.kernel32
+        for handle_id in (-11, -12):
+            handle = kernel32.GetStdHandle(handle_id)
+            mode = ctypes.c_uint32()
+            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
+                kernel32.SetConsoleMode(handle, mode.value | 0x0004)
     except Exception:
         pass
 
@@ -26,25 +36,13 @@ try:
 except Exception:
     pass
 
-public_url = "https://6a.tailc56f23.ts.net"
-runtime_path = os.path.join(cabinet_dir, ".runtime", "public_url.txt")
-if os.path.exists(runtime_path):
-    try:
-        with open(runtime_path, "r", encoding="utf-8-sig") as f:
-            p = f.read().strip()
-            if p:
-                public_url = p
-    except Exception:
-        pass
-
 print("======================================================================")
 print("     ЕДИНЫЙ СЕРВЕР: ЛИЧНЫЙ КАБИНЕТ + ГЕНЕРАТОР ТЕСТОВ (СОР/СОЧ)       ")
 print("======================================================================")
-print(f"  Кабинет учителя (ПК):        http://127.0.0.1:8010")
-print(f"  По локальному Wi-Fi / LAN:   http://{lan_ip}:8010")
-print(f"  Интернет для учеников:       {public_url}/generator/exam/<ID>")
+print(f"  Кабинет учителя (на этом ПК):    http://127.0.0.1:8010")
+print(f"  Вход по Wi-Fi / Хотспоту (LAN):  http://{lan_ip}:8001/generator/exam/<ID>")
+print("  Внешний интернет-туннель (4G):   запускается автоматически...")
 print("======================================================================")
 print()
 
 runpy.run_path(os.path.join(cabinet_dir, "server.py"), run_name="__main__")
-
