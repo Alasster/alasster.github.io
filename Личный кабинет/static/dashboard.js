@@ -62,7 +62,7 @@ const sectionHeadings = {
   overview: ['ОБЗОР КАБИНЕТА', 'Рабочая область'],
   profile: ['ПРОФИЛЬ', 'Профиль пользователя'],
   lessons: ['УРОКИ И КЛАССЫ', 'Учебные разделы'],
-  tests: ['ТЕСТЫ И ЗАДАНИЯ', 'Задания и проверки'],
+  tests: ['ТЕСТЫ И ЗАДАНИЯ', 'Генератор СОР и СОЧ'],
   materials: ['МОИ МАТЕРИАЛЫ', 'Личные материалы'],
 };
 
@@ -70,6 +70,7 @@ const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(Number(val
 let trafficSeries = { daily: [], monthly: [] };
 let selectedTrafficMode = 'daily';
 let lessonCatalogRequest = null;
+let lessonsSummaryText = 'Загрузка списка...';
 
 function appendSummaryRow(list, label, value) {
   const row = document.createElement('li');
@@ -130,8 +131,12 @@ function showCabinetSection(section) {
   if (sectionCards) sectionCards.hidden = !sectionViews.some(
     (view) => view.closest('#section-cards') && !view.hidden,
   );
+  if (selectedSection === 'tests') {
+    window.initTestGenerator?.();
+  }
   const [eyebrow, sectionTitle] = sectionHeadings[selectedSection];
-  const title = selectedSection === 'overview' ? currentDisplayName : sectionTitle;
+  let title = selectedSection === 'overview' ? currentDisplayName : sectionTitle;
+  if (selectedSection === 'lessons') title = lessonsSummaryText;
   const eyebrowNode = document.querySelector('.workspace-header .eyebrow');
   const titleNode = document.querySelector('.workspace-header h1');
   if (eyebrowNode) eyebrowNode.textContent = eyebrow;
@@ -247,11 +252,13 @@ async function loadUsers() {
 function showModal(modal) {
   modal.hidden = false;
   modal.style.display = 'grid';
+  modal.classList.add('open');
 }
 
 function hideModal(modal) {
   modal.hidden = true;
   modal.style.display = 'none';
+  modal.classList.remove('open');
 }
 
 function collectProfileChanges() {
@@ -513,7 +520,7 @@ function renderLessonsCatalog(classes) {
     totalLessons += item.lessons;
     const card = document.createElement('details');
     card.className = 'lesson-class-card';
-    card.open = lessonCatalogGrid.childElementCount === 0;
+    card.open = false;
     card.addEventListener('toggle', syncOpenClassLayout);
 
     const summary = document.createElement('summary');
@@ -565,13 +572,22 @@ function renderLessonsCatalog(classes) {
     lessonCatalogGrid.append(card);
   });
   syncOpenClassLayout();
-  lessonCatalogStatus.textContent = `${formatNumber(classes.length)} классов · ${formatNumber(totalLessons)} уроков`;
+  lessonsSummaryText = `${formatNumber(classes.length)} классов · ${formatNumber(totalLessons)} уроков`;
+  if (lessonCatalogStatus) lessonCatalogStatus.textContent = lessonsSummaryText;
+  if (currentSection === 'lessons') {
+    const titleNode = document.querySelector('.workspace-header h1');
+    if (titleNode) titleNode.textContent = lessonsSummaryText;
+  }
   lessonCatalogRetry.hidden = true;
 }
 
 async function loadLessonsCatalog() {
   if (lessonCatalogRequest) return lessonCatalogRequest;
-  lessonCatalogStatus.textContent = 'Обновление списка...';
+  if (lessonCatalogStatus) lessonCatalogStatus.textContent = 'Обновление списка...';
+  if (currentSection === 'lessons' && lessonsSummaryText === 'Загрузка списка...') {
+    const titleNode = document.querySelector('.workspace-header h1');
+    if (titleNode) titleNode.textContent = 'Обновление списка...';
+  }
   lessonCatalogRetry.hidden = true;
   lessonCatalogRequest = (async () => {
     try {
@@ -580,7 +596,12 @@ async function loadLessonsCatalog() {
       if (!response.ok) throw new Error(data.detail || 'Не удалось загрузить уроки.');
       renderLessonsCatalog(data.classes);
     } catch (error) {
-      lessonCatalogStatus.textContent = error.message || 'Не удалось загрузить уроки.';
+      const msg = error.message || 'Не удалось загрузить уроки.';
+      if (lessonCatalogStatus) lessonCatalogStatus.textContent = msg;
+      if (currentSection === 'lessons') {
+        const titleNode = document.querySelector('.workspace-header h1');
+        if (titleNode) titleNode.textContent = msg;
+      }
       lessonCatalogRetry.hidden = false;
     } finally {
       lessonCatalogRequest = null;
@@ -699,3 +720,17 @@ loadSiteOverview().catch(() => {
 window.setInterval(() => {
   loadSiteOverview().catch(() => {});
 }, 60_000);
+
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  let prevReloadToken = null;
+  window.setInterval(async () => {
+    try {
+      const response = await fetch('/static/reload.txt?t=' + Date.now());
+      if (response.ok) {
+        const token = await response.text();
+        if (prevReloadToken && token !== prevReloadToken) window.location.reload();
+        prevReloadToken = token;
+      }
+    } catch (_) {}
+  }, 1000);
+}

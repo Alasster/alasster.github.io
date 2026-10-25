@@ -1,0 +1,90 @@
+:root {
+  --primary: #536dfe;
+  --primary-hover: #3e55d8;
+  --primary-light: #edf0ff;
+  --primary-dark: #3e55d8;
+  --bg-page: #e7ebf3;
+  --bg-card: #e7ebf3;
+  --text-main: #263248;
+  --text-muted: #748097;
+  --text-light: #748097;
+  --border: rgba(116, 128, 151, .22);
+  --border-focus: #536dfe;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-sm: 3px 3px 7px rgba(163, 174, 195, .3), -3px -3px 7px rgba(255, 255, 255, .7);
+  --shadow-md: 5px 5px 12px rgba(163, 174, 195, .32), -5px -5px 12px rgba(255, 255, 255, .68);
+  --shadow-lg: 8px 8px 18px rgba(163, 174, 195, .38), -8px -8px 18px rgba(255, 255, 255, .72);
+}
+
+:root[data-theme="dark"] {
+  --primary: #91a3ff;
+  --primary-hover: #b5c0ff;
+  --primary-light: #30384e;
+  --primary-dark: #b5c0ff;
+  --bg-page: #202633;
+  --bg-card: #202633;
+  --text-main: #e7ebf5;
+  --text-muted: #9aa7bd;
+  --text-light: #9aa7bd;
+  --border: rgba(190, 205, 235, .14);
+  --border-focus: #91a3ff;
+  --shadow-sm: 3px 3px 7px rgba(11, 15, 25, .42), -3px -3px 7px rgba(190, 205, 235, .1);
+  --shadow-md: 5px 5px 12px rgba(11, 15, 25, .45), -5px -5px 12px rgba(190, 205, 235, .1);
+  --shadow-lg: 8px 8px 16px rgba(11, 15, 25, .5), -8px -8px 16px rgba(190, 205, 235, .12);
+}
+
+body {
+  font-family: "Manrope", system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-main);
+}
+
+.glass-app .header-bar,
+.glass-app .card,
+.glass-app .task-card,
+.glass-app .modal-dialog,
+.glass-app .calc-popup-card,
+.glass-app .exam-header {
+  background: var(--bg-card);
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.glass-app .nav-tab-btn.active,
+.glass-app .btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.glass-app .form-control,
+.glass-app .btn-secondary,
+.glass-app .task-nav-item:not(.active),
+.glass-app .option-label:not(.selected),
+.glass-app .ordering-item,
+.glass-app .matching-row td,
+.glass-app .classification-item,
+.glass-app .inline-select,
+.glass-app .tf-option:not(.selected-true):not(.selected-false),
+.glass-app .variant-pick-card,
+.glass-app .letter-box:not(.active) {
+  background: var(--bg-page);
+  border-color: var(--border);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+
+.glass-app :is(input, textarea, select) {
+  color: var(--text-main);
+}
+
+.glass-app .modal-backdrop {
+  background: rgba(38, 50, 72, .42);
+}
+
+:root[data-theme="dark"] .glass-app .table th,
+:root[data-theme="dark"] .glass-app .table tr:hover td,
+:root[data-theme="dark"] .glass-app .modal-footer {
+  background: rgba(32, 38, 51, .92);
+}

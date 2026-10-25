@@ -7,20 +7,25 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import hmac
 from html import unescape
+import importlib.util
 import logging
 import os
 import re
 import secrets
 import sqlite3
+import sys
+import uuid
 from contextlib import closing
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import quote
 
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -44,7 +49,14 @@ except ImportError:  # pragma: no cover - dependency is installed from requireme
 
 
 BASE_DIR = Path(__file__).resolve().parent
+GENERATOR_DIR = BASE_DIR / "generator"
+GENERATOR_DATA_DIR = GENERATOR_DIR / "data"
 LOGGER = logging.getLogger("personal_cabinet.ga4")
+generator_server = None
+generator_timer_task = None
+generator_student_gateway_class = None
+student_gateway_server = None
+student_gateway_task = None
 
 
 def load_local_env() -> None:
@@ -76,6 +88,8 @@ SUPERADMIN_EMAIL = os.environ.get("PERSONAL_CABINET_SUPERADMIN_EMAIL", "alasster
 ALLOWED_ROLES = {"user", "teacher", "admin", "superadmin"}
 
 app = FastAPI(title="Личный кабинет", docs_url=None, redoc_url=None)
+app.mount("/static/uploads", StaticFiles(directory=BASE_DIR / "generator" / "static" / "uploads"), name="generator_uploads")
+app.mount("/static/vendor", StaticFiles(directory=BASE_DIR / "generator" / "static" / "vendor"), name="generator_vendor")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 
@@ -91,14 +105,18 @@ async def security_headers(request: Request, call_next):
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
+    embedded_generator_page = (
+        request.url.path == "/generator/teacher"
+        or request.url.path.startswith("/generator/exam/")
+    )
+    response.headers["X-Frame-Options"] = "SAMEORIGIN" if embedded_generator_page else "DENY"
     response.headers["Referrer-Policy"] = "same-origin"
     response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; base-uri 'none'; object-src 'none'; "
-        "frame-ancestors 'none'; form-action 'self'; script-src 'self'; "
-        "style-src 'self' https://fonts.googleapis.com; "
-        "font-src 'self' https://fonts.gstatic.com; connect-src 'self'; "
-        "img-src 'self' data:"
+        "default-src 'self'; base-uri 'self'; object-src 'none'; "
+        "frame-ancestors 'self'; form-action 'self'; "
+        "script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' ws: wss:; "
+        "img-src 'self' data: blob:"
     )
     return response
 
@@ -384,9 +402,126 @@ def ga4_summary() -> dict:
     return result
 
 
+async def get_generator_teacher(request: Request) -> dict:
+    user = get_user_from_request(request)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Требуется авторизация")
+    if user["role"] not in {"teacher", "admin", "superadmin"}:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Раздел доступен учителям и администраторам")
+
+    async with generator_server.get_db() as db:
+        cursor = await db.execute(
+            "SELECT id, username, full_name, created_at FROM teachers WHERE lower(username) = lower(?)",
+            (user["username"],),
+        )
+        teacher = await cursor.fetchone()
+        if teacher is None and user["role"] in {"admin", "superadmin"}:
+            cursor = await db.execute(
+                "SELECT id, username, full_name, created_at FROM teachers ORDER BY created_at, id"
+            )
+            legacy_teachers = await cursor.fetchall()
+            if len(legacy_teachers) == 1:
+                teacher = legacy_teachers[0]
+        if teacher is None:
+            teacher_id = str(uuid.uuid4())
+            await db.execute(
+                "INSERT INTO teachers (id, username, password_hash, full_name, created_at) VALUES (?, ?, ?, ?, ?)",
+                (
+                    teacher_id,
+                    user["username"],
+                    generator_server.hash_password(secrets.token_urlsafe(48)),
+                    user["display_name"] or user["username"],
+                    datetime.now().isoformat(),
+                ),
+            )
+            await db.commit()
+            cursor = await db.execute(
+                "SELECT id, username, full_name, created_at FROM teachers WHERE id = ?",
+                (teacher_id,),
+            )
+            teacher = await cursor.fetchone()
+    return dict(teacher)
+
+
+def load_generator_server():
+    os.environ["BAGALAU_DB_DIR"] = str(GENERATOR_DATA_DIR)
+    generator_path = str(GENERATOR_DIR)
+    sys.path.insert(0, generator_path)
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "personal_cabinet_generator_server",
+            GENERATOR_DIR / "server.py",
+        )
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Не удалось загрузить сервер генератора тестов")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        gateway_module = importlib.import_module("public_gateway")
+    except Exception:
+        sys.modules.pop("personal_cabinet_generator_server", None)
+        raise
+    finally:
+        sys.path.remove(generator_path)
+
+    module.app.dependency_overrides[module.get_current_teacher] = get_generator_teacher
+    module.app.router.routes = [
+        route for route in module.app.router.routes
+        if route.path not in {"/api/teacher/login", "/api/teacher/logout"}
+    ]
+    return module, gateway_module.StudentPublicGateway
+
+
+async def start_student_gateway() -> None:
+    global student_gateway_server, student_gateway_task
+    import uvicorn
+
+    gateway_app = generator_student_gateway_class(app)
+    config = uvicorn.Config(
+        gateway_app,
+        host="0.0.0.0",
+        port=int(os.environ.get("BAGALAU_STUDENT_PORT", "8001")),
+        lifespan="off",
+        log_config=None,
+    )
+    student_gateway_server = uvicorn.Server(config)
+    student_gateway_task = asyncio.create_task(student_gateway_server.serve())
+    for _ in range(50):
+        if student_gateway_server.started:
+            return
+        if student_gateway_task.done():
+            await student_gateway_task
+            raise RuntimeError("Не удалось запустить ученический сервер на порту 8001")
+        await asyncio.sleep(0.1)
+    raise RuntimeError("Не удалось запустить ученический сервер на порту 8001")
+
+
 @app.on_event("startup")
-def startup() -> None:
+async def startup() -> None:
+    global generator_server, generator_timer_task, generator_student_gateway_class
     init_db()
+    generator_server, generator_student_gateway_class = load_generator_server()
+    await generator_server.init_db()
+    app.dependency_overrides[generator_server.get_current_teacher] = get_generator_teacher
+    for route in generator_server.app.routes:
+        if hasattr(route, "path") and route.path not in {
+            "/", "/api/health", "/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc", "/static", "/teacher/login"
+        }:
+            app.routes.append(route)
+    app.mount("/generator", generator_server.app, name="test_generator")
+    generator_timer_task = asyncio.create_task(generator_server.background_timer_and_heartbeat_checker())
+    await start_student_gateway()
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    if generator_timer_task is not None:
+        generator_timer_task.cancel()
+        await asyncio.gather(generator_timer_task, return_exceptions=True)
+    if student_gateway_server is not None:
+        student_gateway_server.should_exit = True
+    if student_gateway_task is not None:
+        await asyncio.gather(student_gateway_task, return_exceptions=True)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -647,6 +782,11 @@ def logout(request: Request, response: Response):
 
 @app.get("/health")
 def health():
+    return {"ok": True}
+
+
+@app.get("/api/health")
+def generator_compatible_health():
     return {"ok": True}
 
 

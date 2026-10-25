@@ -3,3 +3,8 @@
 Личный кабинет/ga4-service-account.json
 __pycache__/
 *.py[cod]
+Личный кабинет/static/reload.txt
+
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm

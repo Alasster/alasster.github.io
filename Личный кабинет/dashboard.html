@@ -1,192 +1,1601 @@
 <!DOCTYPE html>
+
 <html lang="ru">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <meta name="theme-color" content="#e5e9f2">
+
   <title>Личный кабинет</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=profile-management-13">
+
+  <link rel="stylesheet" href="/static/vendor/katex.min.css">
+
+  <link rel="stylesheet" href="/static/test-generator.css?v=29">
+
+  <link rel="stylesheet" href="/static/styles.css?v=profile-management-19">
+
 </head>
+
 <body>
+
   <div class="app-shell">
+
     <aside class="sidebar glass-card">
+
       <a class="brand" href="https://alasster.site/" aria-label="ALASSTER.SITE">
+
         <span class="brand-mark brand-mark-small brand-logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C9.4 4.8 6.2 4.5 3 5.4v12.1c3.2-.9 6.4-.6 9 1.1m0-12.1c2.6-1.7 5.8-2 9-1.1v12.1c-3.2-.9-6.4-.6-9 1.1m0-12.1v12.1" /></svg></span>
+
         <span><strong>ALASSTER</strong><small>.SITE</small></span>
+
       </a>
 
       <nav class="sidebar-nav" aria-label="Разделы кабинета">
+
         <a class="sidebar-link active" href="#overview"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="sidebar-label">Обзор</span></a>
+
         <a class="sidebar-link" href="#profile"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span><span class="sidebar-label">Профиль</span></a>
+
         <a class="sidebar-link" href="#lessons"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15M8 7h8M8 11h8"/></svg></span><span class="sidebar-label">Уроки и классы</span></a>
+
         <a class="sidebar-link" href="#tests"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.3 2.3 4.8-5"/></svg></span><span class="sidebar-label">Тесты и задания</span></a>
+
         <a class="sidebar-link" href="#materials"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l2 2h9v9a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2z"/><path d="M2.5 7.5v-2a2 2 0 0 1 2-2h5l2 2h5"/></svg></span><span class="sidebar-label">Мои материалы</span></a>
+
       </nav>
 
       <div class="sidebar-footer">
+
         <button class="button button-ghost theme-toggle" id="theme-toggle" type="button" aria-pressed="false"><span class="theme-icon" id="theme-icon" aria-hidden="true">☾</span><span class="sidebar-label" id="theme-label">Тёмная тема</span></button>
+
         <button class="button button-ghost logout-button" id="logout-button" type="button" aria-label="Выйти"><span class="logout-icon" aria-hidden="true"></span><span class="sidebar-label">Выйти</span></button>
+
       </div>
+
     </aside>
 
     <main class="workspace" id="overview">
+
       <header class="workspace-header">
+
         <div>
+
           <p class="eyebrow">ОБЗОР КАБИНЕТА</p>
+
           <h1>Рабочая область</h1>
+
         </div>
+
         <div class="workspace-role" id="workspace-role">Личный кабинет</div>
+
       </header>
 
       <section class="site-summary glass-card" data-cabinet-section="overview" aria-labelledby="site-summary-title">
+
         <div class="panel-heading">
+
           <div>
+
             <p class="eyebrow">ALASSTER.SITE</p>
+
             <h2 id="site-summary-title">Общая информация о сайте</h2>
+
           </div>
+
           <span class="status-chip" id="site-summary-status">Обновление...</span>
+
         </div>
+
         <div class="summary-stats">
+
           <article class="summary-stat"><span class="summary-stat-value" id="summary-lessons">—</span><span class="summary-stat-label">уроков и страниц</span></article>
+
           <article class="summary-stat"><span class="summary-stat-value" id="summary-classes">—</span><span class="summary-stat-label">учебных разделов</span></article>
+
           <article class="summary-stat"><span class="summary-stat-value" id="summary-users">—</span><span class="summary-stat-label">авторизованных пользователей сейчас</span></article>
+
           <article class="summary-stat"><span class="summary-stat-value" id="summary-online-users">—</span><span class="summary-stat-label">посетителей сайта онлайн</span></article>
+
         </div>
+
         <div class="summary-details">
+
           <div>
+
             <h3>Учебные разделы</h3>
+
             <ul class="summary-list" id="summary-classes-list"><li>Загрузка данных...</li></ul>
+
           </div>
+
           <div>
+
             <div class="traffic-toolbar">
+
               <div>
+
                 <h3>Посещаемость</h3>
+
               </div>
+
               <div class="traffic-switcher" role="group" aria-label="Период графика">
+
                 <button class="traffic-mode is-active" type="button" data-traffic-mode="daily" aria-pressed="true">По дням</button>
+
                 <button class="traffic-mode" type="button" data-traffic-mode="monthly" aria-pressed="false">По месяцам</button>
+
               </div>
+
             </div>
+
             <div class="traffic-chart" id="traffic-chart" role="img" aria-label="График посещаемости" hidden>
+
               <div class="traffic-chart-y" id="traffic-chart-y" aria-hidden="true"></div>
+
               <div class="traffic-chart-main">
+
                 <div class="traffic-chart-grid" aria-hidden="true"></div>
+
                 <div class="traffic-chart-bars" id="traffic-chart-bars"></div>
+
                 <div class="traffic-chart-labels" id="traffic-chart-labels"></div>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
       </section>
 
       <section class="card-grid" id="section-cards" aria-label="Раздел кабинета" hidden>
+
         <article class="glass-card feature-card profile-editor feature-indigo" id="profile" data-cabinet-section="profile">
+
           <form id="profile-form" class="profile-form" autocomplete="off">
+
             <div class="profile-form-grid">
+
               <label class="profile-field"><span>Имя</span><input class="field" id="profile-first-name" name="first_name" maxlength="80" required></label>
+
               <label class="profile-field"><span>Фамилия</span><input class="field" id="profile-last-name" name="last_name" maxlength="80" required></label>
+
               <label class="profile-field profile-field-wide"><span>Email / логин</span><input class="field" id="profile-email-edit" name="email" type="email" maxlength="160" required></label>
+
               <label class="profile-field"><span>Новый пароль</span><input class="field" id="profile-password" name="new_password" type="password" minlength="8" autocomplete="new-password"></label>
+
               <label class="profile-field"><span>Подтверждение пароля</span><input class="field" id="profile-password-confirm" name="new_password_confirm" type="password" minlength="8" autocomplete="new-password"></label>
+
             </div>
+
             <div class="profile-form-actions">
+
               <button class="button button-primary" id="profile-save" type="submit">Сохранить изменения</button>
+
               <p class="panel-message" id="profile-message" role="status"></p>
+
             </div>
+
           </form>
+
         </article>
+
         <article class="glass-card lesson-catalog-card" id="lessons" data-cabinet-section="lessons">
-          <div class="lesson-catalog-heading">
-            <div>
-              <span class="feature-icon feature-icon-compact" aria-hidden="true">02</span>
-              <h2>Уроки и классы</h2>
-            </div>
-            <span class="lesson-catalog-status" id="lesson-catalog-status" role="status">Загрузка списка...</span>
-          </div>
+
           <div class="lesson-catalog-grid" id="lesson-catalog-grid" aria-live="polite"></div>
+
           <button class="button button-ghost lesson-catalog-retry" id="lesson-catalog-retry" type="button" hidden>Повторить загрузку</button>
+
         </article>
-        <article class="glass-card feature-card feature-amber" id="tests" data-cabinet-section="tests">
-          <span class="feature-icon" aria-hidden="true">03</span>
-          <h2>Тесты и задания</h2>
-          <p>Место для работ, проверок и инструментов генератора заданий.</p>
-          <span class="feature-state">Можно подключить отдельно</span>
+
+                <article class="glass-card test-generator-card" id="tests" data-cabinet-section="tests">
+
+          <div class="test-generator-toolbar">
+            <div class="test-generator-tabs" role="tablist">
+              <button type="button" class="nav-tab-btn test-tab-btn is-active active" data-tab="tests">Мои работы</button>
+              <button type="button" class="nav-tab-btn test-tab-btn" data-tab="launches">Проведение</button>
+              <button type="button" class="nav-tab-btn test-tab-btn" data-tab="backups">Резервные копии</button>
+            </div>
+            <div id="tests-switcher-toolbar" class="tests-switcher-toolbar">
+              <div class="generator-switcher" role="group" aria-label="Статус работ">
+                <button type="button" id="tab-active-tests" class="is-active active" onclick="setArchiveFilter(false)">Активные работы</button>
+                <button type="button" id="tab-archive-tests" onclick="setArchiveFilter(true)">Архив</button>
+              </div>
+            </div>
+            <div id="backup-create-toolbar" class="backup-create-toolbar" style="display: none;">
+              <input type="text" id="backup-custom-name" class="form-control" placeholder="Название копии (необязательно)..." style="width: 260px; font-size: 0.86rem; min-height: 40px; padding: 6px 14px;">
+              <button class="btn btn-primary btn-sm" onclick="createNewBackup()" type="button" style="white-space: nowrap; min-height: 40px;">+ Создать резервную копию</button>
+            </div>
+          </div>
+
+          <div class="test-generator-native" id="test-generator-root">
+
+    <section id="view-tests">
+
+      <div class="test-controls-bar">
+        <button id="btn-open-create-test" class="btn btn-primary" type="button">+ Создать работу</button>
+
+      </div>
+
+      <!-- Фильтры и поиск -->
+
+      <div class="test-filter-bar">
+
+        <input type="text" id="tests-search" class="form-control" placeholder="Поиск по названию или разделу...">
+
+        <select id="filter-type" class="form-control">
+
+          <option value="">Все типы</option>
+
+          <option value="СОР">СОР</option>
+
+          <option value="СОЧ">СОЧ</option>
+
+        </select>
+
+        <select id="filter-grade" class="form-control">
+
+          <option value="">Все классы</option>
+
+          <option value="7">7 класс</option>
+
+          <option value="8">8 класс</option>
+
+          <option value="9">9 класс</option>
+
+          <option value="10 ЕМН">10 ЕМН</option>
+
+          <option value="10 ОГН">10 ОГН</option>
+
+          <option value="11">11 класс</option>
+
+        </select>
+
+        <select id="filter-quarter" class="form-control">
+
+          <option value="">Все четверти</option>
+
+          <option value="1">1 четверть</option>
+
+          <option value="2">2 четверть</option>
+
+          <option value="3">3 четверть</option>
+
+          <option value="4">4 четверть</option>
+
+        </select>
+
+      </div>
+
+      <!-- Сетка карточек работ -->
+
+      <div id="tests-grid" class="tests-grid"></div>
+
+    </section>
+
+    <!-- =========================================================================
+
+         2. РАЗДЕЛ: РЕДАКТОР РАБОТЫ (10 ТИПОВ ЗАДАНИЙ, КАРТИНКИ, ЦВЕТ ФОНА, ПРЕДПРОСМОТР)
+
+         ========================================================================= -->
+
+    <section id="view-editor" style="display: none;">
+
+      <div style="margin-bottom: 1.25rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="switchMainView('tests')" style="margin-bottom: 0.45rem;">← Назад к списку работ</button>
+        <h2 id="editor-test-title" style="font-size: 1.4rem; margin: 0 0 0.65rem 0;">Название работы</h2>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+          <!-- Левая сторона: бэдж + варианты -->
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <span id="editor-test-badge" class="badge badge-indigo">СОР · 10 класс</span>
+            <div class="generator-switcher variant-switcher" role="group" aria-label="Варианты заданий" style="margin-left: 0.25rem;">
+              <button type="button" id="tab-editor-v1" class="is-active active" onclick="switchEditorVariant('1')">Вариант 1</button>
+              <button type="button" id="tab-editor-v2" onclick="switchEditorVariant('2')">Вариант 2</button>
+              <button type="button" id="tab-editor-all" onclick="switchEditorVariant('all')">Все задания</button>
+            </div>
+          </div>
+
+          <!-- Правая сторона: 3 кнопки-иконки без текста на 1 линии с вариантами -->
+          <div class="editor-header-actions" style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+            <button type="button" class="btn btn-secondary btn-icon-round" onclick="openStudentPreview()" title="Предпросмотр глазами ученика" aria-label="Предпросмотр ученика">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button type="button" class="btn btn-secondary btn-icon-round" id="btn-toggle-editor-sidebar" onclick="toggleEditorSidebar()" title="Настройки работы (время, классы, фон)" aria-label="Настройки">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+            <button type="button" class="btn btn-primary btn-icon-round" onclick="openCreateLaunchModal(activeTest?.id)" title="Опубликовать проведение" aria-label="Опубликовать проведение">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-layout sidebar-collapsed" id="editor-layout-grid">
+
+        <!-- Левая колонка: Компактный список заданий -->
+
+        <div class="card" style="padding: 1rem;">
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+
+            <div>
+
+              <strong style="font-size: 0.95rem;">Задания</strong>
+
+              <span id="editor-active-variant-label" class="badge badge-sm" style="margin-left: 0.4rem; background: #FCE8E6; color: #991B1B;">Вар. 1</span>
+
+            </div>
+
+            <button type="button" class="btn btn-primary btn-icon-round" onclick="addNewTask()" title="Добавить задание" aria-label="Добавить задание" style="width: 32px; min-width: 32px; height: 32px; min-height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+          </div>
+
+          <div id="editor-tasks-nav" class="task-list-nav"></div>
+
+          <div style="border-top: 1px solid var(--border); margin-top: 1rem; padding-top: 0.75rem; font-size: 0.88rem; color: var(--text-muted);">
+
+            Всего баллов: <strong id="editor-total-score" style="color: var(--primary);">0</strong>
+
+          </div>
+
+        </div>
+
+        <!-- Центральная колонка: Содержимое выбранного задания -->
+
+        <div class="card" style="padding: 1.5rem;">
+
+          <div id="task-editor-form-container">
+
+            <p style="color: var(--text-muted); text-align: center;">Выберите задание из списка слева</p>
+
+          </div>
+
+        </div>
+
+        <!-- Правая колонка: Оформление ученика и быстрые настройки -->
+
+        <div class="card" id="editor-right-sidebar" style="display: none; padding: 1.25rem;">
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.65rem;">
+
+            <div style="display: flex; align-items: center; gap: 0.45rem;">
+
+              <span style="font-size: 1.1rem;">⚙️</span>
+
+              <strong style="font-size: 1.05rem;">Настройки работы</strong>
+
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditorSidebar(false)" title="Скрыть панель" style="padding: 2px 8px; font-size: 0.78rem; min-height: 24px; line-height: 1;">✕</button>
+
+          </div>
+
+          <!-- Время выполнения -->
+
+          <div class="form-group" style="margin-bottom: 1.1rem;">
+
+            <label class="form-label" for="editor-test-duration" style="display: flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+
+              <span>⏱ Время выполнения (минут):</span>
+
+            </label>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+
+              <div class="stepper-control" style="max-width: 120px;">
+                <input type="number" id="editor-test-duration" class="form-control" min="0" placeholder="45" value="45" style="font-weight: 700;">
+                <div class="stepper-buttons">
+                  <button type="button" class="stepper-btn stepper-up" onclick="stepNumberInput(this, 5)" title="Увеличить">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
+                  </button>
+                  <button type="button" class="stepper-btn stepper-down" onclick="stepNumberInput(this, -5)" title="Уменьшить">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <span style="font-size: 0.8rem; color: var(--text-muted);">0 — без ограничений</span>
+
+            </div>
+
+            <p class="form-hint" style="margin-top: 0.3rem;">Индивидуальный таймер для каждого ученика при сдаче.</p>
+
+          </div>
+
+          <!-- Буквы классов -->
+
+          <div class="form-group" style="margin-bottom: 1.2rem;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+
+              <label class="form-label" style="margin: 0; font-weight: 700;">🏷 Буквы классов:</label>
+
+              <div style="display: flex; gap: 0.3rem;">
+
+                <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 0.72rem; min-height: 24px;" onclick="selectAllEditorLetters(true)">Все</button>
+
+                <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 0.72rem; min-height: 24px;" onclick="selectAllEditorLetters(false)">Снять</button>
+
+              </div>
+
+            </div>
+
+            <div class="letter-checkbox-grid" id="editor-letters-grid" style="grid-template-columns: repeat(5, 1fr); gap: 0.35rem;"></div>
+
+            <p class="form-hint" style="margin-top: 0.35rem;">Ученик выберет свой класс и букву из отмеченных при входе.</p>
+
+          </div>
+
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem;">
+
+            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem;">Цвета экранов и защита</h4>
+
+            <!-- Цвет для Варианта 1 -->
+
+            <div class="form-group" style="background: #FFF5F5; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.75rem; margin-bottom: 0.75rem;">
+
+              <label class="form-label" style="color: #991B1B; font-weight: 700; margin-bottom: 0.35rem;">Вариант 1 (фон экрана):</label>
+
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+
+                <input type="color" id="editor-bg-v1" value="#FCE8E6" style="width: 36px; height: 32px; border: none; cursor: pointer; border-radius: 4px;" onchange="updateVariantBgColor('1', this.value)">
+
+                <input type="text" id="editor-bg-v1-text" class="form-control" value="#FCE8E6" style="width: 105px; font-family: monospace; font-size: 0.85rem;" onchange="updateVariantBgColor('1', this.value)">
+
+                <span style="font-size: 0.8rem; color: #7F1D1D;">Персиковый</span>
+
+              </div>
+
+            </div>
+
+            <!-- Цвет для Варианта 2 -->
+
+            <div class="form-group" style="background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;">
+
+              <label class="form-label" style="color: #166534; font-weight: 700; margin-bottom: 0.35rem;">Вариант 2 (фон экрана):</label>
+
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+
+                <input type="color" id="editor-bg-v2" value="#E6F4EA" style="width: 36px; height: 32px; border: none; cursor: pointer; border-radius: 4px;" onchange="updateVariantBgColor('2', this.value)">
+
+                <input type="text" id="editor-bg-v2-text" class="form-control" value="#E6F4EA" style="width: 105px; font-family: monospace; font-size: 0.85rem;" onchange="updateVariantBgColor('2', this.value)">
+
+                <span style="font-size: 0.8rem; color: #14532D;">Мятный</span>
+
+              </div>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label" style="font-weight: 700;">Инструкция перед началом:</label>
+
+              <textarea id="editor-inst-text" class="form-control" rows="3" placeholder="Инструкции перед началом работы..."></textarea>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label" for="editor-shuffle-options" style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer; font-weight: 600;">
+
+                <input type="checkbox" id="editor-shuffle-options" style="accent-color: var(--primary); width: 16px; height: 16px;">
+
+                <span>В случайном порядке</span>
+
+              </label>
+
+              <p class="form-hint">Перемешивать варианты ответов во всех заданиях работы.</p>
+
+            </div>
+
+            <button type="button" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 0.5rem;" onclick="saveTestGeneralSettings()">Сохранить настройки работы</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+
+         3. РАЗДЕЛ: СПИСОК ПРОВЕДЕНИЙ (С кнопкой удаления сессии и кнопкой на сайт)
+
+         ========================================================================= -->
+
+    <section id="view-launches" style="display: none;">
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+
+        <div>
+
+          <h2 style="font-size: 1.5rem;">Проведение работ</h2>
+
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Управление активными сессиями, интеграция на сайт и удаление завершённых проведений.</p>
+
+        </div>
+
+      </div>
+
+      <div class="card" style="padding: 0;">
+
+        <div class="table-responsive">
+
+          <table class="table">
+
+            <thead>
+
+              <tr>
+
+                <th>Название сессии</th>
+
+                <th>Статус</th>
+
+                <th>Классы</th>
+
+                <th>Длительность</th>
+
+                <th>Участники</th>
+
+                <th>Дата создания</th>
+
+                <th>Действия</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="launches-table-body"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+
+         4. РАЗДЕЛ: ЭКРАН УПРАВЛЕНИЯ ПРОВЕДЕНИЕМ В РЕАЛЬНОМ ВРЕМЕНИ
+
+         ========================================================================= -->
+
+    <section id="view-live" style="display: none;">
+
+      <!-- Шапка текущего запуска -->
+
+      <div class="card" style="margin-bottom: 1.25rem;">
+
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+          <!-- Слева: кнопка назад и статус на одной линии -->
+          <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="switchMainView('launches')">← К списку проведений</button>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-muted);">Статус:</span>
+              <span id="live-status-badge" class="badge-status badge-draft">Подготовка</span>
+            </div>
+          </div>
+
+          <!-- Справа: кнопки управления статусом -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-warning btn-sm" onclick="setLaunchStatus('waiting')">Открыть ожидание</button>
+            <button class="btn btn-success btn-sm" onclick="setLaunchStatus('active')">Начать работу</button>
+            <button class="btn btn-secondary btn-sm" onclick="setLaunchStatus('closed_entry')">Закрыть вход</button>
+            <button class="btn btn-primary btn-sm" onclick="setLaunchStatus('active')">Снова открыть вход</button>
+            <button class="btn btn-danger btn-sm" onclick="setLaunchStatus('finished')">Завершить работу</button>
+          </div>
+        </div>
+
+        <!-- Ссылка и кнопка генерации страницы на сайте -->
+
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: var(--bg-page); border: 1px solid var(--border); padding: 0.6rem 0.85rem; border-radius: var(--radius-md);">
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 300px;">
+
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Ссылка для учеников:</span>
+
+            <input type="text" id="live-public-url" class="form-control live-url-input" readonly placeholder="http://...">
+
+            <button type="button" class="btn btn-primary btn-sm" onclick="copyStudentLink()">Копировать</button>
+
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openCreateSitePageModal()">
+
+            🌐 Создать страницу на сайте alasster.site
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- Вложенные 3 вкладки -->
+
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+
+        <button class="btn btn-secondary btn-sm launch-subnav-btn active" data-subtab="tab-live-monitoring" onclick="switchLaunchTab('tab-live-monitoring')">Проведение (Live)</button>
+
+        <button class="btn btn-secondary btn-sm launch-subnav-btn" data-subtab="tab-live-results" onclick="switchLaunchTab('tab-live-results')">Результаты и проверка</button>
+
+        <button class="btn btn-secondary btn-sm launch-subnav-btn" data-subtab="tab-live-settings" onclick="switchLaunchTab('tab-live-settings')">Настройки запуска</button>
+
+        <label id="btn-toggle-publish-results" class="publish-results-toggle" style="margin-left: auto;" title="Разрешить или запретить ученикам просмотр результатов">
+
+          <input type="checkbox" id="publish-results-toggle-input" onchange="togglePublishResults(this.checked)">
+
+          <span class="publish-results-toggle-slider" aria-hidden="true"></span>
+
+          <span id="publish-results-toggle-label">Выдать результаты</span>
+
+        </label>
+
+      </div>
+
+      <!-- Вкладка 1: Живой мониторинг участников -->
+
+      <div id="tab-live-monitoring" class="launch-sub-tab">
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem;">
+
+          <div class="card" style="padding: 1rem; text-align: center; margin-bottom: 0;">
+
+            <div id="cnt-total" style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">0</div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Всего подключилось</div>
+
+          </div>
+
+          <div class="card" style="padding: 1rem; text-align: center; margin-bottom: 0;">
+
+            <div id="cnt-waiting" style="font-size: 1.8rem; font-weight: 800; color: #D97706;">0</div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">В ожидании</div>
+
+          </div>
+
+          <div class="card" style="padding: 1rem; text-align: center; margin-bottom: 0;">
+
+            <div id="cnt-progress" style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">0</div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Выполняют работу</div>
+
+          </div>
+
+          <div class="card" style="padding: 1rem; text-align: center; margin-bottom: 0;">
+
+            <div id="cnt-submitted" style="font-size: 1.8rem; font-weight: 800; color: var(--success);">0</div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Сдали работу</div>
+
+          </div>
+
+        </div>
+
+        <div class="card" style="padding: 0;">
+
+          <div class="table-responsive">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+
+                  <th>ФИО Ученика</th>
+
+                  <th>Класс</th>
+
+                  <th>Вариант</th>
+
+                  <th>Рабочее место (ПК / Сеть)</th>
+
+                  <th>Статус</th>
+
+                  <th style="text-align: center;">Связь</th>
+
+                  <th>Прогресс</th>
+
+                  <th>Начало</th>
+
+                  <th>Сдача</th>
+
+                  <th>Ответы</th>
+
+                  <th>Управление</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="live-students-tbody"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Вкладка 2: Результаты, фильтры и печать -->
+
+      <div id="tab-live-results" class="launch-sub-tab" style="display: none;">
+
+        <div class="card" style="padding: 1rem; margin-bottom: 1rem;">
+
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+
+            <div style="display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+
+              <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Класс:</label>
+                <select id="filter-results-class" class="form-control" style="width: auto; min-width: 130px; font-size: 0.88rem;" onchange="renderGradingView()">
+                  <option value="">Все классы</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Буква:</label>
+                <select id="filter-results-letter" class="form-control" style="width: auto; min-width: 100px; font-size: 0.88rem;" onchange="renderGradingView()">
+                  <option value="">Все буквы</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Четверть:</label>
+                <select id="filter-results-quarter" class="form-control" style="width: auto; min-width: 125px; font-size: 0.88rem;" onchange="renderGradingView()">
+                  <option value="">Все четверти</option>
+                  <option value="1 четверть">1 четверть</option>
+                  <option value="2 четверть">2 четверть</option>
+                  <option value="3 четверть">3 четверть</option>
+                  <option value="4 четверть">4 четверть</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Вариант:</label>
+                <select id="filter-results-variant" class="form-control" style="width: auto; min-width: 120px; font-size: 0.88rem;" onchange="renderGradingView()">
+                  <option value="">Все варианты</option>
+                  <option value="1">Вариант 1</option>
+                  <option value="2">Вариант 2</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Поиск ученика:</label>
+                <input type="text" id="filter-results-search" class="form-control" placeholder="Поиск по ФИО..." style="width: 160px; font-size: 0.88rem;" oninput="renderGradingView()">
+              </div>
+
+              <div style="display: flex; align-items: flex-end;">
+                <button type="button" class="btn btn-secondary btn-icon-toolbar" onclick="resetResultsFilters()" title="Сбросить все фильтры">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                  </svg>
+                </button>
+              </div>
+
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+              <button type="button" class="btn btn-secondary btn-icon-toolbar" onclick="printAllResultsSummary()" title="Печать результатов">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+              </button>
+              <button type="button" class="btn btn-secondary btn-icon-toolbar" onclick="downloadExport('xlsx')" title="Экспорт в Excel (.xlsx)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <path d="M8 13l4 6m0-6l-4 6"/>
+                </svg>
+              </button>
+              <button type="button" class="btn btn-secondary btn-icon-toolbar" onclick="downloadExport('csv')" title="Экспорт в CSV">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <path d="M8 13h2m-2 4h5"/>
+                </svg>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="card" id="grading-table-container"></div>
+
+      </div>
+
+      <!-- Вкладка 3: Настройки запуска -->
+
+      <div id="tab-live-settings" class="launch-sub-tab" style="display: none;">
+
+        <div class="card" style="max-width: 650px;">
+
+          <h3 style="margin-bottom: 1.25rem;">Настройки проведения</h3>
+
+          <div class="form-group">
+
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+
+              <input type="checkbox" id="set-manual-approval" style="width: 18px; height: 18px;">
+
+              <span style="font-weight: 600;">Ручной допуск участников из комнаты ожидания</span>
+
+            </label>
+
+            <p class="form-hint">Если включено, каждый подключившийся ученик ожидает явного одобрения учителем кнопки «Допустить».</p>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">Продолжительность (минут):</label>
+
+            <div class="stepper-control" style="max-width: 140px;">
+              <input type="number" id="set-duration" class="form-control" min="0">
+              <div class="stepper-buttons">
+                <button type="button" class="stepper-btn stepper-up" onclick="stepNumberInput(this, 5)" title="Увеличить">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
+                </button>
+                <button type="button" class="stepper-btn stepper-down" onclick="stepNumberInput(this, -5)" title="Уменьшить">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="form-hint">Таймер запускается сервером индивидуально. 0 — без ограничения времени.</p>
+
+          </div>
+
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+
+            <h4 style="margin-bottom: 0.75rem;">Публикация результатов для учеников:</h4>
+
+            <div class="form-group">
+
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+
+                <input type="checkbox" id="set-pub-scores" style="width: 18px; height: 18px;">
+
+                <span>Показывать набранные баллы и проценты</span>
+
+              </label>
+
+            </div>
+
+            <div class="form-group">
+
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+
+                <input type="checkbox" id="set-pub-answers" style="width: 18px; height: 18px;">
+
+                <span>Показывать правильные ответы и разбор</span>
+
+              </label>
+
+            </div>
+
+            <div class="form-group">
+
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+
+                <input type="checkbox" id="set-pub-comments" style="width: 18px; height: 18px;">
+
+                <span>Показывать индивидуальные комментарии учителя</span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="saveLaunchSettings()">Сохранить настройки проведения</button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+
+         5. РАЗДЕЛ: РЕЗЕРВНЫЕ КОПИИ
+
+         ========================================================================= -->
+
+    <section id="view-backups" style="display: none;">
+      <div class="card" style="padding: 0;">
+        <div id="backups-list"></div>
+      </div>
+    </section>
+
+          </div>
+
         </article>
+
         <article class="glass-card feature-card feature-indigo" id="materials" data-cabinet-section="materials">
+
           <span class="feature-icon" aria-hidden="true">04</span>
+
           <h2>Мои материалы</h2>
+
           <p>Документы, ссылки и личные заметки в одном разделе.</p>
+
           <span class="feature-state">Раздел готов к наполнению</span>
+
         </article>
+
       </section>
 
       <section class="admin-panel glass-card" id="admin-panel" data-cabinet-section="profile" hidden>
+
         <div class="panel-heading">
+
           <div>
+
             <h2>Пользователи и роли</h2>
+
           </div>
+
         </div>
+
         <div class="users-table-wrap">
+
           <table class="users-table">
+
             <thead><tr><th>Пользователь</th><th>Email / логин</th><th>Роль</th><th>Пароль</th></tr></thead>
+
             <tbody id="users-list"></tbody>
+
           </table>
+
         </div>
+
         <p class="panel-message" id="admin-message" role="status"></p>
+
       </section>
+
     </main>
+
   </div>
 
   <div class="modal-backdrop" id="logout-modal" hidden>
+
     <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+
       <h2 id="logout-modal-title">Выйти из кабинета?</h2>
+
       <div class="modal-actions">
+
         <button class="button button-ghost" id="logout-cancel" type="button">Остаться</button>
+
         <button class="button button-primary" id="logout-confirm" type="button">Выйти</button>
+
       </div>
+
     </section>
+
   </div>
 
   <div class="modal-backdrop" id="profile-confirm-modal" hidden>
+
     <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="profile-confirm-title">
+
       <p class="eyebrow">ПОДТВЕРЖДЕНИЕ</p>
+
       <h2 id="profile-confirm-title">Сохранить изменения?</h2>
+
       <p class="modal-text">Данные профиля и новый пароль будут обновлены в базе данных.</p>
+
       <div class="modal-actions">
+
         <button class="button button-ghost" id="profile-confirm-cancel" type="button">Отмена</button>
+
         <button class="button button-primary" id="profile-confirm-save" type="button">Подтвердить</button>
+
       </div>
+
     </section>
+
   </div>
 
   <div class="modal-backdrop" id="unsaved-profile-modal" hidden>
+
     <section class="confirm-modal unsaved-confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="unsaved-profile-title">
+
       <h2 id="unsaved-profile-title">Сохранить изменения?</h2>
+
       <div class="modal-actions modal-actions-3">
+
         <button class="button button-ghost" id="unsaved-profile-discard" type="button">Не сохранять</button>
+
         <button class="button button-ghost" id="unsaved-profile-cancel" type="button">Отмена</button>
+
         <button class="button button-primary" id="unsaved-profile-save" type="button">Сохранить</button>
+
       </div>
+
     </section>
+
   </div>
 
   <div class="modal-backdrop" id="admin-password-modal" hidden>
+
     <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="admin-password-title">
+
       <p class="eyebrow">ДОСТУП ПОЛЬЗОВАТЕЛЯ</p>
+
       <h2 id="admin-password-title">Задать новый пароль</h2>
+
       <p class="modal-text" id="admin-password-user"></p>
+
       <input class="field modal-field" id="admin-new-password" type="password" minlength="8" autocomplete="new-password" placeholder="Новый пароль">
+
       <input class="field modal-field" id="admin-new-password-confirm" type="password" minlength="8" autocomplete="new-password" placeholder="Повторите пароль">
+
       <div class="modal-actions">
+
         <button class="button button-ghost" id="admin-password-cancel" type="button">Отмена</button>
+
         <button class="button button-primary" id="admin-password-confirm" type="button">Сохранить</button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- =========================================================================
+
+       МОДАЛЬНЫЕ ОКНА
+
+       ========================================================================= -->
+
+  <!-- 1. Модальное окно: Создание / Редактирование работы -->
+
+  <div id="create-test-modal" class="modal-backdrop">
+
+    <div class="modal-dialog" style="max-width: 620px;">
+
+      <div class="modal-header">
+
+        <h3 class="modal-title">Создание новой работы</h3>
+
+        <button type="button" id="close-create-test-modal" class="btn btn-secondary btn-sm">✕</button>
+
+      </div>
+
+      <form id="create-test-form">
+
+        <div class="modal-body">
+
+          <div class="form-group">
+
+            <label class="form-label" for="new-test-title">Название работы:</label>
+
+            <input type="text" id="new-test-title" class="form-control" required placeholder="Например: СОР №1 по разделу «Алгоритмизация»">
+
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+            <div class="form-group">
+
+              <label class="form-label" for="new-test-type">Тип работы:</label>
+
+              <select id="new-test-type" class="form-control">
+
+                <option value="СОР">СОР (Суммативное оценивание за раздел)</option>
+
+                <option value="СОЧ">СОЧ (Суммативное оценивание за четверть)</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label" for="new-test-subject">Предмет:</label>
+
+              <input type="text" id="new-test-subject" class="form-control" required value="Информатика">
+
+            </div>
+
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+            <div class="form-group">
+
+              <label class="form-label" for="new-test-grade">Класс (параллель):</label>
+
+              <select id="new-test-grade" class="form-control">
+
+                <option value="7">7 класс</option>
+
+                <option value="8">8 класс</option>
+
+                <option value="9" selected>9 класс</option>
+
+                <option value="10 ЕМН">10 ЕМН</option>
+
+                <option value="10 ОГН">10 ОГН</option>
+
+                <option value="11">11 класс</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label" for="new-test-quarter">Четверть:</label>
+
+              <select id="new-test-quarter" class="form-control">
+
+                <option value="1">1 четверть</option>
+
+                <option value="2">2 четверть</option>
+
+                <option value="3">3 четверть</option>
+
+                <option value="4">4 четверть</option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+          <!-- Буквы классов: чекбоксы от А до П (без Ё и Й) -->
+
+          <div class="form-group">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+
+              <label class="form-label" style="margin: 0;">Буквы классов (выберите нужные):</label>
+
+              <div style="display: flex; gap: 0.4rem;">
+
+                <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 0.78rem;" onclick="selectAllLetters(true)">Выбрать все</button>
+
+                <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 0.78rem;" onclick="selectAllLetters(false)">Снять все</button>
+
+              </div>
+
+            </div>
+
+            <div class="letter-checkbox-grid" id="new-test-letters-grid"></div>
+
+            <p class="form-hint">Буквы от А до П (без Ё и Й). Выбранные буквы будут доступны ученикам при входе.</p>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label" for="new-test-section">Раздел / Сквозная тема:</label>
+
+            <input type="text" id="new-test-section" class="form-control" placeholder="Например: Представление данных">
+
+          </div>
+
+          <!-- Настройка 2 вариантов и фонов экранов для защиты от списывания -->
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+
+            <div style="background: #FFF5F5; border: 1.5px solid #FECACA; border-radius: 8px; padding: 0.75rem;">
+
+              <label style="font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem; color: #991B1B;">
+
+                Вариант 1 (фон):
+
+              </label>
+
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem;">
+
+                <input type="color" id="new-test-bg-v1" value="#FCE8E6" style="width: 38px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+
+                <span style="font-size: 0.82rem; color: #7F1D1D;">Персиковый</span>
+
+              </div>
+
+            </div>
+
+            <div style="background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 8px; padding: 0.75rem;">
+
+              <label style="font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem; color: #166534;">
+
+                Вариант 2 (фон):
+
+              </label>
+
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem;">
+
+                <input type="color" id="new-test-bg-v2" value="#E6F4EA" style="width: 38px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+
+                <span style="font-size: 0.82rem; color: #14532D;">Мятный</span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <input type="hidden" id="new-test-bg-color" value="#F8FAFC">
+
+        </div>
+
+        <div class="modal-footer">
+
+          <button type="submit" class="btn btn-primary">Создать и перейти к заданиям</button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- 2. Модальное окно: Публикация проведения (Launch) -->
+
+  <div id="create-launch-modal" class="modal-backdrop">
+
+    <div class="modal-dialog">
+
+      <div class="modal-header">
+
+        <h3 id="launch-modal-title" class="modal-title">Публикация проведения</h3>
+
+        <button type="button" id="close-create-launch-modal" class="btn btn-secondary btn-sm">✕</button>
+
+      </div>
+
+      <form id="create-launch-form">
+
+        <input type="hidden" id="launch-target-test-id">
+
+        <div class="modal-body">
+
+          <div class="form-group">
+
+            <label class="form-label">Название проведения:</label>
+
+            <input type="text" id="launch-title-input" class="form-control" required>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">Разрешённые классы (через запятую):</label>
+
+            <input type="text" id="launch-classes-input" class="form-control" required placeholder="Например: 9 А, 9 Б, 9 В">
+
+            <p class="form-hint">Ученик выбирает свой класс и букву из этого списка.</p>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">Длительность работы (минут):</label>
+
+            <div class="stepper-control" style="max-width: 140px;">
+              <input type="number" id="launch-duration-input" class="form-control" value="45" min="0">
+              <div class="stepper-buttons">
+                <button type="button" class="stepper-btn stepper-up" onclick="stepNumberInput(this, 5)" title="Увеличить">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
+                </button>
+                <button type="button" class="stepper-btn stepper-down" onclick="stepNumberInput(this, -5)" title="Уменьшить">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="form-hint">Отсчёт ведётся сервером. 0 — без ограничения времени.</p>
+
+          </div>
+
+          <div class="form-group">
+
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+
+              <input type="checkbox" id="launch-approval-input" style="width: 18px; height: 18px;">
+
+              <span>Требовать ручного одобрения учителя для каждого вошедшего</span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+          <button type="submit" class="btn btn-primary">Создать запуск</button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- 3. Модальное окно: Создание страницы урока на сайте alasster.site -->
+
+  <div id="create-site-page-modal" class="modal-backdrop">
+
+    <div class="modal-dialog">
+
+      <div class="modal-header">
+
+        <h3 class="modal-title">Создать страницу урока на сайте</h3>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeSitePageModal()">✕</button>
+
+      </div>
+
+      <form id="create-site-page-form" onsubmit="handleCreateSitePage(event)">
+
+        <div class="modal-body">
+
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+
+            Страница урока будет автоматически сгенерирована и сохранена в нужную папку вашего сайта <code>alasster.site</code>.
+
+          </p>
+
+          <div class="form-group">
+
+            <label class="form-label">Папка класса:</label>
+
+            <select id="site-grade-folder" class="form-control" required>
+
+              <option value="9 класс">9 класс</option>
+
+              <option value="10 ЕМН">10 ЕМН</option>
+
+              <option value="10 ОГН">10 ОГН</option>
+
+              <option value="11 класс">11 класс</option>
+
+            </select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">Папка четверти:</label>
+
+            <select id="site-quarter-folder" class="form-control" required>
+
+              <option value="1 четверть">1 четверть</option>
+
+              <option value="2 четверть">2 четверть</option>
+
+              <option value="3 четверть">3 четверть</option>
+
+              <option value="4 четверть">4 четверть</option>
+
+            </select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">Номер / Название урока:</label>
+
+            <input type="text" id="site-lesson-number" class="form-control" required placeholder="Например: 7 урок или СОР 1">
+
+            <p class="form-hint">Будет создан файл: <code>{папка четверти}/{номер урока}.html</code></p>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">Тема урока (заголовок):</label>
+
+            <input type="text" id="site-lesson-title" class="form-control" placeholder="Например: Суммативное оценивание за 1 четверть">
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="handleDeleteSitePage()" title="Удалить указанный урок с сайта и из меню">
+
+            <i class="fa-solid fa-trash"></i> Удалить с сайта
+
+          </button>
+
+          <div style="display: flex; gap: 8px;">
+
+            <button type="button" class="btn btn-secondary" onclick="closeSitePageModal()">Отмена</button>
+
+            <button type="submit" class="btn btn-primary">Сгенерировать и добавить в меню</button>
+
+          </div>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- 4. Модальное окно: Предпросмотр теста глазами ученика -->
+
+  <div id="student-preview-modal" class="modal-backdrop">
+
+    <div class="modal-dialog" style="max-width: 860px; max-height: 90vh; display: flex; flex-direction: column;">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h3 class="modal-title">Предпросмотр теста глазами ученика</h3>
+
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Точно так, как работу увидят ученики на своих компьютерах</span>
+
+        </div>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeStudentPreview()">✕</button>
+
+      </div>
+
+      <div class="modal-body" id="preview-modal-body" style="overflow-y: auto; flex: 1; padding: 1.5rem;"></div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" onclick="closeStudentPreview()">Закрыть предпросмотр</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 5. Модальное окно: Подробная проверка и печать бланка в PDF -->
+
+  <div id="student-grading-modal" class="modal-backdrop">
+
+    <div class="modal-dialog" style="max-width: 850px; max-height: 90vh; display: flex; flex-direction: column;">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h3 class="modal-title">Проверка работы ученика</h3>
+
+          <div id="grade-modal-student" style="font-size: 0.95rem; color: var(--primary); font-weight: 700; margin-top: 0.2rem;"></div>
+
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+
+          <button type="button" class="btn btn-primary btn-sm" onclick="printStudentSheet()">🖨 Печать в PDF</button>
+
+          <button type="button" id="close-grade-modal" class="btn btn-secondary btn-sm">✕</button>
+
+        </div>
+
+      </div>
+
+      <div class="modal-body" id="grade-modal-body" style="overflow-y: auto; flex: 1;">
+
+        <div id="grade-modal-tasks"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 6. Модальное окно: Переместить в архив -->
+  <div id="archive-confirm-modal" class="modal-backdrop" onclick="if(event.target === this) closeArchiveModal()">
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="archive-modal-title">
+      <div class="modal-icon" style="color: var(--primary);">
+        📦
+      </div>
+      <h2 id="archive-modal-title" style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text);">Переместить в архив?</h2>
+      <div class="modal-actions" style="margin-top: 24px;">
+        <button type="button" class="button button-ghost" onclick="closeArchiveModal()">Нет</button>
+        <button type="button" id="archive-confirm-btn" class="button button-primary" style="font-weight: 700; color: var(--primary);">Да</button>
       </div>
     </section>
   </div>
 
-    <script src="/static/dashboard.js?v=profile-management-10"></script>
+  <!-- 8. Модальное окно: Универсальное подтверждение (Удалить задание / общее подтверждение) -->
+  <div id="action-confirm-modal" class="modal-backdrop" onclick="if(event.target === this) closeActionConfirmModal(false)">
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="action-confirm-title">
+      <div id="action-confirm-icon" class="modal-icon" style="color: #ef4444;">
+        🗑
+      </div>
+      <h2 id="action-confirm-title" style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text);">Удалить это задание?</h2>
+      <div class="modal-actions" style="margin-top: 24px;">
+        <button type="button" class="button button-ghost" onclick="closeActionConfirmModal(false)">Нет</button>
+        <button type="button" id="action-confirm-btn" class="button button-primary" style="font-weight: 800; color: #ef4444;">Да</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- 7. Модальное окно: Подтверждение удаления -->
+
+  <div id="delete-confirm-modal" class="modal-backdrop" onclick="if(event.target === this) closeDeleteModal()">
+
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+
+      <div class="modal-icon" style="color: #ef4444;">
+
+        🗑
+
+      </div>
+
+      <h2 id="delete-modal-title" style="margin-bottom: 8px;">Удаление</h2>
+
+      <p id="delete-modal-desc" class="modal-text" style="margin-bottom: 18px;"></p>
+
+      <div class="modal-actions">
+
+        <button type="button" class="button button-ghost" onclick="closeDeleteModal()">Отмена</button>
+
+        <button type="button" id="delete-confirm-btn" class="button button-ghost" style="color: #ef4444; font-weight: 800;">Удалить навсегда</button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="/static/vendor/katex.min.js"></script>
+
+  <script src="/static/vendor/auto-render.min.js"></script>
+
+  <script src="/static/test-generator.js?v=29"></script>
+
+    <script src="/static/dashboard.js?v=profile-management-17"></script>
+
 </body>
+
 </html>
+
