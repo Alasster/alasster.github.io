@@ -62,12 +62,22 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "[OK] Все необходимые библиотеки установлены." -ForegroundColor Green
 
-# 3. Правило брандмауэра Windows для входящих подключений (порт 8010)
+# 3. Правило брандмауэра Windows для входящих подключений (порты 8010 и 8001)
 try {
     netsh advfirewall firewall add rule name="Alasster Cabinet Port 8010" dir=in action=allow protocol=TCP localport=8010 | Out-Null
+    netsh advfirewall firewall add rule name="Alasster Student Port 8001" dir=in action=allow protocol=TCP localport=8001 | Out-Null
 } catch {}
 
-# 4. Определение локального IP-адреса Wi-Fi/LAN
+# 4. Определение интернет и локальных адресов
+$publicUrl = "https://6a.tailc56f23.ts.net"
+try {
+    $runtimeFile = Join-Path $scriptDir "Личный кабинет\.runtime\public_url.txt"
+    if (Test-Path $runtimeFile) {
+        $pUrl = (Get-Content $runtimeFile).Trim()
+        if ($pUrl) { $publicUrl = $pUrl }
+    }
+} catch {}
+
 $lanIp = "127.0.0.1"
 try {
     $ips = [System.Net.Dns]::GetHostAddresses([System.Net.Dns]::GetHostName()) | 
@@ -84,20 +94,21 @@ try {
 
 Write-Host ""
 Write-Host "======================================================================" -ForegroundColor Cyan
-Write-Host "  СЕРВЕР УСПЕШНО ЗАПУСКАЕТСЯ! ВСЁ РАБОТАЕТ НА ЕДИНОМ ПОРТУ: 8010       " -ForegroundColor Green
+Write-Host "  СЕРВЕР УСПЕШНО ЗАПУСКАЕТСЯ! ДОСТУПЕН В ЛЮБОЙ СЕТИ И НА ВСЕХ УСТРОЙСТВАХ" -ForegroundColor Green
 Write-Host ""
 Write-Host "  Вход для учителя:" -ForegroundColor White
 Write-Host "    -> С этого компьютера:       http://127.0.0.1:8010" -ForegroundColor Cyan
-Write-Host "    -> С телефона/планшета (LAN): http://$lanIp`:8010" -ForegroundColor Cyan
+Write-Host "    -> По школьному Wi-Fi / LAN: http://$lanIp`:8010" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Для учеников (сдача тестов):" -ForegroundColor White
-Write-Host "    -> http://$lanIp`:8010/generator/exam/<id_работы>" -ForegroundColor Magenta
+Write-Host "  ДЛЯ УЧЕНИКОВ (сдача тестов с любых телефонов / мобильного интернета):" -ForegroundColor Yellow
+Write-Host "    -> ИНТЕРНЕТ (Tailscale):     $publicUrl/generator/exam/<id_работы>" -ForegroundColor Magenta
+Write-Host "    -> В локальном Wi-Fi:        http://$lanIp`:8010/generator/exam/<id_работы>" -ForegroundColor Magenta
 Write-Host ""
 Write-Host "  Сервисы единого сервера:" -ForegroundColor Gray
-Write-Host "    [+] Личный кабинет учителя" -ForegroundColor Gray
+Write-Host "    [+] Личный кабинет учителя (порт 8010)" -ForegroundColor Gray
 Write-Host "    [+] Генератор тестов, СОР и СОЧ" -ForegroundColor Gray
-Write-Host "    [+] Онлайн проведение и мониторинг учеников" -ForegroundColor Gray
-Write-Host "    [+] Сдача работ учениками (ПК, планшеты, телефоны)" -ForegroundColor Gray
+Write-Host "    [+] Интернет-шлюз для учеников (порт 8001 / Tailscale Funnel)" -ForegroundColor Gray
+Write-Host "    [+] Онлайн мониторинг и проведение" -ForegroundColor Gray
 Write-Host "    [+] Раздел «Мои материалы»" -ForegroundColor Gray
 Write-Host ""
 Write-Host "  Для остановки сервера нажмите Ctrl + C в этом окне." -ForegroundColor Yellow

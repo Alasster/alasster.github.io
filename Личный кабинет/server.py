@@ -63,6 +63,9 @@ MATERIALS_DIR.mkdir(parents=True, exist_ok=True)
 LOGGER = logging.getLogger("personal_cabinet.ga4")
 generator_server = None
 generator_timer_task = None
+generator_student_gateway_class = None
+student_gateway_server = None
+student_gateway_task = None
 
 
 def load_local_env() -> None:
@@ -85,7 +88,8 @@ load_local_env()
 
 PERSONAL_CABINET_HOST = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
 PERSONAL_CABINET_PORT = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
-os.environ.setdefault("BAGALAU_STUDENT_PORT", str(PERSONAL_CABINET_PORT))
+os.environ.setdefault("BAGALAU_STUDENT_PORT", "8001")
+os.environ.setdefault("BAGALAU_PUBLIC_URL", "https://6a.tailc56f23.ts.net")
 
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
@@ -494,7 +498,8 @@ async def get_generator_teacher(request: Request) -> dict:
 
 def load_generator_server():
     os.environ["BAGALAU_DB_DIR"] = str(GENERATOR_DATA_DIR)
-    os.environ["BAGALAU_STUDENT_PORT"] = str(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
+    os.environ["BAGALAU_STUDENT_PORT"] = "8001"
+    os.environ.setdefault("BAGALAU_PUBLIC_URL", "https://6a.tailc56f23.ts.net")
     generator_path = str(GENERATOR_DIR)
     sys.path.insert(0, generator_path)
     try:
@@ -507,6 +512,7 @@ def load_generator_server():
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
+        gateway_module = importlib.import_module("public_gateway")
     except Exception:
         sys.modules.pop("personal_cabinet_generator_server", None)
         raise
@@ -518,14 +524,76 @@ def load_generator_server():
         route for route in module.app.router.routes
         if route.path not in {"/api/teacher/login", "/api/teacher/logout"}
     ]
-    return module
+    return module, gateway_module.StudentPublicGateway
+
+
+class StudentPublicGateway:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope['type'] != 'http':
+            await self.app(scope, receive, send)
+            return
+        path = scope.get('path', '')
+        if path == '/':
+            response = HTMLResponse(
+                '<!doctype html><html lang="ru"><meta charset="utf-8">'
+                '<meta name="viewport" content="width=device-width,initial-scale=1">'
+                '<title>Бағалау</title><body style="font:18px sans-serif;padding:2rem">'
+                '<h1>Бағалау</h1><p>Сервер доступен. Откройте ссылку на работу, '
+                'которую выдал учитель.</p></body></html>')
+            await response(scope, receive, send)
+            return
+
+        if path.startswith('/generator/'):
+            clean_path = path[len('/generator'):]
+            query = scope.get('query_string', b'').decode('latin-1')
+            if query:
+                clean_path = f"{clean_path}?{query}"
+            await RedirectResponse(clean_path, status_code=307)(scope, receive, send)
+            return
+
+        allowed = (
+            path == '/api/health'
+            or path.startswith('/exam/')
+            or path.startswith('/api/student/')
+            or path.startswith('/static/')
+        )
+        if not allowed:
+            await JSONResponse({'detail': 'Доступен только вход ученика'}, status_code=404)(scope, receive, send)
+            return
+
+        await self.app(scope, receive, send)
+
+
+async def start_student_gateway() -> None:
+    global student_gateway_server, student_gateway_task
+    import uvicorn
+
+    gateway_app = StudentPublicGateway(app)
+    config = uvicorn.Config(
+        gateway_app,
+        host="0.0.0.0",
+        port=8001,
+        lifespan="off",
+        log_config=None,
+    )
+    student_gateway_server = uvicorn.Server(config)
+    student_gateway_task = asyncio.create_task(student_gateway_server.serve())
+    for _ in range(50):
+        if student_gateway_server.started:
+            return
+        if student_gateway_task.done():
+            break
+        await asyncio.sleep(0.1)
 
 
 @app.on_event("startup")
 async def startup() -> None:
-    global generator_server, generator_timer_task
+    global generator_server, generator_timer_task, generator_student_gateway_class
     init_db()
-    generator_server = load_generator_server()
+    generator_server, generator_student_gateway_class = load_generator_server()
     await generator_server.init_db()
     app.dependency_overrides[generator_server.get_current_teacher] = get_generator_teacher
     for route in generator_server.app.routes:
@@ -535,6 +603,10 @@ async def startup() -> None:
             app.routes.append(route)
     app.mount("/generator", generator_server.app, name="test_generator")
     generator_timer_task = asyncio.create_task(generator_server.background_timer_and_heartbeat_checker())
+    try:
+        await start_student_gateway()
+    except Exception as e:
+        LOGGER.warning("Could not bind port 8001: %s", e)
 
 
 @app.on_event("shutdown")
@@ -542,6 +614,10 @@ async def shutdown() -> None:
     if generator_timer_task is not None:
         generator_timer_task.cancel()
         await asyncio.gather(generator_timer_task, return_exceptions=True)
+    if student_gateway_server is not None:
+        student_gateway_server.should_exit = True
+    if student_gateway_task is not None:
+        await asyncio.gather(student_gateway_task, return_exceptions=True)
 
 
 @app.get("/", response_class=HTMLResponse)
