@@ -26,6 +26,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from fastapi import FastAPI, HTTPException, Request, Response, status, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -62,9 +63,6 @@ MATERIALS_DIR.mkdir(parents=True, exist_ok=True)
 LOGGER = logging.getLogger("personal_cabinet.ga4")
 generator_server = None
 generator_timer_task = None
-generator_student_gateway_class = None
-student_gateway_server = None
-student_gateway_task = None
 
 
 def load_local_env() -> None:
@@ -85,6 +83,10 @@ def load_local_env() -> None:
 
 load_local_env()
 
+PERSONAL_CABINET_HOST = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
+PERSONAL_CABINET_PORT = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
+os.environ.setdefault("BAGALAU_STUDENT_PORT", str(PERSONAL_CABINET_PORT))
+
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
 SESSION_TTL = 60 * 60 * 24 * 7
@@ -96,8 +98,18 @@ SUPERADMIN_EMAIL = os.environ.get("PERSONAL_CABINET_SUPERADMIN_EMAIL", "alasster
 ALLOWED_ROLES = {"user", "teacher", "admin", "superadmin"}
 
 app = FastAPI(title="Личный кабинет", docs_url=None, redoc_url=None)
-app.mount("/static/uploads", StaticFiles(directory=BASE_DIR / "generator" / "static" / "uploads"), name="generator_uploads")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.mount("/generator/static", StaticFiles(directory=BASE_DIR / "generator" / "static"), name="generator_static_direct")
+app.mount("/static/css", StaticFiles(directory=BASE_DIR / "generator" / "static" / "css"), name="generator_css")
+app.mount("/static/js", StaticFiles(directory=BASE_DIR / "generator" / "static" / "js"), name="generator_js")
 app.mount("/static/vendor", StaticFiles(directory=BASE_DIR / "generator" / "static" / "vendor"), name="generator_vendor")
+app.mount("/static/uploads", StaticFiles(directory=BASE_DIR / "generator" / "static" / "uploads"), name="generator_uploads")
 app.mount("/materials", StaticFiles(directory=MATERIALS_DIR), name="materials")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
@@ -116,16 +128,22 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     embedded_generator_page = (
         request.url.path == "/generator/teacher"
+        or request.url.path == "/teacher"
         or request.url.path.startswith("/generator/exam/")
+        or request.url.path.startswith("/exam/")
+        or request.url.path.startswith("/generator/lesson/")
+        or request.url.path.startswith("/lesson/")
     )
     response.headers["X-Frame-Options"] = "SAMEORIGIN" if embedded_generator_page else "DENY"
     response.headers["Referrer-Policy"] = "same-origin"
     response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; base-uri 'self'; object-src 'none'; "
-        "frame-ancestors 'self'; form-action 'self'; "
-        "script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        "font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' ws: wss:; "
-        "img-src 'self' data: blob:"
+        "default-src 'self' 'unsafe-inline' data: blob:; "
+        "frame-ancestors 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*; "
+        "font-src 'self' https://fonts.gstatic.com data:; "
+        "connect-src 'self' * ws: wss:; "
+        "img-src 'self' data: blob: https://* http://*;"
     )
     return response
 
@@ -476,6 +494,7 @@ async def get_generator_teacher(request: Request) -> dict:
 
 def load_generator_server():
     os.environ["BAGALAU_DB_DIR"] = str(GENERATOR_DATA_DIR)
+    os.environ["BAGALAU_STUDENT_PORT"] = str(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
     generator_path = str(GENERATOR_DIR)
     sys.path.insert(0, generator_path)
     try:
@@ -488,7 +507,6 @@ def load_generator_server():
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
-        gateway_module = importlib.import_module("public_gateway")
     except Exception:
         sys.modules.pop("personal_cabinet_generator_server", None)
         raise
@@ -500,38 +518,14 @@ def load_generator_server():
         route for route in module.app.router.routes
         if route.path not in {"/api/teacher/login", "/api/teacher/logout"}
     ]
-    return module, gateway_module.StudentPublicGateway
-
-
-async def start_student_gateway() -> None:
-    global student_gateway_server, student_gateway_task
-    import uvicorn
-
-    gateway_app = generator_student_gateway_class(app)
-    config = uvicorn.Config(
-        gateway_app,
-        host="0.0.0.0",
-        port=int(os.environ.get("BAGALAU_STUDENT_PORT", "8001")),
-        lifespan="off",
-        log_config=None,
-    )
-    student_gateway_server = uvicorn.Server(config)
-    student_gateway_task = asyncio.create_task(student_gateway_server.serve())
-    for _ in range(50):
-        if student_gateway_server.started:
-            return
-        if student_gateway_task.done():
-            await student_gateway_task
-            raise RuntimeError("Не удалось запустить ученический сервер на порту 8001")
-        await asyncio.sleep(0.1)
-    raise RuntimeError("Не удалось запустить ученический сервер на порту 8001")
+    return module
 
 
 @app.on_event("startup")
 async def startup() -> None:
-    global generator_server, generator_timer_task, generator_student_gateway_class
+    global generator_server, generator_timer_task
     init_db()
-    generator_server, generator_student_gateway_class = load_generator_server()
+    generator_server = load_generator_server()
     await generator_server.init_db()
     app.dependency_overrides[generator_server.get_current_teacher] = get_generator_teacher
     for route in generator_server.app.routes:
@@ -541,7 +535,6 @@ async def startup() -> None:
             app.routes.append(route)
     app.mount("/generator", generator_server.app, name="test_generator")
     generator_timer_task = asyncio.create_task(generator_server.background_timer_and_heartbeat_checker())
-    await start_student_gateway()
 
 
 @app.on_event("shutdown")
@@ -549,10 +542,6 @@ async def shutdown() -> None:
     if generator_timer_task is not None:
         generator_timer_task.cancel()
         await asyncio.gather(generator_timer_task, return_exceptions=True)
-    if student_gateway_server is not None:
-        student_gateway_server.should_exit = True
-    if student_gateway_task is not None:
-        await asyncio.gather(student_gateway_task, return_exceptions=True)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -1323,4 +1312,6 @@ def generator_compatible_health():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("server:app", host=os.environ.get("PERSONAL_CABINET_HOST", "127.0.0.1"), port=int(os.environ.get("PERSONAL_CABINET_PORT", "8010")), reload=False)
+    host = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
+    port = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
+    uvicorn.run("server:app", host=host, port=port, reload=False)
