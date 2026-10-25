@@ -1,11 +1,37 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
-title Единый сервер — Личный кабинет и Генератор тестов
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0run_server.ps1"
-if %ERRORLEVEL% neq 0 (
-    echo.
-    echo Ошибка при запуске. Нажмите любую клавишу для закрытия...
-    pause >nul
+title Alasster Unified Server
+
+set "PYTHON="
+
+if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PYTHON=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+if not defined PYTHON (
+    for %%V in (Python313 Python312 Python311 Python310) do (
+        if not defined PYTHON if exist "%LOCALAPPDATA%\Programs\Python\%%V\python.exe" set "PYTHON=%LOCALAPPDATA%\Programs\Python\%%V\python.exe"
+    )
+)
+if not defined PYTHON (
+    for %%V in (Python313 Python312 Python311 Python310) do (
+        if not defined PYTHON if exist "%ProgramFiles%\Python\%%V\python.exe" set "PYTHON=%ProgramFiles%\Python\%%V\python.exe"
+        if not defined PYTHON if exist "%ProgramFiles%\%%V\python.exe" set "PYTHON=%ProgramFiles%\%%V\python.exe"
+        if not defined PYTHON if exist "C:\%%V\python.exe" set "PYTHON=C:\%%V\python.exe"
+    )
+)
+if not defined PYTHON (
+    python --version >nul 2>&1
+    if not errorlevel 1 set "PYTHON=python"
+)
+if not defined PYTHON (
+    py -3 --version >nul 2>&1
+    if not errorlevel 1 set "PYTHON=py -3"
 )
 
+if not defined PYTHON (
+    echo [ERROR] Python 3.10+ not found!
+    echo Please install Python 3.10+ from https://www.python.org/
+    pause
+    exit /b 1
+)
+
+"%PYTHON%" "start_runner.py"
+if errorlevel 1 pause
