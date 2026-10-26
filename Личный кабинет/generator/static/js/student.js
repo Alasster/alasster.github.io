@@ -49,8 +49,38 @@ document.addEventListener("dragstart", (e) => {
   }
 }, true);
 
-// Защита от Circle to Search, Google Lens и захвата экрана при потере фокуса
+// Защита от Circle to Search, Google Lens, боковых панелей и захвата экрана
 let isExamActive = false;
+
+function resumeExamFocus() {
+  document.body.classList.remove("exam-unfocused");
+  try {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      }
+    }
+  } catch (e) {}
+  window.focus();
+}
+
+function checkExamSecurity() {
+  if (!isExamActive) return;
+  const isDocumentFocused = document.hasFocus();
+  const isTabVisible = !document.hidden && document.visibilityState === "visible";
+  const isCalcFocused = document.getElementById("calc-popup")?.contains(document.activeElement);
+
+  // Если окно потеряло фокус (открыта боковая панель Google Lens, клик в поисковик, переключение вкладки):
+  if (!isTabVisible || (!isDocumentFocused && !isCalcFocused)) {
+    document.body.classList.add("exam-unfocused");
+  } else if (isDocumentFocused && isTabVisible) {
+    // Если боковая панель не активна и фокус вернулся
+  }
+}
+
+setInterval(checkExamSecurity, 120);
 
 window.addEventListener("blur", () => {
   if (isExamActive && !document.getElementById("calc-popup")?.contains(document.activeElement)) {
@@ -59,16 +89,51 @@ window.addEventListener("blur", () => {
 });
 
 window.addEventListener("focus", () => {
-  document.body.classList.remove("exam-unfocused");
+  if (document.hasFocus()) {
+    document.body.classList.remove("exam-unfocused");
+  }
 });
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && isExamActive) {
     document.body.classList.add("exam-unfocused");
-  } else if (!document.hidden) {
+  } else if (!document.hidden && isExamActive && document.hasFocus()) {
     document.body.classList.remove("exam-unfocused");
   }
 });
+
+document.addEventListener("fullscreenchange", () => {
+  if (isExamActive && !document.fullscreenElement && !document.webkitFullscreenElement) {
+    document.body.classList.add("exam-unfocused");
+  }
+});
+
+document.addEventListener("webkitfullscreenchange", () => {
+  if (isExamActive && !document.fullscreenElement && !document.webkitFullscreenElement) {
+    document.body.classList.add("exam-unfocused");
+  }
+});
+
+// Блокировка клавиш скриншотеров (PrintScreen, Snipping Tool) и инспекции
+document.addEventListener("keydown", (e) => {
+  if (!isExamActive) return;
+  if (e.key === "F12" || (e.ctrlKey && ["u", "p", "s", "U", "P", "S"].includes(e.key))) {
+    e.preventDefault();
+    return false;
+  }
+  if (e.ctrlKey && e.shiftKey && ["i", "I", "c", "C", "j", "J", "s", "S"].includes(e.key)) {
+    e.preventDefault();
+    return false;
+  }
+  if (e.key === "PrintScreen" || e.code === "PrintScreen") {
+    e.preventDefault();
+    try { navigator.clipboard?.writeText(""); } catch (err) {}
+    document.body.classList.add("exam-unfocused");
+    setTimeout(() => {
+      if (document.hasFocus()) document.body.classList.remove("exam-unfocused");
+    }, 1200);
+  }
+}, true);
 
 // =========================================================================
 // РАБОТА С ТОКЕНОМ УЧЕНИКА (С ПОДДЕРЖКОЙ SESSIONSTORAGE И LOCALSTORAGE)
@@ -258,11 +323,6 @@ function populateLaunchInfoOnScreens() {
   const varGroup = document.getElementById("variant-picker-group");
   const card1 = document.getElementById("var-card-1");
   const card2 = document.getElementById("var-card-2");
-  const sub1 = document.getElementById("var-sub-1");
-  const sub2 = document.getElementById("var-sub-2");
-
-  if (sub1) sub1.textContent = hasBoth ? `Нечётный ряд (${v1Tasks} зад.)` : `${v1Tasks} зад.`;
-  if (sub2) sub2.textContent = hasBoth ? `Чётный ряд (${v2Tasks} зад.)` : `${v2Tasks} зад.`;
 
   if (!hasBoth) {
     if (hasV2 && !hasV1) {
@@ -637,6 +697,17 @@ async function startExamSession() {
 
   isExamActive = true;
   document.body.classList.remove("exam-unfocused");
+
+  try {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      }
+    }
+  } catch (e) {}
+
   showScreen("screen-testing");
   if (currentAttempt) {
     document.getElementById("student-info-badge").textContent = `${currentAttempt.student_name} (${currentAttempt.student_class})`;

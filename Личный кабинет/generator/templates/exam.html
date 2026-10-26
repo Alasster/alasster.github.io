@@ -15,7 +15,7 @@
   <!-- KaTeX for Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <link rel="stylesheet" href="/generator/static/css/app.css?v=3">
-  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=9">
+  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=15">
   <style>
     /* Защита от Google Lens, Circle to Search, копирования и скриншотов */
     body {
@@ -37,21 +37,20 @@
       user-select: none !important;
       -webkit-touch-callout: none !important;
     }
-    /* Моментальный защитный блюр при потере фокуса (глушит Circle to Search, Google Lens и захват экрана) */
+    /* Полная защита от Google Lens, Circle to Search, боковой панели и скриншотов */
     body.exam-unfocused #screen-testing {
-      filter: blur(28px) grayscale(100%) !important;
-      opacity: 0.12 !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      filter: blur(50px) grayscale(100%) !important;
       pointer-events: none !important;
-      transition: filter 0.04s ease, opacity 0.04s ease;
+      transition: none !important;
     }
     #lens-shield-overlay {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 999999;
-      background: rgba(231, 235, 243, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: var(--surface) !important;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -60,6 +59,20 @@
     }
     body.exam-unfocused #lens-shield-overlay {
       display: flex !important;
+    }
+    /* Тонкий защитный анти-OCR микроузор для предотвращения машинного распознавания шрифтов */
+    .task-card, .matching-item, .cat-item, .option-card {
+      position: relative;
+    }
+    .task-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(83, 109, 254, 0.035) 1px, transparent 1px);
+      background-size: 6px 6px;
+      border-radius: inherit;
+      z-index: 1;
     }
     .img-shield-wrapper {
       position: relative;
@@ -126,18 +139,12 @@
             <div class="variant-picker-grid">
               <div class="variant-pick-card active" id="var-card-1" onclick="selectVariant('1')">
                 <div class="variant-color-dot" id="var-dot-1" style="background: #FCE8E6;"></div>
-                <div>
-                  <div class="variant-pick-title">Вариант 1</div>
-                  <div class="variant-pick-Card-sub" id="var-sub-1">Нечётный ряд</div>
-                </div>
+                <span class="variant-pick-title">Вариант 1</span>
                 <div class="var-check">✓</div>
               </div>
               <div class="variant-pick-card" id="var-card-2" onclick="selectVariant('2')">
                 <div class="variant-color-dot" id="var-dot-2" style="background: #E6F4EA;"></div>
-                <div>
-                  <div class="variant-pick-title">Вариант 2</div>
-                  <div class="variant-pick-Card-sub" id="var-sub-2">Чётный ряд</div>
-                </div>
+                <span class="variant-pick-title">Вариант 2</span>
                 <div class="var-check">✓</div>
               </div>
             </div>
@@ -509,16 +516,22 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
   <script src="/generator/static/js/exam-content-guard.js?v=1"></script>
-  <script src="/generator/static/js/student.js?v=9"></script>
+  <script src="/generator/static/js/student.js?v=15"></script>
   <!-- Оверлей защиты от Google Lens / Circle to Search -->
   <div id="lens-shield-overlay">
-    <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">🛡️</div>
-    <div style="font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem;">Режим защиты тестирования</div>
-    <div style="font-size: 0.9rem; color: var(--muted); max-width: 440px; line-height: 1.5; margin-bottom: 1.25rem;">
-      Окно экзамена автоматически скрыто при переключении приложений или попытке сканирования экрана. Нажмите кнопку ниже, чтобы вернуться.
+    <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-out); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#536dfe" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
     </div>
-    <button type="button" class="btn btn-primary" onclick="window.focus(); document.body.classList.remove('exam-unfocused');" style="padding: 0.75rem 1.6rem; font-size: 0.95rem;">
-      Продолжить тестирование
+    <div style="font-size: 1.45rem; font-weight: 800; color: var(--text); margin-bottom: 0.65rem;">Экран экзамена защищён</div>
+    <div style="font-size: 0.95rem; color: var(--muted); max-width: 480px; line-height: 1.55; margin-bottom: 1.5rem;">
+      Вопросы автоматически скрыты при потере фокуса, выходе из полноэкранного режима или активации экранных ассистентов (Google Lens, боковые панели).
+    </div>
+    <button type="button" class="btn btn-primary" onclick="resumeExamFocus()" style="padding: 0.9rem 2rem; font-size: 1.02rem; font-weight: 800;">
+      Вернуться к экзамену (на весь экран)
     </button>
   </div>
 </body>

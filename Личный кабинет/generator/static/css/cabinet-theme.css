@@ -324,10 +324,12 @@ select.inline-select {
 }
 
 .variant-pick-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 12px 18px !important;
+  min-height: 52px !important;
   border-radius: 18px !important;
   border: 2px solid transparent !important;
   background: var(--surface) !important;
@@ -336,6 +338,7 @@ select.inline-select {
   transition: all 0.18s ease;
   user-select: none;
   position: relative;
+  white-space: nowrap !important;
 }
 
 .variant-pick-card:hover {
@@ -350,28 +353,25 @@ select.inline-select {
 }
 
 .variant-color-dot {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
   box-shadow: var(--shadow-soft);
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.85);
   flex-shrink: 0;
 }
 
 .variant-pick-title {
-  font-weight: 800;
-  font-size: 0.96rem;
-  color: var(--text);
+  font-weight: 800 !important;
+  font-size: 0.98rem !important;
+  color: var(--text) !important;
+  white-space: nowrap !important;
+  flex: 1 !important;
+  text-align: left !important;
 }
 
 .variant-pick-card.active .variant-pick-title {
-  color: var(--primary-dark);
-}
-
-.variant-pick-Card-sub {
-  font-size: 0.74rem;
-  color: var(--muted);
-  font-weight: 600;
+  color: var(--primary-dark) !important;
 }
 
 .variant-pick-card .var-check {
@@ -387,6 +387,7 @@ select.inline-select {
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 900;
+  flex-shrink: 0;
   transition: all 0.18s ease;
 }
 
