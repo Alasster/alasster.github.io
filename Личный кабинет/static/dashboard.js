@@ -510,6 +510,13 @@ async function loadSiteOverview() {
   trafficModes.forEach((button) => { button.disabled = !analyticsAvailable; });
   summaryStatus.textContent = analyticsAvailable ? 'GA4 подключён' : 'Ожидание GA4';
   renderTrafficChart(selectedTrafficMode);
+
+  if (data.mobile_connect) {
+    const lanInput = document.getElementById('mobile-lan-link');
+    const internetInput = document.getElementById('mobile-internet-link');
+    if (lanInput && data.mobile_connect.lan_url) lanInput.value = data.mobile_connect.lan_url;
+    if (internetInput && data.mobile_connect.internet_url) internetInput.value = data.mobile_connect.internet_url;
+  }
 }
 
 function renderLessonsCatalog(classes) {

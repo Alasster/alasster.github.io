@@ -276,11 +276,16 @@ def init_db() -> None:
             db.commit()
 
 
+def is_local_request(request: Request) -> bool:
+    if request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for"):
+        return False
+    client_host = request.client.host if request.client else ""
+    return client_host in ("127.0.0.1", "::1", "localhost")
+
 def get_user_from_request(request: Request) -> sqlite3.Row | None:
     token = request.cookies.get(SESSION_COOKIE) or request.query_params.get("session_token")
     if not token:
-        client_host = request.client.host if request.client else ""
-        if client_host in ("127.0.0.1", "::1", "localhost") and request.url.path not in ("/login", "/register"):
+        if is_local_request(request) and request.url.path not in ("/login", "/register"):
             with closing(open_db()) as db:
                 return db.execute(
                     "SELECT id, username, display_name, first_name, last_name, role FROM users WHERE role = 'superadmin' ORDER BY id LIMIT 1"
@@ -643,6 +648,16 @@ def _save_public_url(url: str | None) -> None:
                 pub_file.unlink()
         except Exception:
             pass
+    try:
+        scripts_dir = BASE_DIR.parent / "скрипты"
+        scripts_dir.mkdir(parents=True, exist_ok=True)
+        json_file = scripts_dir / "cabinet_url.json"
+        if url:
+            json_file.write_text(json.dumps({"url": url}), encoding="utf-8")
+        elif json_file.exists():
+            json_file.unlink()
+    except Exception:
+        pass
 
 
 def _probe_url_health(base_url: str, timeout: float = 3.0) -> bool:
@@ -671,7 +686,7 @@ def _try_tailscale_funnel() -> str | None:
         if not dns_name:
             return None
         url = f"https://{dns_name}"
-        subprocess.run([exe, "funnel", "--bg", "--https=443", "http://127.0.0.1:8001"], capture_output=True, timeout=6)
+        subprocess.run([exe, "funnel", "--bg", "--https=443", "http://127.0.0.1:8010"], capture_output=True, timeout=6)
         if _probe_url_health(url, timeout=3.0):
             return url
     except Exception:
@@ -693,7 +708,7 @@ async def _maintain_ssh_tunnel() -> None:
             try:
                 proc = await asyncio.create_subprocess_exec(
                     cf_exe,
-                    "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:8001",
+                    "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:8010",
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
                 )
@@ -732,7 +747,7 @@ async def _maintain_ssh_tunnel() -> None:
                 "-o", "UserKnownHostsFile=NUL",
                 "-o", "ServerAliveInterval=30",
                 "-o", "ServerAliveCountMax=3",
-                "-R", "80:127.0.0.1:8001",
+                "-R", "80:127.0.0.1:8010",
                 "nokey@localhost.run",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,
@@ -793,7 +808,8 @@ def dashboard(request: Request):
     resp = HTMLResponse(page("dashboard.html"))
     query_token = request.query_params.get("session_token")
     if query_token:
-        resp.set_cookie(SESSION_COOKIE, query_token, max_age=SESSION_TTL, httponly=True, samesite="lax")
+        is_https = (request.url.scheme == "https") or (request.headers.get("x-forwarded-proto") == "https")
+        resp.set_cookie(SESSION_COOKIE, query_token, max_age=SESSION_TTL, httponly=True, samesite="lax", secure=is_https)
     return resp
 
 
@@ -903,6 +919,18 @@ def site_overview(request: Request):
         ).fetchone()["count"]
     content = site_content_summary()
     analytics = ga4_summary()
+    pub_file = BASE_DIR / ".runtime" / "public_url.txt"
+    pub_url = pub_file.read_text(encoding="utf-8").strip() if pub_file.exists() else (os.environ.get("BAGALAU_PUBLIC_URL") or "")
+    lan_ip = "127.0.0.1"
+    try:
+        hostname = socket.gethostname()
+        for info in socket.getaddrinfo(hostname, None, socket.AF_INET):
+            ip = info[4][0]
+            if not ip.startswith(("127.", "169.254.", "100.")):
+                lan_ip = ip
+                break
+    except Exception:
+        pass
     return {
         "site": "alasster.site",
         "lessons": content["lessons"],
@@ -912,6 +940,11 @@ def site_overview(request: Request):
         "online_users": analytics["online_users"],
         "analytics_available": analytics["available"],
         "traffic": analytics["traffic"],
+        "mobile_connect": {
+            "lan_ip": lan_ip,
+            "lan_url": f"http://{lan_ip}:8010",
+            "internet_url": pub_url or None,
+        },
     }
 
 
@@ -923,7 +956,7 @@ def lessons_catalog(request: Request):
 
 
 @app.post("/api/login")
-def login(payload: LoginRequest, response: Response):
+def login(payload: LoginRequest, request: Request, response: Response):
     email = payload.username.strip().lower()
     with closing(open_db()) as db:
         user = db.execute(
@@ -944,13 +977,14 @@ def login(payload: LoginRequest, response: Response):
         )
         db.commit()
 
+    is_https = (request.url.scheme == "https") or (request.headers.get("x-forwarded-proto") == "https")
     response.set_cookie(
         SESSION_COOKIE,
         token,
         max_age=SESSION_TTL,
         httponly=True,
         samesite="lax",
-        secure=os.environ.get("PERSONAL_CABINET_SECURE_COOKIE", "0") == "1",
+        secure=is_https,
     )
     return {"ok": True, "user": {"username": user["username"], "display_name": user["display_name"], "role": user["role"]}}
 

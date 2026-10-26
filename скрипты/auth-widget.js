@@ -4,7 +4,14 @@
  */
 
 (function() {
-  const CLOUD_TUNNEL_FALLBACK = 'https://fever-tablet-solomon-add.trycloudflare.com';
+  const CLOUD_TUNNEL_FALLBACK = 'https://bowl-lane-lip-pork.trycloudflare.com';
+
+  try {
+    fetch('/скрипты/cabinet_url.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.url) window.ALASSTER_CABINET_URL = d.url; })
+      .catch(() => {});
+  } catch (e) {}
 
   function getCabinetBaseUrl() {
     // If running on port 8010, same origin
