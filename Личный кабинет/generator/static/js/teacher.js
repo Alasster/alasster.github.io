@@ -2334,7 +2334,12 @@ function renderLiveStudentsTable() {
       <td>${escapeHtml(s.student_class)}</td>
       <td>${varBadge}</td>
       <td><span style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">${escapeHtml(s.device_label || 'Сеть')}</span></td>
-      <td><span class="badge badge-${s.status}">${getStatusLabel(s.status)}</span>${s.is_duplicate_flag ? '<br><small>Повторный вход с устройства/IP: проверьте ученика</small>' : ''}</td>
+      <td>
+        <span class="badge badge-${s.status}">${getStatusLabel(s.status)}</span>
+        ${s.is_away ? '<div style="margin-top: 4px;"><span class="badge" style="background: #fef3c7; color: #b45309; font-weight: 800; font-size: 0.72rem; border: 1px solid rgba(217, 119, 6, 0.4); padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">👀 Свернул окно</span></div>' : ''}
+        ${s.tab_switches_count > 0 ? `<div style="margin-top: 4px;"><span class="badge" style="background: #fee2e2; color: #dc2626; font-weight: 800; font-size: 0.72rem; border: 1px solid rgba(220, 38, 38, 0.4); padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" title="Количество уходов с вкладки или переключений окон (Alt+Tab / рабочий стол / другие приложения)">⚠️ Уходов: ${s.tab_switches_count}</span></div>` : ''}
+        ${s.is_duplicate_flag ? '<br><small>Повторный вход с устройства/IP: проверьте ученика</small>' : ''}
+      </td>
       <td>${connHtml}</td>
       <td>${s.answered_count || 0} / ${s.task_count || 0} (${s.progress_pct || 0}%)</td>
       <td>${s.started_at ? new Date(s.started_at).toLocaleTimeString() : '—'}</td>
@@ -3383,13 +3388,39 @@ function downloadExport(type) {
   window.open(`/api/launches/${activeLaunch.id}/export.${type}`, "_blank");
 }
 
+let teacherLiveEventSource = null;
+
 function startLiveMonitoring(launchId) {
   stopLiveMonitoring();
-  pollInterval = setInterval(refreshStudentsList, 5000);
+  pollInterval = setInterval(refreshStudentsList, 3000);
+  try {
+    teacherLiveEventSource = new EventSource(`/api/launches/${launchId}/stream`);
+    teacherLiveEventSource.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.event === "student_tab_switch") {
+          const item = activeLaunchStudents.find(s => s.id === payload.data?.attempt_id);
+          if (item) {
+            item.tab_switches_count = payload.data.tab_switches_count;
+            item.is_away = payload.data.is_away;
+            renderLiveStudentsTable();
+          } else {
+            refreshStudentsList();
+          }
+        } else if (["student_joined", "student_started", "student_submitted", "student_time_expired", "student_action_applied"].includes(payload.event)) {
+          refreshStudentsList();
+        }
+      } catch (e) {}
+    };
+  } catch (e) {}
 }
 
 function stopLiveMonitoring() {
   if (pollInterval) clearInterval(pollInterval);
+  if (teacherLiveEventSource) {
+    try { teacherLiveEventSource.close(); } catch (e) {}
+    teacherLiveEventSource = null;
+  }
 }
 
 // Резервные копии

@@ -233,7 +233,9 @@ async def init_db():
             ("student_attempts", "device_name", "TEXT"),
             ("student_attempts", "variant", "TEXT DEFAULT '1'"),
             ("student_attempts", "publish_results_override", "INTEGER DEFAULT NULL"),
-            ("student_attempts", "hidden_from_live", "INTEGER DEFAULT 0")
+            ("student_attempts", "hidden_from_live", "INTEGER DEFAULT 0"),
+            ("student_attempts", "tab_switches_count", "INTEGER DEFAULT 0"),
+            ("student_attempts", "is_away", "INTEGER DEFAULT 0")
         ]
         for tbl, col, col_def in migrations:
             try:

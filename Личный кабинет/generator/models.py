@@ -127,6 +127,9 @@ class StudentJoinRequest(BaseModel):
 class StudentChangeVariantRequest(BaseModel):
     variant: str
 
+class StudentTabEventRequest(BaseModel):
+    event: str
+
 class CreateBackupRequest(BaseModel):
     name: Optional[str] = None
 

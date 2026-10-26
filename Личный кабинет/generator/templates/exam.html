@@ -15,7 +15,7 @@
   <!-- KaTeX for Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <link rel="stylesheet" href="/generator/static/css/app.css?v=3">
-  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=15">
+  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=21">
   <style>
     /* Защита от Google Lens, Circle to Search, копирования и скриншотов */
     body {
@@ -37,28 +37,27 @@
       user-select: none !important;
       -webkit-touch-callout: none !important;
     }
-    /* Полная защита от Google Lens, Circle to Search, боковой панели и скриншотов */
-    body.exam-unfocused #screen-testing {
-      visibility: hidden !important;
-      opacity: 0 !important;
-      filter: blur(50px) grayscale(100%) !important;
-      pointer-events: none !important;
-      transition: none !important;
-    }
-    #lens-shield-overlay {
-      display: none;
+    /* Всплывающее предупреждение ученику о переключении окна / Alt+Tab */
+    .student-tab-warning-toast {
       position: fixed;
-      inset: 0;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 999999;
-      background: var(--surface) !important;
-      flex-direction: column;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.25), var(--shadow-out);
+      border: 2px solid rgba(220, 38, 38, 0.45);
+      border-radius: 18px;
+      padding: 12px 22px;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 1.5rem;
+      gap: 14px;
+      animation: slideDownToast 0.25s ease-out;
+      pointer-events: none;
     }
-    body.exam-unfocused #lens-shield-overlay {
-      display: flex !important;
+    @keyframes slideDownToast {
+      from { opacity: 0; transform: translate(-50%, -20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
     }
     /* Тонкий защитный анти-OCR микроузор для предотвращения машинного распознавания шрифтов */
     .task-card, .matching-item, .cat-item, .option-card {
@@ -408,8 +407,18 @@
           Ваши ответы зафиксированы на сервере учителя.
         </p>
 
-        <!-- Блок мгновенной статистики после сдачи -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1rem;">
+        <!-- Блок мгновенной статистики после сдачи: Набрано баллов на первом месте -->
+        <div class="neu-well" style="padding: 1.25rem; margin-bottom: 1rem;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary-dark); font-weight: 800;">Набрано баллов</div>
+          <div id="res-score-badge" style="font-size: 1.85rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.25rem;">0 из 0</div>
+          <span id="conf-code-badge" style="display: none;"></span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1.5rem;">
+          <div class="neu-well" style="padding: 1rem;">
+            <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Время сдачи</div>
+            <div id="conf-time-text" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">—</div>
+          </div>
           <div class="neu-well" style="padding: 1rem;">
             <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Выполнено</div>
             <div id="res-completed-count" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">0 из 0</div>
@@ -418,16 +427,6 @@
             <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Затрачено</div>
             <div id="res-time-spent" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">0 мин</div>
           </div>
-          <div class="neu-well" style="padding: 1rem;">
-            <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Время сдачи</div>
-            <div id="conf-time-text" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">—</div>
-          </div>
-        </div>
-
-        <div class="neu-well" style="padding: 1.25rem; margin-bottom: 1.5rem;">
-          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary-dark); font-weight: 800;">Набрано баллов</div>
-          <div id="res-score-badge" style="font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.3rem;">0 из 0</div>
-          <span id="conf-code-badge" style="display: none;"></span>
         </div>
 
         <!-- Блок результатов, если учитель опубликовал их -->
@@ -516,23 +515,16 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
   <script src="/generator/static/js/exam-content-guard.js?v=1"></script>
-  <script src="/generator/static/js/student.js?v=15"></script>
-  <!-- Оверлей защиты от Google Lens / Circle to Search -->
-  <div id="lens-shield-overlay">
-    <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-out); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#536dfe" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
+  <script src="/generator/static/js/student.js?v=21"></script>
+  <!-- Тост предупреждения ученика об уходе с окна / Alt+Tab -->
+  <div id="student-tab-warning-toast" class="student-tab-warning-toast" style="display: none;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+      ⚠️
     </div>
-    <div style="font-size: 1.45rem; font-weight: 800; color: var(--text); margin-bottom: 0.65rem;">Экран экзамена защищён</div>
-    <div style="font-size: 0.95rem; color: var(--muted); max-width: 480px; line-height: 1.55; margin-bottom: 1.5rem;">
-      Вопросы автоматически скрыты при потере фокуса, выходе из полноэкранного режима или активации экранных ассистентов (Google Lens, боковые панели).
+    <div>
+      <div style="font-weight: 800; font-size: 0.94rem; color: #dc2626; margin-bottom: 2px;">Зафиксировано переключение окна (Alt+Tab / вкладка)</div>
+      <div style="font-size: 0.82rem; color: var(--muted);" id="tab-warning-text">Учитель видит все уходы с экрана в режиме реального времени.</div>
     </div>
-    <button type="button" class="btn btn-primary" onclick="resumeExamFocus()" style="padding: 0.9rem 2rem; font-size: 1.02rem; font-weight: 800;">
-      Вернуться к экзамену (на весь экран)
-    </button>
   </div>
 </body>
 </html>

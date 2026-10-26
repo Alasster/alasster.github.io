@@ -49,72 +49,76 @@ document.addEventListener("dragstart", (e) => {
   }
 }, true);
 
-// Защита от Circle to Search, Google Lens, боковых панелей и захвата экрана
+// Мониторинг уходов с экрана, Alt+Tab, переключения виртуальных рабочих столов и окон
 let isExamActive = false;
+let tabSwitchesCount = 0;
+let isCurrentlyAway = false;
+let toastTimeout = null;
 
-function resumeExamFocus() {
-  document.body.classList.remove("exam-unfocused");
-  try {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
-      }
-    }
-  } catch (e) {}
-  window.focus();
-}
-
-function checkExamSecurity() {
+function notifyTabSwitch(eventType) {
   if (!isExamActive) return;
-  const isDocumentFocused = document.hasFocus();
-  const isTabVisible = !document.hidden && document.visibilityState === "visible";
-  const isCalcFocused = document.getElementById("calc-popup")?.contains(document.activeElement);
+  const token = getStudentToken();
+  if (!token) return;
 
-  // Если окно потеряло фокус (открыта боковая панель Google Lens, клик в поисковик, переключение вкладки):
-  if (!isTabVisible || (!isDocumentFocused && !isCalcFocused)) {
-    document.body.classList.add("exam-unfocused");
-  } else if (isDocumentFocused && isTabVisible) {
-    // Если боковая панель не активна и фокус вернулся
+  if (eventType === "away" && !isCurrentlyAway) {
+    isCurrentlyAway = true;
+    tabSwitchesCount++;
+    try {
+      fetch("/api/student/tab-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Attempt-Token": token },
+        body: JSON.stringify({ event: "away" }),
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+  } else if (eventType === "return" && isCurrentlyAway) {
+    isCurrentlyAway = false;
+    try {
+      fetch("/api/student/tab-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Attempt-Token": token },
+        body: JSON.stringify({ event: "return" }),
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+
+    showTabWarningToast();
   }
 }
 
-setInterval(checkExamSecurity, 120);
+function showTabWarningToast() {
+  const toast = document.getElementById("student-tab-warning-toast");
+  const text = document.getElementById("tab-warning-text");
+  if (!toast) return;
+  if (text) {
+    text.textContent = `Учителю отправлено уведомление. Зафиксировано переключений окон / Alt+Tab: ${tabSwitchesCount}.`;
+  }
+  toast.style.display = "flex";
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.style.display = "none";
+  }, 4500);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    notifyTabSwitch("away");
+  } else {
+    notifyTabSwitch("return");
+  }
+});
 
 window.addEventListener("blur", () => {
-  if (isExamActive && !document.getElementById("calc-popup")?.contains(document.activeElement)) {
-    document.body.classList.add("exam-unfocused");
+  if (!document.getElementById("calc-popup")?.contains(document.activeElement)) {
+    notifyTabSwitch("away");
   }
 });
 
 window.addEventListener("focus", () => {
-  if (document.hasFocus()) {
-    document.body.classList.remove("exam-unfocused");
-  }
+  notifyTabSwitch("return");
 });
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden && isExamActive) {
-    document.body.classList.add("exam-unfocused");
-  } else if (!document.hidden && isExamActive && document.hasFocus()) {
-    document.body.classList.remove("exam-unfocused");
-  }
-});
-
-document.addEventListener("fullscreenchange", () => {
-  if (isExamActive && !document.fullscreenElement && !document.webkitFullscreenElement) {
-    document.body.classList.add("exam-unfocused");
-  }
-});
-
-document.addEventListener("webkitfullscreenchange", () => {
-  if (isExamActive && !document.fullscreenElement && !document.webkitFullscreenElement) {
-    document.body.classList.add("exam-unfocused");
-  }
-});
-
-// Блокировка клавиш скриншотеров (PrintScreen, Snipping Tool) и инспекции
+// Блокировка клавиш печати и инспекции
 document.addEventListener("keydown", (e) => {
   if (!isExamActive) return;
   if (e.key === "F12" || (e.ctrlKey && ["u", "p", "s", "U", "P", "S"].includes(e.key))) {
@@ -128,10 +132,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "PrintScreen" || e.code === "PrintScreen") {
     e.preventDefault();
     try { navigator.clipboard?.writeText(""); } catch (err) {}
-    document.body.classList.add("exam-unfocused");
-    setTimeout(() => {
-      if (document.hasFocus()) document.body.classList.remove("exam-unfocused");
-    }, 1200);
+    notifyTabSwitch("away");
+    setTimeout(() => notifyTabSwitch("return"), 1000);
   }
 }, true);
 
@@ -696,18 +698,6 @@ async function startExamSession() {
   }
 
   isExamActive = true;
-  document.body.classList.remove("exam-unfocused");
-
-  try {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
-      }
-    }
-  } catch (e) {}
-
   showScreen("screen-testing");
   if (currentAttempt) {
     document.getElementById("student-info-badge").textContent = `${currentAttempt.student_name} (${currentAttempt.student_class})`;
@@ -2327,6 +2317,20 @@ function isEmptyPublishedAnswer(val) {
 function renderStructuredAnswerHtml(value, questionType, isCorrectKey = false, referenceCorrect = null) {
   if (isEmptyPublishedAnswer(value)) {
     return `<span class="res-empty-text">Нет ответа</span>`;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+      try { value = JSON.parse(trimmed); } catch (e) {}
+    }
+  }
+
+  if (typeof referenceCorrect === "string") {
+    const trimmedRef = referenceCorrect.trim();
+    if ((trimmedRef.startsWith("{") && trimmedRef.endsWith("}")) || (trimmedRef.startsWith("[") && trimmedRef.endsWith("]"))) {
+      try { referenceCorrect = JSON.parse(trimmedRef); } catch (e) {}
+    }
   }
 
   // 1. Объекты: Сопоставление, Классификация по группам, Таблица утверждений, Пропуски в тексте

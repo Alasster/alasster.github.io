@@ -33,7 +33,7 @@ from models import (
     TeacherLoginRequest, TeacherRegisterRequest,
     CreateTestRequest, UpdateTestRequest, TaskItem,
     CreateLaunchRequest, UpdateLaunchStatusRequest, UpdateLaunchSettingsRequest,
-    StudentJoinRequest, StudentChangeVariantRequest, SaveAnswerRequest, BatchSaveAnswersRequest, StudentSubmitRequest,
+    StudentJoinRequest, StudentChangeVariantRequest, StudentTabEventRequest, SaveAnswerRequest, BatchSaveAnswersRequest, StudentSubmitRequest,
     TeacherActionStudentRequest, GradeSingleAnswerRequest, RosterImportRequest,
     StudentTaskView, CreateLessonPageRequest, DeleteLessonPageRequest, CreateBackupRequest,
     StudentResultsVisibilityRequest
@@ -1140,6 +1140,8 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
             d["total_score"] = round(float(d.get("total_score") or 0.0), 1)
             d["progress_pct"] = round((d["answered_count"] / stu_task_count * 100), 1) if stu_task_count > 0 else 0
             d["device_label"] = get_device_info(d.get("ip_address"))
+            d["tab_switches_count"] = int(d.get("tab_switches_count") or 0)
+            d["is_away"] = bool(d.get("is_away"))
             result.append(d)
 
         return result
@@ -1981,6 +1983,48 @@ async def get_student_attempt(attempt: dict = Depends(get_current_student_attemp
         response_data["time_spent_seconds"] = time_spent_seconds
         return response_data
 
+@app.post("/api/student/tab-event")
+async def student_tab_event(
+    req: StudentTabEventRequest,
+    attempt: dict = Depends(get_current_student_attempt)
+):
+    if attempt["status"] not in ("in_progress", "approved", "in_waiting"):
+        return {"ok": True}
+
+    is_away = 1 if req.event == "away" else 0
+    now = datetime.now(timezone.utc).isoformat()
+    async with get_db() as db:
+        if req.event == "away":
+            await db.execute("""
+                UPDATE student_attempts
+                SET tab_switches_count = COALESCE(tab_switches_count, 0) + 1,
+                    is_away = 1,
+                    last_heartbeat = ?
+                WHERE id = ?
+            """, (now, attempt["id"]))
+        else:
+            await db.execute("""
+                UPDATE student_attempts
+                SET is_away = 0,
+                    last_heartbeat = ?
+                WHERE id = ?
+            """, (now, attempt["id"]))
+        await db.commit()
+
+        cur = await db.execute("SELECT tab_switches_count FROM student_attempts WHERE id = ?", (attempt["id"],))
+        row = await cur.fetchone()
+        cnt = row["tab_switches_count"] if row else 0
+
+    broadcast_live_event(attempt["launch_id"], "student_tab_switch", {
+        "attempt_id": attempt["id"],
+        "student_name": attempt["student_name"],
+        "tab_switches_count": cnt,
+        "is_away": bool(is_away),
+        "event": req.event
+    })
+    return {"ok": True, "tab_switches_count": cnt, "is_away": bool(is_away)}
+
+
 @app.post("/api/student/change-variant")
 async def student_change_variant(
     req: StudentChangeVariantRequest,
@@ -2674,7 +2718,13 @@ async def student_get_results(attempt: dict = Depends(get_current_student_attemp
                 total_score += float(sc)
 
         if pub_answers:
-            item["correct_answer"] = t.get("answer_key")
+            ak = t.get("answer_key")
+            if isinstance(ak, str):
+                try:
+                    ak = json.loads(ak)
+                except Exception:
+                    pass
+            item["correct_answer"] = ak
             item["explanation"] = t.get("comment_explanation")
 
         if pub_comments:
