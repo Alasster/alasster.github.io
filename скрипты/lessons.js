@@ -7087,3 +7087,221 @@ const slides = [...document.querySelectorAll('.slide')];
     runCurrentLesson();
   }
 })();
+
+
+/* === NEUMORPHIC AUTH WIDGET FOR LESSONS === */
+/**
+ * ALASSTER.SITE — Auth Bridge & Neumorphic Auth Button
+ * Links index.html and all lesson pages to Личный кабинет authentication
+ */
+
+(function() {
+  function getCabinetBaseUrl() {
+    // If running on port 8010, same origin
+    if (window.location.port === '8010') return '';
+    // If local development, points to the cabinet port 8010
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+      return 'http://127.0.0.1:8010';
+    }
+    // Production / public domain fallback
+    return 'http://127.0.0.1:8010';
+  }
+
+  function getStoredUser() {
+    try {
+      const raw = localStorage.getItem('alasster_auth_user');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setStoredUser(user) {
+    try {
+      if (user) {
+        localStorage.setItem('alasster_auth_user', JSON.stringify(user));
+        localStorage.setItem('alasster_logged_in', '1');
+      } else {
+        localStorage.removeItem('alasster_auth_user');
+        localStorage.removeItem('alasster_logged_in');
+      }
+    } catch (e) {}
+  }
+
+  async function checkServerSession() {
+    const base = getCabinetBaseUrl();
+    try {
+      const res = await fetch(`${base}/api/me`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        const user = await res.json();
+        setStoredUser(user);
+        return user;
+      } else if (res.status === 401) {
+        setStoredUser(null);
+        return null;
+      }
+    } catch (e) {
+      // Offline / server not running: rely on localStorage
+    }
+    return getStoredUser();
+  }
+
+  async function performLogout() {
+    const base = getCabinetBaseUrl();
+    try {
+      await fetch(`${base}/api/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (e) {}
+    setStoredUser(null);
+    renderAuthButton(null);
+  }
+
+  function renderAuthButton(user) {
+    const container = document.getElementById('auth-nav-container');
+    if (!container) return;
+
+    const base = getCabinetBaseUrl();
+    const currentUrl = window.location.href;
+    const loginUrl = `${base}/login?return_to=${encodeURIComponent(currentUrl)}`;
+    const cabinetUrl = `${base}/`;
+    const generatorUrl = `${base}/generator/teacher`;
+
+    if (user) {
+      const displayName = user.display_name || user.first_name || user.username || 'Учитель';
+      const roleLabel = (user.role === 'superadmin' || user.role === 'admin') ? 'Администратор' : 'Учитель';
+
+      container.innerHTML = `
+        <div class="neu-auth-wrapper">
+          <button type="button" class="neu-auth-btn is-logged" id="neu-auth-trigger" aria-haspopup="true" aria-expanded="false" title="Профиль: ${escapeHtml(displayName)}">
+            <span class="neu-auth-avatar"><i class="fa-solid fa-user-check"></i></span>
+            <span class="neu-auth-name">${escapeHtml(displayName)}</span>
+            <i class="fa-solid fa-chevron-down neu-auth-chevron"></i>
+          </button>
+          <div class="neu-auth-dropdown" id="neu-auth-dropdown">
+            <div class="neu-auth-dropdown-header">
+              <div class="neu-auth-dropdown-name">${escapeHtml(displayName)}</div>
+              <div class="neu-auth-dropdown-role">${roleLabel}</div>
+            </div>
+            <a href="${cabinetUrl}" class="neu-auth-dropdown-item">
+              <i class="fa-solid fa-gauge-high"></i>
+              <span>Личный кабинет</span>
+            </a>
+            <a href="${generatorUrl}" class="neu-auth-dropdown-item">
+              <i class="fa-solid fa-clipboard-check"></i>
+              <span>Генератор тестов</span>
+            </a>
+            <div class="neu-auth-dropdown-divider"></div>
+            <button type="button" class="neu-auth-dropdown-item neu-auth-logout-btn" id="neu-logout-btn">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Выйти из аккаунта</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      const trigger = document.getElementById('neu-auth-trigger');
+      const dropdown = document.getElementById('neu-auth-dropdown');
+      const logoutBtn = document.getElementById('neu-logout-btn');
+
+      if (trigger && dropdown) {
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = dropdown.classList.contains('is-open');
+          dropdown.classList.toggle('is-open', !isOpen);
+          trigger.setAttribute('aria-expanded', String(!isOpen));
+        });
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          logoutBtn.disabled = true;
+          logoutBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Выход...</span>';
+          await performLogout();
+        });
+      }
+    } else {
+      container.innerHTML = `
+        <div class="neu-auth-wrapper">
+          <a href="${loginUrl}" class="neu-auth-btn" id="neu-auth-trigger" title="Войти в личный кабинет">
+            <span class="neu-auth-avatar"><i class="fa-solid fa-user"></i></span>
+            <span class="neu-auth-name">Войти</span>
+          </a>
+        </div>
+      `;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // Close dropdown on outside click or Escape
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('neu-auth-dropdown');
+    const trigger = document.getElementById('neu-auth-trigger');
+    if (dropdown && dropdown.classList.contains('is-open')) {
+      if (!dropdown.contains(e.target) && !trigger?.contains(e.target)) {
+        dropdown.classList.remove('is-open');
+        trigger?.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const dropdown = document.getElementById('neu-auth-dropdown');
+      const trigger = document.getElementById('neu-auth-trigger');
+      if (dropdown && dropdown.classList.contains('is-open')) {
+        dropdown.classList.remove('is-open');
+        trigger?.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  // Ensure container exists in navbar right actions
+  function ensureAuthContainer() {
+    if (document.getElementById('auth-nav-container')) return;
+
+    const navRight = document.querySelector('.nav-right-actions');
+    if (navRight) {
+      const wrap = document.createElement('div');
+      wrap.id = 'auth-nav-container';
+      navRight.prepend(wrap);
+    }
+  }
+
+  async function initAuthWidget() {
+    ensureAuthContainer();
+    // 1. Instant render from cached localStorage (zero layout shift)
+    const cachedUser = getStoredUser();
+    renderAuthButton(cachedUser);
+
+    // 2. Background verification with backend server
+    const verifiedUser = await checkServerSession();
+    renderAuthButton(verifiedUser);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAuthWidget);
+  } else {
+    initAuthWidget();
+  }
+
+  window.AlassterAuthWidget = {
+    checkServerSession,
+    performLogout,
+    getStoredUser
+  };
+})();

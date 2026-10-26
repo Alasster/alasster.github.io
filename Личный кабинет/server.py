@@ -116,6 +116,7 @@ app.mount("/static/vendor", StaticFiles(directory=BASE_DIR / "generator" / "stat
 app.mount("/static/uploads", StaticFiles(directory=BASE_DIR / "generator" / "static" / "uploads"), name="generator_uploads")
 app.mount("/materials", StaticFiles(directory=MATERIALS_DIR), name="materials")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+app.mount("/site", StaticFiles(directory=BASE_DIR.parent, html=True), name="site_root")
 
 
 @app.middleware("http")
@@ -123,7 +124,7 @@ async def security_headers(request: Request, call_next):
     # Исходные шаблоны хранятся на сервере и доступны только через
     # контролируемые маршруты /login, /register и /. Прямые обращения к
     # именам файлов не должны становиться альтернативным способом доступа.
-    if request.url.path.lower().endswith(".html"):
+    if request.url.path.lower().endswith(".html") and not request.url.path.startswith(("/site/", "/generator/")):
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
     response = await call_next(request)
@@ -313,7 +314,7 @@ def page(filename: str) -> str:
 
 
 def site_content_summary() -> dict:
-    excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов"}
+    excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов", "_backup_site_legacy"}
     class_rows = []
     for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name):
         if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
@@ -328,7 +329,7 @@ def site_content_summary() -> dict:
 
 
 def site_lesson_catalog() -> list[dict]:
-    excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов"}
+    excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов", "_backup_site_legacy"}
     catalog = []
     for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name.casefold()):
         if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
@@ -797,8 +798,9 @@ def dashboard(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
+    return_to = request.query_params.get("return_to")
     if get_user_from_request(request) is not None:
-        return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(return_to or "/", status_code=status.HTTP_303_SEE_OTHER)
     return page("auth.html")
 
 

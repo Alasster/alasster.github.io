@@ -91,7 +91,7 @@ document.querySelectorAll('[data-auth-switch]').forEach((link) => {
 
 window.addEventListener('popstate', () => switchMode(getMode(), false));
 
-if (window.location.pathname !== '/login') window.history.replaceState({}, '', '/login');
+if (window.location.pathname !== '/login') window.history.replaceState({}, '', '/login' + window.location.search);
 switchMode('login', false);
 if (new URLSearchParams(window.location.search).get('registered') === '1') {
   setAlert('login', 'Аккаунт создан. Теперь войдите по email и паролю.', 'success');
@@ -115,7 +115,14 @@ loginForm.addEventListener('submit', async (event) => {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || 'Не удалось выполнить вход.');
-    window.location.assign('/');
+    if (data.user) {
+      try {
+        localStorage.setItem('alasster_auth_user', JSON.stringify(data.user));
+        localStorage.setItem('alasster_logged_in', '1');
+      } catch (e) {}
+    }
+    const returnTo = new URLSearchParams(window.location.search).get('return_to');
+    window.location.assign(returnTo || '/');
   } catch (error) {
     loginFields.forEach((field) => field.classList.add('is-invalid'));
     submitButton.disabled = false;

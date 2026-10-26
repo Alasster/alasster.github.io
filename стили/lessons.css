@@ -1,89 +1,88 @@
 /* ==========================================================================
-   ALASSTER.SITE — UNIFIED LESSON DESIGN SYSTEM (LIQUID GLASS & VISION-OS)
-   Shared across all lessons in grades 9, 10 ЕМН, 10 ОГН, 11
-   Identical design system from index.html (styles.css)
+   ALASSTER.SITE — UNIFIED LESSON DESIGN SYSTEM (NEUMORPHISM)
+   Matching Личный кабинет theme & design tokens
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ==========================================================================
-   1. DESIGN TOKENS & LIQUID GLASS VARIABLES
+   1. DESIGN TOKENS & NEUMORPHIC VARIABLES
    ========================================================================== */
 :root {
-  --bg: #F6F8FC;
-  --bg-card: rgba(255, 255, 255, 0.72);
-  --bg-card-hover: rgba(255, 255, 255, 0.88);
+  --page: #e7ebf3;
+  --surface: #e7ebf3;
+  --surface-lift: #edf1f8;
+  --surface-recess: #dfe3eb;
+  --bg: #e7ebf3;
+  --bg-card: #e7ebf3;
+  --bg-card-hover: #edf1f8;
 
-  --glass-surface: rgba(255, 255, 255, 0.72);
-  --glass-surface-hover: rgba(255, 255, 255, 0.88);
-  --glass-border: rgba(255, 255, 255, 0.9);
-  --glass-border-subtle: rgba(226, 232, 240, 0.75);
+  --glass-surface: #e7ebf3;
+  --glass-surface-hover: #edf1f8;
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-border-subtle: rgba(163, 174, 195, 0.28);
 
-  --primary: #4F46E5;
-  --primary-light: rgba(79, 70, 229, 0.08);
-  --primary-glow: rgba(99, 102, 241, 0.35);
+  --primary: #536dfe;
+  --primary-dark: #3e55d8;
+  --primary-light: rgba(83, 109, 254, 0.12);
+  --primary-glow: rgba(83, 109, 254, 0.32);
 
-  --indigo: #4F46E5;
-  --teal: #0D9488;
-  --teal-light: rgba(13, 148, 136, 0.08);
-  --amber: #D97706;
-  --amber-light: rgba(217, 119, 6, 0.08);
-  --rose: #E11D48;
-  --rose-light: rgba(225, 29, 72, 0.08);
-  --violet: #8B5CF6;
-  --purple: #9333EA;
-  --cyan: #06B6D4;
-  --green: #10B981;
+  --indigo: #536dfe;
+  --teal: #159f9a;
+  --teal-light: rgba(21, 159, 154, 0.12);
+  --amber: #c98a22;
+  --amber-light: rgba(201, 138, 34, 0.12);
+  --rose: #ef4444;
+  --rose-light: rgba(239, 68, 68, 0.12);
+  --violet: #8b5cf6;
+  --purple: #9333ea;
+  --cyan: #06b6d4;
+  --green: #10b981;
   --emerald: #059669;
-  --blue: #2563EB;
-  --orange: #EA580C;
-  --clay: #C2410C;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --clay: #c2410c;
 
-  --text: #0F172A;
-  --ink: #0F172A;
-  --text-muted: #64748B;
-  --muted: #64748B;
-  --line: rgba(226, 232, 240, 0.8);
-  --panel: rgba(255, 255, 255, 0.78);
-  --panel-bg: rgba(255, 255, 255, 0.78);
-  --panel-border: rgba(255, 255, 255, 0.9);
+  --text: #263248;
+  --ink: #263248;
+  --text-dark: #1b2434;
+  --text-muted: #748097;
+  --muted: #748097;
+  --line: rgba(163, 174, 195, 0.35);
+  --panel: #e7ebf3;
+  --panel-bg: #e7ebf3;
+  --panel-border: rgba(255, 255, 255, 0.65);
 
-  --font-main: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
-  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 24px;
   --radius-xl: 32px;
   --radius-full: 9999px;
 
-  --glass-shadow:
-    0 16px 36px -10px rgba(99, 102, 241, 0.08),
-    0 0 1px 1px rgba(255, 255, 255, 0.9) inset,
-    0 4px 16px rgba(15, 23, 42, 0.03);
+  /* Neumorphic tactile shadows */
+  --shadow-out: 8px 8px 18px rgba(163, 174, 195, 0.38), -8px -8px 18px rgba(255, 255, 255, 0.72);
+  --shadow-out-hover: 12px 12px 24px rgba(163, 174, 195, 0.42), -12px -12px 24px rgba(255, 255, 255, 0.82);
+  --shadow-soft: 4px 4px 10px rgba(163, 174, 195, 0.32), -4px -4px 10px rgba(255, 255, 255, 0.64);
+  --shadow-soft-hover: 6px 6px 14px rgba(163, 174, 195, 0.36), -6px -6px 14px rgba(255, 255, 255, 0.74);
+  --shadow-in: inset 4px 4px 9px rgba(163, 174, 195, 0.28), inset -4px -4px 9px rgba(255, 255, 255, 0.68);
+  --shadow-pressed: inset 3px 3px 6px rgba(163, 174, 195, 0.35), inset -3px -3px 6px rgba(255, 255, 255, 0.7);
 
-  --glass-shadow-hover:
-    0 24px 50px -12px rgba(99, 102, 241, 0.2),
-    0 0 1px 1px rgba(255, 255, 255, 1) inset,
-    0 8px 24px rgba(15, 23, 42, 0.05);
-
-  --shadow: var(--glass-shadow);
-  --shadow-hover: var(--glass-shadow-hover);
+  --glass-shadow: var(--shadow-out);
+  --glass-shadow-hover: var(--shadow-out-hover);
+  --shadow: var(--shadow-out);
+  --shadow-hover: var(--shadow-out-hover);
   --accent: var(--primary);
   --accent-light: var(--primary-light);
   --coral: var(--primary);
-  --clay: var(--primary);
-  --plum: var(--primary-dark, #3730A3);
+  --plum: var(--primary-dark);
   --sage: var(--primary);
-  --sage2: var(--primary-soft, #ECFDF5);
-  --butter: #FDE68A;
-  --paper: rgba(255, 255, 255, 0.82);
-  --mint: #10B981;
-  --mint-dark: #047857;
-  --orange-dark: var(--primary-dark, #C2410C);
-  --red: #DC2626;
-  --success: #059669;
-  --error: #DC2626;
+  --sage2: #e7ebf3;
+  --butter: #fde68a;
+  --paper: var(--surface);
 }
 
 /* ==========================================================================
@@ -118,15 +117,7 @@ body.lesson-page {
 }
 
 /* Ambient glowing orbs */
-.ambient-orb {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(80px);
-  z-index: 0;
-  opacity: 0.55;
-  animation: orbFloat 20s infinite alternate ease-in-out;
-}
+.ambient-orb { display: none !important; }
 .orb-1 {
   width: 550px;
   height: 550px;
@@ -203,8 +194,8 @@ a {
 .navbar {
   pointer-events: auto;
   background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-full);
   padding: 8px 16px 8px 20px;
@@ -336,8 +327,8 @@ a {
   inset: 0;
   z-index: 2000;
   background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   display: grid;
   place-items: center;
   padding: 24px;
@@ -356,8 +347,8 @@ a {
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-xl);
   box-shadow:
@@ -405,8 +396,8 @@ a {
   border-radius: 50%;
   border: 1px solid rgba(226, 232, 240, 0.85);
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   color: var(--text-muted);
   display: inline-flex;
   align-items: center;
@@ -772,8 +763,8 @@ a {
   gap: 8px;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-full);
   padding: 10px 6px;
@@ -898,7 +889,7 @@ a {
   font-weight: 600;
   white-space: nowrap;
   pointer-events: none;
-  backdrop-filter: blur(10px);
+  /* neumorphic solid */
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
   font-family: var(--font-main);
   z-index: 1000;
@@ -984,8 +975,8 @@ a {
   padding: 12px 26px !important;
   border-radius: var(--radius-full) !important;
   background: rgba(79, 70, 229, 0.09) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   color: var(--primary) !important;
   font-family: var(--font-main);
   font-size: 0.95rem;
@@ -1052,7 +1043,7 @@ a {
   padding: 12px 24px;
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
+  /* neumorphic solid */
   color: var(--text);
   font-size: 0.92rem;
   font-weight: 700;
@@ -1095,8 +1086,8 @@ a {
   height: 42px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(226, 232, 240, 0.9);
   color: var(--primary);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
@@ -1354,8 +1345,8 @@ p.lead {
   padding: 8px 18px;
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(226, 232, 240, 0.95);
   color: var(--text);
   font-size: 0.86rem;
@@ -1459,8 +1450,8 @@ p.lead {
 /* Goal Box */
 .goal-box {
   background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-xl);
   padding: 32px;
@@ -1519,8 +1510,8 @@ p.lead {
 .task-card,
 .conclusion-card {
   background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-xl);
   box-shadow:
@@ -1666,8 +1657,8 @@ p.lead {
   flex: 1;
   min-width: 180px;
   background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-lg);
   padding: 22px 24px;
@@ -1735,8 +1726,8 @@ p.lead {
 .versus,
 .info-box {
   background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-left: 5px solid var(--primary);
   border-radius: var(--radius-lg);
@@ -1780,8 +1771,8 @@ p.lead {
 .quizbox,
 .panel.quiz {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(30px) saturate(190%);
-  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-xl);
   padding: 32px;
@@ -1873,8 +1864,8 @@ p.lead {
   padding: 16px 22px;
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1.5px solid rgba(226, 232, 240, 0.95);
   color: var(--text);
   font-family: var(--font-main);
@@ -1953,8 +1944,8 @@ p.lead {
   margin-top: 18px;
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   transition: all 0.25s ease;
   display: block;
 }
@@ -2053,7 +2044,7 @@ table,
   overflow: hidden;
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
+  /* neumorphic solid */
   margin: 18px 0;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
 }
@@ -2094,7 +2085,7 @@ tr:hover td {
 }
 .formula-card {
   background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
+  /* neumorphic solid */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 20px;
@@ -2152,7 +2143,7 @@ code {
   cursor: pointer;
   text-align: center;
   background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
+  /* neumorphic solid */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--glass-shadow);
@@ -2259,7 +2250,7 @@ code {
 /* --- Speedtest Bandwidth (9-6) --- */
 .speedtest-box-light {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(24px);
+  /* neumorphic solid */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: 24px;
@@ -2385,7 +2376,7 @@ code {
 .perceptron-panel,
 .diagram-panel {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(24px);
+  /* neumorphic solid */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: 24px;
@@ -2617,7 +2608,7 @@ img {
   padding: 10px 20px;
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
+  /* neumorphic solid */
   border: 1px solid rgba(226, 232, 240, 0.95);
   color: var(--text);
   font-family: var(--font-main);
@@ -2645,7 +2636,7 @@ img {
 }
 .case-content {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(28px);
+  /* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-xl);
   padding: 28px;
@@ -2725,7 +2716,7 @@ ol.clean-list,
   padding: 14px 18px !important;
   border-radius: var(--radius-md) !important;
   background: rgba(255, 255, 255, 0.76) !important;
-  backdrop-filter: blur(14px) !important;
+  /* neumorphic solid */ !important;
   border: 1px solid rgba(226, 232, 240, 0.9) !important;
   font-size: 0.94rem !important;
   line-height: 1.55 !important;
@@ -2752,8 +2743,8 @@ ol.clean-list,
 .paper.visual,
 .visual-paper {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-xl);
   padding: 32px 36px;
@@ -3047,7 +3038,7 @@ ol.clean-list,
   margin-bottom: 24px;
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(20px);
+  /* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow: var(--glass-shadow);
 }
@@ -3067,8 +3058,8 @@ ol.clean-list,
   padding: 26px 30px;
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
     0 20px 45px -10px rgba(99, 102, 241, 0.12),
@@ -3259,8 +3250,8 @@ ol.clean-list,
     align-items: center;
     gap: 4px;
     background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(20px) saturate(190%);
-    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    /* neumorphic solid */
+    -webkit-/* neumorphic solid */
     border: 1px solid rgba(226, 232, 240, 0.95);
     border-radius: var(--radius-full);
     padding: 3px 6px;
@@ -3564,7 +3555,7 @@ background: var(--panel);
             border: 1px solid var(--line);
             border-radius: 24px;
             box-shadow: var(--shadow);
-            backdrop-filter: blur(14px);
+            /* neumorphic solid */
 }
 
 .lesson-9-1 .pad {
@@ -3975,7 +3966,7 @@ margin-bottom:20px
 }
 
 .lesson-9-2 .paper {
-background:var(--paper);border:1px solid #ffffffdd;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #ffffffdd;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-9-2 .pad {
@@ -7563,7 +7554,7 @@ background: var(--panel);
             border: 1px solid var(--line);
             border-radius: 16px;
             box-shadow: var(--shadow);
-            backdrop-filter: blur(16px);
+            /* neumorphic solid */
 }
 
 .lesson-10emn-1-2 .pad {
@@ -8072,7 +8063,7 @@ font-family:Consolas,monospace
 }
 
 .lesson-10emn-3 .paper {
-background:var(--paper);border:1px solid #ffffffde;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #ffffffde;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-3 .pad {
@@ -8626,7 +8617,7 @@ opacity:.55;cursor:not-allowed
 }
 
 .lesson-10emn-3 .paper, .lesson-10emn-3 .card, .lesson-10emn-3 .quizbox, .lesson-10emn-3 .qualitynote, .lesson-10emn-3 .flowstep, .lesson-10emn-3 .pipe, .lesson-10emn-3 .task {
-border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+border-radius:18px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-3 .pill, .lesson-10emn-3 .tag {
@@ -8682,7 +8673,7 @@ display:block;width:100%;height:420px;object-fit:cover;border-radius:20px;border
 }
 
 .lesson-10emn-4 .visual-caption {
-position:absolute;left:32px;right:32px;bottom:32px;padding:12px 16px;border-radius:14px;background:rgba(46,32,64,.72);backdrop-filter:blur(8px);color:#fff;font-size:.9rem;line-height:1.4;box-shadow:0 10px 24px rgba(46,32,64,.18)
+position:absolute;left:32px;right:32px;bottom:32px;padding:12px 16px;border-radius:14px;background:rgba(46,32,64,.72);/* neumorphic solid */color:#fff;font-size:.9rem;line-height:1.4;box-shadow:0 10px 24px rgba(46,32,64,.18)
 }
 
 .lesson-10emn-4 .visual-caption strong {
@@ -8698,7 +8689,7 @@ margin-top:0
 }
 
 .lesson-10emn-4 .paper {
-background:var(--paper);border:1px solid rgba(255,255,255,.8);border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid rgba(255,255,255,.8);border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-4 .pad {
@@ -8952,7 +8943,7 @@ color:var(--violet)
 }
 
 .lesson-10emn-5 .paper {
-background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-5 .pad {
@@ -9705,7 +9696,7 @@ color:var(--violet)
 }
 
 .lesson-10emn-6 .paper {
-background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-6 .pad {
@@ -10253,7 +10244,7 @@ color:var(--violet)
 }
 
 .lesson-10emn-7 .paper {
-background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-7 .pad {
@@ -10551,7 +10542,7 @@ color:var(--violet)
 }
 
 .lesson-10emn-8 .paper {
-background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10emn-8 .pad {
@@ -12081,7 +12072,7 @@ min-width: 0;
 }
 
 .lesson-10emn-9 .glass {
-backdrop-filter: blur(12px);
+/* neumorphic solid */
 }
 
 .lesson-10emn-9 .task-card {
@@ -12727,7 +12718,7 @@ background: var(--panel);
 }
 
 .lesson-10emn-9 .glass {
-backdrop-filter: blur(12px);
+/* neumorphic solid */
 }
 
 .lesson-10emn-9 .task-card {
@@ -12803,7 +12794,7 @@ background:var(--paper);
   border:1px solid rgba(255,255,255,.9);
   border-radius:24px;
   box-shadow:var(--shadow);
-  backdrop-filter:blur(12px);
+  /* neumorphic solid */
 }
 
 .lesson-10emn-10 .pad {
@@ -13474,7 +13465,7 @@ background: var(--panel);
             border: 1px solid var(--line);
             border-radius: 16px;
             box-shadow: var(--shadow);
-            backdrop-filter: blur(16px);
+            /* neumorphic solid */
 }
 
 .lesson-10ogn-1 .pad {
@@ -13947,7 +13938,7 @@ display: none;
 }
 
 .lesson-10ogn-1 .panel, .lesson-10ogn-1 .card, .lesson-10ogn-1 .quiz-card, .lesson-10ogn-1 .era-card, .lesson-10ogn-1 .lab-card, .lesson-10ogn-1 .timeline-card {
-background:var(--panel);border:1px solid #fff;border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--panel);border:1px solid #fff;border-radius:22px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10ogn-1 .chip, .lesson-10ogn-1 .tag, .lesson-10ogn-1 .badge {
@@ -13999,7 +13990,7 @@ font-family:Consolas,monospace
 }
 
 .lesson-10ogn-2 .paper {
-background:var(--paper);border:1px solid #ffffffde;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #ffffffde;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10ogn-2 .pad {
@@ -14550,7 +14541,7 @@ opacity:.55;cursor:not-allowed
 }
 
 .lesson-10ogn-2 .paper, .lesson-10ogn-2 .card, .lesson-10ogn-2 .quizbox, .lesson-10ogn-2 .qualitynote, .lesson-10ogn-2 .flowstep, .lesson-10ogn-2 .pipe, .lesson-10ogn-2 .task {
-border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+border-radius:18px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10ogn-2 .pill, .lesson-10ogn-2 .tag {
@@ -14622,7 +14613,7 @@ color:var(--blue)
 }
 
 .lesson-10ogn-3 .paper {
-background:var(--paper);border:1px solid #fff;box-shadow:var(--shadow);border-radius:22px;backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;box-shadow:var(--shadow);border-radius:22px;/* neumorphic solid */
 }
 
 .lesson-10ogn-3 .pad {
@@ -15268,7 +15259,7 @@ color:var(--blue)
 }
 
 .lesson-10ogn-4 .paper {
-background:var(--paper);border:1px solid #fff;box-shadow:var(--shadow);border-radius:22px;backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;box-shadow:var(--shadow);border-radius:22px;/* neumorphic solid */
 }
 
 .lesson-10ogn-4 .pad {
@@ -15536,7 +15527,7 @@ color:var(--ink);background:#ecfdf5;box-shadow:none
 }
 
 .lesson-10ogn-4 .slide-next {
-position:fixed;z-index:20;top:22px;right:58px;left:auto;bottom:auto;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:99px;color:var(--blue);background:#ffffffd8;font-size:.82rem;font-weight:900;transform:none;box-shadow:0 8px 18px #17203318;backdrop-filter:blur(10px)
+position:fixed;z-index:20;top:22px;right:58px;left:auto;bottom:auto;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:99px;color:var(--blue);background:#ffffffd8;font-size:.82rem;font-weight:900;transform:none;box-shadow:0 8px 18px #17203318;/* neumorphic solid */
 }
 
 .lesson-10ogn-4 .slide-next:hover {
@@ -15673,7 +15664,7 @@ color:var(--violet)
 }
 
 .lesson-10ogn-5 .paper {
-background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10ogn-5 .pad {
@@ -16598,7 +16589,7 @@ stroke:var(--orange)
 }
 
 .lesson-10ogn-5 .slide-next {
-position:fixed;z-index:140;top:22px;right:58px;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:99px;color:var(--blue,#059669);background:#ffffffd8;font-size:.82rem;font-weight:900;box-shadow:0 8px 18px #17203318;backdrop-filter:blur(10px)
+position:fixed;z-index:140;top:22px;right:58px;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:99px;color:var(--blue,#059669);background:#ffffffd8;font-size:.82rem;font-weight:900;box-shadow:0 8px 18px #17203318;/* neumorphic solid */
 }
 
 .lesson-10ogn-5 .slide-next:hover {
@@ -16709,7 +16700,7 @@ color:var(--violet)
 }
 
 .lesson-10ogn-6 .paper {
-background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:var(--paper);border:1px solid #fff;border-radius:25px;box-shadow:var(--shadow);/* neumorphic solid */
 }
 
 .lesson-10ogn-6 .pad {
@@ -17397,7 +17388,7 @@ color:#059669
 }
 
 .lesson-10ogn-6 .slide-next {
-position:fixed;z-index:140;top:22px;right:58px;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:99px;color:#059669;background:#ffffffd8;font-size:.82rem;font-weight:900;box-shadow:0 8px 18px #17203318;backdrop-filter:blur(10px)
+position:fixed;z-index:140;top:22px;right:58px;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:99px;color:#059669;background:#ffffffd8;font-size:.82rem;font-weight:900;box-shadow:0 8px 18px #17203318;/* neumorphic solid */
 }
 
 .lesson-10ogn-6 .slide-next:hover {
@@ -17467,7 +17458,7 @@ background: linear-gradient(135deg, var(--accent), var(--violet));
 
 .lesson-11-1 .glass {
 background: var(--panel);
-            backdrop-filter: blur(12px);
+            /* neumorphic solid */
             border: 1px solid var(--panel-border);
             padding: 30px;
             border-radius: 16px;
@@ -17981,7 +17972,7 @@ background: linear-gradient(135deg, var(--rose), var(--violet)); -webkit-backgro
 }
 
 .lesson-11-2 .glass {
-background: var(--panel); backdrop-filter: blur(12px);
+background: var(--panel); /* neumorphic solid */
             border: 1px solid var(--panel-border); padding: 30px;
             border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
 }
@@ -18064,7 +18055,7 @@ background:var(--panel);border:1px solid var(--panel-border);padding:25px;border
 }
 
 .lesson-11-3 .glass {
-backdrop-filter:blur(12px)
+/* neumorphic solid */
 }
 
 .lesson-11-3 .task-card {
@@ -18250,7 +18241,7 @@ background: var(--panel);
 }
 
 .lesson-11-4 .glass {
-backdrop-filter: blur(12px);
+/* neumorphic solid */
 }
 
 .lesson-11-4 .task-card {
@@ -18524,7 +18515,7 @@ min-width: 0;
 }
 
 .lesson-11-5 .glass {
-backdrop-filter: blur(12px);
+/* neumorphic solid */
 }
 
 .lesson-11-5 .task-card {
@@ -19204,7 +19195,7 @@ background: var(--panel);
 }
 
 .lesson-11-6 .glass {
-backdrop-filter: blur(12px);
+/* neumorphic solid */
 }
 
 .lesson-11-6 .task-card {
@@ -20148,8 +20139,8 @@ body.lesson-page .goal {
   border: 1px solid rgba(255, 255, 255, 0.95) !important;
   border-radius: var(--radius-xl) !important;
   box-shadow: var(--glass-shadow) !important;
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   padding: clamp(22px, 2.5vw, 32px) !important;
 }
 
@@ -20198,8 +20189,8 @@ body.lesson-page .recallquiz {
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.85);
   box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(30px) saturate(190%);
-  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
 }
 
 body.lesson-page .recallquestion {
@@ -20683,8 +20674,8 @@ body.lesson-page :is(
   box-shadow:
     0 16px 40px rgba(78, 92, 130, 0.07),
     0 1px 0 rgba(255, 255, 255, 0.82) inset;
-  backdrop-filter: blur(42px) saturate(140%);
-  -webkit-backdrop-filter: blur(42px) saturate(140%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
 }
 
 body.lesson-page :is(
@@ -20711,8 +20702,8 @@ body.lesson-page .card-featured {
 body.lesson-page .recalloption:not(.correct):not(.wrong) {
   background: rgba(255, 255, 255, 0.44);
   border-color: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(30px) saturate(140%);
-  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
 }
 
 body.lesson-page .recalloption:hover:not(:disabled):not(.correct):not(.wrong),
@@ -20723,8 +20714,8 @@ body.lesson-page .recalloption:focus-visible:not(.correct):not(.wrong) {
 body.lesson-page :is(.pill, .chip, .tag) {
   background: rgba(255, 255, 255, 0.42);
   border-color: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(30px) saturate(140%);
-  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
 }
 
 body.lesson-page :is(.pill, .chip, .tag):hover {
@@ -20734,8 +20725,8 @@ body.lesson-page :is(.pill, .chip, .tag):hover {
 body.lesson-page :is(.quiz-option, .choice, .option, .quizoptions button, .choices button):not(.correct):not(.wrong):not(.active):not(.selected) {
   background: rgba(255, 255, 255, 0.44);
   border-color: rgba(255, 255, 255, 0.76);
-  backdrop-filter: blur(30px) saturate(140%);
-  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
 }
 
 body.lesson-page :is(.quiz-option, .choice, .option, .quizoptions button, .choices button):hover:not(.correct):not(.wrong):not(.active):not(.selected) {
@@ -20774,8 +20765,8 @@ body.lesson-9-1 .lesson-ethics-visual {
   box-shadow:
     0 22px 60px rgba(79, 70, 229, 0.08),
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
-  backdrop-filter: blur(24px) saturate(145%);
-  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
 }
 
 body.lesson-9-1 .lesson-ethics-visual::before,
@@ -21003,8 +20994,8 @@ body.lesson-9-1 .ai-future-card {
   box-shadow:
     0 18px 48px rgba(79, 70, 229, 0.08),
     0 1px 0 rgba(255, 255, 255, 0.92) inset;
-  backdrop-filter: blur(22px) saturate(140%);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   animation: ai-future-card-enter 0.7s cubic-bezier(0.2, 0.65, 0.3, 1) both;
 }
 
@@ -21163,8 +21154,8 @@ body.lesson-page .further-reading-card {
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
   color: inherit;
   text-decoration: none;
-  backdrop-filter: blur(26px) saturate(140%);
-  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  /* neumorphic solid */
+  -webkit-/* neumorphic solid */
   transition:
     transform 0.24s cubic-bezier(0.2, 0.75, 0.25, 1),
     background-color 0.24s ease,
@@ -21576,8 +21567,8 @@ body.lesson-page[data-lesson-id^="11-"] .classes-menu-btn:hover {
    -------------------------------------------------------------------------- */
 body.lesson-page .navbar {
   background: rgba(255, 255, 255, 0.80) !important;
-  backdrop-filter: blur(32px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+  /* neumorphic solid */ !important;
+  -webkit-/* neumorphic solid */ !important;
   border: 1px solid rgba(255, 255, 255, 0.94) !important;
   box-shadow:
     0 12px 32px -6px rgba(15, 23, 42, 0.07),
@@ -21670,8 +21661,8 @@ body.lesson-page :is(
     rgba(255, 255, 255, 0.50) 0%,
     rgba(255, 255, 255, 0.36) 100%
   ) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  /* neumorphic solid */ !important;
+  -webkit-/* neumorphic solid */ !important;
   border: 1px solid rgba(255, 255, 255, 0.78) !important;
   box-shadow:
     0 16px 38px -10px rgba(15, 23, 42, 0.07),
@@ -22049,4 +22040,181 @@ body.lesson-page .lesson-current-tag,
 body.lesson-page .lesson-row-card:hover .lesson-badge-id {
   background: var(--primary) !important;
   color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   NEUMORPHIC AUTHENTICATION WIDGET (NAVBAR RIGHT ACTION)
+   ========================================================================== */
+.neu-auth-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.neu-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--glass-border);
+  color: var(--text-dark);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.neu-auth-btn:hover {
+  transform: translateY(-2px);
+  color: var(--primary);
+  box-shadow: var(--shadow-soft-hover);
+}
+
+.neu-auth-btn:active, .neu-auth-btn.is-active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-pressed);
+}
+
+.neu-auth-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.neu-auth-btn.is-logged .neu-auth-avatar {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+.neu-auth-chevron {
+  font-size: 0.7rem;
+  color: var(--muted);
+  transition: transform 0.25s ease;
+}
+
+.neu-auth-btn[aria-expanded="true"] .neu-auth-chevron {
+  transform: rotate(180deg);
+}
+
+.neu-auth-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 240px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow-out);
+  border: 1px solid var(--glass-border);
+  padding: 10px;
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  animation: neuDropIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-auth-dropdown.is-open {
+  display: flex;
+}
+
+.neu-auth-dropdown-header {
+  padding: 8px 12px 10px 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.neu-auth-dropdown-name {
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--text-dark);
+}
+
+.neu-auth-dropdown-role {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.neu-auth-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.neu-auth-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow-soft);
+  color: var(--primary);
+}
+
+.neu-auth-dropdown-item:active {
+  box-shadow: var(--shadow-pressed);
+}
+
+.neu-auth-dropdown-item i {
+  font-size: 0.95rem;
+  color: var(--muted);
+  width: 18px;
+  text-align: center;
+}
+
+.neu-auth-dropdown-item:hover i {
+  color: var(--primary);
+}
+
+.neu-auth-dropdown-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 6px;
+}
+
+.neu-auth-logout-btn {
+  color: var(--rose) !important;
+}
+
+.neu-auth-logout-btn i {
+  color: var(--rose) !important;
+}
+
+.neu-auth-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: var(--rose) !important;
+}
+
+/* Enhanced SVG Diagrams & Viewports for Neumorphism */
+.demo-viewport, .diagram-viewport, .svg-viewport, .calc-box, .chart-box {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--glass-border) !important;
+}
+
+svg text {
+  font-family: var(--font-main) !important;
 }
