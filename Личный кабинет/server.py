@@ -562,11 +562,12 @@ class StudentPublicGateway:
 
         clean_path = path[len('/generator'):] if path.startswith('/generator/') else path
         allowed = (
-            clean_path in ('/api/health', '/health')
+            clean_path in ('/api/health', '/health', '/login', '/register', '/api/login', '/api/register', '/api/me', '/api/logout')
             or clean_path.startswith('/exam/')
             or clean_path.startswith('/api/student/')
             or clean_path.startswith('/static/')
             or clean_path.startswith('/materials/')
+            or clean_path.startswith('/site/')
         )
         if not allowed:
             await JSONResponse({'detail': 'Доступен только вход ученика'}, status_code=404)(scope, receive, send)
@@ -799,8 +800,25 @@ def dashboard(request: Request):
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
     return_to = request.query_params.get("return_to")
-    if get_user_from_request(request) is not None:
-        return RedirectResponse(return_to or "/", status_code=status.HTTP_303_SEE_OTHER)
+    force = request.query_params.get("force") == "1"
+    session_token = request.cookies.get(SESSION_COOKIE) or request.query_params.get("session_token")
+    user = get_user_from_request(request)
+
+    if user is not None and session_token and not force:
+        if return_to:
+            sep = "&" if "?" in return_to else "?"
+            user_data = json.dumps({
+                "id": user["id"],
+                "username": user["username"],
+                "display_name": user["display_name"],
+                "first_name": user["first_name"],
+                "last_name": user["last_name"],
+                "role": user["role"]
+            })
+            b64_user = base64.urlsafe_b64encode(user_data.encode()).decode()
+            return RedirectResponse(f"{return_to}{sep}alasster_user={b64_user}", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+
     return page("auth.html")
 
 

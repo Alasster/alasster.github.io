@@ -122,7 +122,19 @@ loginForm.addEventListener('submit', async (event) => {
       } catch (e) {}
     }
     const returnTo = new URLSearchParams(window.location.search).get('return_to');
-    window.location.assign(returnTo || '/');
+    if (returnTo) {
+      try {
+        const userJson = JSON.stringify(data.user);
+        const userB64 = btoa(encodeURIComponent(userJson));
+        const sep = returnTo.includes('?') ? '&' : '?';
+        window.location.assign(`${returnTo}${sep}alasster_user=${userB64}`);
+        return;
+      } catch (e) {
+        window.location.assign(returnTo);
+        return;
+      }
+    }
+    window.location.assign('/');
   } catch (error) {
     loginFields.forEach((field) => field.classList.add('is-invalid'));
     submitButton.disabled = false;

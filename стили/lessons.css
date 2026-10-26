@@ -104,13 +104,8 @@ body.lesson-page {
   min-height: 100vh;
   font-family: var(--font-main);
   color: var(--text);
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 90% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.06) 0%, transparent 40%);
-  background-attachment: fixed;
+  background-color: var(--page);
+  background-image: none !important;
   line-height: 1.6;
   overflow: hidden;
   position: relative;
@@ -22217,4 +22212,215 @@ body.lesson-page .lesson-row-card:hover .lesson-badge-id {
 
 svg text {
   font-family: var(--font-main) !important;
+}
+
+
+/* ==========================================================================
+   AUTHORITATIVE NEUMORPHIC THEME FOR ALL LESSONS (MATCHING Личный кабинет)
+   ========================================================================== */
+html, body.lesson-page {
+  background-color: var(--page) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  font-family: var(--font-main) !important;
+}
+
+.ambient-orb, #network-bg, .bg-spheres {
+  display: none !important;
+}
+
+/* Lesson Navbar */
+.nav-wrapper {
+  position: fixed !important;
+  top: 14px !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  padding: 0 16px !important;
+  pointer-events: none !important;
+}
+
+.navbar,
+body.lesson-page .navbar {
+  pointer-events: auto !important;
+  background: var(--surface) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--shadow-out) !important;
+  border: 1px solid var(--border-light) !important;
+  padding: 8px 18px !important;
+  height: auto !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.brand-icon-box {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 1px solid var(--border-light) !important;
+  color: var(--primary) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.brand-title-text {
+  font-family: var(--font-main) !important;
+  font-weight: 800 !important;
+  color: var(--text-dark) !important;
+}
+
+.nav-lesson-badge {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  padding: 6px 14px !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+}
+
+.nav-badge-class { color: var(--primary) !important; }
+.nav-badge-num { color: var(--text-dark) !important; font-weight: 800 !important; }
+.nav-badge-topic { color: var(--text-muted) !important; }
+
+.classes-menu-btn {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 14px !important;
+  color: var(--text-dark) !important;
+  padding: 7px 16px !important;
+  font-weight: 700 !important;
+  transition: all 0.22s ease !important;
+}
+
+.classes-menu-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+}
+
+.classes-menu-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-pressed) !important;
+}
+
+/* Nav Controls & Dots */
+.nav-controls, .mobile-nav-bar {
+  pointer-events: auto !important;
+}
+
+.nav-controls button,
+.dots .dot,
+.dots button {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 1px solid var(--border-light) !important;
+  color: var(--text-dark) !important;
+  transition: all 0.22s ease !important;
+}
+
+.nav-controls button:hover {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+  transform: scale(1.05) !important;
+}
+
+.nav-controls button:active {
+  box-shadow: var(--shadow-pressed) !important;
+  transform: scale(0.96) !important;
+}
+
+.dots .dot.active, .dots button.active {
+  background: var(--primary) !important;
+  box-shadow: 0 2px 8px var(--primary-glow) !important;
+}
+
+/* All Cards, Papers, Panels across all Lessons */
+.card, .paper, .box, .panel, .glass-card, .info-card, .slide .card,
+.quiz-card, .task-card, .code-card, .definition, .summary, .visual,
+.impact-card, .flow .card, .timeline .card, .grid2 > div, .grid3 > div, .grid-3 > div, .grid-4 > div {
+  background: var(--surface) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--shadow-out) !important;
+  border: 1px solid var(--border-light) !important;
+  color: var(--text-dark) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.card:hover, .paper:hover, .slide .card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--shadow-out-hover) !important;
+}
+
+/* Recessed Elements: Code, Terminal, Math */
+pre, code, .codebox, .terminal, .console, .recessed, .formula-box, .code-wrap, .syntax-highlighter {
+  background: var(--surface-recess) !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 14px !important;
+  color: var(--text-dark) !important;
+}
+
+/* Buttons in Lessons */
+button.quiz-btn, .option-btn, .btn-action, .btn-primary, .interactive-btn, .action-btn {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 14px !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+  transition: all 0.22s ease !important;
+}
+
+button.quiz-btn:hover, .option-btn:hover, .btn-action:hover, .interactive-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+}
+
+button.quiz-btn:active, .option-btn:active, .btn-action:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-pressed) !important;
+}
+
+/* Modal Drawer inside Lessons */
+.modal-backdrop.active, .modal-backdrop.is-open {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.modal-glass-container {
+  background: var(--surface) !important;
+  box-shadow: 16px 16px 36px rgba(163, 174, 195, 0.48), -16px -16px 36px rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 22px !important;
+}
+
+.class-tab-pill {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 12px !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease !important;
+}
+
+.class-tab-pill.active, .class-tab-pill:hover {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+}
+
+.class-tab-pill:active {
+  box-shadow: var(--shadow-pressed) !important;
 }

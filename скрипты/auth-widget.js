@@ -4,6 +4,8 @@
  */
 
 (function() {
+  const CLOUD_TUNNEL_FALLBACK = 'https://fever-tablet-solomon-add.trycloudflare.com';
+
   function getCabinetBaseUrl() {
     // If running on port 8010, same origin
     if (window.location.port === '8010') return '';
@@ -11,7 +13,11 @@
     if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
       return 'http://127.0.0.1:8010';
     }
-    // Production / public domain fallback
+    // If running on HTTPS public domain (e.g. alasster.site)
+    if (window.location.protocol === 'https:') {
+      // If user provided a custom tunnel endpoint, use it, else cloud tunnel
+      return window.ALASSTER_CABINET_URL || CLOUD_TUNNEL_FALLBACK;
+    }
     return 'http://127.0.0.1:8010';
   }
 
@@ -36,6 +42,31 @@
     } catch (e) {}
   }
 
+  // Parse returning user from redirect query parameter
+  function checkUrlUserPayload() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('alasster_user')) {
+        const b64 = urlParams.get('alasster_user');
+        let user = null;
+        try {
+          user = JSON.parse(decodeURIComponent(atob(b64)));
+        } catch (e1) {
+          try {
+            user = JSON.parse(atob(b64.replace(/-/g, '+').replace(/_/g, '/')));
+          } catch (e2) {}
+        }
+        if (user && (user.username || user.display_name)) {
+          setStoredUser(user);
+        }
+        urlParams.delete('alasster_user');
+        const cleanSearch = urlParams.toString();
+        const cleanUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '') + window.location.hash;
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    } catch (e) {}
+  }
+
   async function checkServerSession() {
     const base = getCabinetBaseUrl();
     if (window.location.protocol === 'https:' && base.startsWith('http://')) {
@@ -56,7 +87,7 @@
         return null;
       }
     } catch (e) {
-      // Offline / server not running: rely on localStorage
+      // Offline / server not reachable: rely on localStorage
     }
     return getStoredUser();
   }
@@ -73,7 +104,6 @@
     }
     setStoredUser(null);
     renderAuthButton(null);
-    return;
   }
 
   function renderAuthButton(user) {
@@ -82,7 +112,8 @@
 
     const base = getCabinetBaseUrl();
     const currentUrl = window.location.href;
-    const loginUrl = `${base}/login?return_to=${encodeURIComponent(currentUrl)}`;
+    // Always pass force=1 so clicking login opens auth.html cleanly
+    const loginUrl = `${base}/login?force=1&return_to=${encodeURIComponent(currentUrl)}`;
     const cabinetUrl = `${base}/`;
     const generatorUrl = `${base}/generator/teacher`;
 
@@ -180,31 +211,23 @@
       if (dropdown && dropdown.classList.contains('is-open')) {
         dropdown.classList.remove('is-open');
         trigger?.setAttribute('aria-expanded', 'false');
+        trigger?.focus();
       }
     }
   });
 
-  // Ensure container exists in navbar right actions
-  function ensureAuthContainer() {
-    if (document.getElementById('auth-nav-container')) return;
-
-    const navRight = document.querySelector('.nav-right-actions');
-    if (navRight) {
-      const wrap = document.createElement('div');
-      wrap.id = 'auth-nav-container';
-      navRight.prepend(wrap);
-    }
-  }
-
+  // Initialize
   async function initAuthWidget() {
-    ensureAuthContainer();
-    // 1. Instant render from cached localStorage (zero layout shift)
-    const cachedUser = getStoredUser();
-    renderAuthButton(cachedUser);
+    checkUrlUserPayload();
+    // Render immediate optimistic state from localStorage
+    const localUser = getStoredUser();
+    renderAuthButton(localUser);
 
-    // 2. Background verification with backend server
-    const verifiedUser = await checkServerSession();
-    renderAuthButton(verifiedUser);
+    // Validate with server session asynchronously
+    const serverUser = await checkServerSession();
+    if (JSON.stringify(serverUser) !== JSON.stringify(localUser)) {
+      renderAuthButton(serverUser);
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -213,10 +236,9 @@
     initAuthWidget();
   }
 
-  window.AlassterAuthWidget = {
-    checkServerSession,
-    performLogout,
-    getStoredUser
+  window.AlassterAuth = {
+    render: renderAuthButton,
+    logout: performLogout,
+    getUser: getStoredUser
   };
 })();
-
