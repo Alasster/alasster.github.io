@@ -38,6 +38,9 @@
 
   async function checkServerSession() {
     const base = getCabinetBaseUrl();
+    if (window.location.protocol === 'https:' && base.startsWith('http://')) {
+      return getStoredUser();
+    }
     try {
       const res = await fetch(`${base}/api/me`, {
         method: 'GET',
@@ -60,14 +63,17 @@
 
   async function performLogout() {
     const base = getCabinetBaseUrl();
-    try {
-      await fetch(`${base}/api/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-    } catch (e) {}
+    if (!base.startsWith('http://') || window.location.protocol !== 'https:') {
+      try {
+        await fetch(`${base}/api/logout`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      } catch (e) {}
+    }
     setStoredUser(null);
     renderAuthButton(null);
+    return;
   }
 
   function renderAuthButton(user) {
@@ -213,3 +219,4 @@
     getStoredUser
   };
 })();
+
