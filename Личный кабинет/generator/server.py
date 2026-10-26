@@ -197,10 +197,11 @@ async def auto_grade_attempt(db, attempt_id: str, snapshot_tasks_json: str):
     cur_att = await db.execute("SELECT variant FROM student_attempts WHERE id = ?", (attempt_id,))
     att_row = await cur_att.fetchone()
     stu_var = str(att_row["variant"] if att_row and "variant" in att_row.keys() and att_row["variant"] else "1")
+    has_distinct_v2 = any(str(t.get("variant") or "1") in ("2",) for t in tasks)
 
     for t in tasks:
         t_var = str(t.get("variant") or "1")
-        if t_var not in (stu_var, "all", "1,2"):
+        if has_distinct_v2 and t_var not in (stu_var, "all", "1,2"):
             continue
         t_id = t["id"]
         task_type = t.get("question_type", "single_choice")
@@ -1531,15 +1532,21 @@ async def student_check_launch(launch_id: str):
                 snap_tasks = []
             del ld["snapshot_tasks_json"]
 
-        v1_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("1", "all", "1,2")]
-        v2_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("2", "all", "1,2")]
+        has_distinct_v2 = any(str(t.get("variant") or "1") in ("2",) for t in snap_tasks)
+        if has_distinct_v2:
+            v1_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("1", "all", "1,2")]
+            v2_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("2", "all", "1,2")]
+        else:
+            v1_tasks = snap_tasks
+            v2_tasks = snap_tasks
 
-        ld["task_count_v1"] = len(v1_tasks) if v1_tasks else ld.get("task_count", 0)
-        ld["max_score_v1"] = round(sum(float(t.get("max_score", 1.0)) for t in v1_tasks), 2) if v1_tasks else ld.get("total_max_score", 0)
-        ld["task_count_v2"] = len(v2_tasks) if v2_tasks else ld.get("task_count", 0)
-        ld["max_score_v2"] = round(sum(float(t.get("max_score", 1.0)) for t in v2_tasks), 2) if v2_tasks else ld.get("total_max_score", 0)
-        ld["task_count"] = ld["task_count_v1"]
-        ld["total_max_score"] = ld["max_score_v1"]
+        ld["task_count_v1"] = len(v1_tasks)
+        ld["max_score_v1"] = round(sum(float(t.get("max_score", 1.0)) for t in v1_tasks), 2)
+        ld["task_count_v2"] = len(v2_tasks)
+        ld["max_score_v2"] = round(sum(float(t.get("max_score", 1.0)) for t in v2_tasks), 2)
+        ld["task_count"] = len(snap_tasks)
+        ld["total_max_score"] = round(sum(float(t.get("max_score", 1.0)) for t in snap_tasks), 2)
+        ld["has_distinct_variants"] = has_distinct_v2
 
         return ld
 
@@ -1827,12 +1834,16 @@ async def get_student_attempt(attempt: dict = Depends(get_current_student_attemp
         
         # ФОРМИРУЕМ БЕЗОПАСНЫЙ УЧЕНИЧЕСКИЙ СПИСОК (БЕЗ answer_key и comment_explanation!)
         # Фильтруем задания строго по выбранному варианту ученика
+        has_distinct_v2 = any(str(t.get("variant") or "1") in ("2",) for t in full_tasks)
         filtered_tasks = []
         for t in full_tasks:
             t_var = str(t.get("variant") or "1")
-            if t_var not in (student_var, "all", "1,2"):
+            if has_distinct_v2 and t_var not in (student_var, "all", "1,2"):
                 continue
             filtered_tasks.append(t)
+
+        if not filtered_tasks:
+            filtered_tasks = full_tasks
 
         # Если в проведении включено перемешивание вопросов
         if lrow["shuffle_questions"]:
@@ -2361,13 +2372,14 @@ def cleanup_site_lessons_for_launches(site_root: str, launch_ids: list):
 def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
     urls = []
     port = int(os.environ.get("BAGALAU_STUDENT_PORT", "8001"))
-    env_url = os.environ.get("BAGALAU_PUBLIC_URL")
+    env_url = None
+    try:
+        with open(os.path.join(BASE_DIR, ".runtime", "public_url.txt"), encoding="utf-8-sig") as f:
+            env_url = f.read().strip()
+    except OSError:
+        pass
     if not env_url:
-        try:
-            with open(os.path.join(BASE_DIR, ".runtime", "public_url.txt"), encoding="utf-8-sig") as f:
-                env_url = f.read().strip()
-        except OSError:
-            pass
+        env_url = os.environ.get("BAGALAU_PUBLIC_URL")
     if env_url:
         urls.append(env_url.rstrip("/"))
     if request:

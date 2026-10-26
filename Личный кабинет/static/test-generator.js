@@ -3337,7 +3337,7 @@ async function saveEditorTasks() {
 
   try {
 
-    for (const task of activeTest?.tasks || []) await persistTask(task);
+    if (activeTask) await persistTask(activeTask);
 
     return true;
 
@@ -3425,7 +3425,7 @@ async function saveTestGeneralSettings() {
 
   if (!activeTest) return;
 
-  if (!(await saveEditorTasks())) return;
+  if (!(await saveCurrentTask(true))) return;
 
   activeTest.instructions = document.getElementById("editor-inst-text").value.trim();
 
@@ -3999,7 +3999,22 @@ function renderStudentPreviewContent() {
 
   const bg = previewVariant === "2" ? (activeTest.bg_color_v2 || "#E6F4EA") : (activeTest.bg_color_v1 || "#FCE8E6");
 
-  body.style.backgroundColor = bg;
+  if (bg) {
+    let hex = String(bg).trim().replace("#", "");
+    if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+      const sR = Math.round(r * 0.78 + 231 * 0.22), sG = Math.round(g * 0.78 + 235 * 0.22), sB = Math.round(b * 0.78 + 243 * 0.22);
+      const dR = Math.max(0, sR - 38), dG = Math.max(0, sG - 34), dB = Math.max(0, sB - 28);
+      const surf = `rgb(${sR}, ${sG}, ${sB})`;
+      body.style.setProperty("--page", surf);
+      body.style.setProperty("--surface", surf);
+      body.style.setProperty("--shadow-out", `8px 8px 18px rgba(${dR}, ${dG}, ${dB}, 0.45), -8px -8px 18px rgba(255, 255, 255, 0.82)`);
+      body.style.setProperty("--shadow-soft", `4px 4px 10px rgba(${dR}, ${dG}, ${dB}, 0.38), -4px -4px 10px rgba(255, 255, 255, 0.75)`);
+      body.style.setProperty("--shadow-in", `inset 4px 4px 9px rgba(${dR}, ${dG}, ${dB}, 0.35), inset -4px -4px 9px rgba(255, 255, 255, 0.78)`);
+      body.style.backgroundColor = surf;
+    }
+  }
 
   let tasks = (activeTest.tasks || []).filter(t => {
 
@@ -4045,7 +4060,7 @@ function renderStudentPreviewContent() {
 
     evalBannerHtml = `
 
-      <div style="background: #FFFFFF; border: 2px solid ${bannerColor}; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+      <div style="background: var(--surface); border: 2px solid ${bannerColor}; border-radius: 20px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; box-shadow: var(--shadow-soft);">
 
         <h3 style="color: ${bannerColor}; margin-bottom: 0.35rem; font-size: 1.3rem;">Итог самопроверки: ${earnedSum} из ${maxSum} баллов (${pct}%)</h3>
 
@@ -4095,7 +4110,7 @@ function renderStudentPreviewContent() {
 
       <p style="color: var(--text-muted); font-size: 0.88rem;">${activeTest.exam_type} · ${activeTest.grade_level} класс · Вариант ${previewVariant} (${tasks.length} заданий)</p>
 
-      ${activeTest.instructions ? `<p style="margin-top: 0.75rem; padding: 0.75rem; background: #F8FAFC; border-radius: 8px; font-size: 0.9rem;">${escapeHtml(activeTest.instructions)}</p>` : ''}
+      ${activeTest.instructions ? `<p style="margin-top: 0.75rem; padding: 0.75rem; background: var(--surface); box-shadow: var(--shadow-in); border-radius: 14px; font-size: 0.9rem;">${escapeHtml(activeTest.instructions)}</p>` : ''}
 
     </div>
 
@@ -5228,6 +5243,24 @@ async function refreshStudentsList() {
     activeLaunchStudents = await res.json();
 
     renderLiveStudentsTable();
+
+    fetch(`/api/launches/${activeLaunch.id}`).then(r => r.ok ? r.json() : null).then(lnData => {
+      if (lnData && Array.isArray(lnData.server_urls)) {
+        activeLaunch.server_urls = lnData.server_urls;
+        const netUrls = lnData.server_urls;
+        let studentOrigin = netUrls.find(u => u.startsWith("https://")) || window.location.origin;
+        if (studentOrigin.includes("127.0.0.1") || studentOrigin.includes("localhost")) {
+          const lanUrl = netUrls.find(u => !u.includes("127.0.0.1") && !u.includes("localhost"));
+          if (lanUrl) studentOrigin = lanUrl;
+          else if (netUrls[0]) studentOrigin = netUrls[0];
+        }
+        const pubInput = document.getElementById("live-public-url");
+        const nextUrl = `${studentOrigin}/generator/exam/${activeLaunch.id}`;
+        if (pubInput && pubInput.value !== nextUrl) {
+          pubInput.value = nextUrl;
+        }
+      }
+    }).catch(() => {});
 
   } catch (err) {}
 

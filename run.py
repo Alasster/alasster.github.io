@@ -1,8 +1,12 @@
 import os
 import sys
+import time
 import socket
 import ctypes
 import warnings
+import threading
+import webbrowser
+import urllib.request
 import runpy
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -47,5 +51,25 @@ print(f"  Вход по Wi-Fi / Хотспоту (LAN):  http://{lan_ip}:8001/ge
 print("  Внешний интернет-туннель (4G):   запускается автоматически...")
 print("======================================================================")
 print()
+
+
+def _open_cabinet_when_ready():
+    import subprocess
+    code_cmd = os.path.expandvars(r"%LOCALAPPDATA%\Programs\Microsoft VS Code\bin\code.cmd")
+    for _ in range(30):
+        try:
+            with urllib.request.urlopen("http://127.0.0.1:8010/health", timeout=1) as r:
+                if r.status == 200:
+                    if os.path.exists(code_cmd):
+                        subprocess.run([code_cmd, "--open-url", "vscode://alasster.alasster-open-cabinet/open"], capture_output=True)
+                    webbrowser.open("http://127.0.0.1:8010")
+                    return
+        except Exception:
+            pass
+        time.sleep(0.5)
+
+
+if os.environ.get("NO_AUTO_BROWSER") != "1":
+    threading.Thread(target=_open_cabinet_when_ready, daemon=True).start()
 
 runpy.run_path(os.path.join(cabinet_dir, "server.py"), run_name="__main__")

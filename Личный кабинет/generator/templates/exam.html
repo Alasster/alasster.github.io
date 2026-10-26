@@ -2,515 +2,308 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="theme-color" content="#4F46E5">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e7ebf3">
+  <meta name="google" content="notranslate">
   <title>Выполнение работы</title>
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%234F46E5' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
+  <!-- Favicon (Синяя открытая книга) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%23536dfe' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/generator/static/css/app.css?v=20261021-teacher-explanation">
-  <link rel="stylesheet" href="/generator/static/vendor/katex.min.css">
-  <link rel="stylesheet" href="/generator/static/css/glass.css?v=20261018-v8">
-  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=1">
-  <script src="/generator/static/js/cabinet-prefix.js?v=1"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- KaTeX for Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <link rel="stylesheet" href="/generator/static/css/app.css?v=3">
+  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=9">
   <style>
-    .student-container {
-      max-width: 820px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    .pulse-dot {
-      width: 14px;
-      height: 14px;
-      background: var(--warning, #f59e0b);
-      border-radius: 50%;
-      display: inline-block;
-      animation: waiting-pulse 1.5s infinite;
-      margin-right: 0.5rem;
-    }
-    @keyframes waiting-pulse {
-      0% { transform: scale(0.9); opacity: 0.7; }
-      50% { transform: scale(1.3); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.7; }
-    }
-    /* Anti-cheating image protection */
-    img {
-      -webkit-user-drag: none;
-      user-drag: none;
+    /* Тихая защита: запрет выделения и перетаскивания текста/картинок */
+    body {
       user-select: none;
       -webkit-user-select: none;
-      pointer-events: none;
+    }
+    input, textarea, select {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+    img, .task-image, .task-img-protected {
+      pointer-events: none !important;
+      -webkit-user-drag: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
     }
     .img-shield-wrapper {
       position: relative;
       display: inline-block;
-      user-select: none;
+      max-width: 100%;
     }
     .img-shield-overlay {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 2;
+      inset: 0;
+      z-index: 10;
       background: transparent;
+      cursor: default;
     }
-
-    /* Стили выбора варианта на экране входа */
-    .variant-select-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-top: 0.35rem;
-    }
-    .variant-pick-card {
-      border: 2px solid #E2E8F0;
-      border-radius: 10px;
-      padding: 0.75rem 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transition: all 0.2s ease;
-      background: #FFFFFF;
-      user-select: none;
-    }
-    .variant-pick-card:hover {
-      border-color: #CBD5E1;
-      transform: translateY(-1px);
-    }
-    .variant-pick-card.active {
-      border-color: #2563EB;
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-    }
-    .variant-color-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-
-    /* Анимированные правила и пиктограммы под запретом */
-    .warning-rules-box {
-      display: grid !important;
-      grid-template-columns: repeat(3, 1fr) !important;
-      gap: 0.75rem !important;
-      margin: 1.25rem 0 !important;
-    }
-    @media (max-width: 600px) {
-      .warning-rules-box {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    .rule-card {
-      background: #FEF2F2 !important;
-      border: 1.5px solid #FCA5A5 !important;
-      border-radius: 10px !important;
-      padding: 0.75rem 0.5rem !important;
-      text-align: center !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
-    }
-    .rule-icon {
-      font-size: 2rem !important;
-      margin-bottom: 0.35rem !important;
-      display: inline-block !important;
-      animation: gentle-wobble 2.5s infinite ease-in-out !important;
-    }
-    @keyframes gentle-wobble {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      25% { transform: translateY(-3px) rotate(-3deg); }
-      75% { transform: translateY(-3px) rotate(3deg); }
-    }
-    .rule-title {
-      font-size: 0.88rem !important;
-      font-weight: 700 !important;
-      color: #991B1B !important;
-      margin-bottom: 0.15rem !important;
-      line-height: 1.2 !important;
-    }
-    .rule-desc {
-      font-size: 0.75rem !important;
-      color: #7F1D1D !important;
-      line-height: 1.2 !important;
-    }
-
-    /* Кнопка калькулятора в хедере: только компактная иконка на одной линии с таймером */
-    .calc-btn-header {
-      background: #F1F5F9;
-      border: 1.5px solid #CBD5E1;
-      color: #0F172A;
-      font-size: 1.25rem;
-      width: 40px;
-      height: 38px;
-      border-radius: 8px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      line-height: 1;
-      padding: 0;
-    }
-    .calc-btn-header:hover {
-      background: #E2E8F0;
-      border-color: #94A3B8;
-      transform: scale(1.05);
-    }
-    .calc-btn-header:active {
-      transform: scale(0.95);
-    }
-
-    /* Всплывающий перемещаемый калькулятор */
-    .calc-popup-card {
-      position: fixed;
-      top: 72px;
-      right: 20px;
-      width: 280px;
-      background: #FFFFFF;
-      border: 1.5px solid #CBD5E1;
-      border-radius: 14px;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.22);
-      z-index: 99999;
-      padding: 0.85rem;
-      display: none;
-      touch-action: none;
-    }
-    .calc-popup-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-      background: #F1F5F9;
-      margin: -0.85rem -0.85rem 0.65rem -0.85rem;
-      padding: 0.6rem 0.85rem;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-      border-bottom: 1px solid #E2E8F0;
-    }
-    .calc-popup-header:active {
-      cursor: grabbing;
-    }
-    .calc-popup-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #0F172A;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .calc-drag-handle-icon {
-      color: #94A3B8;
-      font-size: 1.1rem;
-      line-height: 1;
-      letter-spacing: -2px;
-      margin-right: 2px;
-    }
-    .calc-close-btn {
-      background: none;
-      border: none;
-      font-size: 1.1rem;
-      cursor: pointer;
-      color: #64748B;
-      padding: 2px 6px;
-      border-radius: 4px;
-      line-height: 1;
-    }
-    .calc-close-btn:hover {
-      background: #E2E8F0;
-      color: #0F172A;
-    }
-    .calc-screen {
-      width: 100% !important;
-      height: 44px !important;
-      background: #0F172A !important;
-      color: #38BDF8 !important;
-      font-family: 'JetBrains Mono', monospace !important;
-      font-size: 1.3rem !important;
-      text-align: right !important;
-      padding: 0.4rem 0.65rem !important;
-      border-radius: 8px !important;
-      margin-bottom: 0.65rem !important;
-      border: none !important;
-      outline: none !important;
-      box-sizing: border-box !important;
-    }
-    .calc-grid {
-      display: grid !important;
-      grid-template-columns: repeat(4, 1fr) !important;
-      gap: 0.4rem !important;
-    }
-    .calc-key {
-      height: 38px !important;
-      font-size: 1rem !important;
-      font-weight: 700 !important;
-      border-radius: 6px !important;
-      border: 1px solid #CBD5E1 !important;
-      background: #F8FAFC !important;
-      color: #0F172A !important;
-      cursor: pointer !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      transition: background 0.1s !important;
-      padding: 0 !important;
-      box-sizing: border-box !important;
-    }
-    .calc-key:hover {
-      background: #E2E8F0 !important;
-    }
-    .calc-key:active {
-      transform: scale(0.96) !important;
-    }
-    .calc-key.op {
-      background: #EFF6FF !important;
-      color: #2563EB !important;
-      border-color: #BFDBFE !important;
-    }
-    .calc-key.clear {
-      background: #FEF2F2 !important;
-      color: #DC2626 !important;
-      border-color: #FECACA !important;
-    }
-    .calc-key.equal {
-      background: #2563EB !important;
-      color: #FFFFFF !important;
-      border-color: #1D4ED8 !important;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
-  <link rel="stylesheet" href="/generator/static/css/glass.css?v=1">
 </head>
-<body class="glass-app exam-page">
+<body>
 
-  <!-- =========================================================================
-       1. ЭКРАН ВХОДА (ВЫБОР КЛАССА, БУКВЫ И ВАРИАНТА, ПК СКРЫТ)
-       ========================================================================= -->
-  <div id="screen-join" class="student-screen student-container">
-    <div class="card" style="padding: 2.25rem;">
-      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.75rem;">
-        <div>
-          <h1 class="brand-title exam-title-text">Загрузка работы...</h1>
-          <p class="brand-subtitle exam-subject-text"></p>
+  <!-- 1. ЭКРАН ВХОДА / ПРИСОЕДИНЕНИЯ -->
+  <div id="screen-join" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 500px; padding: 2.25rem !important;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; text-align: left;">
+          <div class="neu-icon-box" style="margin: 0; flex-shrink: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div style="min-width: 0;">
+            <div class="exam-title-text" style="font-size: 1.15rem; font-weight: 800; color: var(--text); line-height: 1.3;">Загрузка...</div>
+            <div class="exam-subject-text" style="font-size: 0.86rem; color: var(--primary-dark); font-weight: 700; margin-top: 0.25rem;"></div>
+          </div>
         </div>
+
+        <form id="join-form">
+          <div class="form-group">
+            <label class="form-label">Фамилия и Имя ученика <span style="color: var(--danger);">*</span></label>
+            <input type="text" id="student-name-input" class="form-control" placeholder="Например: Алиев Арман" required autocomplete="off">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label">Параллель (Класс) <span style="color: var(--danger);">*</span></label>
+              <select id="student-grade-select" class="form-control" required onchange="onGradeSelectChange()">
+                <option value="">-- Выберите класс --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Буква класса <span style="color: var(--danger);">*</span></label>
+              <select id="student-letter-input" class="form-control" required onchange="syncCombinedClass()">
+                <option value="">-- Выберите букву --</option>
+              </select>
+            </div>
+          </div>
+          <input type="hidden" id="student-class-select" value="">
+
+          <div class="form-group" style="margin-top: 0.25rem;">
+            <label class="form-label">Выберите ваш вариант <span style="color: var(--danger);">*</span></label>
+            <input type="hidden" id="student-variant-input" value="1">
+            <div class="variant-picker-grid">
+              <div class="variant-pick-card active" id="var-card-1" onclick="selectVariant('1')">
+                <div class="variant-color-dot" id="var-dot-1" style="background: #FCE8E6;"></div>
+                <div>
+                  <div class="variant-pick-title">Вариант 1</div>
+                  <div class="variant-pick-Card-sub">Нечётный ряд</div>
+                </div>
+                <div class="var-check">✓</div>
+              </div>
+              <div class="variant-pick-card" id="var-card-2" onclick="selectVariant('2')">
+                <div class="variant-color-dot" id="var-dot-2" style="background: #E6F4EA;"></div>
+                <div>
+                  <div class="variant-pick-title">Вариант 2</div>
+                  <div class="variant-pick-Card-sub">Чётный ряд</div>
+                </div>
+                <div class="var-check">✓</div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="join-btn" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1rem; margin-top: 0.5rem;">
+            Подтвердить и продолжить
+          </button>
+        </form>
       </div>
-
-      <form id="join-form">
-        <div class="form-group">
-          <label class="form-label" for="student-name-input">Фамилия и имя ученика:</label>
-          <input type="text" id="student-name-input" class="form-control" required placeholder="Например: Касымов Арман" autofocus>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div class="form-group">
-            <label class="form-label" for="student-grade-select">Класс (параллель):</label>
-            <select id="student-grade-select" class="form-control" required onchange="onGradeSelectChange()">
-              <option value="">Выберите класс...</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="student-letter-input">Буква класса:</label>
-            <select id="student-letter-input" class="form-control" required>
-              <option value="">Выберите букву...</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Выбор варианта работы -->
-        <div class="form-group" style="margin-top: 1rem;">
-          <label class="form-label">Вариант работы:</label>
-          <div class="variant-select-grid">
-            <div class="variant-pick-card active" id="var-card-1" onclick="selectVariant('1')">
-              <div class="variant-color-dot" id="var-dot-1" style="background: #FCE8E6; color: #991B1B;">1</div>
-              <div>
-                <div style="font-weight: 700; font-size: 0.95rem;">Вариант 1</div>
-                <div style="font-size: 0.76rem; color: var(--text-muted);">Первый вариант</div>
-              </div>
-            </div>
-            <div class="variant-pick-card" id="var-card-2" onclick="selectVariant('2')">
-              <div class="variant-color-dot" id="var-dot-2" style="background: #E6F4EA; color: #166534;">2</div>
-              <div>
-                <div style="font-weight: 700; font-size: 0.95rem;">Вариант 2</div>
-                <div style="font-size: 0.76rem; color: var(--text-muted);">Второй вариант</div>
-              </div>
-            </div>
-          </div>
-          <input type="hidden" id="student-variant-input" value="1">
-        </div>
-
-        <!-- Скрытые поля класса и ПК -->
-        <input type="hidden" id="student-class-select" value="">
-        <input type="hidden" id="student-desk-input" value="">
-
-        <div style="margin-top: 2rem;">
-          <button type="submit" id="join-btn" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem;">Подтвердить и продолжить</button>
-        </div>
-      </form>
     </div>
   </div>
 
-  <!-- =========================================================================
-       2. ЭКРАН КОМНАТЫ ОЖИДАНИЯ
-       ========================================================================= -->
-  <div id="screen-waiting-room" class="student-screen student-container" style="display: none;">
-    <div class="card" style="text-align: center; padding: 3rem 2rem;">
-      <div style="margin-bottom: 1.5rem;">
-        <span class="pulse-dot"></span>
-        <h2 style="display: inline-block; font-size: 1.4rem;">Учитель ещё не открыл работу</h2>
-      </div>
-      <h3 class="exam-title-text" style="color: var(--primary); margin-bottom: 0.5rem;"></h3>
-      <p class="exam-subject-text" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
-      
-      <div style="max-width: 500px; margin: 0 auto; background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem;">
-        <p style="font-size: 0.95rem; color: var(--text-main);">
-          Вы успешно подключились к сессии проведения. Не закрывайте эту страницу: как только учитель нажмёт «Начать работу», задания откроются автоматически.
+  <!-- 2. ЭКРАН КОМНАТЫ ОЖИДАНИЯ (Учитель еще не запустил работу) -->
+  <div id="screen-waiting-room" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 500px; text-align: center; padding: 2.5rem 2rem !important;">
+        <div class="neu-icon-circle" style="color: var(--primary);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 4s linear infinite;">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Ожидание начала работы</h2>
+        <p style="color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem; font-weight: 500;">
+          Вы успешно подключились к проведению работы:<br>
+          <strong class="exam-title-text" style="color: var(--text);"></strong>
         </p>
+        <div class="neu-well" style="color: var(--teal); font-size: 0.9rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+          <span class="status-dot online"></span>
+          Ожидайте: как только учитель запустит работу, задания откроются автоматически.
+        </div>
+        <p style="font-size: 0.82rem; color: var(--muted); font-weight: 600;">Не закрывайте эту страницу.</p>
       </div>
     </div>
   </div>
 
-  <!-- =========================================================================
-       3. ЭКРАН РУЧНОГО ОДОБРЕНИЯ
-       ========================================================================= -->
-  <div id="screen-waiting-approval" class="student-screen student-container" style="display: none;">
-    <div class="card" style="text-align: center; padding: 3rem 2rem;">
-      <div style="margin-bottom: 1.5rem;">
-        <span class="pulse-dot"></span>
-        <h2 style="display: inline-block; font-size: 1.4rem;">Ожидание допуска учителя</h2>
+  <!-- 3. ЭКРАН ОЖИДАНИЯ ПОДТВЕРЖДЕНИЯ УЧИТЕЛЕМ (Ручной допуск / Дубликат) -->
+  <div id="screen-waiting-approval" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 500px; text-align: center; padding: 2.5rem 2rem !important;">
+        <div class="neu-icon-circle" style="color: var(--amber);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Запрос отправлен учителю</h2>
+        <p style="color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem; font-weight: 500;">
+          Ваша заявка на вход ожидает подтверждения учителем в панели управления классом.
+        </p>
+        <div class="neu-well" style="color: var(--amber); font-size: 0.9rem; font-weight: 700;">
+          Пожалуйста, подождите несколько секунд. Страница обновится автоматически после допуска.
+        </div>
       </div>
-      <p style="color: var(--text-muted); font-size: 1rem; max-width: 500px; margin: 0 auto;">
-        Ваш вход требует подтверждения учителя. Это также возможно при повторном входе с одного IP в течение 20 минут. Учитель видит ваше имя в списке; дождитесь допуска.
-      </p>
     </div>
   </div>
 
-  <!-- =========================================================================
-       4. ЭКРАН ИНСТРУКЦИЙ (С КОМПАКТНЫМИ КАРТОЧКАМИ ПРАВИЛ)
-       ========================================================================= -->
-  <div id="screen-intro" class="student-screen student-container" style="display: none;">
-    <div class="card" style="padding: 2.25rem;">
-      <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.25rem; margin-bottom: 1.5rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem;">
-          <span class="badge badge-indigo">Готово к выполнению</span>
-          <span id="intro-variant-badge" class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700;">Вариант 1</span>
+  <!-- 4. ЭКРАН ИНСТРУКЦИИ И СТАРТА (С анимированными правилами) -->
+  <div id="screen-intro" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 650px; padding: 2.25rem !important;">
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; flex-wrap: wrap;">
+          <span class="badge badge-indigo exam-subject-text" id="intro-subject-badge"></span>
+          <span class="badge" id="intro-variant-badge" style="font-weight: 800;">Вариант 1</span>
         </div>
-        <h1 class="exam-title-text" style="font-size: 1.6rem; margin-bottom: 0.35rem;"></h1>
-        <p class="exam-subject-text" style="color: var(--text-muted); font-weight: 600;"></p>
-      </div>
+        <h1 class="exam-title-text" style="font-size: 1.5rem; margin-top: 0.35rem; margin-bottom: 1.25rem;"></h1>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; text-align: center;">
-        <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 0.85rem; border-radius: var(--radius-md);">
-          <div id="intro-task-count" style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">0</div>
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">ЗАДАНИЙ</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="neu-well" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.76rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Заданий</div>
+            <div id="intro-task-count" style="font-size: 1.45rem; font-weight: 800; color: var(--text); margin-top: 0.15rem;">0</div>
+          </div>
+          <div class="neu-well" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.76rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Макс. балл</div>
+            <div id="intro-max-score" style="font-size: 1.45rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.15rem;">0</div>
+          </div>
+          <div class="neu-well" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.76rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Время</div>
+            <div id="intro-duration" style="font-size: 1.35rem; font-weight: 800; color: var(--text); margin-top: 0.15rem;">40 мин</div>
+          </div>
         </div>
-        <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 0.85rem; border-radius: var(--radius-md);">
-          <div id="intro-max-score" style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">0</div>
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">МАКС. БАЛЛ</div>
-        </div>
-        <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 0.85rem; border-radius: var(--radius-md);">
-          <div id="intro-duration" style="font-size: 1.4rem; font-weight: 800; color: #D97706;">45 мин</div>
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">ВРЕМЯ НА РАБОТУ</div>
-        </div>
-      </div>
 
-      <!-- Карточки правил -->
-      <div class="warning-rules-box">
-        <div class="rule-card">
-          <div class="rule-icon">📵</div>
-          <div class="rule-title">Без телефонов</div>
-          <div class="rule-desc">Смартфоны и наушники строго запрещены</div>
+        <!-- Пиктограммы правил в неоморфном стиле -->
+        <div class="warning-rules-box">
+          <div class="rule-card">
+            <div class="rule-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="2" width="12" height="20" rx="2.5"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+                <line x1="4" y1="4" x2="20" y2="20" stroke="#dc2626" stroke-width="2.3"/>
+              </svg>
+            </div>
+            <div class="rule-title">Без телефонов</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2.5"/>
+                <line x1="2" y1="9" x2="22" y2="9"/>
+                <line x1="9" y1="4" x2="9" y2="9"/>
+                <line x1="4" y1="4" x2="20" y2="20" stroke="#dc2626" stroke-width="2.3"/>
+              </svg>
+            </div>
+            <div class="rule-title">Без вкладок и ИИ</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+            </div>
+            <div class="rule-title">Самостоятельно</div>
+          </div>
         </div>
-        <div class="rule-card">
-          <div class="rule-icon">🤖🚫</div>
-          <div class="rule-title">Без нейросетей</div>
-          <div class="rule-desc">ChatGPT, ИИ и боты строго запрещены</div>
-        </div>
-        <div class="rule-card">
-          <div class="rule-icon">🚫</div>
-          <div class="rule-title">Без списывания</div>
-          <div class="rule-desc">Переключение вкладок фиксируется учителем</div>
-        </div>
-      </div>
 
-      <div style="margin-bottom: 2rem;">
-        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Инструкция к выполнению:</h3>
-        <div id="intro-instructions" style="background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; font-size: 0.95rem; line-height: 1.6;"></div>
-      </div>
+        <p id="intro-instructions" style="display: none;"></p>
 
-      <button type="button" id="btn-start-exam" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1.05rem;">
-        Начать выполнение работы
-      </button>
-      <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.6rem;">
-        Таймер начнёт отсчёт только после нажатия этой кнопки.
-      </p>
+        <button type="button" id="btn-start-exam" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.05rem;">
+          Начать выполнение работы
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- =========================================================================
-       5. ЭКРАН ВЫПОЛНЕНИЯ ЗАДАНИЙ (ТЕСТИРОВАНИЕ)
-       ========================================================================= -->
+  <!-- 5. ЭКРАН ВЫПОЛНЕНИЯ ЗАДАНИЙ (Основной режим тестирования) -->
   <div id="screen-testing" class="student-screen" style="display: none;">
-    <!-- Липкая верхняя панель прохождения -->
     <header class="exam-header">
       <div class="exam-header-inner">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span id="student-info-badge" style="font-weight: 700; font-size: 0.95rem;">Ученик</span>
-            <span id="student-variant-badge" class="badge" style="background: #FCE8E6; color: #991B1B; font-weight: 700; font-size: 0.75rem;">Вар. 1</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.2rem;">
-            <div style="width: 120px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
-              <div id="progress-fill" style="width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease;"></div>
+          <div class="exam-title-text" style="font-weight: 800; font-size: 1.02rem; color: var(--text);"></div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.35rem;">
+            <div class="progress-track-neu">
+              <div id="progress-fill" class="progress-fill-neu"></div>
             </div>
-            <span id="progress-text" style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted);">0 отвечено</span>
+            <span id="progress-text" style="font-size: 0.78rem; font-weight: 700; color: var(--muted);">0 из 0</span>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <div id="save-indicator" class="save-indicator saved">✓ Сохранено</div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span id="save-indicator" class="save-indicator saved">✓ Сохранено</span>
+          <span id="student-variant-badge" class="badge" style="font-weight: 800;">Вар. 1</span>
+          <span id="student-info-badge" class="badge"></span>
           
-          <!-- Кнопка вызова всплывающего калькулятора (только иконка левее таймера) -->
+          <!-- Кнопка калькулятора (только иконка) -->
           <button type="button" id="btn-calc" class="calc-btn-header" onclick="toggleCalculator()" title="Калькулятор" aria-label="Калькулятор">
-            🧮
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2.5"/>
+              <rect x="8" y="6" width="8" height="4" rx="1"/>
+              <line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>
+              <line x1="8" y1="18" x2="8.01" y2="18"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="16" y1="18" x2="16.01" y2="18"/>
+            </svg>
           </button>
 
-          <!-- Таймер работы -->
-          <div id="timer-box">
-            <div id="timer-pill" class="timer-pill">
-              ⏱ <span id="timer-text">--:--</span>
+          <div id="timer-box" style="display: none;">
+            <div class="timer-pill" id="timer-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span id="timer-text">40:00</span>
             </div>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Всплывающий перемещаемый виджет калькулятора -->
+    <!-- Всплывающее перемещаемое окно калькулятора -->
     <div id="calc-popup" class="calc-popup-card">
-      <div id="calc-drag-handle" class="calc-popup-header" title="Потяните, чтобы переместить по экрану">
+      <div class="calc-popup-header" id="calc-drag-handle" title="Потяните, чтобы переместить калькулятор">
         <span class="calc-popup-title">
-          <span class="calc-drag-handle-icon">⠿</span>
-          <span>🧮 Калькулятор</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity: 0.5;">
+            <circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/>
+            <circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>
+          </svg>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--primary-dark)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2.5"/>
+            <rect x="8" y="6" width="8" height="4" rx="1"/>
+            <line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>
+            <line x1="8" y1="18" x2="8.01" y2="18"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="16" y1="18" x2="16.01" y2="18"/>
+          </svg>
+          <span>Калькулятор</span>
         </span>
-        <button type="button" class="calc-close-btn" onclick="toggleCalculator()" title="Закрыть">✕</button>
+        <button type="button" class="calc-close-btn" onclick="toggleCalculator()" title="Закрыть" aria-label="Закрыть">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
       <input type="text" id="calc-display" class="calc-screen" value="0" readonly>
       <div class="calc-grid">
         <button type="button" class="calc-key clear" onclick="calcClear()">C</button>
         <button type="button" class="calc-key op" onclick="calcInput('(')">(</button>
         <button type="button" class="calc-key op" onclick="calcInput(')')">)</button>
-        <button type="button" class="calc-key op" onclick="calcInput('/')">/</button>
+        <button type="button" class="calc-key op" onclick="calcInput('/')">÷</button>
 
         <button type="button" class="calc-key" onclick="calcInput('7')">7</button>
         <button type="button" class="calc-key" onclick="calcInput('8')">8</button>
@@ -520,7 +313,7 @@
         <button type="button" class="calc-key" onclick="calcInput('4')">4</button>
         <button type="button" class="calc-key" onclick="calcInput('5')">5</button>
         <button type="button" class="calc-key" onclick="calcInput('6')">6</button>
-        <button type="button" class="calc-key op" onclick="calcInput('-')">-</button>
+        <button type="button" class="calc-key op" onclick="calcInput('-')">−</button>
 
         <button type="button" class="calc-key" onclick="calcInput('1')">1</button>
         <button type="button" class="calc-key" onclick="calcInput('2')">2</button>
@@ -529,131 +322,155 @@
 
         <button type="button" class="calc-key" onclick="calcInput('0')">0</button>
         <button type="button" class="calc-key" onclick="calcInput('.')">.</button>
-        <button type="button" class="calc-key" onclick="calcBackspace()">⌫</button>
+        <button type="button" class="calc-key" onclick="calcBackspace()" title="Стереть" aria-label="Стереть">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/>
+          </svg>
+        </button>
         <button type="button" class="calc-key equal" onclick="calcEqual()">=</button>
       </div>
     </div>
 
-    <div class="student-container">
+    <main style="max-width: 840px; margin: 2rem auto; padding: 0 1.25rem 4rem;">
+      <!-- Контейнер для карточек заданий -->
       <div id="tasks-container"></div>
 
-      <div class="card" style="text-align: center; padding: 1.5rem; margin-top: 2rem;">
-        <button type="button" id="btn-submit-exam" class="btn btn-primary" style="padding: 0.85rem 2rem; font-size: 1.05rem;">
-          Отправить работу
+      <!-- Блок завершения и сдачи работы -->
+      <div class="card" style="text-align: center; padding: 2rem !important; margin-top: 2rem;">
+        <h3 style="margin-bottom: 0.4rem;">Завершение работы</h3>
+        <p style="color: var(--muted); font-size: 0.9rem; font-weight: 500; margin-bottom: 1.25rem;">
+          Проверьте, что вы ответили на все вопросы. После нажатия кнопки изменить ответы будет нельзя.
+        </p>
+        <button type="button" id="btn-submit-exam" class="btn btn-primary" style="padding: 0.9rem 2.5rem; font-size: 1rem;">
+          Сдать работу учителю
         </button>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.6rem;">
-          После отправки ответы будут окончательно зафиксированы на сервере.
+      </div>
+    </main>
+  </div>
+
+  <!-- 6. ЭКРАН УСПЕШНОЙ СДАЧИ (Квитанция подтверждения + Статистика ученика) -->
+  <div id="screen-submitted" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 580px; text-align: center; padding: 2.5rem 2rem !important;">
+        <div class="neu-icon-circle" style="color: var(--success);">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.55rem; margin-bottom: 0.4rem;">Работа успешно сдана!</h2>
+        <p style="color: var(--muted); font-size: 0.95rem; font-weight: 500; margin-bottom: 1.5rem;">
+          Ваши ответы зафиксированы на сервере учителя.
+        </p>
+
+        <!-- Блок мгновенной статистики после сдачи -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1rem;">
+          <div class="neu-well" style="padding: 1rem;">
+            <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Выполнено</div>
+            <div id="res-completed-count" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">0 из 0</div>
+          </div>
+          <div class="neu-well" style="padding: 1rem;">
+            <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Затрачено</div>
+            <div id="res-time-spent" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">0 мин</div>
+          </div>
+          <div class="neu-well" style="padding: 1rem;">
+            <div style="font-size: 0.73rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">Время сдачи</div>
+            <div id="conf-time-text" style="font-size: 1.15rem; font-weight: 800; color: var(--text); margin-top: 0.25rem;">—</div>
+          </div>
+        </div>
+
+        <div class="neu-well" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary-dark); font-weight: 800;">Набрано баллов</div>
+          <div id="res-score-badge" style="font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.3rem;">0 из 0</div>
+          <span id="conf-code-badge" style="display: none;"></span>
+        </div>
+
+        <!-- Блок результатов, если учитель опубликовал их -->
+        <div id="results-box" style="display: none; margin-top: 1.5rem; text-align: left;"></div>
+
+        <!-- Кнопка завершения и закрытия сессии -->
+        <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid rgba(163, 174, 195, 0.25);">
+          <button type="button" class="btn btn-secondary" onclick="logoutStudentAndReset()" style="width: 100%; padding: 0.85rem; font-weight: 800;">
+            Завершить и закрыть
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. ЭКРАН БЛОКИРОВКИ -->
+  <div id="screen-blocked" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 480px; text-align: center; padding: 2.5rem 2rem !important;">
+        <div class="neu-icon-circle" style="color: var(--danger);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+          </svg>
+        </div>
+        <h2 style="color: var(--danger); margin-bottom: 0.5rem;">Попытка заблокирована</h2>
+        <p style="color: var(--muted); margin-bottom: 1rem; font-weight: 500;">
+          Учитель заблокировал выполнение данной попытки. Обратитесь к учителю в классе.
         </p>
       </div>
     </div>
   </div>
 
-  <!-- =========================================================================
-       6. ЭКРАН УСПЕШНОЙ СДАЧИ (С МГНОВЕННЫМ ПОКАЗОМ РЕЗУЛЬТАТА И КНОПКОЙ ВЫХОДА)
-       ========================================================================= -->
-  <div id="screen-submitted" class="student-screen student-container" style="display: none;">
-    <div class="card" style="text-align: center; padding: 3rem 2rem;">
-      <div style="width: 56px; height: 56px; background: var(--success-light); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1.25rem;">
-        ✓
-      </div>
-      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Проведение работы завершено</h2>
-      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
-        Все ваши ответы сохранены на сервере. Изменение ответов больше недоступно.
-      </p>
-
-      <!-- Мгновенные итоги: количество выполненных, время, набранные баллы -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 580px; margin: 0 auto 1.5rem;">
-        <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;">
-          <div id="res-completed-count" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">0 / 0</div>
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 0.2rem;">ВЫПОЛНЕНО ЗАДАНИЙ</div>
+  <!-- 8. ЭКРАН ОШИБКИ / ЗАКРЫТОГО ДОСТУПА -->
+  <div id="screen-error" class="student-screen" style="display: none;">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="width: 100%; max-width: 480px; text-align: center; padding: 2.5rem 2rem !important;">
+        <div class="neu-icon-circle" style="color: var(--amber);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
         </div>
-        <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;">
-          <div id="res-time-spent" style="font-size: 1.5rem; font-weight: 800; color: #D97706;">00:00</div>
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 0.2rem;">ЗАТРАЧЕНО ВРЕМЕНИ</div>
-        </div>
-        <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;">
-          <div id="res-score-badge" style="font-size: 1.5rem; font-weight: 800; color: var(--success);">0 / 0</div>
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 0.2rem;">НАБРАНО БАЛЛОВ</div>
-        </div>
-      </div>
-
-      <div style="display: inline-block; background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1.4rem; margin-bottom: 1.5rem;">
-        <span style="font-size: 0.9rem; color: var(--text-muted);">
-          Время завершения работы: <strong id="conf-time-text" style="color: var(--text-main);"></strong>
-        </span>
-      </div>
-
-      <!-- Блок опубликованных учителем разборов (если разрешено) -->
-      <div id="results-box" style="display: none;"></div>
-
-      <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.25rem;">
-        <p style="font-size: 0.85rem; color: #059669; font-weight: 600; margin-bottom: 1rem;">
-          🔒 Однократная сдача завершена. Изменение ответов заблокировано.
-        </p>
-
-        <!-- Кнопка завершения и закрытия -->
-        <button type="button" class="btn btn-secondary" onclick="logoutStudentAndReset()" style="font-weight: 700; padding: 0.75rem 1.5rem; font-size: 0.95rem; border-radius: 8px;">
-          Завершить и закрыть
-        </button>
+        <h2 id="error-screen-title" style="margin-bottom: 0.5rem;">Доступ ограничен</h2>
+        <p id="error-screen-msg" style="color: var(--muted); font-weight: 500;"></p>
+        <button type="button" class="btn btn-secondary" style="margin-top: 1.25rem;" onclick="clearStudentSession()">Ввести данные заново</button>
       </div>
     </div>
   </div>
 
-  <!-- =========================================================================
-       7. ЭКРАН БЛОКИРОВКИ
-       ========================================================================= -->
-  <div id="screen-blocked" class="student-screen student-container" style="display: none;">
-    <div class="card" style="text-align: center; padding: 3rem 2rem; border-color: #FCA5A5;">
-      <h2 style="color: var(--danger); margin-bottom: 0.5rem;">Выполнение заблокировано</h2>
-      <p style="color: var(--text-muted);">
-        Учитель временно заблокировал выполнение вашей работы. Обратитесь к учителю для разблокировки. Ваши ранее сохранённые ответы в безопасности.
-      </p>
+  <!-- Спокойное окно статуса для ученика -->
+  <div id="student-status-modal" class="student-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="student-status-modal-title">
+    <div class="student-modal-card" style="text-align: center;">
+      <div class="neu-icon-box" style="width: 50px; height: 50px; border-radius: 15px; margin: 0 auto 0.85rem;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h2 id="student-status-modal-title" style="font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 0.45rem;">Работа завершена</h2>
+      <p id="student-status-modal-message" style="color: var(--muted); font-size: 0.95rem; font-weight: 500; line-height: 1.5; margin-bottom: 1.35rem;">Проведение работы уже завершено.</p>
+      <button type="button" class="btn btn-primary" style="width: 100%; padding: 0.8rem 1.25rem; font-weight: 800;" onclick="hideStudentStatus()">Понятно</button>
     </div>
   </div>
 
-  <!-- =========================================================================
-       8. ЭКРАН ОШИБКИ
-       ========================================================================= -->
-  <div id="screen-error" class="student-screen student-container" style="display: none;">
-    <div class="card" style="text-align: center; padding: 3rem 2rem;">
-      <div id="status-icon" style="width: 56px; height: 56px; margin: 0 auto 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FEF3C7; color: #B45309; font-size: 1.7rem;">i</div>
-      <h2 id="error-title" style="margin-bottom: 0.5rem;">Текущий статус</h2>
-      <p id="error-msg" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
-    </div>
-  </div>
-
-  <!-- Небольшое уведомление о статусе проведения без системного alert -->
-  <div id="student-status-modal" role="status" aria-live="polite" style="display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 1rem; background: rgba(15, 23, 42, 0.22); backdrop-filter: blur(3px);">
-    <div style="width: min(390px, 100%); border: 1px solid rgba(148, 163, 184, 0.35); border-radius: 16px; padding: 1.35rem 1.35rem 1.15rem; background: rgba(255, 255, 255, 0.97); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2); text-align: center;">
-      <div id="student-status-modal-icon" style="width: 42px; height: 42px; margin: 0 auto 0.7rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FEF3C7; color: #B45309; font-size: 1.25rem; font-weight: 800;">!</div>
-      <div id="student-status-modal-title" style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">Текущий статус</div>
-      <div id="student-status-modal-message" style="margin-top: 0.45rem; color: #64748B; font-size: 0.92rem; line-height: 1.45;"></div>
-      <button type="button" class="btn btn-secondary" onclick="hideStudentStatus()" style="margin-top: 1rem; min-width: 96px;">Понятно</button>
-    </div>
-  </div>
-
-  <div id="student-submit-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="student-submit-confirm-title" style="display: none; position: fixed; inset: 0; z-index: 1990; align-items: center; justify-content: center; padding: 1rem; background: rgba(15, 23, 42, 0.22); backdrop-filter: blur(3px);">
-    <div style="width: min(410px, 100%); border: 1px solid rgba(148, 163, 184, 0.35); border-radius: 16px; padding: 1.35rem; background: rgba(255, 255, 255, 0.98); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2); text-align: center;">
-      <div id="student-submit-confirm-title" style="font-size: 1.08rem; font-weight: 800; color: #0F172A;">Завершить работу?</div>
-      <div id="student-submit-confirm-message" style="margin-top: 0.5rem; color: #64748B; font-size: 0.92rem; line-height: 1.45;"></div>
-      <div style="display: flex; justify-content: center; gap: 0.65rem; margin-top: 1.1rem;">
-        <button type="button" class="btn btn-secondary" onclick="hideSubmitConfirm()">Отмена</button>
-        <button type="button" class="btn btn-primary" onclick="confirmStudentSubmit()">Отправить работу</button>
+  <!-- Подтверждение отправки работы -->
+  <div id="student-submit-confirm-modal" class="student-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="student-submit-confirm-title">
+    <div class="student-modal-card" style="text-align: center;">
+      <div class="neu-icon-box" style="width: 50px; height: 50px; border-radius: 15px; margin: 0 auto 0.85rem;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 12l2 2 4-4"/>
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+      </div>
+      <h2 id="student-submit-confirm-title" style="font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 0.45rem;">Отправить работу учителю?</h2>
+      <p id="student-submit-confirm-message" style="color: var(--muted); font-size: 0.95rem; font-weight: 500; line-height: 1.5; margin-bottom: 1.35rem;">После отправки изменить ответы будет нельзя.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 0.8rem 1rem; font-weight: 800;" onclick="hideSubmitConfirm()">Вернуться</button>
+        <button type="button" id="student-submit-confirm-yes" class="btn btn-primary" style="width: 100%; padding: 0.8rem 1rem; font-weight: 800;" onclick="confirmStudentSubmit()">Отправить</button>
       </div>
     </div>
   </div>
 
-  <!-- KaTeX скрипты -->
-  <script src="/generator/static/vendor/katex.min.js"></script>
-  <script src="/generator/static/vendor/auto-render.min.js"></script>
-  <style>
-    body { -webkit-user-select: none; user-select: none; }
-    input, textarea, [contenteditable="true"] {
-      -webkit-user-select: text;
-      user-select: text;
-    }
-  </style>
-  <script src="/generator/static/js/exam-content-guard.js?v=20261018"></script>
-  <script src="/generator/static/js/student.js?v=cabinet-integration-2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <script src="/generator/static/js/exam-content-guard.js?v=1"></script>
+  <script src="/generator/static/js/student.js?v=9"></script>
 </body>
 </html>

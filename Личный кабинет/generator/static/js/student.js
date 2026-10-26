@@ -142,8 +142,8 @@ function populateLaunchInfoOnScreens() {
   // Настройка выбора параллели и буквы
   const gradeSelect = document.getElementById("student-grade-select");
   const letterSelect = document.getElementById("student-letter-input");
-  gradeSelect.innerHTML = '<option value="">-- Выберите класс --</option>';
-  letterSelect.innerHTML = '<option value="">-- Выберите букву --</option>';
+  gradeSelect.innerHTML = '<option value="">Выберите класс</option>';
+  letterSelect.innerHTML = '<option value="">Выберите букву</option>';
 
   const CLASS_LETTERS = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П"];
   const allowed = launchInfo.allowed_classes || [];
@@ -182,13 +182,13 @@ function populateLaunchInfoOnScreens() {
   gradesSet.forEach(g => {
     const opt = document.createElement("option");
     opt.value = g;
-    opt.textContent = `${g} класс`;
+    opt.textContent = (g.toLowerCase().includes("класс") || g.includes("ЕМН") || g.includes("ОГН")) ? g : `${g} класс`;
     gradeSelect.appendChild(opt);
   });
 
   function updateLettersForSelectedGrade() {
     const selectedGrade = gradeSelect.value.trim();
-    letterSelect.innerHTML = '<option value="">-- Буква --</option>';
+    letterSelect.innerHTML = '<option value="">Выберите букву</option>';
 
     let available = [];
     if (selectedGrade && gradeToLetters[selectedGrade] && gradeToLetters[selectedGrade].size > 0) {
@@ -212,6 +212,7 @@ function populateLaunchInfoOnScreens() {
       letterSelect.value = available[0];
     }
     syncCombinedClass();
+    if (window.syncAllCustomSelects) window.syncAllCustomSelects();
   }
 
   gradeSelect.addEventListener("change", () => {
@@ -228,6 +229,8 @@ function populateLaunchInfoOnScreens() {
 
   // Инициализируем предпросмотр фона для выбранного варианта
   selectVariant(document.getElementById("student-variant-input")?.value || "1");
+  if (window.initAllCustomSelects) window.initAllCustomSelects();
+  if (window.syncAllCustomSelects) window.syncAllCustomSelects();
 }
 
 function selectVariant(v) {
@@ -337,9 +340,45 @@ async function checkExistingAttempt() {
 }
 
 function applyCustomBgColor(color) {
-  if (color) {
-    document.body.style.backgroundColor = color;
+  if (!color) return;
+  const root = document.documentElement;
+  root.style.setProperty("--variant-tint", color);
+
+  // Преобразуем HEX в RGB для генерации цельной неоморфной палитры варианта
+  let hex = String(color).trim().replace("#", "");
+  if (hex.length === 3) {
+    hex = hex.split("").map(c => c + c).join("");
   }
+  if (hex.length !== 6) return;
+
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return;
+
+  // Базовая поверхность (насыщенный пастельный тон варианта, хорошо заметный издалека)
+  const surfR = Math.round(r * 0.78 + 231 * 0.22);
+  const surfG = Math.round(g * 0.78 + 235 * 0.22);
+  const surfB = Math.round(b * 0.78 + 243 * 0.22);
+  const surfaceHex = `rgb(${surfR}, ${surfG}, ${surfB})`;
+
+  // Тёмная тень в тон поверхности (для чистого 3D-неоморфизма без грязи)
+  const darkR = Math.max(0, surfR - 38);
+  const darkG = Math.max(0, surfG - 34);
+  const darkB = Math.max(0, surfB - 28);
+
+  // Яркий акцент варианта для верхней полосы и бейджа варианта
+  const isGreenish = g > r && g >= b;
+  const accentColor = isGreenish ? "#10b981" : (r > g && r > b ? "#ef4444" : "#536dfe");
+  const glowColor = isGreenish ? "rgba(16, 185, 129, 0.42)" : (r > g && r > b ? "rgba(239, 68, 68, 0.42)" : "rgba(83, 109, 254, 0.42)");
+
+  root.style.setProperty("--page", surfaceHex);
+  root.style.setProperty("--surface", surfaceHex);
+  root.style.setProperty("--shadow-out", `8px 8px 18px rgba(${darkR}, ${darkG}, ${darkB}, 0.45), -8px -8px 18px rgba(255, 255, 255, 0.82)`);
+  root.style.setProperty("--shadow-soft", `4px 4px 10px rgba(${darkR}, ${darkG}, ${darkB}, 0.38), -4px -4px 10px rgba(255, 255, 255, 0.75)`);
+  root.style.setProperty("--shadow-in", `inset 4px 4px 9px rgba(${darkR}, ${darkG}, ${darkB}, 0.35), inset -4px -4px 9px rgba(255, 255, 255, 0.78)`);
+  root.style.setProperty("--variant-accent", accentColor);
+  root.style.setProperty("--variant-glow", glowColor);
 }
 
 function handleAttemptState() {
@@ -674,7 +713,7 @@ function renderTasks() {
         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
           <span>Выберите верный вариант:</span>
           <select class="inline-select" onchange="handleAnswerChange('${t.id}', this.value, 'dropdown')">
-            <option value="">-- Выберите вариант --</option>
+            <option value="">Выберите вариант</option>
             ${(t.options || []).map(opt => `<option value="${escapeHtml(opt)}" ${saved === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
           </select>
         </div>
@@ -729,7 +768,7 @@ function renderTasks() {
                   <span>${escapeHtml(item)}</span>
                 </div>
               `).join('')}
-              ${items.filter(it => !curClasses[it]).length === 0 ? '<div style="font-size: 0.85rem; color: #10b981; font-weight: 700;">Все карточки распределены! 🎉</div>' : ''}
+              ${items.filter(it => !curClasses[it]).length === 0 ? '<div style="font-size: 0.85rem; color: #10b981; font-weight: 700;">✓ Все карточки распределены</div>' : ''}
             </div>
           </div>
         </div>
@@ -850,7 +889,7 @@ function renderTasks() {
         <div class="highlight-words-container">
           <div class="highlight-toolbar">
             <span class="highlight-tool-btn active">
-              <span>🖍</span> <span>Маркер выделения</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> <span>Маркер выделения</span>
             </span>
             <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 0.5rem;">
               Кликните по нужным словам в тексте, чтобы выделить или снять выделение:
@@ -906,9 +945,9 @@ function renderTasks() {
     }
 
     card.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid rgba(163, 174, 195, 0.24); padding-bottom: 0.65rem;">
         <span class="badge badge-indigo">Задание ${idx + 1}</span>
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">${t.max_score} б.</span>
+        <span class="badge" style="color: var(--muted) !important;">${t.max_score} б.</span>
       </div>
 
       ${(t.question_type === 'word_bank_cloze' || t.question_type === 'highlight_words') ? '' : `<div class=\"task-condition\">${escapeHtml(t.question_text)}</div>`}
@@ -934,6 +973,8 @@ function renderTasks() {
       }
     });
   };
+  if (window.initAllCustomSelects) window.initAllCustomSelects(container);
+  if (window.syncAllCustomSelects) window.syncAllCustomSelects();
   initMatchingLines();
   requestAnimationFrame(initMatchingLines);
   setTimeout(initMatchingLines, 50);
@@ -1866,7 +1907,7 @@ function showSubmissionErrorBanner(msg) {
   }
   errBox.innerHTML = `
     <div style="display: flex; align-items: flex-start; gap: 10px;">
-      <span style="font-size: 1.3rem; line-height: 1;">⚠️</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div>
         <strong>Не удалось отправить работу на сервер:</strong> ${escapeHtml(msg)}<br>
         <span style="color: #4B5563; font-size: 0.88rem;">Ваши ответы надёжно сохранены в браузере. Проверьте подключение к сети и нажмите кнопку <b>«Повторить отправку»</b> ниже.</span>
@@ -2030,30 +2071,49 @@ async function loadStudentResults() {
       box.style.display = "block";
       let html = `<div style="margin-top: 1.5rem; text-align: left;">
         <div class="published-results-button-wrap">
-        <button type="button" id="btn-show-published-results" class="btn btn-primary published-results-button" onclick="togglePublishedResults()">Посмотреть ответы</button>
+          <button type="button" id="btn-show-published-results" class="btn btn-primary published-results-button" onclick="togglePublishedResults()">Посмотреть ответы</button>
         </div>
-        <div id="published-results-details" style="display: none; margin-top: 1rem;">
-        <h4 style="margin-bottom: 1rem;">Разбор заданий:</h4>`;
-      data.tasks.forEach(t => {
-        const studentAnswer = t.student_answer === null || t.student_answer === undefined || t.student_answer === ""
-          ? "Нет ответа"
-          : escapeHtml(formatPublishedValue(t.student_answer));
-        const correctAnswer = t.correct_answer === null || t.correct_answer === undefined
-          ? ""
-          : `<strong>Правильный ответ:</strong> <span style="color: var(--success); font-weight: 600;">${escapeHtml(formatPublishedValue(t.correct_answer))}</span><br>`;
+        <div id="published-results-details" style="display: none; margin-top: 1.25rem;">
+          <h4 style="margin-bottom: 1rem; font-size: 1.05rem; font-weight: 800; color: var(--text);">Разбор заданий:</h4>`;
+
+      data.tasks.forEach((t, idx) => {
+        const qType = t.question_type || "single_choice";
+        const cleanQuestionText = qType === "word_bank_cloze"
+          ? escapeHtml(t.question_text || "").replace(/\[(\d+)\]/g, '<span class="res-slot-tag">[$1]</span>')
+          : escapeHtml(t.question_text || "");
+
+        const maxSc = Number(t.max_score || 0);
+        const sc = t.score !== undefined && t.score !== null ? Number(t.score) : null;
+        let scoreBadgeHtml = "";
+        if (sc !== null) {
+          const scoreClass = sc >= maxSc && maxSc > 0 ? "is-full" : (sc > 0 ? "is-partial" : "is-zero");
+          scoreBadgeHtml = `<span class="res-task-score ${scoreClass}">${sc} / ${maxSc} б.</span>`;
+        }
+
+        const studentBlockHtml = renderStructuredAnswerHtml(t.student_answer, qType, false, t.correct_answer);
+        const hasCorrect = t.correct_answer !== null && t.correct_answer !== undefined;
+        const isFullyCorrect = sc !== null && maxSc > 0 && sc >= maxSc;
+        const correctBlockHtml = (hasCorrect && !isFullyCorrect)
+          ? `<div class="res-answer-section res-correct-section">
+               <div class="res-answer-label correct-label">Правильный ответ:</div>
+               <div class="res-answer-body">${renderStructuredAnswerHtml(t.correct_answer, qType, true, null)}</div>
+             </div>`
+          : "";
+
         html += `
-          <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-            <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.5rem;">
-              <span>Задание ${t.order_index}</span>
-              ${t.score !== undefined ? `<span style="color: var(--primary);">${t.score} / ${t.max_score} б.</span>` : ''}
+          <div class="neu-panel res-task-card" style="padding: 1.25rem; margin-bottom: 1rem;">
+            <div class="res-task-header">
+              <span class="res-task-num">Задание ${t.order_index || (idx + 1)}</span>
+              ${scoreBadgeHtml}
             </div>
-            <p style="margin-bottom: 0.5rem;">${escapeHtml(t.question_text)}</p>
-            <div style="font-size: 0.9rem; color: var(--text-muted);">
-              <strong>Ваш ответ:</strong> ${studentAnswer}<br>
-              ${correctAnswer}
-              ${t.explanation ? `<div class="teacher-explanation"><div class="teacher-explanation-title">Пояснение учителя</div><div>${escapeHtml(t.explanation)}</div></div>` : ''}
-              ${t.teacher_comment ? `<strong>Комментарий учителя:</strong> <em>${escapeHtml(t.teacher_comment)}</em>` : ''}
+            <div class="res-task-question">${cleanQuestionText}</div>
+            <div class="res-answer-section ${isFullyCorrect ? 'res-user-correct' : (sc === 0 ? 'res-user-wrong' : '')}">
+              <div class="res-answer-label">Ваш ответ:</div>
+              <div class="res-answer-body">${studentBlockHtml}</div>
             </div>
+            ${correctBlockHtml}
+            ${t.explanation ? `<div class="teacher-explanation"><div class="teacher-explanation-title">Пояснение</div><div>${escapeHtml(t.explanation)}</div></div>` : ''}
+            ${t.teacher_comment ? `<div class="teacher-explanation" style="margin-top:0.5rem;"><div class="teacher-explanation-title">Комментарий учителя</div><div><em>${escapeHtml(t.teacher_comment)}</em></div></div>` : ''}
           </div>
         `;
       });
@@ -2061,6 +2121,96 @@ async function loadStudentResults() {
       box.innerHTML = html;
     }
   } catch (e) {}
+}
+
+function isEmptyPublishedAnswer(val) {
+  if (val === null || val === undefined || val === "") return true;
+  if (Array.isArray(val)) return val.length === 0;
+  if (typeof val === "object") return Object.keys(val).length === 0;
+  return false;
+}
+
+function renderStructuredAnswerHtml(value, questionType, isCorrectKey = false, referenceCorrect = null) {
+  if (isEmptyPublishedAnswer(value)) {
+    return `<span class="res-empty-text">Нет ответа</span>`;
+  }
+
+  // 1. Объекты: Сопоставление, Классификация по группам, Таблица утверждений, Пропуски в тексте
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const entries = Object.entries(value);
+    if (questionType === "group_classification") {
+      // Группируем по категориям для наглядности
+      const byCategory = {};
+      entries.forEach(([item, cat]) => {
+        const cName = String(cat || "Без категории");
+        if (!byCategory[cName]) byCategory[cName] = [];
+        byCategory[cName].push(item);
+      });
+      return `<div class="res-groups-grid">` + Object.entries(byCategory).map(([cat, items]) => `
+        <div class="res-group-box">
+          <div class="res-group-title">${escapeHtml(cat)}</div>
+          <div class="res-group-items">
+            ${items.map(it => {
+              let mark = "";
+              if (!isCorrectKey && referenceCorrect && typeof referenceCorrect === "object") {
+                const ok = String(referenceCorrect[it]) === String(cat);
+                mark = ok ? '<span class="res-mark ok">✓</span>' : '<span class="res-mark bad">✕</span>';
+              }
+              return `<div class="res-group-item">${mark}<span>${escapeHtml(it)}</span></div>`;
+            }).join("")}
+          </div>
+        </div>
+      `).join("") + `</div>`;
+    }
+
+    return `<div class="res-pairs-list">` + entries.map(([k, v]) => {
+      const leftLabel = questionType === "word_bank_cloze" ? `Пропуск [${k}]` : k;
+      let mark = "";
+      if (!isCorrectKey && referenceCorrect && typeof referenceCorrect === "object") {
+        const ok = String(referenceCorrect[k]) === String(v);
+        mark = ok ? '<span class="res-mark ok">✓</span>' : '<span class="res-mark bad">✕</span>';
+      }
+      return `
+        <div class="res-pair-row">
+          <span class="res-pair-left">${escapeHtml(leftLabel)}</span>
+          <span class="res-pair-arrow">→</span>
+          <span class="res-pair-right">${mark}${escapeHtml(String(v))}</span>
+        </div>
+      `;
+    }).join("") + `</div>`;
+  }
+
+  // 2. Массивы: Последовательность (ordering), Множественный выбор (multi_choice), Выделение слов (highlight_words)
+  if (Array.isArray(value)) {
+    if (questionType === "ordering") {
+      return `<div class="res-steps-list">` + value.map((item, i) => {
+        let mark = "";
+        if (!isCorrectKey && Array.isArray(referenceCorrect)) {
+          const ok = String(referenceCorrect[i]) === String(item);
+          mark = ok ? '<span class="res-mark ok">✓</span>' : '<span class="res-mark bad">✕</span>';
+        }
+        return `
+          <div class="res-step-row">
+            <span class="res-step-idx">${i + 1}</span>
+            <span class="res-step-text">${escapeHtml(String(item))}</span>
+            ${mark}
+          </div>
+        `;
+      }).join("") + `</div>`;
+    }
+
+    return `<div class="res-chips-list">` + value.map(item => {
+      let mark = "";
+      if (!isCorrectKey && Array.isArray(referenceCorrect)) {
+        const ok = referenceCorrect.map(String).includes(String(item));
+        mark = ok ? '<span class="res-mark ok">✓</span>' : '<span class="res-mark bad">✕</span>';
+      }
+      return `<span class="res-chip-item">${mark}${escapeHtml(String(item))}</span>`;
+    }).join("") + `</div>`;
+  }
+
+  // 3. Одиночное значение
+  return `<span class="res-single-val">${escapeHtml(String(value))}</span>`;
 }
 
 function formatPublishedValue(value) {
@@ -2125,4 +2275,182 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+
+// =========================================================================
+// КАСТОМНЫЕ НЕОМОРФНЫЕ ВЫПАДАЮЩИЕ СПИСКИ, ТОСТЫ И ПОДСКАЗКИ ЛИЧНОГО КАБИНЕТА
+// =========================================================================
+
+function showToast(message, type = "info") {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement("div");
+  toast.className = `cabinet-toast toast-${type}`;
+  toast.innerHTML = `<span style="flex:1;">${escapeHtml(message)}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+window.showToast = showToast;
+window.alert = function(msg) {
+  showToast(msg, "error");
+};
+
+function initCustomSelect(select) {
+  if (!select || select.dataset.customized === "true") return;
+  select.dataset.customized = "true";
+
+  const container = document.createElement("div");
+  container.className = "custom-select-container" + (select.classList.contains("inline-select") ? " inline-custom-select" : "");
+  if (select.id) container.dataset.for = select.id;
+
+  select.parentNode.insertBefore(container, select);
+  container.appendChild(select);
+
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "custom-select-trigger";
+  trigger.setAttribute("aria-haspopup", "listbox");
+  trigger.setAttribute("aria-expanded", "false");
+
+  const label = document.createElement("span");
+  label.className = "custom-select-label";
+
+  const chevron = document.createElement("span");
+  chevron.className = "custom-select-chevron";
+  chevron.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+
+  trigger.appendChild(label);
+  trigger.appendChild(chevron);
+  container.appendChild(trigger);
+
+  const menu = document.createElement("div");
+  menu.className = "custom-select-menu";
+  menu.setAttribute("role", "listbox");
+  container.appendChild(menu);
+
+  function syncOptions() {
+    menu.innerHTML = "";
+    const options = Array.from(select.options);
+    const selectedOpt = options[select.selectedIndex] || options[0];
+    label.textContent = selectedOpt ? selectedOpt.text : "";
+
+    options.forEach((opt, idx) => {
+      if (opt.value === "" && options.length > 1) return;
+      const optEl = document.createElement("div");
+      optEl.className = "custom-select-option" + (idx === select.selectedIndex ? " is-selected" : "");
+      optEl.dataset.value = opt.value;
+      optEl.innerHTML = `
+        <span>${escapeHtml(opt.text)}</span>
+        <span class="custom-select-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </span>
+      `;
+
+      optEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        select.value = opt.value;
+        select.selectedIndex = idx;
+        label.textContent = opt.text;
+
+        menu.querySelectorAll(".custom-select-option").forEach((o) => {
+          o.classList.toggle("is-selected", o.dataset.value === String(opt.value));
+        });
+
+        closeDropdown();
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        select.dispatchEvent(new Event("input", { bubbles: true }));
+        if (typeof select.onchange === "function") {
+          select.onchange.call(select, new Event("change"));
+        }
+      });
+
+      menu.appendChild(optEl);
+    });
+  }
+
+  select._syncCustomSelect = syncOptions;
+
+  function toggleDropdown() {
+    const isOpen = container.classList.contains("is-open");
+    document.querySelectorAll(".custom-select-container.is-open").forEach((c) => {
+      if (c !== container) {
+        c.classList.remove("is-open");
+        const t = c.querySelector(".custom-select-trigger");
+        if (t) t.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    if (isOpen) {
+      closeDropdown();
+    } else {
+      const rect = trigger.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      if (spaceBelow < 260 && rect.top > 260) {
+        container.classList.add("drop-up");
+      } else {
+        container.classList.remove("drop-up");
+      }
+      container.classList.add("is-open");
+      trigger.setAttribute("aria-expanded", "true");
+      const selected = menu.querySelector(".custom-select-option.is-selected");
+      if (selected) selected.scrollIntoView({ block: "nearest" });
+    }
+  }
+
+  function closeDropdown() {
+    container.classList.remove("is-open");
+    trigger.setAttribute("aria-expanded", "false");
+  }
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleDropdown();
+  });
+
+  select.addEventListener("change", () => syncOptions());
+
+  const observer = new MutationObserver(() => {
+    syncOptions();
+    setTimeout(syncOptions, 0);
+  });
+  observer.observe(select, { childList: true, subtree: true, attributes: true });
+
+  syncOptions();
+}
+
+function initAllCustomSelects(root = document) {
+  if (!root) return;
+  const selects = (root.tagName === "SELECT") ? [root] : Array.from(root.querySelectorAll("select"));
+  selects.forEach(initCustomSelect);
+}
+
+function syncAllCustomSelects() {
+  document.querySelectorAll("select[data-customized='true']").forEach(s => {
+    if (typeof s._syncCustomSelect === "function") s._syncCustomSelect();
+  });
+}
+
+window.initAllCustomSelects = initAllCustomSelects;
+window.syncAllCustomSelects = syncAllCustomSelects;
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".custom-select-container")) {
+    document.querySelectorAll(".custom-select-container.is-open").forEach((c) => {
+      c.classList.remove("is-open");
+      const t = c.querySelector(".custom-select-trigger");
+      if (t) t.setAttribute("aria-expanded", "false");
+    });
+  }
+});
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => initAllCustomSelects());
+} else {
+  initAllCustomSelects();
 }

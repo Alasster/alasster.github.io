@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
 Set-Location -LiteralPath $PSScriptRoot
 
@@ -64,7 +64,16 @@ try {
     $publicReady = $false
     $publicUrl = $null
 
-    if ($state) {
+    $existingPubFile = Join-Path $runtime 'public_url.txt'
+    if (Test-Path -LiteralPath $existingPubFile) {
+        $existingUrl = (Get-Content -LiteralPath $existingPubFile -Raw -ErrorAction SilentlyContinue).Trim()
+        if ($existingUrl -and (Test-BagalauHealth $existingUrl)) {
+            $publicReady = $true
+            $publicUrl = $existingUrl
+        }
+    }
+
+    if (-not $publicReady -and $state) {
         $url = 'https://' + $state.Self.DNSName.TrimEnd('.')
         Write-Host 'Публикуется ученический вход через Tailscale Funnel.'
         $ErrorActionPreference = 'Continue'
