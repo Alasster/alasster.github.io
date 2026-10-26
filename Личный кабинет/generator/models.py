@@ -124,6 +124,9 @@ class StudentJoinRequest(BaseModel):
     variant: Optional[str] = "1"
     desk_number: Optional[str] = None
 
+class StudentChangeVariantRequest(BaseModel):
+    variant: str
+
 class CreateBackupRequest(BaseModel):
     name: Optional[str] = None
 

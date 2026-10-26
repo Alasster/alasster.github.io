@@ -33,7 +33,7 @@ from models import (
     TeacherLoginRequest, TeacherRegisterRequest,
     CreateTestRequest, UpdateTestRequest, TaskItem,
     CreateLaunchRequest, UpdateLaunchStatusRequest, UpdateLaunchSettingsRequest,
-    StudentJoinRequest, SaveAnswerRequest, BatchSaveAnswersRequest, StudentSubmitRequest,
+    StudentJoinRequest, StudentChangeVariantRequest, SaveAnswerRequest, BatchSaveAnswersRequest, StudentSubmitRequest,
     TeacherActionStudentRequest, GradeSingleAnswerRequest, RosterImportRequest,
     StudentTaskView, CreateLessonPageRequest, DeleteLessonPageRequest, CreateBackupRequest,
     StudentResultsVisibilityRequest
@@ -197,11 +197,10 @@ async def auto_grade_attempt(db, attempt_id: str, snapshot_tasks_json: str):
     cur_att = await db.execute("SELECT variant FROM student_attempts WHERE id = ?", (attempt_id,))
     att_row = await cur_att.fetchone()
     stu_var = str(att_row["variant"] if att_row and "variant" in att_row.keys() and att_row["variant"] else "1")
-    has_distinct_v2 = any(str(t.get("variant") or "1") in ("2",) for t in tasks)
 
     for t in tasks:
         t_var = str(t.get("variant") or "1")
-        if has_distinct_v2 and t_var not in (stu_var, "all", "1,2"):
+        if t_var not in (stu_var, "all", "1,2"):
             continue
         t_id = t["id"]
         task_type = t.get("question_type", "single_choice")
@@ -1132,8 +1131,6 @@ async def get_launch_students(launch_id: str, teacher: dict = Depends(get_curren
             d["is_online"] = is_online
             stu_var = str(d.get("variant") or "1")
             stu_task_count = len([t for t in tasks if str(t.get("variant", "1")) in (stu_var, "all", "1,2")])
-            if stu_task_count == 0:
-                stu_task_count = task_count
             d["variant"] = stu_var
             override = d.get("publish_results_override")
             d["results_published"] = bool(override) if override is not None else bool(
@@ -1532,13 +1529,8 @@ async def student_check_launch(launch_id: str):
                 snap_tasks = []
             del ld["snapshot_tasks_json"]
 
-        has_distinct_v2 = any(str(t.get("variant") or "1") in ("2",) for t in snap_tasks)
-        if has_distinct_v2:
-            v1_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("1", "all", "1,2")]
-            v2_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("2", "all", "1,2")]
-        else:
-            v1_tasks = snap_tasks
-            v2_tasks = snap_tasks
+        v1_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("1", "all", "1,2")]
+        v2_tasks = [t for t in snap_tasks if str(t.get("variant") or "1") in ("2", "all", "1,2")]
 
         ld["task_count_v1"] = len(v1_tasks)
         ld["max_score_v1"] = round(sum(float(t.get("max_score", 1.0)) for t in v1_tasks), 2)
@@ -1546,7 +1538,9 @@ async def student_check_launch(launch_id: str):
         ld["max_score_v2"] = round(sum(float(t.get("max_score", 1.0)) for t in v2_tasks), 2)
         ld["task_count"] = len(snap_tasks)
         ld["total_max_score"] = round(sum(float(t.get("max_score", 1.0)) for t in snap_tasks), 2)
-        ld["has_distinct_variants"] = has_distinct_v2
+        ld["has_v1"] = len(v1_tasks) > 0
+        ld["has_v2"] = len(v2_tasks) > 0
+        ld["has_distinct_variants"] = bool(len(v1_tasks) > 0 and len(v2_tasks) > 0)
 
         return ld
 
@@ -1655,6 +1649,22 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
         if not launch:
             raise HTTPException(status_code=404, detail="Работа не найдена")
 
+        # Normalize variant if chosen variant has 0 tasks
+        snap_tasks = []
+        raw_snap = launch["snapshot_tasks_json"] if "snapshot_tasks_json" in launch.keys() else None
+        if raw_snap:
+            try:
+                snap_tasks = json.loads(raw_snap)
+            except Exception:
+                snap_tasks = []
+        v1_cnt = len([t for t in snap_tasks if str(t.get("variant") or "1") in ("1", "all", "1,2")])
+        v2_cnt = len([t for t in snap_tasks if str(t.get("variant") or "1") in ("2", "all", "1,2")])
+
+        if student_variant == "2" and v2_cnt == 0 and v1_cnt > 0:
+            student_variant = "1"
+        elif student_variant == "1" and v1_cnt == 0 and v2_cnt > 0:
+            student_variant = "2"
+
         allowed_classes = json.loads(launch["allowed_classes_json"])
         if not is_class_allowed(student_class, allowed_classes):
             raise HTTPException(status_code=400, detail=f"Класс '{student_class}' не входит в список разрешённых для данной работы")
@@ -1693,8 +1703,29 @@ async def student_join(launch_id: str, req: StudentJoinRequest, request: Request
                 extra_allowed = True
                 await db.execute("UPDATE student_attempts SET allow_extra_attempt = 0 WHERE id = ?", (existing["id"],))
             elif existing["attempt_token"] in tokens:
-                # A retry/refresh resumes the original attempt, deadline and receipt.
-                if str(existing["variant"] or "1") != student_variant:
+                # If student is still in waiting / approved or if their current variant has 0 tasks, allow updating variant:
+                snap_tasks = []
+                raw_snap2 = launch["snapshot_tasks_json"] if "snapshot_tasks_json" in launch.keys() else None
+                if raw_snap2:
+                    try:
+                        snap_tasks = json.loads(raw_snap2)
+                    except Exception:
+                        snap_tasks = []
+                v1_cnt = len([t for t in snap_tasks if str(t.get("variant") or "1") in ("1", "all", "1,2")])
+                v2_cnt = len([t for t in snap_tasks if str(t.get("variant") or "1") in ("2", "all", "1,2")])
+
+                if student_variant == "2" and v2_cnt == 0 and v1_cnt > 0:
+                    student_variant = "1"
+                elif student_variant == "1" and v1_cnt == 0 and v2_cnt > 0:
+                    student_variant = "2"
+
+                if existing["status"] in ("in_waiting", "approved", "waiting_approval") or (str(existing["variant"]) == "2" and v2_cnt == 0):
+                    if str(existing["variant"] or "1") != student_variant:
+                        await db.execute("UPDATE student_attempts SET variant = ? WHERE id = ?", (student_variant, existing["id"]))
+                        await db.commit()
+                        existing = dict(existing)
+                        existing["variant"] = student_variant
+                elif str(existing["variant"] or "1") != student_variant:
                     raise HTTPException(status_code=409, detail="Вариант уже закреплён за вашей попыткой. Для смены варианта удалите текущую попытку учителем.")
                 return student_join_response(response, existing, launch_id)
             elif existing["status"] == "waiting_approval":
@@ -1834,16 +1865,7 @@ async def get_student_attempt(attempt: dict = Depends(get_current_student_attemp
         
         # ФОРМИРУЕМ БЕЗОПАСНЫЙ УЧЕНИЧЕСКИЙ СПИСОК (БЕЗ answer_key и comment_explanation!)
         # Фильтруем задания строго по выбранному варианту ученика
-        has_distinct_v2 = any(str(t.get("variant") or "1") in ("2",) for t in full_tasks)
-        filtered_tasks = []
-        for t in full_tasks:
-            t_var = str(t.get("variant") or "1")
-            if has_distinct_v2 and t_var not in (student_var, "all", "1,2"):
-                continue
-            filtered_tasks.append(t)
-
-        if not filtered_tasks:
-            filtered_tasks = full_tasks
+        filtered_tasks = [t for t in full_tasks if str(t.get("variant") or "1") in (student_var, "all", "1,2")]
 
         # Если в проведении включено перемешивание вопросов
         if lrow["shuffle_questions"]:
@@ -1958,6 +1980,22 @@ async def get_student_attempt(attempt: dict = Depends(get_current_student_attemp
         response_data["total_score"] = round(total_sc, 2)
         response_data["time_spent_seconds"] = time_spent_seconds
         return response_data
+
+@app.post("/api/student/change-variant")
+async def student_change_variant(
+    req: StudentChangeVariantRequest,
+    attempt: dict = Depends(get_current_student_attempt)
+):
+    if attempt["status"] not in ("in_waiting", "approved", "waiting_approval"):
+        raise HTTPException(status_code=400, detail="Нельзя сменить вариант после начала выполнения работы")
+    new_var = str(req.variant or "1")
+    if new_var not in ("1", "2"):
+        new_var = "1"
+    async with get_db() as db:
+        await db.execute("UPDATE student_attempts SET variant = ? WHERE id = ?", (new_var, attempt["id"]))
+        await db.commit()
+    return {"ok": True, "variant": new_var}
+
 
 @app.post("/api/student/start")
 async def student_start_exam(attempt: dict = Depends(get_current_student_attempt)):

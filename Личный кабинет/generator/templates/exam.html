@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#e7ebf3">
-  <meta name="google" content="notranslate">
+  <meta name="google" content="notranslate, nopagereadout, nositelinkssearchbox">
+  <meta name="robots" content="noindex, nofollow, noimageindex, noarchive, nosnippet">
   <title>Выполнение работы</title>
   <!-- Favicon (Синяя открытая книга) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%23536dfe' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
@@ -16,20 +17,49 @@
   <link rel="stylesheet" href="/generator/static/css/app.css?v=3">
   <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=9">
   <style>
-    /* Тихая защита: запрет выделения и перетаскивания текста/картинок */
+    /* Защита от Google Lens, Circle to Search, копирования и скриншотов */
     body {
-      user-select: none;
-      -webkit-user-select: none;
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+    * {
+      -webkit-touch-callout: none !important;
     }
     input, textarea, select {
       user-select: text !important;
       -webkit-user-select: text !important;
+      -webkit-touch-callout: default !important;
     }
     img, .task-image, .task-img-protected {
       pointer-events: none !important;
       -webkit-user-drag: none !important;
       user-select: none !important;
       -webkit-touch-callout: none !important;
+    }
+    /* Моментальный защитный блюр при потере фокуса (глушит Circle to Search, Google Lens и захват экрана) */
+    body.exam-unfocused #screen-testing {
+      filter: blur(28px) grayscale(100%) !important;
+      opacity: 0.12 !important;
+      pointer-events: none !important;
+      transition: filter 0.04s ease, opacity 0.04s ease;
+    }
+    #lens-shield-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: rgba(231, 235, 243, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem;
+    }
+    body.exam-unfocused #lens-shield-overlay {
+      display: flex !important;
     }
     .img-shield-wrapper {
       position: relative;
@@ -90,7 +120,7 @@
           </div>
           <input type="hidden" id="student-class-select" value="">
 
-          <div class="form-group" style="margin-top: 0.25rem;">
+          <div class="form-group" id="variant-picker-group" style="margin-top: 0.25rem;">
             <label class="form-label">Выберите ваш вариант <span style="color: var(--danger);">*</span></label>
             <input type="hidden" id="student-variant-input" value="1">
             <div class="variant-picker-grid">
@@ -98,7 +128,7 @@
                 <div class="variant-color-dot" id="var-dot-1" style="background: #FCE8E6;"></div>
                 <div>
                   <div class="variant-pick-title">Вариант 1</div>
-                  <div class="variant-pick-Card-sub">Нечётный ряд</div>
+                  <div class="variant-pick-Card-sub" id="var-sub-1">Нечётный ряд</div>
                 </div>
                 <div class="var-check">✓</div>
               </div>
@@ -106,7 +136,7 @@
                 <div class="variant-color-dot" id="var-dot-2" style="background: #E6F4EA;"></div>
                 <div>
                   <div class="variant-pick-title">Вариант 2</div>
-                  <div class="variant-pick-Card-sub">Чётный ряд</div>
+                  <div class="variant-pick-Card-sub" id="var-sub-2">Чётный ряд</div>
                 </div>
                 <div class="var-check">✓</div>
               </div>
@@ -224,6 +254,14 @@
             </div>
             <div class="rule-title">Самостоятельно</div>
           </div>
+        </div>
+
+        <div id="intro-empty-warning" class="neu-well" style="display: none; margin-bottom: 1.25rem; padding: 1.15rem 1.25rem; border-left: 4px solid var(--danger); background: var(--surface);">
+          <div style="font-weight: 700; color: var(--danger); font-size: 0.98rem; margin-bottom: 0.35rem;">В этом варианте нет заданий</div>
+          <div style="font-size: 0.88rem; color: var(--muted); margin-bottom: 0.85rem;">Учитель не добавлял задания для этого варианта. Переключитесь, чтобы начать выполнение работы:</div>
+          <button type="button" class="btn btn-primary" id="btn-switch-to-available-var" style="padding: 0.55rem 1.15rem; font-size: 0.92rem;">
+            Перейти к варианту 1
+          </button>
         </div>
 
         <p id="intro-instructions" style="display: none;"></p>
@@ -472,5 +510,16 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
   <script src="/generator/static/js/exam-content-guard.js?v=1"></script>
   <script src="/generator/static/js/student.js?v=9"></script>
+  <!-- Оверлей защиты от Google Lens / Circle to Search -->
+  <div id="lens-shield-overlay">
+    <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">🛡️</div>
+    <div style="font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem;">Режим защиты тестирования</div>
+    <div style="font-size: 0.9rem; color: var(--muted); max-width: 440px; line-height: 1.5; margin-bottom: 1.25rem;">
+      Окно экзамена автоматически скрыто при переключении приложений или попытке сканирования экрана. Нажмите кнопку ниже, чтобы вернуться.
+    </div>
+    <button type="button" class="btn btn-primary" onclick="window.focus(); document.body.classList.remove('exam-unfocused');" style="padding: 0.75rem 1.6rem; font-size: 0.95rem;">
+      Продолжить тестирование
+    </button>
+  </div>
 </body>
 </html>

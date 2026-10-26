@@ -49,6 +49,27 @@ document.addEventListener("dragstart", (e) => {
   }
 }, true);
 
+// Защита от Circle to Search, Google Lens и захвата экрана при потере фокуса
+let isExamActive = false;
+
+window.addEventListener("blur", () => {
+  if (isExamActive && !document.getElementById("calc-popup")?.contains(document.activeElement)) {
+    document.body.classList.add("exam-unfocused");
+  }
+});
+
+window.addEventListener("focus", () => {
+  document.body.classList.remove("exam-unfocused");
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && isExamActive) {
+    document.body.classList.add("exam-unfocused");
+  } else if (!document.hidden) {
+    document.body.classList.remove("exam-unfocused");
+  }
+});
+
 // =========================================================================
 // РАБОТА С ТОКЕНОМ УЧЕНИКА (С ПОДДЕРЖКОЙ SESSIONSTORAGE И LOCALSTORAGE)
 // =========================================================================
@@ -227,10 +248,112 @@ function populateLaunchInfoOnScreens() {
     updateLettersForSelectedGrade();
   }
 
-  // Инициализируем предпросмотр фона для выбранного варианта
-  selectVariant(document.getElementById("student-variant-input")?.value || "1");
+  // Настройка доступности вариантов на экране входа
+  const v1Tasks = Number(launchInfo.task_count_v1 ?? 0);
+  const v2Tasks = Number(launchInfo.task_count_v2 ?? 0);
+  const hasV1 = v1Tasks > 0;
+  const hasV2 = v2Tasks > 0;
+  const hasBoth = hasV1 && hasV2;
+
+  const varGroup = document.getElementById("variant-picker-group");
+  const card1 = document.getElementById("var-card-1");
+  const card2 = document.getElementById("var-card-2");
+  const sub1 = document.getElementById("var-sub-1");
+  const sub2 = document.getElementById("var-sub-2");
+
+  if (sub1) sub1.textContent = hasBoth ? `Нечётный ряд (${v1Tasks} зад.)` : `${v1Tasks} зад.`;
+  if (sub2) sub2.textContent = hasBoth ? `Чётный ряд (${v2Tasks} зад.)` : `${v2Tasks} зад.`;
+
+  if (!hasBoth) {
+    if (hasV2 && !hasV1) {
+      if (card1) card1.style.display = "none";
+      if (card2) card2.style.display = "flex";
+      selectVariant("2");
+    } else {
+      if (card2) card2.style.display = "none";
+      if (card1) card1.style.display = "flex";
+      selectVariant("1");
+    }
+    if (varGroup) varGroup.style.display = "none";
+  } else {
+    if (varGroup) varGroup.style.display = "block";
+    if (card1) card1.style.display = "flex";
+    if (card2) card2.style.display = "flex";
+    selectVariant(document.getElementById("student-variant-input")?.value || "1");
+  }
   if (window.initAllCustomSelects) window.initAllCustomSelects();
   if (window.syncAllCustomSelects) window.syncAllCustomSelects();
+}
+
+function getVariantStats(v) {
+  if (!launchInfo) return { taskCount: 0, maxScore: 0 };
+  const varStr = String(v || "1");
+  const count = varStr === "2"
+    ? (launchInfo.task_count_v2 !== undefined ? Number(launchInfo.task_count_v2) : 0)
+    : (launchInfo.task_count_v1 !== undefined ? Number(launchInfo.task_count_v1) : Number(launchInfo.task_count || 0));
+  const score = varStr === "2"
+    ? (launchInfo.max_score_v2 !== undefined ? Number(launchInfo.max_score_v2) : 0)
+    : (launchInfo.max_score_v1 !== undefined ? Number(launchInfo.max_score_v1) : Number(launchInfo.total_max_score || 0));
+  return { taskCount: count, maxScore: score };
+}
+
+function updateIntroVariantDisplay(v) {
+  const stats = getVariantStats(v);
+  const taskCntEl = document.getElementById("intro-task-count");
+  const maxScEl = document.getElementById("intro-max-score");
+  if (taskCntEl) taskCntEl.textContent = stats.taskCount;
+  if (maxScEl) maxScEl.textContent = stats.maxScore;
+
+  const warnEl = document.getElementById("intro-empty-warning");
+  const btnStart = document.getElementById("btn-start-exam");
+
+  if (stats.taskCount === 0) {
+    if (warnEl) {
+      warnEl.style.display = "block";
+      const otherVar = v === "2" ? "1" : "2";
+      const otherStats = getVariantStats(otherVar);
+      const btnSwitch = document.getElementById("btn-switch-to-available-var");
+      if (btnSwitch) {
+        btnSwitch.textContent = `Перейти к Варианту ${otherVar} (${otherStats.taskCount} зад.)`;
+        btnSwitch.onclick = () => switchStudentVariant(otherVar);
+      }
+    }
+    if (btnStart) {
+      btnStart.disabled = true;
+      btnStart.style.opacity = "0.45";
+      btnStart.style.pointerEvents = "none";
+      btnStart.title = "В этом варианте нет заданий";
+    }
+  } else {
+    if (warnEl) warnEl.style.display = "none";
+    if (btnStart) {
+      btnStart.disabled = false;
+      btnStart.style.opacity = "1";
+      btnStart.style.pointerEvents = "auto";
+      btnStart.title = "";
+    }
+  }
+}
+
+async function switchStudentVariant(targetVar) {
+  const token = getStudentToken();
+  if (token) {
+    try {
+      const res = await fetch("/api/student/change-variant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Attempt-Token": token
+        },
+        body: JSON.stringify({ variant: targetVar })
+      });
+      if (res.ok) {
+        await checkExistingAttempt();
+        return;
+      }
+    } catch (e) {}
+  }
+  selectVariant(targetVar);
 }
 
 function selectVariant(v) {
@@ -244,14 +367,7 @@ function selectVariant(v) {
   const color = v === "2" ? (launchInfo?.bg_color_v2 || "#E6F4EA") : (launchInfo?.bg_color_v1 || "#FCE8E6");
   applyCustomBgColor(color);
 
-  if (launchInfo) {
-    const taskCnt = v === "2" ? (launchInfo.task_count_v2 ?? launchInfo.task_count) : (launchInfo.task_count_v1 ?? launchInfo.task_count);
-    const maxSc = v === "2" ? (launchInfo.max_score_v2 ?? launchInfo.total_max_score) : (launchInfo.max_score_v1 ?? launchInfo.total_max_score);
-    const taskCntEl = document.getElementById("intro-task-count");
-    const maxScEl = document.getElementById("intro-max-score");
-    if (taskCntEl && taskCnt !== undefined) taskCntEl.textContent = taskCnt;
-    if (maxScEl && maxSc !== undefined) maxScEl.textContent = maxSc;
-  }
+  updateIntroVariantDisplay(v);
 }
 
 
@@ -332,6 +448,9 @@ async function checkExistingAttempt() {
       stuVarBadge.style.background = varBg;
       stuVarBadge.style.color = varColor;
     }
+
+    // Обновляем количество заданий именно для варианта текущего ученика!
+    updateIntroVariantDisplay(varNum);
 
     handleAttemptState();
   } catch (err) {
@@ -516,6 +635,8 @@ async function startExamSession() {
     }
   }
 
+  isExamActive = true;
+  document.body.classList.remove("exam-unfocused");
   showScreen("screen-testing");
   if (currentAttempt) {
     document.getElementById("student-info-badge").textContent = `${currentAttempt.student_name} (${currentAttempt.student_class})`;
@@ -2018,6 +2139,8 @@ async function submitWork(isAutoExpired = false) {
 
 // Экран успешной сдачи с мгновенными баллами и статистикой
 function showSubmissionSuccessScreen(data = null) {
+  isExamActive = false;
+  document.body.classList.remove("exam-unfocused");
   showScreen("screen-submitted");
   const confBadge = document.getElementById("conf-code-badge");
   if (confBadge) confBadge.textContent = currentAttempt.confirmation_code || "";
