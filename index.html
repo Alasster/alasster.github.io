@@ -25,7 +25,7 @@
   <!-- Google Analytics 4 -->
   <script src="скрипты/analytics.js"></script>
 
-  <link rel="stylesheet" href="стили/styles.css?v=neu-2026-10">
+  <link rel="stylesheet" href="стили/styles.css?v=neu-2026-11">
 </head>
 <body>
 
@@ -33,7 +33,7 @@
        AIRY PILL NAVIGATION BAR
        ========================================================================== -->
   <div class="nav-wrapper">
-    <div class="container">
+    <div class="container nav-header-bar">
       <nav class="navbar">
         <!-- Logo -->
         <a href="index.html" class="brand-logo-group">
@@ -45,23 +45,22 @@
           <span class="brand-title-text"><span class="brand-title-prefix">ALASSTER</span><span class="brand-title-domain">.SITE</span></span>
         </a>
 
-        <!-- Desktop Navigation Items (white-space: nowrap) -->
+        <!-- Desktop Navigation Items (shifted right) -->
         <ul class="nav-links-menu" id="main-navigation">
           <li><button type="button" class="nav-pill-link" data-class-id="c11" aria-haspopup="dialog"><span class="nav-pill-label">11 класс</span></button></li>
           <li><button type="button" class="nav-pill-link" data-class-id="c10emn" aria-haspopup="dialog"><span class="nav-pill-label">10 ЕМН</span></button></li>
           <li><button type="button" class="nav-pill-link" data-class-id="c10ogn" aria-haspopup="dialog"><span class="nav-pill-label">10 ОГН</span></button></li>
           <li><button type="button" class="nav-pill-link" data-class-id="c9" aria-haspopup="dialog"><span class="nav-pill-label">9 класс</span></button></li>
-
         </ul>
 
         <!-- Mobile Navigation Toggle -->
-        <div class="nav-right-actions">
-          <div id="auth-nav-container"></div>
-          <button class="mobile-burger-btn" aria-expanded="false" aria-controls="main-navigation" aria-label="Меню">
-            <span class="menu-toggle-label">Классы </span><span class="menu-toggle-icon" aria-hidden="true"></span>
-          </button>
-        </div>
+        <button class="mobile-burger-btn" aria-expanded="false" aria-controls="main-navigation" aria-label="Меню">
+          <span class="menu-toggle-label">Классы </span><span class="menu-toggle-icon" aria-hidden="true"></span>
+        </button>
       </nav>
+
+      <!-- Separate Standalone Auth Button outside navbar -->
+      <div id="auth-nav-container" class="nav-auth-external"></div>
     </div>
   </div>
 
@@ -181,7 +180,7 @@
   <!-- ==========================================================================
        JAVASCRIPT: THREE.JS 3D MOTION & INTERACTIONS
        ========================================================================== -->
-  <script src="скрипты/auth-widget.js?v=neu-2026-10"></script>
-  <script src="скрипты/script.js?v=neu-2026-10"></script>
+  <script src="скрипты/auth-widget.js?v=neu-2026-11"></script>
+  <script src="скрипты/script.js?v=neu-2026-11"></script>
 </body>
 </html>

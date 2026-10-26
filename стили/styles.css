@@ -121,19 +121,32 @@ button {
   top: 18px;
   z-index: 100;
   padding: 0 16px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+}
+
+.nav-header-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .navbar {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 10px 18px;
+  gap: 18px;
+  padding: 10px 22px;
   background: var(--surface);
-  border-radius: 36px;
+  border-radius: 18px;
   box-shadow: var(--shadow-out);
   border: 1px solid var(--border-light);
+}
+
+.nav-auth-external {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 /* Logo */
@@ -198,6 +211,7 @@ button {
   gap: 10px;
   list-style: none;
   margin: 0;
+  margin-left: auto;
   padding: 0;
   flex-wrap: nowrap;
 }
@@ -206,8 +220,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 18px;
-  border-radius: 20px;
+  padding: 8px 18px;
+  border-radius: 14px;
   background: var(--surface);
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
@@ -255,14 +269,14 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  padding: 8px 18px;
-  border-radius: 22px;
+  padding: 10px 22px;
+  border-radius: 18px;
   background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-out);
   border: 1px solid var(--border-light);
   color: var(--text-dark);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -465,14 +479,14 @@ button {
    HERO SECTION WITH 3D MOTION STAGE
    ========================================================================== */
 .hero-section {
-  padding: 40px 0 60px 0;
+  padding: 24px 0 10px 0;
   position: relative;
 }
 
 .hero-grid {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: 48px;
+  gap: 40px;
   align-items: center;
 }
 
@@ -483,7 +497,7 @@ button {
   line-height: 1.15;
   color: var(--text-dark);
   letter-spacing: -0.03em;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .gradient-text {
@@ -537,15 +551,14 @@ button {
   letter-spacing: -0.01em;
 }
 
-/* 3D Motion Stage */
+/* 3D Motion Stage without outer contour */
 .hero-3d-stage {
   position: relative;
-  height: 480px;
-  border-radius: var(--radius-xl);
-  background: var(--surface);
-  box-shadow: var(--shadow-out);
-  border: 1px solid var(--border-light);
-  overflow: hidden;
+  height: 420px;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -557,12 +570,12 @@ button {
   display: block;
 }
 
-/* Floating Micro-Widgets */
+/* Floating Micro-Widgets (Cards brought closer together) */
 .hero-glass-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  padding: 24px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -576,10 +589,11 @@ button {
   gap: 14px;
   padding: 14px 20px;
   background: var(--surface);
-  border-radius: 20px;
+  border-radius: 18px;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   max-width: 380px;
+  margin-top: 10px;
   animation: neuFloat 6s ease-in-out infinite alternate;
 }
 
@@ -623,12 +637,13 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 16px 20px;
+  padding: 14px 18px;
   background: var(--surface);
-  border-radius: 22px;
+  border-radius: 18px;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   gap: 16px;
+  margin-bottom: 8px;
 }
 
 .stats-item {
@@ -659,11 +674,12 @@ button {
    NATIONAL MOTTO BANNER (ТУҒАН ЖЕР)
    ========================================================================== */
 .motto-wrapper {
-  margin: 20px auto 60px auto;
+  margin: 0 auto 40px auto;
 }
 
 .motto-contour-card {
-  padding: 8px;
+  padding: 6px;
+  border-radius: 20px;
 }
 
 .motto-glass-pill {
@@ -671,9 +687,9 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 22px 32px;
+  padding: 18px 28px;
   background: var(--surface);
-  border-radius: 26px;
+  border-radius: 18px;
   box-shadow: var(--shadow-in);
 }
 
@@ -738,7 +754,8 @@ button {
   transition: opacity 0.3s ease;
 }
 
-.modal-backdrop.is-open {
+.modal-backdrop.is-open,
+.modal-backdrop.active {
   opacity: 1;
   pointer-events: auto;
 }
@@ -754,10 +771,11 @@ button {
   flex-direction: column;
   overflow: hidden;
   transform: scale(0.95);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.modal-backdrop.is-open .modal-glass-container {
+.modal-backdrop.is-open .modal-glass-container,
+.modal-backdrop.active .modal-glass-container {
   transform: scale(1);
 }
 
@@ -845,32 +863,33 @@ button {
   border-radius: 4px;
 }
 
-.lesson-card-item {
+.lesson-card-item, .lesson-row-card {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: var(--surface);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   text-decoration: none;
   color: var(--text-dark);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
-.lesson-card-item:hover {
+.lesson-card-item:hover, .lesson-row-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-soft-hover);
   color: var(--primary);
 }
 
-.lesson-card-item:active {
+.lesson-card-item:active, .lesson-row-card:active {
   transform: translateY(0);
   box-shadow: var(--shadow-pressed);
 }
 
-.lesson-num-badge {
+.lesson-num-badge, .lesson-badge-id {
   width: 38px;
   height: 38px;
   border-radius: 12px;
@@ -883,23 +902,37 @@ button {
   font-size: 0.95rem;
   color: var(--primary);
   flex-shrink: 0;
+  border: 1px solid var(--border-light);
 }
 
-.lesson-title-text {
+.lesson-title-text, .lesson-title-label {
   font-weight: 700;
-  font-size: 0.98rem;
+  font-size: 0.96rem;
   flex: 1;
+  color: var(--text-dark);
 }
 
-.lesson-arrow-icon {
-  color: var(--muted);
-  font-size: 0.9rem;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.lesson-card-item:hover .lesson-arrow-icon {
-  transform: translateX(4px);
+.lesson-arrow-icon, .btn-launch-lesson {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--primary);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  border: none;
+}
+
+.lesson-card-item:hover .lesson-arrow-icon,
+.lesson-row-card:hover .btn-launch-lesson {
+  transform: translateX(3px);
+  box-shadow: var(--shadow-soft-hover);
 }
 
 /* ==========================================================================
@@ -912,11 +945,32 @@ button {
   }
   
   .hero-3d-stage {
-    height: 400px;
+    height: 360px;
   }
   
   .nav-links-menu {
     display: none;
+  }
+  
+  .nav-links-menu.is-open {
+    display: flex;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 16px;
+    right: 16px;
+    background: var(--surface);
+    border-radius: 18px;
+    box-shadow: var(--shadow-out);
+    border: 1px solid var(--border-light);
+    padding: 14px;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+  }
+  
+  .nav-links-menu.is-open .nav-pill-link {
+    width: 100%;
+    justify-content: flex-start;
   }
   
   .mobile-burger-btn {

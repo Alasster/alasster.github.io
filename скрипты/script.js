@@ -100,56 +100,69 @@ function showClassModal(id) {
 
   lastModalTrigger = document.activeElement;
   closeNavMenu();
-  const [className, topic] = data.title.split(' • ');
-  document.getElementById('modal-heading-el').textContent = className;
-  document.getElementById('modal-subtitle-el').textContent = topic;
-  const list = document.getElementById('modal-lessons-list');
-  list.innerHTML = '';
-  list.scrollTop = 0;
 
-  const latestLessons = [...data.lessons].sort((a, b) =>
-    (parseInt(String(b.num), 10) || 0) - (parseInt(String(a.num), 10) || 0)
-  );
-  latestLessons.forEach(l => {
-    const row = document.createElement('div');
-    row.className = 'lesson-row-card';
-    row.innerHTML = `
-      <div class="lesson-badge-id">${l.num}</div>
-      <div class="lesson-title-label">${l.title}</div>
-      <a href="${encodeURI(l.path)}" class="btn-launch-lesson">
-        <span>Открыть</span> <i class="fa-solid fa-arrow-right"></i>
-      </a>
-    `;
-    list.appendChild(row);
-  });
+  const rawTitle = data.title || '';
+  const delimiter = rawTitle.includes('·') ? '·' : (rawTitle.includes('•') ? '•' : ' - ');
+  const parts = rawTitle.split(delimiter);
+  const className = (parts[0] || rawTitle).trim();
+  const topic = (parts[1] || '').trim();
+
+  const headingEl = document.getElementById('modal-heading-el');
+  const subtitleEl = document.getElementById('modal-subtitle-el');
+  if (headingEl) headingEl.textContent = className;
+  if (subtitleEl) subtitleEl.textContent = topic;
+
+  const list = document.getElementById('modal-lessons-list');
+  if (list) {
+    list.innerHTML = '';
+    list.scrollTop = 0;
+
+    const latestLessons = [...data.lessons].sort((a, b) =>
+      (parseInt(String(b.num), 10) || 0) - (parseInt(String(a.num), 10) || 0)
+    );
+    latestLessons.forEach(l => {
+      const row = document.createElement('a');
+      row.className = 'lesson-card-item lesson-row-card';
+      row.href = encodeURI(l.path);
+      row.innerHTML = `
+        <div class="lesson-num-badge lesson-badge-id">${l.num}</div>
+        <div class="lesson-title-text lesson-title-label">${l.title}</div>
+        <div class="lesson-arrow-icon btn-launch-lesson" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
 
   const backdrop = document.getElementById('modal-backdrop-el');
+  if (!backdrop) return;
+
+  backdrop.removeAttribute('inert');
   backdrop.inert = false;
   backdrop.classList.add('active');
+  backdrop.classList.add('is-open');
   document.body.classList.add('modal-open');
+
   requestAnimationFrame(() => {
-    if (backdrop.classList.contains('active')) {
-      document.querySelector('.btn-close-modal').focus({ preventScroll: true });
-    }
-  });
-  [...document.body.children].forEach(element => {
-    if (element !== backdrop && element.tagName !== 'SCRIPT') element.inert = true;
+    document.querySelector('.btn-close-modal')?.focus({ preventScroll: true });
   });
 }
 
 function hideClassModal() {
   const backdrop = document.getElementById('modal-backdrop-el');
-  if (!backdrop.classList.contains('active')) return;
+  if (!backdrop) return;
+
   backdrop.classList.remove('active');
+  backdrop.classList.remove('is-open');
   document.body.classList.remove('modal-open');
-  [...document.body.children].forEach(element => {
-    if (element !== backdrop) element.inert = false;
-  });
+  backdrop.setAttribute('inert', '');
+  backdrop.inert = true;
+
   const trigger = lastModalTrigger?.closest('.nav-links-menu') && mobileNav.matches
     ? document.querySelector('.mobile-burger-btn')
     : lastModalTrigger;
-  trigger?.focus({ preventScroll: true });
-  backdrop.inert = true;
+  trigger?.focus?.({ preventScroll: true });
 }
 
 const mobileNav = window.matchMedia('(max-width: 860px)');
