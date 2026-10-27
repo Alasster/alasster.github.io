@@ -779,14 +779,12 @@ button {
   display: inline;
 }
 
-.motto-kz {
-  font-weight: 800;
-  color: var(--text-dark);
-}
-
+.motto-kz,
 .motto-ru {
-  font-weight: 600;
+  font-family: "Manrope", Arial, sans-serif;
+  font-weight: 500;
   color: var(--muted);
+  opacity: 0.9;
 }
 
 .motto-divider {
@@ -870,19 +868,27 @@ button {
 }
 
 .btn-close-modal {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
   border-radius: 50%;
   background: var(--surface);
   box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(120, 137, 166, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 800;
   transition: all 0.2s ease;
   cursor: pointer;
+}
+
+.btn-close-modal:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .btn-close-modal:hover {
@@ -950,7 +956,8 @@ button {
 }
 
 .lesson-num-badge, .lesson-badge-id {
-  width: 38px;
+  width: auto;
+  min-width: 48px;
   height: 38px;
   border-radius: 12px;
   background: var(--surface);
@@ -963,6 +970,8 @@ button {
   color: var(--primary);
   flex-shrink: 0;
   border: 1px solid var(--border-light);
+  white-space: nowrap;
+  padding-inline: 8px;
 }
 
 .lesson-title-text, .lesson-title-label {
@@ -986,7 +995,13 @@ button {
   flex-shrink: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
-  border: none;
+  border: 1px solid rgba(120, 137, 166, 0.28);
+}
+
+.lesson-arrow-icon:focus-visible,
+.btn-launch-lesson:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .lesson-card-item:hover .lesson-arrow-icon,
