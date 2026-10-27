@@ -127,13 +127,12 @@
     if (user) {
       const displayName = user.display_name || user.first_name || user.username || 'Учитель';
       const roleLabel = (user.role === 'superadmin' || user.role === 'admin') ? 'Администратор' : 'Учитель';
+      const initials = getUserInitials(displayName);
 
       container.innerHTML = `
         <div class="neu-auth-wrapper">
-          <button type="button" class="neu-auth-btn is-logged" id="neu-auth-trigger" aria-haspopup="true" aria-expanded="false" title="Профиль: ${escapeHtml(displayName)}">
-            <span class="neu-auth-avatar"><i class="fa-solid fa-user-check"></i></span>
-            <span class="neu-auth-name">${escapeHtml(displayName)}</span>
-            <i class="fa-solid fa-chevron-down neu-auth-chevron"></i>
+          <button type="button" class="neu-auth-btn is-logged" id="neu-auth-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Профиль: ${escapeHtml(displayName)}" title="Профиль: ${escapeHtml(displayName)}">
+            <span class="neu-auth-avatar neu-auth-initials" aria-hidden="true">${escapeHtml(initials)}</span>
           </button>
           <div class="neu-auth-dropdown" id="neu-auth-dropdown">
             <div class="neu-auth-dropdown-header">
@@ -143,10 +142,6 @@
             <a href="${cabinetUrl}" class="neu-auth-dropdown-item">
               <i class="fa-solid fa-gauge-high"></i>
               <span>Личный кабинет</span>
-            </a>
-            <a href="${generatorUrl}" class="neu-auth-dropdown-item">
-              <i class="fa-solid fa-clipboard-check"></i>
-              <span>Генератор тестов</span>
             </a>
             <div class="neu-auth-dropdown-divider"></div>
             <button type="button" class="neu-auth-dropdown-item neu-auth-logout-btn" id="neu-logout-btn">
@@ -181,13 +176,18 @@
     } else {
       container.innerHTML = `
         <div class="neu-auth-wrapper">
-          <a href="${loginUrl}" class="neu-auth-btn" id="neu-auth-trigger" title="Войти в личный кабинет">
-            <span class="neu-auth-avatar"><i class="fa-solid fa-user"></i></span>
-            <span class="neu-auth-name">Войти</span>
+          <a href="${loginUrl}" class="neu-auth-btn" id="neu-auth-trigger" aria-label="Войти в личный кабинет" title="Войти в личный кабинет">
+            <span class="neu-auth-avatar neu-auth-login-mark" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
           </a>
         </div>
       `;
     }
+  }
+
+  function getUserInitials(name) {
+    const parts = String(name || 'Учитель').trim().split(/\s+/).filter(Boolean);
+    if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase();
   }
 
   function escapeHtml(str) {
