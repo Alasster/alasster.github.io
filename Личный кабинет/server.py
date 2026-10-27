@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import hmac
+import json
 from html import unescape
 import importlib.util
 import logging
@@ -248,6 +249,11 @@ def init_db() -> None:
                 google_drive_id TEXT DEFAULT '',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
+            CREATE TABLE IF NOT EXISTS lesson_visibility (
+                relative_path TEXT PRIMARY KEY,
+                is_visible INTEGER NOT NULL DEFAULT 1,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             """
         )
         session_columns = {row["name"] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
@@ -260,7 +266,6 @@ def init_db() -> None:
         db.execute("UPDATE users SET role = 'superadmin' WHERE lower(username) = ?", (SUPERADMIN_EMAIL,))
         db.execute("INSERT OR IGNORE INTO materials_folders (id, name, created_at) VALUES ('default', 'Общие', CURRENT_TIMESTAMP)")
         db.commit()
-
         username = os.environ.get("PERSONAL_CABINET_ADMIN_USERNAME", "").strip()
         password = os.environ.get("PERSONAL_CABINET_ADMIN_PASSWORD", "")
         if not username or not password:
@@ -274,6 +279,30 @@ def init_db() -> None:
                 (username.lower(), hash_password(password), display_name, "", "", "superadmin"),
             )
             db.commit()
+
+    sync_public_lesson_visibility()
+
+
+PUBLIC_VISIBILITY_PATH = BASE_DIR.parent / "скрипты" / "lesson-visibility.json"
+
+
+def _visibility_rows() -> dict[str, bool]:
+    with closing(open_db()) as db:
+        rows = db.execute("SELECT relative_path, is_visible FROM lesson_visibility").fetchall()
+    return {str(row["relative_path"]): bool(row["is_visible"]) for row in rows}
+
+
+def sync_public_lesson_visibility() -> None:
+    PUBLIC_VISIBILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"version": 1, "lessons": _visibility_rows()}
+    PUBLIC_VISIBILITY_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _teacher_or_admin(request: Request) -> sqlite3.Row:
+    user = get_user_from_request(request)
+    if user is None or user["role"] not in {"teacher", "admin", "superadmin"}:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    return user
 
 
 def is_local_request(request: Request) -> bool:
@@ -333,8 +362,9 @@ def site_content_summary() -> dict:
     }
 
 
-def site_lesson_catalog() -> list[dict]:
+def site_lesson_catalog(include_hidden: bool = False) -> list[dict]:
     excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов", "_backup_site_legacy"}
+    visibility = _visibility_rows()
     catalog = []
     for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name.casefold()):
         if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
@@ -351,6 +381,11 @@ def site_lesson_catalog() -> list[dict]:
 
         groups = {}
         for lesson_file in lesson_files:
+            relative_path = lesson_file.relative_to(BASE_DIR.parent).as_posix()
+            quarter_key = f"__quarter__|{directory.name}|{lesson_file.parent.name}"
+            is_visible = visibility.get(quarter_key, True) and visibility.get(relative_path, True)
+            if not include_hidden and not is_visible:
+                continue
             content = lesson_file.read_text(encoding="utf-8")
             heading = re.search(r"<h1\b[^>]*>(.*?)</h1\s*>", content, re.IGNORECASE | re.DOTALL)
             title = heading.group(1) if heading else ""
@@ -362,15 +397,17 @@ def site_lesson_catalog() -> list[dict]:
             if not title:
                 title = lesson_file.stem
 
-            relative_path = lesson_file.relative_to(BASE_DIR.parent).as_posix()
             group_name = lesson_file.parent.name if lesson_file.parent != directory else "Темы"
             groups.setdefault(group_name, []).append({
                 "number": int(lesson_file.stem.split(maxsplit=1)[0].split(".", 1)[0])
                     if re.match(r"^\d+", lesson_file.stem) else None,
                 "title": title,
                 "href": f"https://alasster.site/{quote(relative_path, safe='/')}",
+                "is_visible": is_visible,
             })
 
+        if not groups:
+            continue
         catalog.append({
             "name": directory.name,
             "lessons": len(lesson_files),
@@ -902,7 +939,7 @@ def update_current_user(payload: ProfileUpdateRequest, request: Request):
 
 
 @app.get("/api/site-overview")
-def site_overview(request: Request):
+async def site_overview(request: Request):
     user = get_user_from_request(request)
     if user is None:
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
@@ -918,7 +955,11 @@ def site_overview(request: Request):
             (ONLINE_WINDOW,),
         ).fetchone()["count"]
     content = site_content_summary()
-    analytics = ga4_summary()
+    try:
+        analytics = await asyncio.wait_for(asyncio.to_thread(ga4_summary), timeout=10)
+    except Exception:
+        LOGGER.warning("GA4 summary timed out or failed", exc_info=True)
+        analytics = {"online_users": None, "traffic": {"daily": [], "monthly": []}, "available": False}
     pub_file = BASE_DIR / ".runtime" / "public_url.txt"
     pub_url = pub_file.read_text(encoding="utf-8").strip() if pub_file.exists() else (os.environ.get("BAGALAU_PUBLIC_URL") or "")
     lan_ip = "127.0.0.1"
@@ -952,7 +993,46 @@ def site_overview(request: Request):
 def lessons_catalog(request: Request):
     if get_user_from_request(request) is None:
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
-    return {"classes": site_lesson_catalog()}
+    return {"classes": site_lesson_catalog(include_hidden=True), "visibility": _visibility_rows()}
+
+
+class LessonVisibilityRequest(BaseModel):
+    relative_path: str | None = None
+    grade: str | None = None
+    quarter: str | None = None
+    is_visible: bool
+
+
+@app.get("/api/lesson-visibility")
+def lesson_visibility(request: Request):
+    _teacher_or_admin(request)
+    return {"lessons": _visibility_rows()}
+
+
+@app.patch("/api/lesson-visibility")
+def update_lesson_visibility(payload: LessonVisibilityRequest, request: Request):
+    _teacher_or_admin(request)
+    if payload.relative_path:
+        key = payload.relative_path.replace("\\", "/").strip("/")
+    elif payload.grade and payload.quarter:
+        key = f"__quarter__|{payload.grade.strip()}|{payload.quarter.strip()}"
+    else:
+        raise HTTPException(status_code=400, detail="Укажите урок или четверть")
+    if key.startswith("__quarter__|"):
+        parts = key.split("|", 2)
+        if len(parts) != 3 or not parts[1] or not parts[2]:
+            raise HTTPException(status_code=400, detail="Некорректная четверть")
+    elif not key.lower().endswith(".html") or key.startswith((".", "/")):
+        raise HTTPException(status_code=400, detail="Некорректный путь урока")
+    with closing(open_db()) as db:
+        db.execute(
+            "INSERT INTO lesson_visibility(relative_path, is_visible, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) "
+            "ON CONFLICT(relative_path) DO UPDATE SET is_visible=excluded.is_visible, updated_at=CURRENT_TIMESTAMP",
+            (key, int(payload.is_visible)),
+        )
+        db.commit()
+    sync_public_lesson_visibility()
+    return {"ok": True, "key": key, "is_visible": bool(payload.is_visible)}
 
 
 @app.post("/api/login")

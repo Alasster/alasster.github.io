@@ -94,6 +94,18 @@ const LESSONS_DATABASE = {
   }
 };
 
+let publicVisibility = {};
+const lessonIsPublic = (file) => {
+  const normalized = file.replace(/\\/g, '/');
+  const parts = normalized.split('/');
+  const quarterKey = parts.length >= 2 ? `__quarter__|${parts[0]}|${parts[1]}` : '';
+  return publicVisibility[quarterKey] !== false && publicVisibility[normalized] !== false;
+};
+fetch('/скрипты/lesson-visibility.json', { cache: 'no-store' })
+  .then(response => response.ok ? response.json() : null)
+  .then(payload => { publicVisibility = payload?.lessons || {}; })
+  .catch(() => {});
+
 function showClassModal(id) {
   const data = LESSONS_DATABASE[id];
   if (!data) return;
@@ -120,7 +132,7 @@ function showClassModal(id) {
     const latestLessons = [...data.lessons].sort((a, b) =>
       (parseInt(String(b.num), 10) || 0) - (parseInt(String(a.num), 10) || 0)
     );
-    latestLessons.forEach(l => {
+    latestLessons.filter(l => lessonIsPublic(l.path)).forEach(l => {
       const row = document.createElement('a');
       row.className = 'lesson-card-item lesson-row-card';
       row.href = encodeURI(l.path);

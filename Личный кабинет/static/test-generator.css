@@ -507,8 +507,10 @@ textarea.form-control,
 #tests-grid .card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  justify-content: flex-start;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
 }
 #tests-grid .card:hover {
   transform: translateY(-2px);
@@ -573,7 +575,19 @@ textarea.form-control,
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   width: 100%;
+  min-width: 0;
 }
+
+#tests-grid .card h3 {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.25;
+}
+#tests-grid .card > * { min-width: 0; max-width: 100%; }
+
 .test-card-actions.archive-actions {
   grid-template-columns: repeat(2, 1fr);
 }
@@ -584,11 +598,11 @@ textarea.form-control,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--text);
   background: var(--surface);
-  box-shadow: 3px 3px 6px rgba(163, 174, 195, 0.42), -3px -3px 6px rgba(255, 255, 255, 0.7);
-  border: none;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-light, rgba(163, 174, 195, .35));
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -596,15 +610,23 @@ textarea.form-control,
   box-shadow: 3px 3px 6px rgba(11, 15, 25, 0.46), -3px -3px 6px rgba(190, 205, 235, 0.1);
 }
 .test-card-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 4px 4px 10px rgba(163, 174, 195, 0.5), -4px -4px 10px rgba(255, 255, 255, 0.85);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-soft-hover, var(--shadow-soft));
 }
 :root[data-theme="dark"] .test-card-btn:hover {
   box-shadow: 4px 4px 10px rgba(11, 15, 25, 0.55), -4px -4px 10px rgba(190, 205, 235, 0.14);
 }
 .test-card-btn:active {
-  transform: translateY(1px);
+  transform: scale(0.96);
   box-shadow: var(--shadow-in);
+}
+.test-card-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+@media (max-width: 480px) {
+  .test-card-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .test-card-btn { min-width: 0; }
 }
 .test-card-btn svg {
   display: block;
@@ -1051,6 +1073,40 @@ textarea.form-control,
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+@media (max-width: 700px) {
+  #tests-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  .editor-layout,
+  .editor-layout.sidebar-collapsed {
+    gap: 12px;
+  }
+
+  .editor-layout > *,
+  .card,
+  .task-card,
+  .modal-dialog {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .live-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-content {
+    padding-inline: 12px;
+  }
+
+  .table-responsive,
+  .matching-table {
+    max-width: 100%;
+  }
+}
 .stat-card {
   padding: 16px;
   border-radius: 18px;
@@ -1093,13 +1149,19 @@ textarea.form-control,
   font-size: 0.95rem;
   font-weight: 800;
   color: var(--text);
+  white-space: nowrap;
 }
 .calc-close-btn {
   background: none;
   border: 0;
-  font-size: 1.1rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
   cursor: pointer;
   color: var(--muted);
+  border-radius: 0;
 }
 .calc-screen {
   width: 100%;

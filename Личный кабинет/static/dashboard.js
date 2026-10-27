@@ -71,6 +71,7 @@ let trafficSeries = { daily: [], monthly: [] };
 let selectedTrafficMode = 'daily';
 let lessonCatalogRequest = null;
 let lessonsSummaryText = 'Загрузка списка...';
+let lessonVisibility = {};
 
 function appendSummaryRow(list, label, value) {
   const row = document.createElement('li');
@@ -495,7 +496,14 @@ adminPasswordConfirm?.addEventListener('click', async () => {
 });
 
 async function loadSiteOverview() {
-  const response = await fetch('/api/site-overview');
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 15_000);
+  let response;
+  try {
+    response = await fetch('/api/site-overview', { signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
   if (!response.ok) throw new Error('Не удалось загрузить сводку сайта.');
   const data = await response.json();
   summaryLessons.textContent = formatNumber(data.lessons);
@@ -508,7 +516,7 @@ async function loadSiteOverview() {
   trafficSeries = data.traffic || { daily: [], monthly: [] };
   const analyticsAvailable = Boolean(data.analytics_available);
   trafficModes.forEach((button) => { button.disabled = !analyticsAvailable; });
-  summaryStatus.textContent = analyticsAvailable ? 'GA4 подключён' : 'Ожидание GA4';
+  summaryStatus.textContent = analyticsAvailable ? 'GA4 подключён' : 'GA4 недоступен';
   renderTrafficChart(selectedTrafficMode);
 
   if (data.mobile_connect) {
@@ -517,6 +525,10 @@ async function loadSiteOverview() {
     if (lanInput && data.mobile_connect.lan_url) lanInput.value = data.mobile_connect.lan_url;
     if (internetInput && data.mobile_connect.internet_url) internetInput.value = data.mobile_connect.internet_url;
   }
+}
+
+function visibilityKeyForQuarter(grade, quarter) {
+  return `__quarter__|${grade}|${quarter}`;
 }
 
 function renderLessonsCatalog(classes) {
@@ -547,11 +559,27 @@ function renderLessonsCatalog(classes) {
       groupSection.className = 'lesson-topic-group';
       const heading = document.createElement('h3');
       heading.textContent = group.name;
+      const quarterKey = visibilityKeyForQuarter(item.name, group.name);
+      const quarterToggle = document.createElement('button');
+      quarterToggle.type = 'button';
+      quarterToggle.className = 'lesson-visibility-toggle';
+      quarterToggle.dataset.visibilityKey = quarterKey;
+      quarterToggle.dataset.visibilityKind = 'quarter';
+      quarterToggle.textContent = lessonVisibility[quarterKey] === false ? 'Четверть скрыта' : 'Четверть видима';
+      quarterToggle.setAttribute('aria-pressed', String(lessonVisibility[quarterKey] !== false));
+      heading.append(' ', quarterToggle);
       const links = document.createElement('div');
       links.className = 'lesson-topic-list';
       group.lessons.forEach((lesson) => {
         const row = document.createElement('div');
         row.className = 'lesson-topic-row';
+        const lessonToggle = document.createElement('button');
+        lessonToggle.type = 'button';
+        lessonToggle.className = 'lesson-visibility-toggle lesson-visibility-toggle-lesson';
+        lessonToggle.dataset.visibilityKey = lesson.href.replace('https://alasster.site/', '');
+        lessonToggle.dataset.visibilityKind = 'lesson';
+        lessonToggle.textContent = lessonVisibility[lessonToggle.dataset.visibilityKey] === false ? 'Скрыт' : 'Виден';
+        lessonToggle.setAttribute('aria-pressed', String(lessonVisibility[lessonToggle.dataset.visibilityKey] !== false));
         const link = document.createElement('a');
         link.className = 'lesson-topic-link';
         link.href = lesson.href;
@@ -563,7 +591,7 @@ function renderLessonsCatalog(classes) {
         const title = document.createElement('span');
         title.textContent = lesson.title;
         link.append(number, title);
-        row.append(link);
+        row.append(link, lessonToggle);
         if (item.name !== 'Python основы') {
           const kspButton = document.createElement('button');
           kspButton.className = 'button button-ghost lesson-ksp-button';
@@ -604,6 +632,7 @@ async function loadLessonsCatalog() {
       const response = await fetch('/api/lessons-catalog');
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Не удалось загрузить уроки.');
+      lessonVisibility = data.visibility || {};
       renderLessonsCatalog(data.classes);
     } catch (error) {
       const msg = error.message || 'Не удалось загрузить уроки.';
@@ -621,6 +650,30 @@ async function loadLessonsCatalog() {
 }
 
 lessonCatalogRetry.addEventListener('click', loadLessonsCatalog);
+
+lessonCatalogGrid?.addEventListener('click', async (event) => {
+  const toggle = event.target.closest('.lesson-visibility-toggle');
+  if (!toggle) return;
+  const key = toggle.dataset.visibilityKey;
+  const nextValue = toggle.getAttribute('aria-pressed') !== 'true';
+  toggle.disabled = true;
+  try {
+    const body = toggle.dataset.visibilityKind === 'quarter'
+      ? (() => { const [, grade, quarter] = key.split('|'); return { grade, quarter, is_visible: nextValue }; })()
+      : { relative_path: key, is_visible: nextValue };
+    const response = await fetch('/api/lesson-visibility', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || 'Не удалось сохранить видимость.');
+    lessonVisibility[key] = nextValue;
+    await loadLessonsCatalog();
+  } catch (error) {
+    alert(error.message || 'Не удалось сохранить видимость.');
+  } finally {
+    toggle.disabled = false;
+  }
+});
 
 function renderTrafficChart(mode) {
   const points = (trafficSeries[mode] || []).slice(-14);
@@ -724,8 +777,9 @@ window.addEventListener('beforeunload', (event) => {
 });
 
 loadCurrentUser().catch(() => window.location.replace('/login'));
-loadSiteOverview().catch(() => {
+loadSiteOverview().catch((error) => {
   summaryStatus.textContent = 'Нет данных';
+  summaryStatus.title = error?.name === 'AbortError' ? 'Сервер аналитики не ответил вовремя.' : 'Не удалось получить данные аналитики.';
 });
 window.setInterval(() => {
   loadSiteOverview().catch(() => {});

@@ -81,6 +81,13 @@
   }
 
   let activeTabId = detectCurrentClass();
+  let publicVisibility = {};
+  const lessonIsPublic = (file) => {
+    const normalized = file.replace(/\\/g, '/');
+    const parts = normalized.split('/');
+    const quarterKey = parts.length >= 2 ? `__quarter__|${parts[0]}|${parts[1]}` : '';
+    return publicVisibility[quarterKey] !== false && publicVisibility[normalized] !== false;
+  };
 
   // Dynamic lesson detection & synchronization
   function syncDynamicLessons() {
@@ -159,7 +166,7 @@
 
     const currentPath = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
 
-    listEl.innerHTML = data.lessons.map(lesson => {
+    listEl.innerHTML = data.lessons.filter(lesson => lessonIsPublic(lesson.file)).map(lesson => {
       const isCurrent = currentPath.endsWith(lesson.file);
       return `
         <a href="../../${lesson.file}" class="lesson-row-card ${isCurrent ? 'current-lesson' : ''}">
@@ -7043,6 +7050,10 @@ const slides = [...document.querySelectorAll('.slide')];
     syncDynamicLessons();
     updateDocumentTitle();
     initClassesModal();
+    fetch('/скрипты/lesson-visibility.json', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(payload => { publicVisibility = payload?.lessons || {}; })
+      .catch(() => {});
     initUniversalSlideController();
 
     // Find current lesson ID via data-lesson-id attribute on body
