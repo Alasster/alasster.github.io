@@ -22424,3 +22424,508 @@ button.quiz-btn:active, .option-btn:active, .btn-action:active {
 .class-tab-pill:active {
   box-shadow: var(--shadow-pressed) !important;
 }
+
+
+/* ==========================================================================
+   UNIFIED NEUMORPHIC SYSTEM FOR ALL LESSONS & GRADES (2026 UPDATE)
+   ========================================================================== */
+
+/* 1. Base Page Background - Smooth, clean, no harsh tints */
+body.lesson-page {
+  background-color: var(--page, #eef2f8) !important;
+  background-image: none !important;
+  color: var(--text, #1e293b) !important;
+}
+
+/* 2. Signature Grade Colors (Smooth, elegant, unified per class) */
+body.lesson-page[class*="lesson-9-"],
+body.lesson-page[data-lesson-id^="9-"] {
+  --primary: #0284c7;
+  --primary-dark: #0369a1;
+  --primary-soft: rgba(2, 132, 199, 0.12);
+  --primary-glow: rgba(2, 132, 199, 0.35);
+  --accent: #0284c7;
+}
+
+body.lesson-page[class*="lesson-10emn-"],
+body.lesson-page[data-lesson-id^="10emn-"],
+body.lesson-page[data-lesson-id^="10-ЕМН"] {
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --primary-soft: rgba(79, 70, 229, 0.12);
+  --primary-glow: rgba(79, 70, 229, 0.35);
+  --accent: #4f46e5;
+}
+
+body.lesson-page[class*="lesson-10ogn-"],
+body.lesson-page[data-lesson-id^="10ogn-"],
+body.lesson-page[data-lesson-id^="10-ОГН"] {
+  --primary: #059669;
+  --primary-dark: #047857;
+  --primary-soft: rgba(5, 150, 105, 0.12);
+  --primary-glow: rgba(5, 150, 105, 0.35);
+  --accent: #059669;
+}
+
+body.lesson-page[class*="lesson-11-"],
+body.lesson-page[data-lesson-id^="11-"] {
+  --primary: #d97706;
+  --primary-dark: #b45309;
+  --primary-soft: rgba(217, 119, 6, 0.12);
+  --primary-glow: rgba(217, 119, 6, 0.35);
+  --accent: #d97706;
+}
+
+/* 3. Navigation Bar Layout (Exact match to index.html) */
+.nav-wrapper .container,
+.nav-wrapper .container.nav-header-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+body.lesson-page .navbar {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  padding: 8px 20px !important;
+  background: var(--surface) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-out) !important;
+  border: 0 !important;
+}
+
+body.lesson-page .brand-icon-box {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  transition: all 0.25s ease !important;
+}
+
+body.lesson-page .brand-title-text {
+  font-weight: 800 !important;
+  color: var(--text-dark) !important;
+}
+
+body.lesson-page .nav-lesson-badge {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  color: var(--text-dark) !important;
+}
+
+body.lesson-page .nav-badge-class {
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+}
+
+body.lesson-page .classes-menu-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+}
+
+body.lesson-page .classes-menu-btn:hover {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.lesson-page .classes-menu-btn:active {
+  box-shadow: var(--shadow-pressed) !important;
+  transform: translateY(0) !important;
+}
+
+/* User Auth Button placed outside navbar on the right */
+.nav-auth-external {
+  flex: 0 0 auto !important;
+}
+
+body.lesson-page .neu-auth-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 53px !important;
+  height: 53px !important;
+  padding: 3px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-out) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  text-decoration: none !important;
+}
+
+body.lesson-page .neu-auth-btn:hover {
+  transform: scale(1.04) !important;
+  color: var(--primary) !important;
+  box-shadow: var(--shadow-soft-hover) !important;
+}
+
+body.lesson-page .neu-auth-btn:active,
+body.lesson-page .neu-auth-btn.is-active {
+  transform: scale(0.98) !important;
+  box-shadow: var(--shadow-pressed) !important;
+}
+
+body.lesson-page .neu-auth-avatar {
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+}
+
+body.lesson-page .neu-auth-initials {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em !important;
+  color: var(--primary) !important;
+}
+
+body.lesson-page .neu-auth-login-mark {
+  color: var(--primary) !important;
+  font-size: 1.15rem !important;
+}
+
+body.lesson-page .neu-auth-name,
+body.lesson-page .neu-auth-chevron {
+  display: none !important;
+}
+
+/* 4. Slide Content Neumorphic Surfaces */
+body.lesson-page .slide .card,
+body.lesson-page .slide .part-card,
+body.lesson-page .slide .glass,
+body.lesson-page .slide .step-card,
+body.lesson-page .slide .info-box,
+body.lesson-page .slide .formula-card,
+body.lesson-page .slide .task-card,
+body.lesson-page .slide .concept-card,
+body.lesson-page .slide .sim-card {
+  background: var(--surface) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body.lesson-page .slide .card:hover,
+body.lesson-page .slide .part-card:hover,
+body.lesson-page .slide .step-card:hover,
+body.lesson-page .slide .concept-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-soft-hover) !important;
+}
+
+body.lesson-page .slide .part-icon,
+body.lesson-page .slide .badge,
+body.lesson-page .slide .formula-box,
+body.lesson-page .slide .code-box,
+body.lesson-page .slide .inset-box {
+  box-shadow: var(--shadow-in) !important;
+  background: var(--surface) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+}
+
+body.lesson-page .start-btn,
+body.lesson-page .nav-btn,
+body.lesson-page .btn-action,
+body.lesson-page .quiz-btn,
+body.lesson-page .option-btn {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+  transition: all 0.22s ease !important;
+}
+
+body.lesson-page .start-btn:hover,
+body.lesson-page .nav-btn:hover,
+body.lesson-page .btn-action:hover,
+body.lesson-page .quiz-btn:hover,
+body.lesson-page .option-btn:hover {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.lesson-page .start-btn:active,
+body.lesson-page .nav-btn:active,
+body.lesson-page .btn-action:active,
+body.lesson-page .quiz-btn:active,
+body.lesson-page .option-btn:active {
+  box-shadow: var(--shadow-pressed) !important;
+  transform: translateY(0) !important;
+}
+
+/* 5. Slide Dots Navigation with Slide Icons */
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-out) !important;
+  border-radius: 26px !important;
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  border: 0 !important;
+  width: auto !important;
+  min-width: 44px !important;
+  height: auto !important;
+  isolation: isolate !important;
+}
+
+body.lesson-page .dot-indicator {
+  display: none !important;
+}
+
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--muted) !important;
+  font-size: 0.88rem !important;
+  cursor: pointer !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav)::before {
+  display: none !important;
+}
+
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav):hover {
+  transform: scale(1.12) !important;
+  color: var(--primary) !important;
+  box-shadow: var(--shadow-soft-hover) !important;
+}
+
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav):is(.active, [aria-current="step"]) {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+  transform: scale(1.04) !important;
+  font-weight: 800 !important;
+}
+
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) i,
+body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) svg {
+  display: inline-block !important;
+  font-size: 0.85rem !important;
+  line-height: 1 !important;
+  color: inherit !important;
+  pointer-events: none !important;
+}
+
+/* 6. Lesson Modal Drawer on Lesson Pages */
+body.lesson-page .modal-glass-container {
+  background: var(--surface) !important;
+  border-radius: 24px !important;
+  box-shadow: 16px 16px 36px rgba(163, 174, 195, 0.48), -16px -16px 36px rgba(255, 255, 255, 0.85) !important;
+  border: 0 !important;
+}
+
+body.lesson-page .modal-header-bar {
+  border-bottom: 1px solid var(--border-subtle) !important;
+  background: var(--surface) !important;
+}
+
+body.lesson-page .btn-close-modal {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  color: var(--rose) !important;
+  font-size: 1.4rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+}
+
+body.lesson-page .btn-close-modal:hover {
+  transform: scale(1.18) !important;
+  opacity: 0.85 !important;
+}
+
+body.lesson-page .modal-classes-nav {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  padding: 12px 24px !important;
+  gap: 10px !important;
+}
+
+body.lesson-page .class-tab-pill {
+  padding: 8px 18px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+body.lesson-page .class-tab-pill:hover {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.lesson-page .class-tab-pill.active {
+  box-shadow: var(--shadow-in) !important;
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+  transform: none !important;
+}
+
+body.lesson-page .tab-home-link {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  color: var(--text-dark) !important;
+  font-weight: 700 !important;
+  padding: 8px 18px !important;
+  text-decoration: none !important;
+}
+
+body.lesson-page .tab-home-link:hover {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.lesson-page .modal-lessons-scroll {
+  padding: 20px 24px 28px !important;
+  gap: 12px !important;
+}
+
+body.lesson-page .lesson-row-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 14px 20px !important;
+  background: var(--surface) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark) !important;
+  text-decoration: none !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body.lesson-page .lesson-row-card:hover {
+  transform: scale(1.008) !important;
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+}
+
+body.lesson-page .lesson-row-card:active {
+  transform: scale(0.995) !important;
+  box-shadow: var(--shadow-pressed) !important;
+}
+
+body.lesson-page .lesson-row-card.current-lesson {
+  box-shadow: var(--shadow-in) !important;
+  background: var(--surface) !important;
+  border: 0 !important;
+}
+
+body.lesson-page .lesson-badge-id {
+  width: auto !important;
+  min-width: 48px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+  color: var(--primary) !important;
+  padding-inline: 8px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+body.lesson-page .lesson-title-label {
+  font-weight: 700 !important;
+  font-size: 0.96rem !important;
+  color: var(--text-dark) !important;
+  flex: 1 !important;
+}
+
+body.lesson-page .lesson-current-tag {
+  box-shadow: var(--shadow-soft) !important;
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-weight: 800 !important;
+  font-size: 0.76rem !important;
+}
+
+body.lesson-page .lesson-arrow-icon {
+  color: var(--muted) !important;
+  font-size: 0.88rem !important;
+  transition: all 0.2s ease !important;
+}
+
+body.lesson-page .lesson-row-card:hover .lesson-arrow-icon {
+  color: var(--primary) !important;
+  transform: translateX(3px) !important;
+}

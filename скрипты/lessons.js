@@ -41,7 +41,7 @@
         { num: 10, title: "Алгоритмы МО: k-NN (Ближайшие соседи)", file: "10 ЕМН/1 четверть/10 урок.html" },
         { num: "11 СОР", title: "Алгоритмы МО: k-means (Метод k-средних)", file: "10 ЕМН/1 четверть/11 урок.html" },
         { num: 12, title: "Алгоритмы МО: Линейная регрессия", file: "10 ЕМН/1 четверть/12 урок.html" },
-        { num: 13, title: "СОЧ: Итоговое оценивание за 1 четверть", file: "10 ЕМН/1 четверть/13 урок.html" }
+        { num: "13 СОЧ", title: "Итоговое оценивание за 1 четверть", file: "10 ЕМН/1 четверть/13 урок.html" }
       ]
     },
     c10ogn: {
@@ -503,6 +503,22 @@
     ]
   };
 
+  function resolveSlideIcon(slide, index, total, title) {
+    const raw = `${title || ''} ${slide.getAttribute('aria-label') || ''} ${slide.querySelector('h1, h2, h3')?.textContent || ''}`.toLowerCase();
+    if (index === 0) return 'fa-house';
+    if (index === total - 1) {
+      if (raw.includes('тест') || raw.includes('сор') || raw.includes('соч') || raw.includes('вопрос') || raw.includes('задан')) return 'fa-circle-check';
+      return 'fa-flag-checkered';
+    }
+    if (raw.includes('тест') || raw.includes('проверк') || raw.includes('квиз') || raw.includes('оцениван') || raw.includes('итог')) return 'fa-circle-check';
+    if (raw.includes('код') || raw.includes('python') || raw.includes('excel') || raw.includes('программ') || raw.includes('практик') || raw.includes('мастерск')) return 'fa-laptop-code';
+    if (raw.includes('архитектур') || raw.includes('структур') || raw.includes('модел') || raw.includes('сеть') || raw.includes('схем') || raw.includes('перцептрон')) return 'fa-diagram-project';
+    if (raw.includes('поняти') || raw.includes('истори') || raw.includes('теория') || raw.includes('элемент') || raw.includes('основ')) return 'fa-lightbulb';
+    if (raw.includes('симулятор') || raw.includes('интерактив') || raw.includes('жест') || raw.includes('лаборатор')) return 'fa-sliders';
+    const sequence = ['fa-house', 'fa-lightbulb', 'fa-diagram-project', 'fa-laptop-code', 'fa-puzzle-piece', 'fa-circle-check', 'fa-flag-checkered'];
+    return sequence[index % sequence.length];
+  }
+
   function initDotsNav() {
     const slides = getSlides();
     if (!slides.length) return;
@@ -585,6 +601,8 @@
       dot.setAttribute('data-title', title);
       dot.setAttribute('data-tooltip', title);
       dot.setAttribute('aria-label', `Слайд ${index + 1}: ${title}`);
+      const slideIcon = resolveSlideIcon(slide, index, slides.length, title);
+      dot.innerHTML = `<i class="fa-solid ${slideIcon}" aria-hidden="true"></i>`;
       dot.onclick = (e) => {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -7201,7 +7219,7 @@ const slides = [...document.querySelectorAll('.slide')];
               <div class="neu-auth-dropdown-role">${roleLabel}</div>
             </div>
             <a href="${cabinetUrl}" class="neu-auth-dropdown-item">
-              <i class="fa-solid fa-gauge-high"></i>
+              <i class="fa-solid fa-user"></i>
               <span>Личный кабинет</span>
             </a>
             <a href="${generatorUrl}" class="neu-auth-dropdown-item">
@@ -7282,15 +7300,23 @@ const slides = [...document.querySelectorAll('.slide')];
     }
   });
 
-  // Ensure container exists in navbar right actions
+  // Ensure container exists outside navbar, to the right (matching index.html)
   function ensureAuthContainer() {
-    if (document.getElementById('auth-nav-container')) return;
+    let authContainer = document.getElementById('auth-nav-container');
+    const navbar = document.querySelector('.navbar');
+    const container = navbar?.closest('.container');
+    if (!container || !navbar) return;
 
-    const navRight = document.querySelector('.nav-right-actions');
-    if (navRight) {
-      const wrap = document.createElement('div');
-      wrap.id = 'auth-nav-container';
-      navRight.prepend(wrap);
+    container.classList.add('nav-header-bar');
+
+    if (!authContainer) {
+      authContainer = document.createElement('div');
+      authContainer.id = 'auth-nav-container';
+      authContainer.className = 'nav-auth-external';
+      navbar.after(authContainer);
+    } else if (navbar.contains(authContainer)) {
+      authContainer.className = 'nav-auth-external';
+      navbar.after(authContainer);
     }
   }
 

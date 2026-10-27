@@ -140,7 +140,7 @@
               <div class="neu-auth-dropdown-role">${roleLabel}</div>
             </div>
             <a href="${cabinetUrl}" class="neu-auth-dropdown-item">
-              <i class="fa-solid fa-gauge-high"></i>
+              <i class="fa-solid fa-user"></i>
               <span>Личный кабинет</span>
             </a>
             <div class="neu-auth-dropdown-divider"></div>
@@ -223,8 +223,28 @@
     }
   });
 
+  function ensureAuthContainer() {
+    let authContainer = document.getElementById('auth-nav-container');
+    const navbar = document.querySelector('.navbar');
+    const container = navbar?.closest('.container');
+    if (!container || !navbar) return;
+
+    container.classList.add('nav-header-bar');
+
+    if (!authContainer) {
+      authContainer = document.createElement('div');
+      authContainer.id = 'auth-nav-container';
+      authContainer.className = 'nav-auth-external';
+      navbar.after(authContainer);
+    } else if (navbar.contains(authContainer)) {
+      authContainer.className = 'nav-auth-external';
+      navbar.after(authContainer);
+    }
+  }
+
   // Initialize
   async function initAuthWidget() {
+    ensureAuthContainer();
     checkUrlUserPayload();
     // Render immediate optimistic state from localStorage
     const localUser = getStoredUser();

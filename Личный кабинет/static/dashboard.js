@@ -189,69 +189,441 @@ async function loadCurrentUser() {
   syncSidebarActive();
 }
 
-async function loadUsers() {
-  const response = await fetch('/api/users');
-  if (!response.ok) throw new Error('Не удалось загрузить пользователей.');
-  const data = await response.json();
+
+const usersSearchInput = document.getElementById('users-search-input');
+const usersClassFilter = document.getElementById('users-class-filter');
+const usersResetFilters = document.getElementById('users-reset-filters');
+const usersCountBadge = document.getElementById('users-count-badge');
+
+const adminEditNameModal = document.getElementById('admin-edit-name-modal');
+const adminEditNameUser = document.getElementById('admin-edit-name-user');
+const adminEditFirstname = document.getElementById('admin-edit-firstname');
+const adminEditLastname = document.getElementById('admin-edit-lastname');
+const adminEditDisplayname = document.getElementById('admin-edit-displayname');
+const adminEditMessage = document.getElementById('admin-edit-message');
+const adminEditCancel = document.getElementById('admin-edit-cancel');
+const adminEditConfirm = document.getElementById('admin-edit-confirm');
+
+const adminDeleteUserModal = document.getElementById('admin-delete-user-modal');
+const adminDeleteDesc = document.getElementById('admin-delete-desc');
+const adminDeleteCancel = document.getElementById('admin-delete-cancel');
+const adminDeleteConfirm = document.getElementById('admin-delete-confirm');
+
+let allUsersData = [];
+let usersSortCol = 'name';
+let usersSortAsc = true;
+let editingUserId = null;
+let deletingUserId = null;
+
+const roleLabels = {
+  user: 'Ученик',
+  teacher: 'Учитель',
+  admin: 'Администратор',
+  superadmin: 'Супер-админ'
+};
+
+
+function applyUsersFilterAndSort() {
+  const searchTerm = (usersSearchInput?.value || '').trim().toLowerCase();
+  const classFilter = (usersClassFilter?.value || '').trim().toLowerCase();
+
+  let filtered = allUsersData.filter((u) => {
+    if (classFilter) {
+      const uClass = (u.class_name || '').trim().toLowerCase();
+      if (classFilter === '__none__' && uClass) return false;
+      if (classFilter !== '__none__' && uClass !== classFilter) return false;
+    }
+    if (searchTerm) {
+      const match = (u.display_name || '').toLowerCase().includes(searchTerm)
+        || (u.first_name || '').toLowerCase().includes(searchTerm)
+        || (u.last_name || '').toLowerCase().includes(searchTerm)
+        || (u.username || '').toLowerCase().includes(searchTerm)
+        || (u.class_name || '').toLowerCase().includes(searchTerm);
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    let valA = '';
+    let valB = '';
+    if (usersSortCol === 'name') {
+      valA = a.display_name || a.username || '';
+      valB = b.display_name || b.username || '';
+    } else if (usersSortCol === 'class') {
+      valA = a.class_name || '';
+      valB = b.class_name || '';
+    } else if (usersSortCol === 'email') {
+      valA = a.username || '';
+      valB = b.username || '';
+    } else if (usersSortCol === 'role') {
+      valA = a.role || '';
+      valB = b.role || '';
+    }
+    const cmp = valA.localeCompare(valB, 'ru', { numeric: true });
+    return usersSortAsc ? cmp : -cmp;
+  });
+
+  if (usersCountBadge) {
+    usersCountBadge.textContent = `Показано: ${filtered.length} из ${allUsersData.length}`;
+  }
+
+  renderUsersRows(filtered);
+}
+
+function updateClassFilterOptions() {
+  if (!usersClassFilter) return;
+  const currentVal = usersClassFilter.value;
+  const classesSet = new Set();
+  allUsersData.forEach((u) => {
+    if (u.class_name && u.class_name.trim()) classesSet.add(u.class_name.trim());
+  });
+  const sortedClasses = Array.from(classesSet).sort((a, b) => a.localeCompare(b, 'ru', { numeric: true }));
+
+  usersClassFilter.replaceChildren();
+  const allOpt = document.createElement('option');
+  allOpt.value = '';
+  allOpt.textContent = 'Все классы';
+  usersClassFilter.append(allOpt);
+
+  sortedClasses.forEach((cls) => {
+    const opt = document.createElement('option');
+    opt.value = cls.toLowerCase();
+    opt.textContent = cls;
+    if (opt.value === currentVal) opt.selected = true;
+    usersClassFilter.append(opt);
+  });
+
+  const noneOpt = document.createElement('option');
+  noneOpt.value = '__none__';
+  noneOpt.textContent = 'Без класса';
+  if (currentVal === '__none__') noneOpt.selected = true;
+  usersClassFilter.append(noneOpt);
+}
+
+function renderUsersRows(users) {
   usersList.replaceChildren();
-  if (!data.users.length) {
+  if (!users.length) {
     const row = document.createElement('tr');
     const cell = document.createElement('td');
-    cell.colSpan = 4;
+    cell.colSpan = 5;
     cell.className = 'table-empty';
-    cell.textContent = 'Других зарегистрированных пользователей пока нет.';
+    cell.textContent = allUsersData.length ? 'Ни один пользователь не соответствует фильтрам.' : 'Других зарегистрированных пользователей пока нет.';
     row.append(cell);
     usersList.append(row);
     return;
   }
-  data.users.forEach((user) => {
+
+  users.forEach((user) => {
     const row = document.createElement('tr');
+
+    // 1. User Name
     const nameCell = document.createElement('td');
-    nameCell.textContent = user.display_name || user.username;
-    const emailCell = document.createElement('td');
-    emailCell.textContent = user.username;
-    const roleCell = document.createElement('td');
-    const select = document.createElement('select');
-    select.className = 'role-select';
-    select.setAttribute('aria-label', `Роль пользователя ${user.username}`);
-    roles.forEach((role) => {
-      const option = document.createElement('option');
-      option.value = role;
-      option.textContent = role;
-      option.selected = role === user.role;
-      select.append(option);
-    });
-    select.addEventListener('change', async () => {
-      select.disabled = true;
-      adminMessage.textContent = '';
+    const nameWrap = document.createElement('div');
+    nameWrap.className = 'user-name-cell';
+    const avatar = document.createElement('span');
+    avatar.style.cssText = 'color: var(--primary); font-size: 0.85rem;';
+    avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
+    const nameText = document.createElement('span');
+    nameText.textContent = user.display_name || user.username;
+    nameWrap.append(avatar, nameText);
+    nameCell.append(nameWrap);
+
+    // 2. Class input (editable by teacher)
+    const classCell = document.createElement('td');
+    const classInput = document.createElement('input');
+    classInput.type = 'text';
+    classInput.className = 'class-input';
+    classInput.value = user.class_name || '';
+    classInput.placeholder = 'Класс...';
+    classInput.title = 'Введите класс и нажмите Enter или кликните в сторону для сохранения';
+
+    let lastVal = user.class_name || '';
+    const saveClass = async () => {
+      const newVal = classInput.value.trim();
+      if (newVal === lastVal) return;
       try {
-        const update = await fetch(`/api/users/${user.id}/role`, {
+        const resp = await fetch(`/api/users/${user.id}/class`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: select.value }),
+          body: JSON.stringify({ class_name: newVal }),
         });
-        const result = await update.json();
-        if (!update.ok) throw new Error(result.detail || 'Не удалось изменить роль.');
-        adminMessage.textContent = 'Роль обновлена.';
-      } catch (error) {
-        select.value = user.role;
-        adminMessage.textContent = error.message;
-      } finally {
-        select.disabled = false;
+        if (!resp.ok) throw new Error('Ошибка сохранения');
+        lastVal = newVal;
+        user.class_name = newVal;
+        classInput.classList.add('is-saved');
+        setTimeout(() => classInput.classList.remove('is-saved'), 1500);
+        updateClassFilterOptions();
+      } catch (err) {
+        classInput.value = lastVal;
+        if (adminMessage) adminMessage.textContent = 'Не удалось обновить класс.';
+      }
+    };
+
+    classInput.addEventListener('blur', saveClass);
+    classInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        classInput.blur();
       }
     });
-    roleCell.append(select);
-    const passwordCell = document.createElement('td');
-    const resetButton = document.createElement('button');
-    resetButton.className = 'button button-ghost table-action';
-    resetButton.type = 'button';
-    resetButton.textContent = 'Задать новый';
-    resetButton.addEventListener('click', () => openAdminPasswordModal(user));
-    passwordCell.append(resetButton);
-    row.append(nameCell, emailCell, roleCell, passwordCell);
+    classCell.append(classInput);
+
+    // 3. Email Cell
+    const emailCell = document.createElement('td');
+    emailCell.textContent = user.username;
+    emailCell.style.color = 'var(--muted)';
+
+    // 4. Role Cell (Custom Neumorphic Dropdown)
+    const roleCell = document.createElement('td');
+    const roleWrap = document.createElement('div');
+    roleWrap.className = 'neu-dropdown-container';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'neu-dropdown-trigger';
+    trigger.setAttribute('aria-label', `Роль пользователя ${user.username}`);
+    trigger.innerHTML = `<span class="neu-dropdown-label">${roleLabels[user.role] || user.role}</span><svg class="neu-dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+    const menu = document.createElement('div');
+    menu.className = 'neu-dropdown-menu';
+
+    roles.forEach((r) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = `neu-dropdown-item ${r === user.role ? 'is-selected' : ''}`;
+      item.innerHTML = `<span>${roleLabels[r] || r}</span>${r === user.role ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}`;
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        menu.classList.remove('is-open');
+        trigger.classList.remove('is-open');
+        if (r === user.role) return;
+        trigger.disabled = true;
+        if (adminMessage) adminMessage.textContent = '';
+        try {
+          const update = await fetch(`/api/users/${user.id}/role`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: r }),
+          });
+          const result = await update.json();
+          if (!update.ok) throw new Error(result.detail || 'Не удалось изменить роль.');
+          user.role = r;
+          trigger.querySelector('.neu-dropdown-label').textContent = roleLabels[r] || r;
+          menu.querySelectorAll('.neu-dropdown-item').forEach((btn, idx) => {
+            const isSel = roles[idx] === r;
+            btn.classList.toggle('is-selected', isSel);
+            btn.innerHTML = `<span>${roleLabels[roles[idx]] || roles[idx]}</span>${isSel ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}`;
+          });
+          if (adminMessage) adminMessage.textContent = 'Роль обновлена.';
+        } catch (error) {
+          if (adminMessage) adminMessage.textContent = error.message;
+        } finally {
+          trigger.disabled = false;
+        }
+      });
+      menu.append(item);
+    });
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = !menu.classList.contains('is-open');
+      document.querySelectorAll('.neu-dropdown-menu.is-open').forEach((m) => {
+        m.classList.remove('is-open');
+        m.previousElementSibling?.classList.remove('is-open');
+      });
+      if (willOpen) {
+        menu.classList.add('is-open');
+        trigger.classList.add('is-open');
+      }
+    });
+
+    roleWrap.append(trigger, menu);
+    roleCell.append(roleWrap);
+
+    // 5. Actions Cell (Password, Edit Name, Delete) with explicit SVGs and dimensions
+    const actionsCell = document.createElement('td');
+    const actionsWrap = document.createElement('div');
+    actionsWrap.className = 'table-actions-cell';
+
+    // Password reset button
+    const passBtn = document.createElement('button');
+    passBtn.className = 'button button-ghost table-action table-action-pass';
+    passBtn.type = 'button';
+    passBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-6 6 6-6m-6 6a5.5 5.5 0 1 0-7.78 7.78 5.5 5.5 0 0 0 7.78-7.78ZM8.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg> <span>Пароль</span>';
+    passBtn.title = 'Задать новый пароль';
+    passBtn.addEventListener('click', () => openAdminPasswordModal(user));
+
+    // Edit Name button
+    const editBtn = document.createElement('button');
+    editBtn.className = 'button button-ghost table-action table-action-icon-btn';
+    editBtn.type = 'button';
+    editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
+    editBtn.title = 'Редактировать имя пользователя';
+    editBtn.addEventListener('click', () => openAdminEditNameModal(user));
+
+    // Delete user button
+    const delBtn = document.createElement('button');
+    delBtn.className = 'button button-ghost table-action table-action-icon-btn table-action-danger';
+    delBtn.type = 'button';
+    delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+    delBtn.title = 'Удалить пользователя';
+    delBtn.addEventListener('click', () => openAdminDeleteUserModal(user));
+
+    actionsWrap.append(passBtn, editBtn, delBtn);
+    actionsCell.append(actionsWrap);
+
+    row.append(nameCell, classCell, emailCell, roleCell, actionsCell);
     usersList.append(row);
   });
 }
+
+function openAdminEditNameModal(user) {
+  editingUserId = user.id;
+  if (adminEditNameUser) adminEditNameUser.textContent = `${user.display_name || user.username} (${user.username})`;
+  if (adminEditFirstname) adminEditFirstname.value = user.first_name || '';
+  if (adminEditLastname) adminEditLastname.value = user.last_name || '';
+  if (adminEditDisplayname) adminEditDisplayname.value = user.display_name || '';
+  if (adminEditMessage) adminEditMessage.textContent = '';
+  showModal(adminEditNameModal);
+  adminEditDisplayname?.focus();
+}
+
+function closeAdminEditNameModal() {
+  hideModal(adminEditNameModal);
+  editingUserId = null;
+}
+
+if (adminEditCancel) adminEditCancel.addEventListener('click', closeAdminEditNameModal);
+
+if (adminEditConfirm) {
+  adminEditConfirm.addEventListener('click', async () => {
+    if (!editingUserId) return;
+    const first = (adminEditFirstname?.value || '').trim();
+    const last = (adminEditLastname?.value || '').trim();
+    let display = (adminEditDisplayname?.value || '').trim();
+    if (!display && (first || last)) display = `${first} ${last}`.trim();
+    if (!display) {
+      if (adminEditMessage) adminEditMessage.textContent = 'Введите имя или ФИО.';
+      return;
+    }
+    adminEditConfirm.disabled = true;
+    try {
+      const resp = await fetch(`/api/users/${editingUserId}/name`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name: first, last_name: last, display_name: display }),
+      });
+      const res = await resp.json();
+      if (!resp.ok) throw new Error(res.detail || 'Не удалось обновить имя.');
+      const u = allUsersData.find((x) => x.id === editingUserId);
+      if (u) {
+        u.first_name = first;
+        u.last_name = last;
+        u.display_name = display;
+      }
+      closeAdminEditNameModal();
+      applyUsersFilterAndSort();
+      if (adminMessage) adminMessage.textContent = 'Имя пользователя обновлено.';
+    } catch (e) {
+      if (adminEditMessage) adminEditMessage.textContent = e.message;
+    } finally {
+      adminEditConfirm.disabled = false;
+    }
+  });
+}
+
+function openAdminDeleteUserModal(user) {
+  deletingUserId = user.id;
+  if (adminDeleteDesc) {
+    adminDeleteDesc.textContent = `Вы действительно хотите удалить пользователя ${user.display_name || user.username} (${user.username})? Все результаты и сессии будут удалены.`;
+  }
+  showModal(adminDeleteUserModal);
+}
+
+function closeAdminDeleteUserModal() {
+  hideModal(adminDeleteUserModal);
+  deletingUserId = null;
+}
+
+if (adminDeleteCancel) adminDeleteCancel.addEventListener('click', closeAdminDeleteUserModal);
+
+if (adminDeleteConfirm) {
+  adminDeleteConfirm.addEventListener('click', async () => {
+    if (!deletingUserId) return;
+    adminDeleteConfirm.disabled = true;
+    try {
+      const resp = await fetch(`/api/users/${deletingUserId}`, { method: 'DELETE' });
+      const res = await resp.json();
+      if (!resp.ok) throw new Error(res.detail || 'Не удалось удалить пользователя.');
+      allUsersData = allUsersData.filter((u) => u.id !== deletingUserId);
+      closeAdminDeleteUserModal();
+      updateClassFilterOptions();
+      applyUsersFilterAndSort();
+      if (adminMessage) adminMessage.textContent = 'Пользователь успешно удален.';
+    } catch (e) {
+      if (adminMessage) adminMessage.textContent = e.message;
+      closeAdminDeleteUserModal();
+    } finally {
+      adminDeleteConfirm.disabled = false;
+    }
+  });
+}
+
+// Setup sortable headers
+document.querySelectorAll('.sortable-th').forEach((th) => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.sort;
+    if (usersSortCol === col) {
+      usersSortAsc = !usersSortAsc;
+    } else {
+      usersSortCol = col;
+      usersSortAsc = true;
+    }
+    document.querySelectorAll('.sortable-th').forEach((t) => {
+      t.classList.toggle('is-active', t === th);
+      const icon = t.querySelector('.sort-icon');
+      if (icon) {
+        if (t === th) {
+          icon.textContent = usersSortAsc ? '▲' : '▼';
+        } else {
+          icon.textContent = '↕';
+        }
+      }
+    });
+    applyUsersFilterAndSort();
+  });
+});
+
+usersSearchInput?.addEventListener('input', applyUsersFilterAndSort);
+usersClassFilter?.addEventListener('change', applyUsersFilterAndSort);
+usersResetFilters?.addEventListener('click', () => {
+  if (usersSearchInput) usersSearchInput.value = '';
+  if (usersClassFilter) usersClassFilter.value = '';
+  usersSortCol = 'name';
+  usersSortAsc = true;
+  document.querySelectorAll('.sortable-th').forEach((t) => {
+    t.classList.toggle('is-active', t.dataset.sort === 'name');
+    const icon = t.querySelector('.sort-icon');
+    if (icon) icon.textContent = t.dataset.sort === 'name' ? '▲' : '↕';
+  });
+  applyUsersFilterAndSort();
+});
+
+async function loadUsers() {
+  if (!canManageUsers) return;
+  adminMessage.textContent = '';
+  try {
+    const response = await fetch('/api/users');
+    if (!response.ok) throw new Error('Не удалось загрузить пользователей.');
+    const data = await response.json();
+    allUsersData = data.users || [];
+    updateClassFilterOptions();
+    applyUsersFilterAndSort();
+  } catch (error) {
+    adminMessage.textContent = error.message;
+  }
+}
+
 
 function showModal(modal) {
   modal.hidden = false;
@@ -535,8 +907,12 @@ function renderLessonsCatalog(classes) {
   lessonCatalogGrid.replaceChildren();
   let totalLessons = 0;
   const syncOpenClassLayout = () => {
-    const openCount = lessonCatalogGrid.querySelectorAll('.lesson-class-card[open]').length;
-    lessonCatalogGrid.classList.toggle('is-single-open', openCount === 1);
+    const cards = Array.from(lessonCatalogGrid.querySelectorAll('.lesson-class-card'));
+    const openCards = cards.filter((c) => c.open);
+    lessonCatalogGrid.classList.toggle('is-single-open', openCards.length === 1);
+    cards.forEach((card) => {
+      card.style.order = card.open ? '1' : '2';
+    });
   };
   classes.forEach((item) => {
     totalLessons += item.lessons;
@@ -784,6 +1160,13 @@ loadSiteOverview().catch((error) => {
 window.setInterval(() => {
   loadSiteOverview().catch(() => {});
 }, 60_000);
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.neu-dropdown-menu.is-open').forEach((m) => {
+    m.classList.remove('is-open');
+    m.previousElementSibling?.classList.remove('is-open');
+  });
+});
 
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
   let prevReloadToken = null;

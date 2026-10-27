@@ -59,8 +59,11 @@ if (drive_root / "alasster.github.io").exists():
     MATERIALS_DIR = drive_root / "Мои материалы"
 else:
     MATERIALS_DIR = Path("G:/Мой диск/Мои материалы")
-MATERIALS_DIR.mkdir(parents=True, exist_ok=True)
-(MATERIALS_DIR / "Общие").mkdir(parents=True, exist_ok=True)
+try:
+    MATERIALS_DIR.mkdir(parents=True, exist_ok=True)
+    (MATERIALS_DIR / "Общие").mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
 LOGGER = logging.getLogger("personal_cabinet.ga4")
 generator_server = None
 generator_timer_task = None
@@ -183,8 +186,13 @@ EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 def open_db() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(DB_PATH)
+    connection = sqlite3.connect(DB_PATH, timeout=10.0)
     connection.row_factory = sqlite3.Row
+    try:
+        connection.execute("PRAGMA journal_mode = WAL")
+        connection.execute("PRAGMA busy_timeout = 5000")
+    except Exception:
+        pass
     return connection
 
 
@@ -260,7 +268,7 @@ def init_db() -> None:
         if "last_seen" not in session_columns:
             db.execute("ALTER TABLE sessions ADD COLUMN last_seen INTEGER NOT NULL DEFAULT 0")
         columns = {row["name"] for row in db.execute("PRAGMA table_info(users)").fetchall()}
-        for column, definition in (("first_name", "TEXT NOT NULL DEFAULT ''"), ("last_name", "TEXT NOT NULL DEFAULT ''"), ("role", "TEXT NOT NULL DEFAULT 'user'")):
+        for column, definition in (("first_name", "TEXT NOT NULL DEFAULT ''"), ("last_name", "TEXT NOT NULL DEFAULT ''"), ("role", "TEXT NOT NULL DEFAULT 'user'"), ("class_name", "TEXT NOT NULL DEFAULT ''")):
             if column not in columns:
                 db.execute(f"ALTER TABLE users ADD COLUMN {column} {definition}")
         db.execute("UPDATE users SET role = 'superadmin' WHERE lower(username) = ?", (SUPERADMIN_EMAIL,))
@@ -828,6 +836,7 @@ async def start_internet_tunnel() -> None:
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
+    global internet_tunnel_task, internet_tunnel_process
     if generator_timer_task is not None:
         generator_timer_task.cancel()
         await asyncio.gather(generator_timer_task, return_exceptions=True)
@@ -835,6 +844,14 @@ async def shutdown() -> None:
         student_gateway_server.should_exit = True
     if student_gateway_task is not None:
         await asyncio.gather(student_gateway_task, return_exceptions=True)
+    if internet_tunnel_task is not None:
+        internet_tunnel_task.cancel()
+        await asyncio.gather(internet_tunnel_task, return_exceptions=True)
+    if internet_tunnel_process is not None:
+        try:
+            internet_tunnel_process.terminate()
+        except Exception:
+            pass
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -1119,10 +1136,63 @@ def list_users(request: Request):
         return access
     with closing(open_db()) as db:
         rows = db.execute(
-            "SELECT id, first_name, last_name, username, display_name, role, created_at FROM users WHERE id != ? ORDER BY id",
+            "SELECT id, first_name, last_name, username, display_name, role, class_name, created_at FROM users WHERE id != ? ORDER BY id",
             (access["id"],),
         ).fetchall()
     return {"users": [dict(row) for row in rows]}
+
+
+@app.patch("/api/users/{user_id}/class")
+def update_user_class(user_id: int, payload: dict, request: Request):
+    access = require_superadmin(request)
+    if isinstance(access, JSONResponse):
+        return access
+    clean_class = str(payload.get("class_name", "")).strip()
+    with closing(open_db()) as db:
+        cursor = db.execute("UPDATE users SET class_name = ? WHERE id = ?", (clean_class, user_id))
+        db.commit()
+    if cursor.rowcount == 0:
+        return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)
+    return {"ok": True, "class_name": clean_class}
+
+
+@app.patch("/api/users/{user_id}/name")
+def update_user_name(user_id: int, payload: dict, request: Request):
+    access = require_superadmin(request)
+    if isinstance(access, JSONResponse):
+        return access
+    first_name = str(payload.get("first_name", "")).strip()
+    last_name = str(payload.get("last_name", "")).strip()
+    display_name = str(payload.get("display_name", "")).strip()
+    if not display_name and (first_name or last_name):
+        display_name = f"{first_name} {last_name}".strip()
+    if not display_name:
+        return JSONResponse({"detail": "Имя не может быть пустым"}, status_code=400)
+    with closing(open_db()) as db:
+        cursor = db.execute(
+            "UPDATE users SET first_name = ?, last_name = ?, display_name = ? WHERE id = ?",
+            (first_name, last_name, display_name, user_id)
+        )
+        db.commit()
+    if cursor.rowcount == 0:
+        return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)
+    return {"ok": True, "display_name": display_name, "first_name": first_name, "last_name": last_name}
+
+
+@app.delete("/api/users/{user_id}")
+def delete_user(user_id: int, request: Request):
+    access = require_superadmin(request)
+    if isinstance(access, JSONResponse):
+        return access
+    if user_id == access["id"]:
+        return JSONResponse({"detail": "Нельзя удалить текущего супер-администратора"}, status_code=400)
+    with closing(open_db()) as db:
+        db.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        cursor = db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        db.commit()
+    if cursor.rowcount == 0:
+        return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)
+    return {"ok": True}
 
 
 @app.patch("/api/users/{user_id}/role")

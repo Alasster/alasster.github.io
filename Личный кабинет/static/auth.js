@@ -104,6 +104,8 @@ loginForm.addEventListener('submit', async (event) => {
   clearLoginError();
   submitButton.disabled = true;
   submitButton.textContent = 'Проверяем...';
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 12000);
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
@@ -112,7 +114,9 @@ loginForm.addEventListener('submit', async (event) => {
         username: document.getElementById('login-username').value.trim().toLowerCase(),
         password: document.getElementById('login-password').value,
       }),
+      signal: controller.signal,
     });
+    window.clearTimeout(timeoutId);
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || 'Не удалось выполнить вход.');
     if (data.user) {
@@ -136,7 +140,12 @@ loginForm.addEventListener('submit', async (event) => {
     }
     window.location.assign('/');
   } catch (error) {
+    window.clearTimeout(timeoutId);
     loginFields.forEach((field) => field.classList.add('is-invalid'));
+    const msg = error.name === 'AbortError'
+      ? 'Время ожидания ответа сервера истекло. Проверьте запущен ли сервер.'
+      : (error.message || 'Не удалось выполнить вход.');
+    setAlert('login', msg, 'error');
     submitButton.disabled = false;
     submitButton.textContent = 'Войти в кабинет';
   }

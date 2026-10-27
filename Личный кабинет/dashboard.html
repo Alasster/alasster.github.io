@@ -18,11 +18,13 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <link rel="stylesheet" href="/static/vendor/katex.min.css">
 
-  <link rel="stylesheet" href="/static/test-generator.css?v=29">
+  <link rel="stylesheet" href="/static/test-generator.css?v=neu-30">
 
-  <link rel="stylesheet" href="/static/styles.css?v=profile-management-19">
+  <link rel="stylesheet" href="/static/styles.css?v=profile-management-20">
 
   <link rel="stylesheet" href="/static/materials.css?v=2">
 
@@ -1018,28 +1020,50 @@
 
       </section>
 
-      <section class="admin-panel glass-card" id="admin-panel" data-cabinet-section="profile" hidden>
+            <section class="admin-panel glass-card" id="admin-panel" data-cabinet-section="profile" hidden>
 
         <div class="panel-heading">
-
           <div>
-
             <h2>Пользователи и роли</h2>
-
           </div>
+          <span class="users-count-badge" id="users-count-badge">Всего: 0</span>
+        </div>
 
+        <div class="users-filter-bar">
+          <div class="filter-field filter-search">
+            <input type="text" id="users-search-input" class="neu-input-sm" placeholder="Поиск по ФИО или email...">
+          </div>
+          <div class="filter-field">
+            <select id="users-class-filter" class="role-select" title="Фильтр по классу">
+              <option value="">Все классы</option>
+            </select>
+          </div>
+          <button type="button" class="button button-ghost button-sm" id="users-reset-filters" title="Сбросить все фильтры">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Сбросить
+          </button>
         </div>
 
         <div class="users-table-wrap">
-
           <table class="users-table">
-
-            <thead><tr><th>Пользователь</th><th>Email / логин</th><th>Роль</th><th>Пароль</th></tr></thead>
-
+            <thead>
+              <tr>
+                <th class="sortable-th" data-sort="name" title="Нажмите для сортировки по имени">
+                  <span>Пользователь</span> <span class="sort-icon" id="sort-icon-name">↕</span>
+                </th>
+                <th class="sortable-th" data-sort="class" title="Нажмите для сортировки по классу">
+                  <span>Класс</span> <span class="sort-icon" id="sort-icon-class">↕</span>
+                </th>
+                <th class="sortable-th" data-sort="email" title="Нажмите для сортировки по email">
+                  <span>Email / логин</span> <span class="sort-icon" id="sort-icon-email">↕</span>
+                </th>
+                <th class="sortable-th" data-sort="role" title="Нажмите для сортировки по роли">
+                  <span>Роль</span> <span class="sort-icon" id="sort-icon-role">↕</span>
+                </th>
+                <th>Действия</th>
+              </tr>
+            </thead>
             <tbody id="users-list"></tbody>
-
           </table>
-
         </div>
 
         <p class="panel-message" id="admin-message" role="status"></p>
@@ -1646,7 +1670,7 @@
 
   <script src="/static/vendor/auto-render.min.js"></script>
 
-  <script src="/static/test-generator.js?v=33"></script>
+  <script src="/static/test-generator.js?v=neu-34"></script>
 
     
     <!-- Modal: ImgBB Links Modal -->
@@ -1757,7 +1781,45 @@
 
   <script src="/static/materials.js?v=5"></script>
 
-    <script src="/static/dashboard.js?v=profile-management-17"></script>
+    <script src="/static/dashboard.js?v=profile-management-18"></script>
+
+
+  <div class="modal-backdrop" id="admin-edit-name-modal" hidden>
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="admin-edit-name-title">
+      <p class="eyebrow">РЕДАКТИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ</p>
+      <h2 id="admin-edit-name-title">Изменить имя</h2>
+      <p class="modal-text" id="admin-edit-name-user" style="color: var(--muted); font-size: 0.85rem; margin-bottom: 12px;"></p>
+      <div class="modal-field">
+        <label class="field-label" for="admin-edit-firstname">Имя</label>
+        <input class="field" id="admin-edit-firstname" type="text" autocomplete="off" placeholder="Имя">
+      </div>
+      <div class="modal-field">
+        <label class="field-label" for="admin-edit-lastname">Фамилия</label>
+        <input class="field" id="admin-edit-lastname" type="text" autocomplete="off" placeholder="Фамилия">
+      </div>
+      <div class="modal-field">
+        <label class="field-label" for="admin-edit-displayname">Отображаемое имя (ФИО)</label>
+        <input class="field" id="admin-edit-displayname" type="text" autocomplete="off" placeholder="Фамилия Имя">
+      </div>
+      <p class="panel-message" id="admin-edit-message" role="status"></p>
+      <div class="modal-actions">
+        <button class="button button-ghost" id="admin-edit-cancel" type="button">Отмена</button>
+        <button class="button button-primary" id="admin-edit-confirm" type="button">Сохранить</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="admin-delete-user-modal" hidden>
+    <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="admin-delete-title">
+      <p class="eyebrow" style="color: var(--rose);">УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ</p>
+      <h2 id="admin-delete-title">Удалить аккаунт?</h2>
+      <p class="modal-text" id="admin-delete-desc">Пользователь будет навсегда удален из системы.</p>
+      <div class="modal-actions">
+        <button class="button button-ghost" id="admin-delete-cancel" type="button">Отмена</button>
+        <button class="button button-primary" id="admin-delete-confirm" type="button" style="background: var(--rose); color: white;">Удалить</button>
+      </div>
+    </section>
+  </div>
 
 </body>
 

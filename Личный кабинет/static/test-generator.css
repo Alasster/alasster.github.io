@@ -598,27 +598,28 @@ textarea.form-control,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  color: var(--text);
-  background: transparent;
-  box-shadow: none;
-  border: 1px solid var(--border-light, rgba(163, 174, 195, .35));
+  border-radius: 12px;
+  color: var(--text-dark, #1e293b);
+  background: var(--surface, #edf2f9);
+  box-shadow: var(--shadow-soft, 4px 4px 10px rgba(163, 174, 195, 0.35), -4px -4px 10px rgba(255, 255, 255, 0.7));
+  border: 0;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 :root[data-theme="dark"] .test-card-btn {
+  background: var(--surface, #1e293b);
   box-shadow: 3px 3px 6px rgba(11, 15, 25, 0.46), -3px -3px 6px rgba(190, 205, 235, 0.1);
 }
 .test-card-btn:hover {
-  transform: scale(1.08);
-  box-shadow: none;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft-hover, 6px 6px 14px rgba(163, 174, 195, 0.4), -6px -6px 14px rgba(255, 255, 255, 0.8));
 }
 :root[data-theme="dark"] .test-card-btn:hover {
   box-shadow: 4px 4px 10px rgba(11, 15, 25, 0.55), -4px -4px 10px rgba(190, 205, 235, 0.14);
 }
 .test-card-btn:active {
-  transform: scale(0.96);
-  box-shadow: none;
+  transform: translateY(0);
+  box-shadow: var(--shadow-pressed, inset 2px 2px 5px rgba(163, 174, 195, 0.35));
 }
 .test-card-btn:focus-visible {
   outline: 2px solid var(--primary);
@@ -1991,9 +1992,10 @@ input[type="number"] {
 
 /* Draft / Preparation: Cool Slate */
 .badge-draft {
-  background: rgba(100, 116, 139, 0.12) !important;
-  color: #475569 !important;
-  border: 1px solid rgba(100, 116, 139, 0.3) !important;
+  background: var(--surface) !important;
+  color: var(--muted) !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
 }
 .badge-draft::before {
   background: #64748B;
