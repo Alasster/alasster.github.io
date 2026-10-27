@@ -873,9 +873,9 @@ button {
   height: 44px;
   min-height: 44px;
   border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(120, 137, 166, 0.35);
+  background: transparent;
+  box-shadow: none;
+  border: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -893,7 +893,7 @@ button {
 
 .btn-close-modal:hover {
   color: var(--rose);
-  box-shadow: var(--shadow-soft-hover);
+  box-shadow: none;
   transform: scale(1.06);
 }
 
@@ -985,8 +985,8 @@ button {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  background: transparent;
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -995,7 +995,7 @@ button {
   flex-shrink: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
-  border: 1px solid rgba(120, 137, 166, 0.28);
+  border: 0;
 }
 
 .lesson-arrow-icon:focus-visible,
@@ -1007,7 +1007,7 @@ button {
 .lesson-card-item:hover .lesson-arrow-icon,
 .lesson-row-card:hover .btn-launch-lesson {
   transform: translateX(3px);
-  box-shadow: var(--shadow-soft-hover);
+  box-shadow: none;
 }
 
 /* ==========================================================================

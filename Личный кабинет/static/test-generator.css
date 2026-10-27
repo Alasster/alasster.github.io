@@ -600,8 +600,8 @@ textarea.form-control,
   justify-content: center;
   border-radius: 10px;
   color: var(--text);
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  background: transparent;
+  box-shadow: none;
   border: 1px solid var(--border-light, rgba(163, 174, 195, .35));
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -611,14 +611,14 @@ textarea.form-control,
 }
 .test-card-btn:hover {
   transform: scale(1.08);
-  box-shadow: var(--shadow-soft-hover, var(--shadow-soft));
+  box-shadow: none;
 }
 :root[data-theme="dark"] .test-card-btn:hover {
   box-shadow: 4px 4px 10px rgba(11, 15, 25, 0.55), -4px -4px 10px rgba(190, 205, 235, 0.14);
 }
 .test-card-btn:active {
   transform: scale(0.96);
-  box-shadow: var(--shadow-in);
+  box-shadow: none;
 }
 .test-card-btn:focus-visible {
   outline: 2px solid var(--primary);

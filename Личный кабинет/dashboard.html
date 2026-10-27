@@ -162,60 +162,6 @@
 
       </section>
 
-      <!-- Mobile / Multi-device Access Card -->
-      <section class="site-summary glass-card" data-cabinet-section="overview" aria-labelledby="mobile-access-title" style="margin-top: 24px;">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">МУЛЬТИ-УСТРОЙСТВА</p>
-            <h2 id="mobile-access-title">Вход с телефона, планшета и других устройств</h2>
-          </div>
-          <span class="status-chip" id="mobile-access-chip" style="background: rgba(34, 197, 94, 0.12); color: #16a34a; font-weight: 700;">Активно</span>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin-top: 18px;">
-          <!-- Wi-Fi / Local -->
-          <div class="glass-card" style="padding: 18px; border-radius: 20px; box-shadow: var(--shadow-out);">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-              <div style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(59, 130, 246, 0.12); color: #3b82f6; font-size: 1.25rem;">
-                📶
-              </div>
-              <div>
-                <strong style="display: block; font-size: 0.95rem; color: var(--text);">По Wi-Fi / Домашней сети</strong>
-                <small style="color: var(--muted); font-size: 0.78rem;">Для устройств в одной локальной сети с ПК</small>
-              </div>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 14px;">
-              <input type="text" readonly id="mobile-lan-link" class="field" style="font-size: 0.82rem; padding: 10px 14px; width: 100%; border-radius: 12px;" value="http://172.20.10.8:8010">
-              <button type="button" class="button button-ghost" onclick="navigator.clipboard.writeText(document.getElementById('mobile-lan-link').value); alert('Ссылка скопирована!');" title="Скопировать ссылку" style="white-space: nowrap; padding: 0 14px; border-radius: 12px;">Скопировать</button>
-            </div>
-          </div>
-
-          <!-- Internet / Cloudflare 4G -->
-          <div class="glass-card" style="padding: 18px; border-radius: 20px; box-shadow: var(--shadow-out);">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-              <div style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 1.25rem;">
-                🌐
-              </div>
-              <div>
-                <strong style="display: block; font-size: 0.95rem; color: var(--text);">Через Интернет (4G / удаленно)</strong>
-                <small style="color: var(--muted); font-size: 0.78rem;">Открывается из любого места с любого смартфона</small>
-              </div>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 14px;">
-              <input type="text" readonly id="mobile-internet-link" class="field" style="font-size: 0.82rem; padding: 10px 14px; width: 100%; border-radius: 12px;" value="https://parcel-member-safe-convert.trycloudflare.com">
-              <button type="button" class="button button-ghost" onclick="navigator.clipboard.writeText(document.getElementById('mobile-internet-link').value); alert('Ссылка скопирована!');" title="Скопировать ссылку" style="white-space: nowrap; padding: 0 14px; border-radius: 12px;">Скопировать</button>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top: 18px; padding: 12px 16px; border-radius: 14px; background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.15); display: flex; align-items: flex-start; gap: 10px;">
-          <span style="font-size: 1.2rem; line-height: 1;">📱</span>
-          <div style="font-size: 0.82rem; line-height: 1.45; color: var(--text);">
-            <strong>Инструкция для входа:</strong> Откройте любую из ссылок выше на смартфоне или планшете. Введите ваш email (<code>alasster@yandex.ru</code>) и пароль администратора. Вы останетесь авторизованы и получите полный доступ ко всем функциям кабинета, тестам и аналитике.
-          </div>
-        </div>
-      </section>
-
       <section class="card-grid" id="section-cards" aria-label="Раздел кабинета" hidden>
 
         <article class="glass-card feature-card profile-editor feature-indigo" id="profile" data-cabinet-section="profile">
