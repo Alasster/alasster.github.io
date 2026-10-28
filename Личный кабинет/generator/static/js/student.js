@@ -193,6 +193,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadLaunchPublicInfo();
   await checkExistingAttempt();
   initDraggableCalculator();
+
+  // Фоновое обновление публичных данных на экране входа (цвета, время, классы)
+  setInterval(async () => {
+    const joinScreen = document.getElementById("screen-join");
+    if (joinScreen && joinScreen.style.display !== "none" && !getStudentToken()) {
+      try {
+        const res = await fetch(`/api/student/check/${launchId}`);
+        if (res.ok) {
+          launchInfo = await res.json();
+          populateLaunchInfoOnScreens();
+        }
+      } catch (e) {}
+    }
+  }, 5000);
 });
 
 // Загрузка открытых метаданных проведения
@@ -599,6 +613,7 @@ function handleAttemptState() {
 
   if (status === "in_waiting" || status === "approved") {
     showScreen("screen-intro");
+    startHeartbeatAndPoll();
     return;
   }
 
@@ -681,19 +696,17 @@ document.getElementById("btn-start-exam").addEventListener("click", async () => 
 async function startExamSession() {
   const token = getStudentToken();
   
-  // Если задания ещё не загружены в память (например, были в режиме ожидания), запрашиваем с сервера
-  if (!currentAttempt || !currentAttempt.tasks || currentAttempt.tasks.length === 0) {
-    if (token) {
-      try {
-        const res = await fetch("/api/student/attempt", {
-          headers: { "X-Attempt-Token": token }
-        });
-        if (res.ok) {
-          currentAttempt = await res.json();
-        }
-      } catch (e) {
-        console.error("Не удалось подгрузить задания попытки", e);
+  // Всегда запрашиваем самые свежие задания и настройки с сервера при начале работы
+  if (token) {
+    try {
+      const res = await fetch("/api/student/attempt", {
+        headers: { "X-Attempt-Token": token }
+      });
+      if (res.ok) {
+        currentAttempt = await res.json();
       }
+    } catch (e) {
+      console.error("Не удалось подгрузить актуальные задания попытки", e);
     }
   }
 
@@ -1838,10 +1851,115 @@ function startTimer(serverDeadlineIso, startedAtIso) {
   }
 }
 
-// Фоновый Heartbeat
+let lastContentHash = null;
+
+function showLiveUpdateToast(msg) {
+  let toast = document.getElementById("student-live-update-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "student-live-update-toast";
+    toast.className = "student-tab-warning-toast";
+    toast.style.borderColor = "var(--variant-accent, #536dfe)";
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `
+    <span style="font-size: 1.25rem;">✨</span>
+    <span style="font-size: 0.9rem; font-weight: 600; color: var(--text);">${msg}</span>
+  `;
+  toast.style.display = "flex";
+  setTimeout(() => {
+    if (toast) toast.style.display = "none";
+  }, 4000);
+}
+
+async function handleLiveTeacherUpdates(data) {
+  if (!data) return;
+
+  // 1. Обновление цвета оформления в реальном времени
+  if (data.bg_color) {
+    if (currentAttempt) {
+      currentAttempt.bg_color = data.bg_color;
+      currentAttempt.bg_color_v1 = data.bg_color_v1;
+      currentAttempt.bg_color_v2 = data.bg_color_v2;
+    }
+    applyCustomBgColor(data.bg_color);
+    const varNum = currentAttempt?.variant || "1";
+    const varBg = varNum === "2" ? (data.bg_color_v2 || "#E6F4EA") : (data.bg_color_v1 || "#FCE8E6");
+    const dot1 = document.getElementById("var-dot-1");
+    const dot2 = document.getElementById("var-dot-2");
+    if (dot1 && data.bg_color_v1) dot1.style.background = data.bg_color_v1;
+    if (dot2 && data.bg_color_v2) dot2.style.background = data.bg_color_v2;
+    const introBadge = document.getElementById("intro-variant-badge");
+    if (introBadge) introBadge.style.background = varBg;
+    const stuBadge = document.getElementById("student-variant-badge");
+    if (stuBadge) stuBadge.style.background = varBg;
+  }
+
+  // 2. Обновление времени и дедлайна
+  if (data.duration_minutes !== undefined && data.duration_minutes !== null) {
+    if (currentAttempt) currentAttempt.duration_minutes = data.duration_minutes;
+    const introDur = document.getElementById("intro-duration");
+    if (introDur) {
+      introDur.textContent = data.duration_minutes ? `${data.duration_minutes} мин` : "Без ограничения";
+    }
+  }
+  if (data.server_deadline && isExamActive) {
+    if (currentAttempt) currentAttempt.server_deadline = data.server_deadline;
+    startTimer(data.server_deadline, currentAttempt?.started_at);
+  }
+
+  // 3. Обновление заданий без потери введенных ответов
+  const token = getStudentToken();
+  if (token) {
+    try {
+      const res = await fetch("/api/student/attempt", {
+        headers: { "X-Attempt-Token": token }
+      });
+      if (res.ok) {
+        const fresh = await res.json();
+        if (fresh && fresh.tasks) {
+          if (currentAttempt) currentAttempt.tasks = fresh.tasks;
+          currentTasks = fresh.tasks;
+
+          if (isExamActive) {
+            // Сохраняем фокус активного поля ввода
+            const activeEl = document.activeElement;
+            const activeId = (activeEl && activeEl.id) ? activeEl.id : null;
+            const selStart = activeEl?.selectionStart;
+            const selEnd = activeEl?.selectionEnd;
+
+            renderTasks();
+            updateProgressIndicator();
+
+            if (activeId) {
+              const restoredEl = document.getElementById(activeId);
+              if (restoredEl) {
+                restoredEl.focus();
+                if (typeof selStart === "number" && typeof selEnd === "number") {
+                  try { restoredEl.setSelectionRange(selStart, selEnd); } catch (e) {}
+                }
+              }
+            }
+
+            showLiveUpdateToast("Учитель обновил задания и параметры работы");
+          } else {
+            updateIntroVariantDisplay(currentAttempt?.variant || "1");
+            const introTaskCount = document.getElementById("intro-task-count");
+            if (introTaskCount) introTaskCount.textContent = currentTasks.length;
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Live task reload error:", e);
+    }
+  }
+}
+
+// Фоновый Heartbeat с поддержкой обновления на лету
 function startHeartbeatAndPoll() {
   if (heartbeatInterval) clearInterval(heartbeatInterval);
   const token = getStudentToken();
+  if (!token) return;
 
   heartbeatInterval = setInterval(async () => {
     try {
@@ -1852,8 +1970,19 @@ function startHeartbeatAndPoll() {
       if (!res.ok) return;
       const data = await res.json();
 
-      if (data.status !== currentAttempt.status || data.launch_status !== currentAttempt.launch_status) {
+      if (data.status !== currentAttempt?.status || data.launch_status !== currentAttempt?.launch_status) {
         await checkExistingAttempt();
+        return;
+      }
+
+      // Проверяем, изменил ли учитель задания, цвет или время
+      if (data.content_hash) {
+        if (lastContentHash !== null && data.content_hash !== lastContentHash) {
+          lastContentHash = data.content_hash;
+          await handleLiveTeacherUpdates(data);
+        } else if (lastContentHash === null) {
+          lastContentHash = data.content_hash;
+        }
       }
 
       if (data.remaining_seconds !== null && currentRemainingSeconds !== null) {
@@ -1863,7 +1992,7 @@ function startHeartbeatAndPoll() {
         }
       }
     } catch (e) {}
-  }, 10000);
+  }, 5000);
 }
 
 // =========================================================================
@@ -2131,7 +2260,7 @@ async function submitWork(isAutoExpired = false) {
       }
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 75000);
 
       const res = await fetch("/api/student/submit", {
         method: "POST",

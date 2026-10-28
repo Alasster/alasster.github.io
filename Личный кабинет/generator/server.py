@@ -10,6 +10,7 @@ if sys.platform == "win32":
         pass
 import uuid
 import secrets
+import hashlib
 import asyncio
 import logging
 import shutil
@@ -448,21 +449,38 @@ async def update_test(test_id: str, req: UpdateTestRequest, teacher: dict = Depe
     var_str = str(req.variant or "1")
     dur = req.duration_minutes if req.duration_minutes is not None else 45
     async with get_db() as db:
-        await db.execute("""
-            UPDATE tests
-            SET title = ?, exam_type = ?, subject = ?, grade_level = ?,
-                class_letters_json = ?, variant = ?, bg_color = ?, bg_color_v1 = ?, bg_color_v2 = ?, has_variants = ?,
-                quarter = ?, section = ?, instructions = ?, learning_objectives = ?,
-                assessment_criteria = ?, is_archived = ?, updated_at = ?, shuffle_options = ?,
-                duration_minutes = ?
-            WHERE id = ? AND teacher_id = ?
-        """, (
-            req.title.strip(), req.exam_type, req.subject.strip(), req.grade_level.strip(),
-            letters_json, var_str, bg, bg_v1, bg_v2, has_vars,
-            req.quarter, req.section, req.instructions, req.learning_objectives,
-            req.assessment_criteria, 1 if req.is_archived else 0, now, int(req.shuffle_options),
-            dur, test_id, teacher["id"]
-        ))
+        if teacher.get("role") == "superadmin":
+            await db.execute("""
+                UPDATE tests
+                SET title = ?, exam_type = ?, subject = ?, grade_level = ?,
+                    class_letters_json = ?, variant = ?, bg_color = ?, bg_color_v1 = ?, bg_color_v2 = ?, has_variants = ?,
+                    quarter = ?, section = ?, instructions = ?, learning_objectives = ?,
+                    assessment_criteria = ?, is_archived = ?, updated_at = ?, shuffle_options = ?,
+                    duration_minutes = ?
+                WHERE id = ?
+            """, (
+                req.title.strip(), req.exam_type, req.subject.strip(), req.grade_level.strip(),
+                letters_json, var_str, bg, bg_v1, bg_v2, has_vars,
+                req.quarter, req.section, req.instructions, req.learning_objectives,
+                req.assessment_criteria, 1 if req.is_archived else 0, now, int(req.shuffle_options),
+                dur, test_id
+            ))
+        else:
+            await db.execute("""
+                UPDATE tests
+                SET title = ?, exam_type = ?, subject = ?, grade_level = ?,
+                    class_letters_json = ?, variant = ?, bg_color = ?, bg_color_v1 = ?, bg_color_v2 = ?, has_variants = ?,
+                    quarter = ?, section = ?, instructions = ?, learning_objectives = ?,
+                    assessment_criteria = ?, is_archived = ?, updated_at = ?, shuffle_options = ?,
+                    duration_minutes = ?
+                WHERE id = ? AND teacher_id = ?
+            """, (
+                req.title.strip(), req.exam_type, req.subject.strip(), req.grade_level.strip(),
+                letters_json, var_str, bg, bg_v1, bg_v2, has_vars,
+                req.quarter, req.section, req.instructions, req.learning_objectives,
+                req.assessment_criteria, 1 if req.is_archived else 0, now, int(req.shuffle_options),
+                dur, test_id, teacher["id"]
+            ))
         await sync_launches_for_test(db, test_id)
         await db.commit()
     return {"ok": True}
@@ -483,7 +501,7 @@ async def sync_launches_for_test(db, test_id: str):
 
     snap_json = json.dumps(snapshot_tasks, ensure_ascii=False)
 
-    test_cur = await db.execute("SELECT bg_color, bg_color_v1, bg_color_v2, duration_minutes, class_letters_json, grade_level FROM tests WHERE id = ?", (test_id,))
+    test_cur = await db.execute("SELECT title, bg_color, bg_color_v1, bg_color_v2, duration_minutes, class_letters_json, grade_level, instructions FROM tests WHERE id = ?", (test_id,))
     test_row = await test_cur.fetchone()
     if test_row:
         allowed_classes = []
@@ -495,27 +513,60 @@ async def sync_launches_for_test(db, test_id: str):
             except Exception:
                 pass
 
+        new_duration = test_row["duration_minutes"] if test_row["duration_minutes"] is not None else 45
+
         if allowed_classes:
             await db.execute("""
                 UPDATE launches
                 SET snapshot_tasks_json = ?,
+                    title = COALESCE(?, title),
                     bg_color = COALESCE(?, bg_color),
                     bg_color_v1 = COALESCE(?, bg_color_v1),
                     bg_color_v2 = COALESCE(?, bg_color_v2),
                     duration_minutes = COALESCE(?, duration_minutes),
                     allowed_classes_json = ?
                 WHERE test_id = ? AND status != 'finished'
-            """, (snap_json, test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], test_row["duration_minutes"], json.dumps(allowed_classes, ensure_ascii=False), test_id))
+            """, (snap_json, test_row["title"], test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], new_duration, json.dumps(allowed_classes, ensure_ascii=False), test_id))
         else:
             await db.execute("""
                 UPDATE launches
                 SET snapshot_tasks_json = ?,
+                    title = COALESCE(?, title),
                     bg_color = COALESCE(?, bg_color),
                     bg_color_v1 = COALESCE(?, bg_color_v1),
                     bg_color_v2 = COALESCE(?, bg_color_v2),
                     duration_minutes = COALESCE(?, duration_minutes)
                 WHERE test_id = ? AND status != 'finished'
-            """, (snap_json, test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], test_row["duration_minutes"], test_id))
+            """, (snap_json, test_row["title"], test_row["bg_color"], test_row["bg_color_v1"], test_row["bg_color_v2"], new_duration, test_id))
+
+        cur_l = await db.execute("SELECT id FROM launches WHERE test_id = ? AND status != 'finished'", (test_id,))
+        launch_rows = await cur_l.fetchall()
+        l_ids = [r["id"] for r in launch_rows]
+
+        # Пересчитываем server_deadline для всех активных попыток учеников (in_progress)
+        if l_ids and new_duration is not None:
+            placeholders = ",".join("?" for _ in l_ids)
+            cur_active = await db.execute(f"""
+                SELECT id, started_at, extra_time_minutes
+                FROM student_attempts
+                WHERE launch_id IN ({placeholders}) AND status = 'in_progress' AND started_at IS NOT NULL
+            """, l_ids)
+            for att in await cur_active.fetchall():
+                try:
+                    st_dt = datetime.fromisoformat(att["started_at"])
+                    if st_dt.tzinfo is None:
+                        st_dt = st_dt.replace(tzinfo=timezone.utc)
+                    tot_m = int(new_duration) + (att["extra_time_minutes"] or 0)
+                    new_dl = (st_dt + timedelta(minutes=tot_m)).isoformat() if tot_m > 0 else None
+                    await db.execute("UPDATE student_attempts SET server_deadline = ? WHERE id = ?", (new_dl, att["id"]))
+                except Exception:
+                    pass
+
+        for lid in l_ids:
+            try:
+                broadcast_live_event(lid, "launch_settings_updated", {"updated": True})
+            except Exception:
+                pass
     else:
         await db.execute("""
             UPDATE launches
@@ -2219,10 +2270,22 @@ async def student_heartbeat(attempt: dict = Depends(get_current_student_attempt)
         except Exception:
             pass
 
+    raw_snap = attempt.get("snapshot_tasks_json") or ""
+    var_str = str(attempt.get("variant") or "1")
+    hash_src = f"{raw_snap}:{attempt.get('duration_minutes')}:{attempt.get('bg_color_v1')}:{attempt.get('bg_color_v2')}"
+    content_hash = hashlib.md5(hash_src.encode("utf-8", errors="ignore")).hexdigest()[:12]
+    chosen_bg = (attempt.get("bg_color_v2") or "#e6f4ea") if var_str == "2" else (attempt.get("bg_color_v1") or "#fce8e6")
+
     return {
         "status": attempt["status"],
         "launch_status": attempt["launch_status"],
-        "remaining_seconds": remaining_seconds
+        "remaining_seconds": remaining_seconds,
+        "server_deadline": attempt.get("server_deadline"),
+        "duration_minutes": attempt.get("duration_minutes"),
+        "bg_color": chosen_bg,
+        "bg_color_v1": attempt.get("bg_color_v1") or "#fce8e6",
+        "bg_color_v2": attempt.get("bg_color_v2") or "#e6f4ea",
+        "content_hash": content_hash,
     }
 
 @app.post("/api/student/submit")

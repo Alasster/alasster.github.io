@@ -105,7 +105,7 @@ async def get_current_student_attempt(request: Request) -> dict:
                    CASE WHEN sa.publish_results_override IS NULL THEN l.publish_answers ELSE sa.publish_results_override END AS publish_answers,
                    CASE WHEN sa.publish_results_override IS NULL THEN l.publish_comments ELSE sa.publish_results_override END AS publish_comments,
                    l.timezone,
-                   l.bg_color, l.bg_color_v1, l.bg_color_v2
+                   l.bg_color, l.bg_color_v1, l.bg_color_v2, l.snapshot_tasks_json
             FROM student_attempts sa
             JOIN launches l ON sa.launch_id = l.id
             WHERE sa.attempt_token = ? AND sa.status != 'removed'
