@@ -151,6 +151,8 @@ function showClassModal(id) {
   const backdrop = document.getElementById('modal-backdrop-el');
   if (!backdrop) return;
 
+  backdrop.dataset.classTheme = id;
+
   backdrop.removeAttribute('inert');
   backdrop.inert = false;
   backdrop.classList.add('active');

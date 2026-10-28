@@ -1678,3 +1678,80 @@ body { display: block !important; }
   .hero-info-grid > .glass-voice-box { flex: 1 1 55% !important; }
   .hero-info-grid > .glass-stats-bar { flex: 0 1 45% !important; }
 }
+
+/* Lesson palette themes */
+.modal-backdrop[data-class-theme="c9"] { --lesson-bg:#eeebf8; --lesson-surface:#fcfaff; --lesson-soft:#c5bde0; --lesson-accent:#8067d8; --lesson-deep:#302a49; }
+.modal-backdrop[data-class-theme="c10emn"] { --lesson-bg:#e3f0fa; --lesson-surface:#f6fbff; --lesson-soft:#b2cedf; --lesson-accent:#3289ce; --lesson-deep:#244761; }
+.modal-backdrop[data-class-theme="c10ogn"] { --lesson-bg:#e5f2ec; --lesson-surface:#f7fffa; --lesson-soft:#b4d4c5; --lesson-accent:#299a78; --lesson-deep:#24483c; }
+.modal-backdrop[data-class-theme="c11"] { --lesson-bg:#fff0e7; --lesson-surface:#fffaf6; --lesson-soft:#eac9b7; --lesson-accent:#ed906c; --lesson-deep:#593c36; }
+
+.modal-backdrop[data-class-theme] .modal-glass-container,
+.modal-backdrop[data-class-theme] .modal-header-bar,
+.modal-backdrop[data-class-theme] .modal-lessons-scroll { background:var(--lesson-bg); }
+.modal-backdrop[data-class-theme] .modal-glass-container { color:var(--lesson-deep); }
+.modal-backdrop[data-class-theme] .modal-header-bar { border-bottom-color:color-mix(in srgb,var(--lesson-soft) 55%,transparent); }
+.modal-backdrop[data-class-theme] .modal-eyebrow,
+.modal-backdrop[data-class-theme] .modal-heading-text,
+.modal-backdrop[data-class-theme] .modal-subtitle,
+.modal-backdrop[data-class-theme] .modal-close-icon { color:var(--lesson-accent); }
+.modal-backdrop[data-class-theme] .lesson-card-item,
+.modal-backdrop[data-class-theme] .lesson-row-card { background:var(--lesson-surface); color:var(--lesson-deep); box-shadow:5px 5px 12px color-mix(in srgb,var(--lesson-soft) 55%,transparent),-5px -5px 12px color-mix(in srgb,white 80%,transparent); }
+.modal-backdrop[data-class-theme] .lesson-card-item:hover,
+.modal-backdrop[data-class-theme] .lesson-row-card:hover { color:var(--lesson-accent); box-shadow:7px 7px 15px color-mix(in srgb,var(--lesson-soft) 65%,transparent),-7px -7px 15px color-mix(in srgb,white 85%,transparent); }
+.modal-backdrop[data-class-theme] .lesson-num-badge,
+.modal-backdrop[data-class-theme] .lesson-badge-id { background:var(--lesson-bg); color:var(--lesson-accent); box-shadow:inset 4px 4px 8px color-mix(in srgb,var(--lesson-soft) 60%,transparent),inset -4px -4px 8px color-mix(in srgb,white 82%,transparent); }
+.modal-backdrop[data-class-theme] .lesson-title-text,
+.modal-backdrop[data-class-theme] .lesson-title-label { color:var(--lesson-deep); }
+.modal-backdrop[data-class-theme] .lesson-arrow-icon,
+.modal-backdrop[data-class-theme] .btn-launch-lesson { color:var(--lesson-accent); }
+.modal-backdrop[data-class-theme] .modal-lessons-scroll::-webkit-scrollbar-track { background:var(--lesson-bg); }
+.modal-backdrop[data-class-theme] .modal-lessons-scroll::-webkit-scrollbar-thumb { background:var(--lesson-soft); }
+
+/* Calm modal shadows and themed scrollbar. */
+.modal-backdrop {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.modal-glass-container {
+  box-shadow: 10px 10px 24px rgba(120, 132, 155, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.58) !important;
+}
+
+.lesson-card-item,
+.lesson-row-card {
+  box-shadow: 3px 4px 9px rgba(120, 132, 155, 0.18),
+    -3px -3px 8px rgba(255, 255, 255, 0.48) !important;
+}
+
+.lesson-card-item:hover,
+.lesson-row-card:hover {
+  box-shadow: 4px 5px 11px rgba(120, 132, 155, 0.22),
+    -4px -4px 10px rgba(255, 255, 255, 0.56) !important;
+}
+
+.modal-lessons-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--primary) 45%, var(--surface)) transparent;
+}
+
+.modal-lessons-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-lessons-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 18px;
+}
+
+.modal-lessons-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--primary) 45%, var(--surface)) !important;
+  border: 3px solid var(--surface);
+  border-radius: 18px;
+  min-height: 42px;
+}
+
+.modal-lessons-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--primary) 62%, var(--surface)) !important;
+}

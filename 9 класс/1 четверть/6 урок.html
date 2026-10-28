@@ -8,11 +8,10 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%237C3AED' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
   
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-v25">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neumorph-2026-10-28-26">
 </head>
 <body class="lesson-page lesson-9-6" data-lesson-id="9-6">
 
@@ -351,7 +350,7 @@
           <div class="grid2">
             <div>
               <label style="font-weight:700; font-size:.9rem; display:block; margin-bottom:6px;">1. Что передаём (Объём Q):</label>
-              <select id="simFileSize" style="width:100%; border:2px solid var(--line); border-radius:12px; padding:10px; background:#fff;">
+              <select id="simFileSize" style="width:100%; border:2px solid var(--line); border-radius:18px; padding:10px; background:#fff;">
                 <option value="5">Фотография высокого качества (Q = 5 МБайт)</option>
                 <option value="20">Музыкальный альбом (Q = 20 МБайт)</option>
                 <option value="150" selected>Учебный видеоклип (Q = 150 МБайт)</option>
@@ -362,7 +361,7 @@
 
             <div>
               <label style="font-weight:700; font-size:.9rem; display:block; margin-bottom:6px;">2. Канал связи (Скорость v):</label>
-              <select id="simNetSpeed" style="width:100%; border:2px solid var(--line); border-radius:12px; padding:10px; background:#fff;">
+              <select id="simNetSpeed" style="width:100%; border:2px solid var(--line); border-radius:18px; padding:10px; background:#fff;">
                 <option value="2">Мобильный 3G (2 Мбит/с = 0.25 МБ/с)</option>
                 <option value="16">Сеть 4G LTE (16 Мбит/с = 2 МБ/с)</option>
                 <option value="50">Домашний Wi-Fi (50 Мбит/с = 6.25 МБ/с)</option>
@@ -472,7 +471,7 @@
                 <p class="small" id="trainText1" style="margin:3px 0 0;">Файл размером <strong>3 МБайт</strong> передаётся по линии связи со скоростью <strong>512 Кбит/с</strong> (считай 1 МБайт = 1024 КБайт). За сколько секунд передастся файл?</p>
               </div>
               <div style="display:flex; gap:8px; align-items:center;">
-                <input type="text" id="trainInput1" placeholder="число" style="width:130px; text-align:center; padding:9px; border:2px solid var(--line); border-radius:10px;">
+                <input type="text" id="trainInput1" placeholder="число" style="width:130px; text-align:center; padding:9px; border:2px solid var(--line); border-radius:18px;">
                 <span id="trainStat1" style="font-weight:800; font-size:1.2rem; min-width:24px; text-align:center;">-</span>
               </div>
             </div>
@@ -483,7 +482,7 @@
                 <p class="small" id="trainText2" style="margin:3px 0 0;">Скорость соединения равна <strong>2048 Кбит/с</strong>. Какой объём данных (в МБайтах) будет передан за <strong>24 секунды</strong> (считай 1 МБайт = 1024 КБайт)?</p>
               </div>
               <div style="display:flex; gap:8px; align-items:center;">
-                <input type="text" id="trainInput2" placeholder="число" style="width:130px; text-align:center; padding:9px; border:2px solid var(--line); border-radius:10px;">
+                <input type="text" id="trainInput2" placeholder="число" style="width:130px; text-align:center; padding:9px; border:2px solid var(--line); border-radius:18px;">
                 <span id="trainStat2" style="font-weight:800; font-size:1.2rem; min-width:24px; text-align:center;">-</span>
               </div>
             </div>
@@ -494,7 +493,7 @@
                 <p class="small" id="trainText3" style="margin:3px 0 0;">За <strong>4 секунды</strong> по каналу был передан файл размером <strong>5120 КБайт</strong> (считай 1 МБайт = 1024 КБайт). Какова скорость соединения в <strong>Мбит/с</strong>?</p>
               </div>
               <div style="display:flex; gap:8px; align-items:center;">
-                <input type="text" id="trainInput3" placeholder="число" style="width:130px; text-align:center; padding:9px; border:2px solid var(--line); border-radius:10px;">
+                <input type="text" id="trainInput3" placeholder="число" style="width:130px; text-align:center; padding:9px; border:2px solid var(--line); border-radius:18px;">
                 <span id="trainStat3" style="font-weight:800; font-size:1.2rem; min-width:24px; text-align:center;">-</span>
               </div>
             </div>
@@ -585,6 +584,7 @@
         <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-            <script src="../../скрипты/lessons.js?v=neu-2026-v25"></script>
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-01"></script>
+            <script src="../../скрипты/lessons.js?v=neumorph-2026-10-28-26"></script>
 </body>
 </html>

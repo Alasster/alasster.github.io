@@ -282,6 +282,16 @@
     const activeDot = dots[activeIndex];
     if (!container || !activeDot) return;
 
+    if (container.clientHeight > 0 && container.scrollHeight > container.clientHeight) {
+      const top = activeDot.offsetTop;
+      const bottom = top + activeDot.offsetHeight;
+      if (bottom > container.scrollTop + container.clientHeight - 7) {
+        container.scrollTop = bottom - container.clientHeight + 7;
+      } else if (top < container.scrollTop + 7) {
+        container.scrollTop = Math.max(0, top - 7);
+      }
+    }
+
     let indicator = container.querySelector('.dot-indicator');
     if (!indicator) {
       indicator = document.createElement('span');
@@ -504,19 +514,20 @@
   };
 
   function resolveSlideIcon(slide, index, total, title) {
+    const mapped = window.AlassterLessonIcons.stage(document.body.dataset.lessonId, index);
+    if (mapped) return mapped.icon;
     const raw = `${title || ''} ${slide.getAttribute('aria-label') || ''} ${slide.querySelector('h1, h2, h3')?.textContent || ''}`.toLowerCase();
-    if (index === 0) return 'fa-house';
-    if (index === total - 1) {
-      if (raw.includes('тест') || raw.includes('сор') || raw.includes('соч') || raw.includes('вопрос') || raw.includes('задан')) return 'fa-circle-check';
-      return 'fa-flag-checkered';
-    }
-    if (raw.includes('тест') || raw.includes('проверк') || raw.includes('квиз') || raw.includes('оцениван') || raw.includes('итог')) return 'fa-circle-check';
-    if (raw.includes('код') || raw.includes('python') || raw.includes('excel') || raw.includes('программ') || raw.includes('практик') || raw.includes('мастерск')) return 'fa-laptop-code';
-    if (raw.includes('архитектур') || raw.includes('структур') || raw.includes('модел') || raw.includes('сеть') || raw.includes('схем') || raw.includes('перцептрон')) return 'fa-diagram-project';
-    if (raw.includes('поняти') || raw.includes('истори') || raw.includes('теория') || raw.includes('элемент') || raw.includes('основ')) return 'fa-lightbulb';
-    if (raw.includes('симулятор') || raw.includes('интерактив') || raw.includes('жест') || raw.includes('лаборатор')) return 'fa-sliders';
-    const sequence = ['fa-house', 'fa-lightbulb', 'fa-diagram-project', 'fa-laptop-code', 'fa-puzzle-piece', 'fa-circle-check', 'fa-flag-checkered'];
-    return sequence[index % sequence.length];
+    if (index === 0) return 'home';
+    if (/практик|мастерск/.test(raw)) return 'computer';
+    if (/тест|проверк|квиз/.test(raw)) return 'check';
+    if (/итог|рефлек|вывод|выходной билет/.test(raw)) return 'flag';
+    if (/схем|структур|сеть/.test(raw)) return 'network';
+    if (index === total - 1) return 'flag';
+    return 'book-alt';
+  }
+
+  function slideIconMarkup(icon) {
+    return window.AlassterLessonIcons.markup(icon, 'slide-stage-icon');
   }
 
   function initDotsNav() {
@@ -593,16 +604,20 @@
         title = `Слайд ${index + 1}`;
       }
 
+      const mappedStage = window.AlassterLessonIcons.stage(currentLessonId, index);
+      if (mappedStage?.title) title = mappedStage.title;
       title = title.replace(/\s+/g, ' ').trim();
+      const fullTitle = title;
       if (title.length > 28) {
         title = title.slice(0, 26).trim() + '…';
       }
 
       dot.setAttribute('data-title', title);
       dot.setAttribute('data-tooltip', title);
-      dot.setAttribute('aria-label', `Слайд ${index + 1}: ${title}`);
+      dot.setAttribute('aria-label', `Слайд ${index + 1}: ${fullTitle}`);
       const slideIcon = resolveSlideIcon(slide, index, slides.length, title);
-      dot.innerHTML = `<i class="fa-solid ${slideIcon}" aria-hidden="true"></i>`;
+      dot.dataset.stageIcon = slideIcon;
+      dot.innerHTML = slideIconMarkup(slideIcon);
       dot.onclick = (e) => {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -7200,18 +7215,16 @@ const slides = [...document.querySelectorAll('.slide')];
     const currentUrl = window.location.href;
     const loginUrl = `${base}/login?return_to=${encodeURIComponent(currentUrl)}`;
     const cabinetUrl = `${base}/`;
-    const generatorUrl = `${base}/generator/teacher`;
 
     if (user) {
       const displayName = user.display_name || user.first_name || user.username || 'Учитель';
       const roleLabel = (user.role === 'superadmin' || user.role === 'admin') ? 'Администратор' : 'Учитель';
+      const initials = getUserInitials(displayName);
 
       container.innerHTML = `
         <div class="neu-auth-wrapper">
-          <button type="button" class="neu-auth-btn is-logged" id="neu-auth-trigger" aria-haspopup="true" aria-expanded="false" title="Профиль: ${escapeHtml(displayName)}">
-            <span class="neu-auth-avatar"><i class="fa-solid fa-user-check"></i></span>
-            <span class="neu-auth-name">${escapeHtml(displayName)}</span>
-            <i class="fa-solid fa-chevron-down neu-auth-chevron"></i>
+          <button type="button" class="neu-auth-btn is-logged" id="neu-auth-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Профиль: ${escapeHtml(displayName)}" title="Профиль: ${escapeHtml(displayName)}">
+            <span class="neu-auth-avatar neu-auth-initials" aria-hidden="true">${escapeHtml(initials)}</span>
           </button>
           <div class="neu-auth-dropdown" id="neu-auth-dropdown">
             <div class="neu-auth-dropdown-header">
@@ -7221,10 +7234,6 @@ const slides = [...document.querySelectorAll('.slide')];
             <a href="${cabinetUrl}" class="neu-auth-dropdown-item">
               <i class="fa-solid fa-user"></i>
               <span>Личный кабинет</span>
-            </a>
-            <a href="${generatorUrl}" class="neu-auth-dropdown-item">
-              <i class="fa-solid fa-clipboard-check"></i>
-              <span>Генератор тестов</span>
             </a>
             <div class="neu-auth-dropdown-divider"></div>
             <button type="button" class="neu-auth-dropdown-item neu-auth-logout-btn" id="neu-logout-btn">
@@ -7259,13 +7268,19 @@ const slides = [...document.querySelectorAll('.slide')];
     } else {
       container.innerHTML = `
         <div class="neu-auth-wrapper">
-          <a href="${loginUrl}" class="neu-auth-btn" id="neu-auth-trigger" title="Войти в личный кабинет">
-            <span class="neu-auth-avatar"><i class="fa-solid fa-user"></i></span>
-            <span class="neu-auth-name">Войти</span>
+          <a href="${loginUrl}" class="neu-auth-btn" id="neu-auth-trigger" aria-label="Войти в личный кабинет" title="Войти в личный кабинет">
+            <span class="neu-auth-avatar neu-auth-login-mark" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
           </a>
         </div>
       `;
     }
+  }
+
+  function getUserInitials(name) {
+    const parts = String(name || 'Учитель').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return 'УЧ';
+    if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase();
   }
 
   function escapeHtml(str) {
@@ -7296,6 +7311,7 @@ const slides = [...document.querySelectorAll('.slide')];
       if (dropdown && dropdown.classList.contains('is-open')) {
         dropdown.classList.remove('is-open');
         trigger?.setAttribute('aria-expanded', 'false');
+        trigger?.focus();
       }
     }
   });
@@ -7342,4 +7358,35 @@ const slides = [...document.querySelectorAll('.slide')];
     performLogout,
     getStoredUser
   };
+})();
+
+// Match desktop slide bounds to the actual navbar, including its separate auth column.
+(() => {
+  function alignLessonContent() {
+    const navbar = document.querySelector('.navbar');
+    const header = navbar?.closest('.container');
+    if (!navbar || !header) return;
+
+    const update = () => {
+      const bounds = navbar.getBoundingClientRect();
+      if (!bounds.width) return;
+      const root = document.documentElement;
+      root.style.setProperty('--lesson-content-left', `${bounds.left}px`);
+      root.style.setProperty('--lesson-content-right', `${root.clientWidth - bounds.right}px`);
+      const authBounds = header.querySelector('.nav-auth-external')?.getBoundingClientRect();
+      root.style.setProperty('--lesson-rail-right', `${Math.max(12, root.clientWidth - (authBounds?.right || bounds.right))}px`);
+      root.style.setProperty('--lesson-rail-top', `${Math.max(bounds.bottom, authBounds?.bottom || 0) + 20}px`);
+    };
+    const observer = new ResizeObserver(update);
+    observer.observe(header);
+    observer.observe(navbar);
+    window.addEventListener('resize', update, { passive: true });
+    document.fonts.ready.then(update);
+    update();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', alignLessonContent, { once: true });
+  } else {
+    alignLessonContent();
+  }
 })();

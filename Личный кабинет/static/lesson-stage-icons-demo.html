@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Иконки этапов урока</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="lesson-stage-icons.css">
+  <style>
+    body { padding: 32px; }
+    main { max-width: 920px; margin: auto; }
+    .icon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; margin-top: 24px; }
+    .icon-card { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-soft); }
+    .icon-card span { color: var(--text); font-size: .82rem; font-weight: 800; }
+    .icon-card small { display: block; margin-top: 2px; color: var(--muted); font-size: .68rem; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">ALASSTER.SITE · ICON SET</p>
+    <h1>Этапы урока</h1>
+    <p class="lead">12 иконок в общей системе: тема, теория, практика, проверка и рефлексия.</p>
+    <section class="icon-grid" aria-label="Набор иконок">
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--topic"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#topic"/></svg></span><div><span>Тема</span><small>topic</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--theory"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#theory"/></svg></span><div><span>Теория</span><small>theory</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--practice"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#practice"/></svg></span><div><span>Практика</span><small>practice</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--test"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#test"/></svg></span><div><span>Тест</span><small>test</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--result"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#result"/></svg></span><div><span>Итог</span><small>result</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--goal"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#goal"/></svg></span><div><span>Цель</span><small>goal</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--example"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#example"/></svg></span><div><span>Пример</span><small>example</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--discussion"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#discussion"/></svg></span><div><span>Обсуждение</span><small>discussion</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--homework"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#homework"/></svg></span><div><span>Домашнее задание</span><small>homework</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--reflection"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#reflection"/></svg></span><div><span>Рефлексия</span><small>reflection</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--time"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#time"/></svg></span><div><span>Время</span><small>time</small></div></div>
+      <div class="icon-card"><span class="lesson-stage-icon lesson-stage-icon--resource"><svg aria-hidden="true"><use href="lesson-stage-icons.svg#resource"/></svg></span><div><span>Материалы</span><small>resource</small></div></div>
+    </section>
+  </main>
+</body>
+</html>

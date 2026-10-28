@@ -1,0 +1,51 @@
+/* Единый размер и неоморфная кнопка для иконок этапов урока. */
+.lesson-stage-icon {
+  --icon-color: var(--primary, #536dfe);
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  padding: 9px;
+  border-radius: 15px;
+  color: var(--icon-color);
+  background: var(--surface, #e7ebf3);
+  box-shadow: var(--shadow-soft, 4px 4px 10px rgba(163, 174, 195, .32), -4px -4px 10px rgba(255, 255, 255, .64));
+}
+
+.lesson-stage-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.1;
+}
+
+.lesson-stage-icon.lesson-stage-icon--topic { --icon-color: #bd7b20; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--theory { --icon-color: #536dfe; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--practice { --icon-color: #159f9a; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--test { --icon-color: #8b61c9; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--result { --icon-color: #1b9b70; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--goal { --icon-color: #d26a78; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--example { --icon-color: #c28b27; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--discussion { --icon-color: #438bb3; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--homework { --icon-color: #5c78c9; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--reflection { --icon-color: #9b6bb9; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--time { --icon-color: #5b8f9a; color: var(--icon-color); }
+.lesson-stage-icon.lesson-stage-icon--resource { --icon-color: #64728e; color: var(--icon-color); }
+
+.lesson-stage-icon.is-active,
+.lesson-stage-icon:hover {
+  box-shadow: var(--shadow-in, inset 4px 4px 9px rgba(163, 174, 195, .28), inset -4px -4px 9px rgba(255, 255, 255, .68));
+}
+
+:root[data-theme="dark"] .lesson-stage-icon {
+  box-shadow: var(--shadow-soft);
+}
+
+:root[data-theme="dark"] .lesson-stage-icon.is-active,
+:root[data-theme="dark"] .lesson-stage-icon:hover {
+  box-shadow: var(--shadow-in);
+}

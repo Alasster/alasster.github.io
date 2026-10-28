@@ -1,0 +1,146 @@
+/* Flaticon UIcons Rounded Regular 3.3.1. https://www.flaticon.com/uicons */
+@font-face {
+  font-family: "LessonFlaticonOutline";
+  src: url("./vendor/flaticon/uicons-regular-rounded.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+body.lesson-page .lesson-flaticon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+body.lesson-page [data-flaticon]::before {
+  display: inline-block;
+  font-family: "LessonFlaticonOutline" !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-size: 1em !important;
+  line-height: 1;
+  text-transform: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body.lesson-page [data-flaticon="arrow-comparison"]::before { content: "\f187"; }
+body.lesson-page [data-flaticon="arrow-left"]::before { content: "\f197"; }
+body.lesson-page [data-flaticon="arrow-right"]::before { content: "\f19b"; }
+body.lesson-page [data-flaticon="arrow-small-left"]::before { content: "\f19d"; }
+body.lesson-page [data-flaticon="arrow-small-right"]::before { content: "\f19e"; }
+body.lesson-page [data-flaticon="arrow-up-right-from-square"]::before { content: "\f1b3"; }
+body.lesson-page [data-flaticon="binary"]::before { content: "\f24e"; }
+body.lesson-page [data-flaticon="bolt"]::before { content: "\f26c"; }
+body.lesson-page [data-flaticon="book-alt"]::before { content: "\f274"; }
+body.lesson-page [data-flaticon="brain"]::before { content: "\f2de"; }
+body.lesson-page [data-flaticon="bulb"]::before { content: "\f304"; }
+body.lesson-page [data-flaticon="calculator"]::before { content: "\f31f"; }
+body.lesson-page [data-flaticon="camera"]::before { content: "\f348"; }
+body.lesson-page [data-flaticon="chart-histogram"]::before { content: "\f3a2"; }
+body.lesson-page [data-flaticon="chart-line-up"]::before { content: "\f3a5"; }
+body.lesson-page [data-flaticon="check"]::before { content: "\f3c8"; }
+body.lesson-page [data-flaticon="cloud"]::before { content: "\f479"; }
+body.lesson-page [data-flaticon="cloud-sun"]::before { content: "\f476"; }
+body.lesson-page [data-flaticon="comment-alt"]::before { content: "\f4a1"; }
+body.lesson-page [data-flaticon="comments"]::before { content: "\f4bc"; }
+body.lesson-page [data-flaticon="computer"]::before { content: "\f4cc"; }
+body.lesson-page [data-flaticon="credit-card"]::before { content: "\f4ee"; }
+body.lesson-page [data-flaticon="cross"]::before { content: "\f4f7"; }
+body.lesson-page [data-flaticon="database"]::before { content: "\f525"; }
+body.lesson-page [data-flaticon="download"]::before { content: "\f591"; }
+body.lesson-page [data-flaticon="edit"]::before { content: "\f5c1"; }
+body.lesson-page [data-flaticon="eye"]::before { content: "\f5f8"; }
+body.lesson-page [data-flaticon="flag"]::before { content: "\f695"; }
+body.lesson-page [data-flaticon="flask"]::before { content: "\f69b"; }
+body.lesson-page [data-flaticon="folder"]::before { content: "\f6ba"; }
+body.lesson-page [data-flaticon="gamepad"]::before { content: "\f6df"; }
+body.lesson-page [data-flaticon="globe"]::before { content: "\f705"; }
+body.lesson-page [data-flaticon="graduation-cap"]::before { content: "\f70f"; }
+body.lesson-page [data-flaticon="heart"]::before { content: "\f7a0"; }
+body.lesson-page [data-flaticon="home"]::before { content: "\f7b8"; }
+body.lesson-page [data-flaticon="interrogation"]::before { content: "\f81e"; }
+body.lesson-page [data-flaticon="language"]::before { content: "\f868"; }
+body.lesson-page [data-flaticon="layers"]::before { content: "\f87c"; }
+body.lesson-page [data-flaticon="link"]::before { content: "\f8ba"; }
+body.lesson-page [data-flaticon="list"]::before { content: "\f8c4"; }
+body.lesson-page [data-flaticon="list-check"]::before { content: "\f8c0"; }
+body.lesson-page [data-flaticon="loading"]::before { content: "\f8c8"; }
+body.lesson-page [data-flaticon="lock"]::before { content: "\f8d5"; }
+body.lesson-page [data-flaticon="magic-wand"]::before { content: "\f8e1"; }
+body.lesson-page [data-flaticon="memory"]::before { content: "\f924"; }
+body.lesson-page [data-flaticon="microchip"]::before { content: "\f941"; }
+body.lesson-page [data-flaticon="microphone"]::before { content: "\f944"; }
+body.lesson-page [data-flaticon="mobile-notch"]::before { content: "\f952"; }
+body.lesson-page [data-flaticon="network"]::before { content: "\f9a1"; }
+body.lesson-page [data-flaticon="paint-brush"]::before { content: "\f9ea"; }
+body.lesson-page [data-flaticon="pen-clip"]::before { content: "\fa1d"; }
+body.lesson-page [data-flaticon="pen-nib"]::before { content: "\fa22"; }
+body.lesson-page [data-flaticon="pencil"]::before { content: "\fa29"; }
+body.lesson-page [data-flaticon="picture"]::before { content: "\fa78"; }
+body.lesson-page [data-flaticon="play"]::before { content: "\fa9e"; }
+body.lesson-page [data-flaticon="plus"]::before { content: "\faac"; }
+body.lesson-page [data-flaticon="presentation"]::before { content: "\fad1"; }
+body.lesson-page [data-flaticon="print"]::before { content: "\fad6"; }
+body.lesson-page [data-flaticon="puzzle"]::before { content: "\faec"; }
+body.lesson-page [data-flaticon="refresh"]::before { content: "\fb34"; }
+body.lesson-page [data-flaticon="robot"]::before { content: "\fb61"; }
+body.lesson-page [data-flaticon="satellite-dish"]::before { content: "\fb8e"; }
+body.lesson-page [data-flaticon="scale"]::before { content: "\fb97"; }
+body.lesson-page [data-flaticon="school"]::before { content: "\fba1"; }
+body.lesson-page [data-flaticon="search"]::before { content: "\fbba"; }
+body.lesson-page [data-flaticon="settings-sliders"]::before { content: "\fbd1"; }
+body.lesson-page [data-flaticon="shield-check"]::before { content: "\fbdb"; }
+body.lesson-page [data-flaticon="sign-out-alt"]::before { content: "\fc0c"; }
+body.lesson-page [data-flaticon="sitemap"]::before { content: "\fc24"; }
+body.lesson-page [data-flaticon="smile"]::before { content: "\fc48"; }
+body.lesson-page [data-flaticon="snowflake"]::before { content: "\fc54"; }
+body.lesson-page [data-flaticon="star"]::before { content: "\fce9"; }
+body.lesson-page [data-flaticon="stethoscope"]::before { content: "\fcf4"; }
+body.lesson-page [data-flaticon="tachometer-fast"]::before { content: "\fd4b"; }
+body.lesson-page [data-flaticon="tags"]::before { content: "\fd51"; }
+body.lesson-page [data-flaticon="target"]::before { content: "\fd5f"; }
+body.lesson-page [data-flaticon="text"]::before { content: "\fd85"; }
+body.lesson-page [data-flaticon="time-fast"]::before { content: "\fda4"; }
+body.lesson-page [data-flaticon="time-past"]::before { content: "\fdaa"; }
+body.lesson-page [data-flaticon="triangle-warning"]::before { content: "\fe33"; }
+body.lesson-page [data-flaticon="trophy"]::before { content: "\fe39"; }
+body.lesson-page [data-flaticon="unlock"]::before { content: "\fe6f"; }
+body.lesson-page [data-flaticon="upload"]::before { content: "\fe75"; }
+body.lesson-page [data-flaticon="user"]::before { content: "\fea0"; }
+body.lesson-page [data-flaticon="user-check"]::before { content: "\fe7d"; }
+body.lesson-page [data-flaticon="user-gear"]::before { content: "\fe82"; }
+body.lesson-page [data-flaticon="user-shield"]::before { content: "\fe97"; }
+body.lesson-page [data-flaticon="users"]::before { content: "\fea6"; }
+body.lesson-page [data-flaticon="users-alt"]::before { content: "\fea1"; }
+body.lesson-page [data-flaticon="volume"]::before { content: "\fed0"; }
+body.lesson-page [data-flaticon="wifi"]::before { content: "\ff08"; }
+
+body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) i.lesson-flaticon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--primary) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.lesson-page .lesson-icon-credit {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  padding: 4px 20px 10px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  text-decoration: underline;
+}
+
