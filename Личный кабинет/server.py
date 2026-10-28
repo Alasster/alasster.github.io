@@ -324,9 +324,13 @@ async def security_headers(request: Request, call_next):
 
     response = await call_next(request)
 
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-
-    response.headers["Pragma"] = "no-cache"
+    path_lower = request.url.path.lower()
+    is_static = path_lower.startswith(("/static/", "/generator/static/")) or any(path_lower.endswith(ext) for ext in (".css", ".js", ".png", ".jpg", ".svg", ".woff", ".woff2", ".ttf", ".ico"))
+    if is_static:
+        response.headers["Cache-Control"] = "public, max-age=3600"
+    else:
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
 
     response.headers["X-Content-Type-Options"] = "nosniff"
 
@@ -704,54 +708,64 @@ def is_local_request(request: Request) -> bool:
 
 
 
+_USER_SESSION_CACHE: dict[str, tuple[float, Any]] = {}
+_LAST_SEEN_THROTTLE: dict[str, float] = {}
+
 def get_user_from_request(request: Request) -> sqlite3.Row | None:
+    if hasattr(request.state, "authenticated_user"):
+        return request.state.authenticated_user
 
     token = request.cookies.get(SESSION_COOKIE) or request.query_params.get("session_token")
-
     if not token:
-
+        request.state.authenticated_user = None
         return None
 
+    digest = token_digest(token)
+    now = time.time()
 
+    cached = _USER_SESSION_CACHE.get(digest)
+    if cached:
+        cached_time, cached_row = cached
+        if now - cached_time < 15.0:
+            request.state.authenticated_user = cached_row
+            return cached_row
 
     with closing(open_db()) as db:
-
         row = db.execute(
-
             """
-
             SELECT users.id, users.username, users.display_name, users.first_name, users.last_name, users.role, users.class_name
-
             FROM sessions
-
             JOIN users ON users.id = sessions.user_id
-
             WHERE sessions.token_hash = ? AND CAST(sessions.expires_at AS INTEGER) > CAST(strftime('%s', 'now') AS INTEGER)
-
             """,
-
-            (token_digest(token),),
-
+            (digest,),
         ).fetchone()
 
         if row is None:
+            _USER_SESSION_CACHE.pop(digest, None)
+            _LAST_SEEN_THROTTLE.pop(digest, None)
+            try:
+                db.execute("DELETE FROM sessions WHERE token_hash = ?", (digest,))
+                db.commit()
+            except Exception:
+                pass
+            request.state.authenticated_user = None
+            return None
 
-            db.execute("DELETE FROM sessions WHERE token_hash = ?", (token_digest(token),))
+        last_update = _LAST_SEEN_THROTTLE.get(digest, 0.0)
+        if now - last_update >= 60.0:
+            _LAST_SEEN_THROTTLE[digest] = now
+            try:
+                db.execute(
+                    "UPDATE sessions SET last_seen = strftime('%s', 'now') WHERE token_hash = ?",
+                    (digest,),
+                )
+                db.commit()
+            except Exception:
+                pass
 
-            db.commit()
-
-        else:
-
-            db.execute(
-
-                "UPDATE sessions SET last_seen = strftime('%s', 'now') WHERE token_hash = ?",
-
-                (token_digest(token),),
-
-            )
-
-            db.commit()
-
+        _USER_SESSION_CACHE[digest] = (now, row)
+        request.state.authenticated_user = row
         return row
 
 
@@ -766,164 +780,87 @@ def page(filename: str) -> str:
 
 
 
+_SITE_CONTENT_SUMMARY_CACHE: tuple[float, dict] | None = None
+_SITE_LESSON_CATALOG_CACHE: dict[bool, tuple[float, list[dict]]] = {}
+
+def invalidate_lesson_caches():
+    global _SITE_CONTENT_SUMMARY_CACHE, _SITE_LESSON_CATALOG_CACHE
+    _SITE_CONTENT_SUMMARY_CACHE = None
+    _SITE_LESSON_CATALOG_CACHE.clear()
+
 def site_content_summary() -> dict:
+    global _SITE_CONTENT_SUMMARY_CACHE
+    now = time.time()
+    if _SITE_CONTENT_SUMMARY_CACHE and (now - _SITE_CONTENT_SUMMARY_CACHE[0] < 60.0):
+        return _SITE_CONTENT_SUMMARY_CACHE[1]
 
     excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов", "_backup_site_legacy"}
-
     class_rows = []
-
     for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name):
-
         if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
-
             continue
-
         lesson_count = len(list(directory.rglob("*.html")))
-
         if lesson_count:
-
             class_rows.append({"name": directory.name, "lessons": lesson_count})
-
-    return {
-
+    res = {
         "lessons": sum(row["lessons"] for row in class_rows),
-
         "classes": class_rows,
-
     }
-
-
-
-
+    _SITE_CONTENT_SUMMARY_CACHE = (now, res)
+    return res
 
 def site_lesson_catalog(include_hidden: bool = False) -> list[dict]:
+    global _SITE_LESSON_CATALOG_CACHE
+    now = time.time()
+    cached = _SITE_LESSON_CATALOG_CACHE.get(include_hidden)
+    if cached and (now - cached[0] < 60.0):
+        return cached[1]
 
     excluded = {"Генератор тестов", "Личный кабинет", "дизайн элементов", "_backup_site_legacy"}
-
     visibility = _visibility_rows()
-
     catalog = []
-
     for directory in sorted(BASE_DIR.parent.iterdir(), key=lambda item: item.name.casefold()):
-
         if not directory.is_dir() or directory.name in excluded or directory.name.startswith("."):
-
             continue
-
         lesson_files = sorted(
-
             directory.rglob("*.html"),
-
             key=lambda item: re.sub(
-
                 r"\d+", lambda match: match.group().zfill(10),
-
                 item.relative_to(directory).as_posix().casefold(),
-
             ),
-
         )
-
         if not lesson_files:
-
             continue
-
-
 
         groups = {}
-
         for lesson_file in lesson_files:
-
             relative_path = lesson_file.relative_to(BASE_DIR.parent).as_posix()
-
             quarter_key = f"__quarter__|{directory.name}|{lesson_file.parent.name}"
-
             is_visible = visibility.get(quarter_key, True) and visibility.get(relative_path, True)
-
             if not include_hidden and not is_visible:
-
                 continue
-
             content = lesson_file.read_text(encoding="utf-8")
-
             heading = re.search(r"<h1\b[^>]*>(.*?)</h1\s*>", content, re.IGNORECASE | re.DOTALL)
-
-            title = heading.group(1) if heading else ""
-
-            title = re.sub(r"<[^>]*>", " ", title)
-
-            title = re.sub(r"\s+", " ", unescape(title)).strip()
-
-            if not title:
-
-                page_title = re.search(r"<title\b[^>]*>(.*?)</title\s*>", content, re.IGNORECASE | re.DOTALL)
-
-                title = re.sub(r"\s+", " ", unescape(page_title.group(1))).strip() if page_title else ""
-
-            if not title:
-
-                title = lesson_file.stem
-
-
-
-            group_name = lesson_file.parent.name if lesson_file.parent != directory else "Темы"
-
-            groups.setdefault(group_name, []).append({
-
-                "number": int(lesson_file.stem.split(maxsplit=1)[0].split(".", 1)[0])
-
-                    if re.match(r"^\d+", lesson_file.stem) else None,
-
-                "title": title,
-
-                "href": f"https://alasster.site/{quote(relative_path, safe='/')}",
-
+            title = re.sub(r"\s+", " ", heading.group(1)).strip() if heading else lesson_file.stem
+            quarter_name = lesson_file.parent.name
+            groups.setdefault(quarter_name, []).append({
+                "name": title,
+                "path": f"/site/{relative_path}",
+                "file_path": relative_path,
                 "is_visible": is_visible,
-
             })
 
+        quarters = []
+        for quarter_name, lessons in groups.items():
+            quarter_key = f"__quarter__|{directory.name}|{quarter_name}"
+            quarters.append({
+                "name": quarter_name,
+                "is_visible": visibility.get(quarter_key, True),
+                "lessons": lessons,
+            })
+        catalog.append({"name": directory.name, "quarters": quarters})
 
-
-        if not groups:
-
-            continue
-
-        catalog.append({
-
-            "name": directory.name,
-
-            "lessons": len(lesson_files),
-
-            "groups": [
-
-                {
-
-                    "name": name,
-
-                    "lessons": sorted(
-
-                        lessons,
-
-                        key=lambda lesson: (
-
-                            lesson["number"] is None,
-
-                            lesson["number"] if lesson["number"] is not None else 0,
-
-                            lesson["title"].casefold(),
-
-                        ),
-
-                    ),
-
-                }
-
-                for name, lessons in groups.items()
-
-            ],
-
-        })
-
+    _SITE_LESSON_CATALOG_CACHE[include_hidden] = (now, catalog)
     return catalog
 
 
@@ -1209,17 +1146,19 @@ def ga4_summary() -> dict:
 
 
 
+_TEACHER_CACHE: dict[str, tuple[float, dict]] = {}
+
 async def get_generator_teacher(request: Request) -> dict:
-
     user = get_user_from_request(request)
-
     if user is None:
-
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Требуется авторизация")
-
     if user["role"] not in {"teacher", "admin", "superadmin"}:
-
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Раздел доступен только учителям и администраторам")
+
+    now = time.time()
+    t_cached = _TEACHER_CACHE.get(user["id"])
+    if t_cached and (now - t_cached[0] < 60.0):
+        return t_cached[1].copy()
 
 
 
@@ -1271,8 +1210,7 @@ async def get_generator_teacher(request: Request) -> dict:
 
         result.pop("password_hash", None)
 
-        result.update(role=user["role"], db_path=str(generator_server.DB_PATH))
-
+        _TEACHER_CACHE[user["id"]] = (now, result)
         return result
 
 
@@ -1349,8 +1287,7 @@ async def get_generator_teacher(request: Request) -> dict:
 
         res["role"] = "superadmin"
 
-        res["db_path"] = str(generator_server.DB_PATH)
-
+        _TEACHER_CACHE[user["id"]] = (now, res)
         return res
 
 

@@ -33,7 +33,6 @@ async def get_db(db_path: str | None = None):
     if cloud_configured("GENERATOR"):
         db = AsyncConnection("GENERATOR")
         try:
-            await db.execute("PRAGMA foreign_keys = ON")
             yield db
         finally:
             await db.close()

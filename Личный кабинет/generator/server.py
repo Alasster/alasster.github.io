@@ -879,7 +879,6 @@ async def create_launch(req: CreateLaunchRequest, teacher: dict = Depends(get_cu
 
 @app.get("/api/launches")
 async def list_launches(test_id: Optional[str] = None, teacher: dict = Depends(get_current_teacher)):
-    remove_lesson_from_database_files(os.path.dirname(BASE_DIR))
     if teacher.get("role") == "superadmin":
         query = "SELECT l.*, t.subject, t.grade_level, t.exam_type FROM launches l JOIN tests t ON l.test_id = t.id"
         params = []
@@ -897,21 +896,33 @@ async def list_launches(test_id: Optional[str] = None, teacher: dict = Depends(g
     async with get_db() as db:
         cursor = await db.execute(query, params)
         rows = await cursor.fetchall()
+
+        # Быстрый сбор статистики всех сессий одним запросом без N+1 задержек
+        sc_all = await db.execute("""
+            SELECT 
+                launch_id,
+                SUM(CASE WHEN status != 'removed' THEN 1 ELSE 0 END) as total_attempts,
+                SUM(CASE WHEN status IN ('submitted', 'time_expired') THEN 1 ELSE 0 END) as submitted_count,
+                SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
+                SUM(CASE WHEN status IN ('in_waiting', 'waiting_approval') THEN 1 ELSE 0 END) as waiting_count
+            FROM student_attempts
+            GROUP BY launch_id
+        """)
+        stats_map = {row["launch_id"]: dict(row) for row in await sc_all.fetchall()}
+
         result = []
         for r in rows:
             ld = dict(r)
-            ld["allowed_classes"] = json.loads(ld["allowed_classes_json"])
-            # Подсчет статистики учеников
-            sc = await db.execute("""
-                SELECT 
-                    SUM(CASE WHEN status != 'removed' THEN 1 ELSE 0 END) as total_attempts,
-                    SUM(CASE WHEN status IN ('submitted', 'time_expired') THEN 1 ELSE 0 END) as submitted_count,
-                    SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
-                    SUM(CASE WHEN status IN ('in_waiting', 'waiting_approval') THEN 1 ELSE 0 END) as waiting_count
-                FROM student_attempts WHERE launch_id = ?
-            """, (ld["id"],))
-            stat = await sc.fetchone()
-            ld["stats"] = dict(stat)
+            try:
+                ld["allowed_classes"] = json.loads(ld["allowed_classes_json"]) if ld.get("allowed_classes_json") else []
+            except Exception:
+                ld["allowed_classes"] = []
+            ld["stats"] = stats_map.get(ld["id"], {
+                "total_attempts": 0,
+                "submitted_count": 0,
+                "in_progress_count": 0,
+                "waiting_count": 0
+            })
             result.append(ld)
         return result
 

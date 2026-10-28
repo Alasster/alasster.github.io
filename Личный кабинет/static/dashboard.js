@@ -1100,10 +1100,15 @@ function renderLessonsCatalog(classes) {
   lessonCatalogRetry.hidden = true;
 }
 
+let cachedLessonCatalogClasses = null;
+
 async function loadLessonsCatalog() {
+  if (cachedLessonCatalogClasses) {
+    renderLessonsCatalog(cachedLessonCatalogClasses);
+  }
   if (lessonCatalogRequest) return lessonCatalogRequest;
-  if (lessonCatalogStatus) lessonCatalogStatus.textContent = 'Обновление списка...';
-  if (currentSection === 'lessons' && lessonsSummaryText === 'Загрузка списка...') {
+  if (!cachedLessonCatalogClasses && lessonCatalogStatus) lessonCatalogStatus.textContent = 'Обновление списка...';
+  if (!cachedLessonCatalogClasses && currentSection === 'lessons' && lessonsSummaryText === 'Загрузка списка...') {
     const titleNode = document.querySelector('.workspace-header h1');
     if (titleNode) titleNode.textContent = 'Обновление списка...';
   }
@@ -1114,6 +1119,7 @@ async function loadLessonsCatalog() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Не удалось загрузить уроки.');
       lessonVisibility = data.visibility || {};
+      cachedLessonCatalogClasses = data.classes;
       renderLessonsCatalog(data.classes);
     } catch (error) {
       const msg = error.message || 'Не удалось загрузить уроки.';

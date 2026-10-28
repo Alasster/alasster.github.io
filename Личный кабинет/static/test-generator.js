@@ -640,6 +640,9 @@ function setArchiveFilter(isArchived) {
 }
 
 async function loadTests() {
+  if (currentTests && currentTests.length > 0) {
+    filterAndRenderTests();
+  }
   try {
     const res = await fetch(`/api/tests?archived=${isArchiveView}`);
     if (!res.ok) {
@@ -4791,6 +4794,9 @@ async function handleDeleteSitePage() {
 // =========================================================================
 
 async function loadLaunches() {
+  if (currentLaunches && currentLaunches.length > 0) {
+    renderLaunchesTable();
+  }
   try {
     const res = await fetch("/api/launches");
     if (!res.ok) {
