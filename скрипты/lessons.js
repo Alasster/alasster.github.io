@@ -1,3 +1,14 @@
+// Start backend discovery before initializing the lesson's account button.
+(() => {
+  if (window.AlassterBackend || window.AlassterBackendLoading) return;
+  const source = new URL('backend-connection.js?v=20261029-1', document.currentScript.src);
+  window.AlassterBackendLoading = new Promise(resolve => {
+    const script = document.createElement('script');
+    script.src = source.href;
+    script.onload = script.onerror = resolve;
+    document.head.appendChild(script);
+  });
+})();
 /* ==========================================================================
    ALASSTER.SITE — UNIFIED LESSON CONTROLLER (ALL LESSONS 9-11)
    ========================================================================== */
@@ -7271,6 +7282,7 @@ const slides = [...document.querySelectorAll('.slide')];
 
 (function() {
   function getCabinetBaseUrl() {
+    if (window.AlassterBackend?.url) return window.AlassterBackend.url;
     // If running on port 8010, same origin
     if (window.location.port === '8010') return '';
     // If local development, points to the cabinet port 8010
@@ -7303,7 +7315,9 @@ const slides = [...document.querySelectorAll('.slide')];
   }
 
   async function checkServerSession() {
+    if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     const base = getCabinetBaseUrl();
+    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) return getStoredUser();
     try {
       const res = await fetch(`${base}/api/me`, {
         method: 'GET',
@@ -7326,6 +7340,12 @@ const slides = [...document.querySelectorAll('.slide')];
 
   async function performLogout() {
     const base = getCabinetBaseUrl();
+    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) {
+      setStoredUser(null);
+      renderAuthButton(null);
+      location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
+      return;
+    }
     try {
       await fetch(`${base}/api/logout`, {
         method: 'POST',
@@ -7466,6 +7486,8 @@ const slides = [...document.querySelectorAll('.slide')];
   }
 
   async function initAuthWidget() {
+    if (window.AlassterBackendLoading) await window.AlassterBackendLoading;
+    if (window.AlassterBackend) await window.AlassterBackend.configReady;
     ensureAuthContainer();
     // 1. Instant render from cached localStorage (zero layout shift)
     const cachedUser = getStoredUser();

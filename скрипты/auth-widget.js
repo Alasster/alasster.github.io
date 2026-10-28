@@ -14,6 +14,7 @@
   } catch (e) {}
 
   function getCabinetBaseUrl() {
+    if (window.AlassterBackend?.url) return window.AlassterBackend.url;
     // If running on port 8010, same origin
     if (window.location.port === '8010') return '';
     // If local development, points to the cabinet port 8010
@@ -75,7 +76,11 @@
   }
 
   async function checkServerSession() {
+    if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     const base = getCabinetBaseUrl();
+    // On a separate Render domain, authentication happens on its own page.
+    // The cached name here is display-only; all permissions stay server-side.
+    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) return getStoredUser();
     if (window.location.protocol === 'https:' && base.startsWith('http://')) {
       return getStoredUser();
     }
@@ -101,6 +106,12 @@
 
   async function performLogout() {
     const base = getCabinetBaseUrl();
+    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) {
+      setStoredUser(null);
+      renderAuthButton(null);
+      location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
+      return;
+    }
     if (!base.startsWith('http://') || window.location.protocol !== 'https:') {
       try {
         await fetch(`${base}/api/logout`, {
@@ -266,6 +277,7 @@
 
   // Initialize
   async function initAuthWidget() {
+    if (window.AlassterBackend) await window.AlassterBackend.configReady;
     ensureAuthContainer();
     checkUrlUserPayload();
     // Render immediate optimistic state from localStorage

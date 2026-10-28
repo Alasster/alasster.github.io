@@ -5,6 +5,12 @@ import logging
 import asyncio
 import sqlite3
 from datetime import datetime, timezone
+try:
+    from cloud_db import AsyncConnection, configured as cloud_configured
+except ImportError:
+    import sys
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    from cloud_db import AsyncConnection, configured as cloud_configured
 
 DB_DIR = os.environ.get("BAGALAU_DB_DIR", os.path.join(os.path.dirname(__file__), "data"))
 DB_PATH = os.path.join(DB_DIR, "bagalau.sqlite3")
@@ -15,19 +21,24 @@ from contextlib import asynccontextmanager
 logger = logging.getLogger("bagalau.db")
 
 _current_db_path: ContextVar[str | None] = ContextVar("current_db_path", default=None)
-_fallback_db_path: str | None = None
 
 def set_current_db_path(path: str | None) -> None:
-    global _fallback_db_path
-    _fallback_db_path = path
     _current_db_path.set(path)
 
 def get_current_db_path() -> str:
-    return _current_db_path.get() or _fallback_db_path or DB_PATH
+    return _current_db_path.get() or DB_PATH
 
 @asynccontextmanager
 async def get_db(db_path: str | None = None):
-    target_path = str(db_path or _current_db_path.get() or _fallback_db_path or DB_PATH)
+    if cloud_configured("GENERATOR"):
+        db = AsyncConnection("GENERATOR")
+        try:
+            await db.execute("PRAGMA foreign_keys = ON")
+            yield db
+        finally:
+            await db.close()
+        return
+    target_path = str(db_path or _current_db_path.get() or DB_PATH)
     target_dir = os.path.dirname(os.path.abspath(target_path))
     os.makedirs(target_dir, exist_ok=True)
     db = await aiosqlite.connect(target_path, timeout=30)
@@ -267,6 +278,8 @@ async def init_db(db_path: str | None = None):
         await db.execute("CREATE INDEX IF NOT EXISTS idx_attempts_token ON student_attempts(attempt_token);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_answers_attempt_id ON student_answers(attempt_id);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_rosters_teacher_class ON class_rosters(teacher_id, class_name);")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_attempts_status_deadline ON student_attempts(status, server_deadline);")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_tests_teacher ON tests(teacher_id, is_archived);")
 
         # Initial teacher account
         cursor = await db.execute("SELECT COUNT(*) as cnt FROM teachers")

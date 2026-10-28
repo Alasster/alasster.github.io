@@ -13,5 +13,10 @@ __pycache__/
 *.exe
 .vscode/
 _backup_site_legacy/
+*.sqlite3
+*.sqlite
+*.db
+Личный кабинет/backups/
+Личный кабинет/generator/backups/
 _backup_site_legacy/
 

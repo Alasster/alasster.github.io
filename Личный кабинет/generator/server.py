@@ -51,7 +51,10 @@ app = FastAPI(title="«Бағалау» — Система проведения 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=(["https://alasster.site", "https://www.alasster.site", "https://alasster.github.io"]
+                   + ([os.environ["RENDER_EXTERNAL_URL"].rstrip("/")] if os.environ.get("RENDER_EXTERNAL_URL") else [])
+                   + [v.strip() for v in os.environ.get("ALASSTER_EXTRA_ORIGINS", "").split(",") if v.strip()])
+                  if os.environ.get("RENDER") else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -198,6 +201,8 @@ async def auto_grade_attempt(db, attempt_id: str, snapshot_tasks_json: str):
     att_row = await cur_att.fetchone()
     stu_var = str(att_row["variant"] if att_row and "variant" in att_row.keys() and att_row["variant"] else "1")
 
+    grade_updates = []
+    grade_inserts = []
     for t in tasks:
         t_var = str(t.get("variant") or "1")
         if t_var not in (stu_var, "all", "1,2"):
@@ -225,17 +230,14 @@ async def auto_grade_attempt(db, attempt_id: str, snapshot_tasks_json: str):
         now_str = datetime.now().isoformat()
 
         if ans_row:
-            await db.execute("""
-                UPDATE student_answers
-                SET auto_score = ?, final_score = COALESCE(manual_score, ?), is_graded = ?, updated_at = ?
-                WHERE id = ?
-            """, (score, final_sc, 1 if is_graded else 0, now_str, ans_row["id"]))
+            grade_updates.append((score, final_sc, 1 if is_graded else 0, now_str, ans_row["id"]))
         else:
             ans_id = str(uuid.uuid4())
-            await db.execute("""
-                INSERT INTO student_answers (id, attempt_id, task_id, answer_json, version, auto_score, final_score, is_graded, updated_at)
-                VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)
-            """, (ans_id, attempt_id, t_id, None, score, final_sc, 1 if is_graded else 0, now_str))
+            grade_inserts.append((ans_id, attempt_id, t_id, None, score, final_sc, 1 if is_graded else 0, now_str))
+    if grade_updates:
+        await db.executemany("UPDATE student_answers SET auto_score = ?, final_score = COALESCE(manual_score, ?), is_graded = ?, updated_at = ? WHERE id = ?", grade_updates)
+    if grade_inserts:
+        await db.executemany("INSERT INTO student_answers (id, attempt_id, task_id, answer_json, version, auto_score, final_score, is_graded, updated_at) VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)", grade_inserts)
 
 # --- HTML Страницы ---
 @app.get("/", response_class=HTMLResponse)
@@ -737,6 +739,8 @@ async def reorder_tasks(test_id: str, task_ids: List[str], teacher: dict = Depen
 
 @app.post("/api/upload/image")
 async def upload_task_image(file: UploadFile = File(...), teacher: dict = Depends(get_current_teacher)):
+    if os.environ.get("RENDER"):
+        raise HTTPException(status_code=409, detail="Загрузка файлов в облако пока отключена. Используйте внешнюю ссылку на изображение.")
     filename = file.filename or "image.png"
     ext = os.path.splitext(filename)[1].lower()
     allowed_exts = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"}
@@ -1272,11 +1276,12 @@ async def teacher_student_action(
 
 # SSE Stream для живого мониторинга
 @app.get("/api/launches/{launch_id}/stream")
-async def live_stream(launch_id: str, token: Optional[str] = Query(None), request: Request = None):
-    # Проверяем авторизацию учителя
-    teacher_token = token or request.cookies.get("bagalau_teacher_session")
-    if not teacher_token or teacher_token not in TEACHER_SESSIONS:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+async def live_stream(launch_id: str, token: Optional[str] = Query(None), request: Request = None,
+                      teacher: dict = Depends(get_current_teacher)):
+    async with get_db() as db:
+        cursor = await db.execute("SELECT id FROM launches WHERE id = ? AND teacher_id = ?", (launch_id, teacher["id"]))
+        if not await cursor.fetchone():
+            raise HTTPException(status_code=404, detail="Запуск не найден")
 
     queue = asyncio.Queue()
     if launch_id not in LIVE_STREAMS:
@@ -1368,6 +1373,12 @@ async def grade_single_answer(launch_id: str, req: GradeSingleAnswerRequest, tea
             raise HTTPException(status_code=404, detail="Запуск не найден")
 
         # Обновляем или вставляем оценку учителя
+        owner = await db.execute("SELECT id FROM student_attempts WHERE id = ? AND launch_id = ?", (req.attempt_id, launch_id))
+        if not await owner.fetchone():
+            raise HTTPException(status_code=404, detail="Попытка не найдена в этом запуске")
+        snapshot = await (await db.execute("SELECT snapshot_tasks_json FROM launches WHERE id = ?", (launch_id,))).fetchone()
+        if req.task_id not in {str(t["id"]) for t in json.loads(snapshot["snapshot_tasks_json"])}:
+            raise HTTPException(status_code=400, detail="Задание не принадлежит этой работе")
         cursor = await db.execute("SELECT id FROM student_answers WHERE attempt_id = ? AND task_id = ?", (req.attempt_id, req.task_id))
         ans_row = await cursor.fetchone()
         if ans_row:
@@ -2092,6 +2103,17 @@ async def student_start_exam(attempt: dict = Depends(get_current_student_attempt
         "server_deadline": deadline_iso
     }
 
+async def validate_attempt_tasks(db, attempt: dict, task_ids) -> None:
+    row = await (await db.execute("SELECT snapshot_tasks_json FROM launches WHERE id = ?", (attempt["launch_id"],))).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Работа не найдена")
+    variant = str(attempt.get("variant") or "1")
+    allowed = {str(t["id"]) for t in json.loads(row["snapshot_tasks_json"])
+               if str(t.get("variant") or "1") in {variant, "all", "1,2"}}
+    if any(str(task_id) not in allowed for task_id in task_ids):
+        raise HTTPException(status_code=400, detail="Задание не принадлежит варианту этой попытки")
+
+
 @app.post("/api/student/save")
 async def student_save_answer(req: SaveAnswerRequest, attempt: dict = Depends(get_current_student_attempt)):
     if attempt["status"] != "in_progress":
@@ -2108,6 +2130,7 @@ async def student_save_answer(req: SaveAnswerRequest, attempt: dict = Depends(ge
         current = await (await db.execute("SELECT status FROM student_attempts WHERE id = ?", (attempt["id"],))).fetchone()
         if not current or current["status"] != "in_progress":
             raise HTTPException(status_code=403, detail="Попытка уже завершена")
+        await validate_attempt_tasks(db, attempt, [req.task_id])
         c = await db.execute("SELECT id, version FROM student_answers WHERE attempt_id = ? AND task_id = ?", (attempt["id"], req.task_id))
         row = await c.fetchone()
         if row:
@@ -2149,6 +2172,7 @@ async def student_batch_save(req: BatchSaveAnswersRequest, attempt: dict = Depen
         current = await (await db.execute("SELECT status FROM student_attempts WHERE id = ?", (attempt["id"],))).fetchone()
         if not current or current["status"] != "in_progress":
             raise HTTPException(status_code=403, detail="Попытка уже завершена")
+        await validate_attempt_tasks(db, attempt, [item.task_id for item in req.answers])
         for item in req.answers:
             ans_json = json.dumps(item.answer, ensure_ascii=False)
             c = await db.execute("SELECT id, version FROM student_answers WHERE attempt_id = ? AND task_id = ?", (attempt["id"], item.task_id))
@@ -2216,6 +2240,7 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
 
             # Если вместе с подтверждением пришли ответы (req.answers), атомарно сохраняем их в базу
             if req.answers and isinstance(req.answers, dict):
+                await validate_attempt_tasks(db, attempt, req.answers.keys())
                 for task_id, ans_val in req.answers.items():
                     if isinstance(ans_val, dict) and "answer" in ans_val:
                         raw_ans = ans_val["answer"]
@@ -2539,10 +2564,13 @@ def generate_native_lesson_html(
         "bg_color_v1": bg_color_v1 or "#fce8e6",
         "bg_color_v2": bg_color_v2 or "#e6f4ea",
         "server_urls": server_urls or [exam_base_url.rstrip("/")],
-        "tasks": tasks
+        # The public wrapper only calculates counts/scores. Actual tasks and
+        # answer keys are served by the authenticated student endpoints.
+        "tasks": [{"variant": str(task.get("variant") or "1"), "max_score": task.get("max_score", 1)} for task in tasks]
     }
     exam_config_json = json.dumps(config_payload, ensure_ascii=False).replace("</", "<\\/")
-    template = Template(open(os.path.join(BASE_DIR, "templates", "lesson.html"), encoding="utf-8").read())
+    with open(os.path.join(BASE_DIR, "templates", "lesson.html"), encoding="utf-8") as source:
+        template = Template(source.read())
     return template.safe_substitute(
         grade=escape(grade),
         quarter=escape(quarter),

@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import hashlib
 import hmac
 import json
@@ -24,13 +25,14 @@ from contextlib import closing
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 from fastapi import FastAPI, HTTPException, Request, Response, status, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from cloud_db import Connection as CloudConnection, configured as cloud_configured
 
 try:
     from google.analytics.data_v1beta import BetaAnalyticsDataClient
@@ -58,7 +60,7 @@ drive_root = BASE_DIR.parent.parent
 if (drive_root / "alasster.github.io").exists():
     MATERIALS_DIR = drive_root / "Мои материалы"
 else:
-    MATERIALS_DIR = Path("G:/Мой диск/Мои материалы")
+    MATERIALS_DIR = BASE_DIR / ".runtime" / "materials" if os.environ.get("RENDER") else Path("G:/Мой диск/Мои материалы")
 try:
     MATERIALS_DIR.mkdir(parents=True, exist_ok=True)
     (MATERIALS_DIR / "Общие").mkdir(parents=True, exist_ok=True)
@@ -93,7 +95,16 @@ load_local_env()
 PERSONAL_CABINET_HOST = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
 PERSONAL_CABINET_PORT = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
 os.environ.setdefault("BAGALAU_STUDENT_PORT", "8001")
-os.environ.pop("BAGALAU_PUBLIC_URL", None)
+if not os.environ.get("RENDER"):
+    os.environ.pop("BAGALAU_PUBLIC_URL", None)
+else:
+    os.environ.setdefault("BAGALAU_PUBLIC_URL", os.environ.get("RENDER_EXTERNAL_URL", ""))
+
+CLOUD_MODE = cloud_configured("GENERATOR")
+ALLOWED_ORIGINS = ["https://alasster.site", "https://www.alasster.site", "https://alasster.github.io"]
+ALLOWED_ORIGINS.extend(v.strip() for v in os.environ.get("ALASSTER_EXTRA_ORIGINS", "").split(",") if v.strip())
+if os.environ.get("RENDER_EXTERNAL_URL"):
+    ALLOWED_ORIGINS.append(os.environ["RENDER_EXTERNAL_URL"].rstrip("/"))
 
 DB_PATH = Path(os.environ.get("PERSONAL_CABINET_DB_PATH", BASE_DIR / "data" / "cabinet.sqlite3"))
 SESSION_COOKIE = "personal_cabinet_session"
@@ -108,7 +119,7 @@ ALLOWED_ROLES = {"user", "teacher", "admin", "superadmin"}
 app = FastAPI(title="Личный кабинет", docs_url=None, redoc_url=None)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS if os.environ.get("RENDER") else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,6 +136,22 @@ app.mount("/site", StaticFiles(directory=BASE_DIR.parent, html=True), name="site
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
+    if generator_server is not None:
+        generator_server.set_current_db_path(None)
+    if request.url.path.startswith("/site/"):
+        relative = request.url.path[len("/site/"):]
+        parts = relative.replace("\\", "/").split("/")
+        public_roots = {"index.html", "9 класс", "10 ЕМН", "10 ОГН", "11 класс", "Python основы", "скрипты", "стили", "Файлы"}
+        if (parts[0] not in public_roots or any(p.startswith(".") for p in parts)
+                or Path(relative).suffix.lower() in {".py", ".sqlite3", ".db", ".sqlite", ".env", ".bak", ".bat", ".ps1"}):
+            return Response(status_code=404)
+    if os.environ.get("RENDER") and request.method not in {"GET", "HEAD", "OPTIONS"}:
+        origin = request.headers.get("origin")
+        if origin and origin not in ALLOWED_ORIGINS:
+            return JSONResponse({"detail": "Недопустимый источник запроса"}, status_code=403)
+    clean_path = request.url.path.removeprefix("/generator")
+    if CLOUD_MODE and clean_path.startswith("/api/backup"):
+        return JSONResponse({"detail": "Облачные копии управляются отдельно от рабочих данных"}, status_code=403)
     # Исходные шаблоны хранятся на сервере и доступны только через
     # контролируемые маршруты /login, /register и /. Прямые обращения к
     # именам файлов не должны становиться альтернативным способом доступа.
@@ -186,6 +213,8 @@ EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def open_db() -> sqlite3.Connection:
+    if cloud_configured("CABINET"):
+        return CloudConnection("CABINET")
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(DB_PATH, timeout=10.0)
     connection.row_factory = sqlite3.Row
@@ -514,6 +543,33 @@ async def get_generator_teacher(request: Request) -> dict:
     if user["role"] not in {"teacher", "admin", "superadmin"}:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Раздел доступен только учителям и администраторам")
 
+    if CLOUD_MODE:
+        generator_server.set_current_db_path(str(generator_server.DB_PATH))
+        teacher_id = f"cabinet_{user['id']}"
+        async with generator_server.get_db(generator_server.DB_PATH) as db:
+            # The migrated legacy owner is explicitly assigned to the cabinet's
+            # existing superadmin. New users never inherit a legacy teacher.
+            if user["role"] == "superadmin":
+                cursor = await db.execute("SELECT * FROM teachers WHERE lower(username) = lower(?)", (user["username"],))
+                teacher = await cursor.fetchone()
+                if teacher is None:
+                    cursor = await db.execute("SELECT * FROM teachers WHERE id NOT LIKE 'cabinet_%' ORDER BY created_at, id LIMIT 1")
+                    teacher = await cursor.fetchone()
+            else:
+                cursor = await db.execute("SELECT * FROM teachers WHERE id = ?", (teacher_id,))
+                teacher = await cursor.fetchone()
+            if teacher is None:
+                await db.execute("INSERT OR IGNORE INTO teachers (id, username, password_hash, full_name, created_at) VALUES (?, ?, ?, ?, ?)",
+                                 (teacher_id, f"cabinet_{user['id']}", generator_server.hash_password(secrets.token_urlsafe(48)),
+                                  user["display_name"], datetime.now().isoformat()))
+                await db.commit()
+                cursor = await db.execute("SELECT * FROM teachers WHERE id = ?", (teacher_id,))
+                teacher = await cursor.fetchone()
+        result = dict(teacher)
+        result.pop("password_hash", None)
+        result.update(role=user["role"], db_path=str(generator_server.DB_PATH))
+        return result
+
     # Superadmin keeps the primary bagalau.sqlite3 database intact
     if user["role"] == "superadmin":
         generator_server.set_current_db_path(str(generator_server.DB_PATH))
@@ -590,7 +646,8 @@ async def get_generator_teacher(request: Request) -> dict:
 def load_generator_server():
     os.environ["BAGALAU_DB_DIR"] = str(GENERATOR_DATA_DIR)
     os.environ["BAGALAU_STUDENT_PORT"] = "8001"
-    os.environ.pop("BAGALAU_PUBLIC_URL", None)
+    if not os.environ.get("RENDER"):
+        os.environ.pop("BAGALAU_PUBLIC_URL", None)
     generator_path = str(GENERATOR_DIR)
     sys.path.insert(0, generator_path)
     try:
@@ -699,7 +756,8 @@ async def startup() -> None:
     app.mount("/generator", generator_server.app, name="test_generator")
     generator_timer_task = asyncio.create_task(generator_server.background_timer_and_heartbeat_checker())
     try:
-        await start_student_gateway()
+        if not os.environ.get("RENDER"):
+            await start_student_gateway()
     except Exception as e:
         LOGGER.warning("Could not bind port 8001: %s", e)
     try:
@@ -857,6 +915,9 @@ async def _maintain_ssh_tunnel() -> None:
 
 async def start_internet_tunnel() -> None:
     global internet_tunnel_task
+    if os.environ.get("RENDER"):
+        _save_public_url(os.environ.get("RENDER_EXTERNAL_URL"))
+        return
     _save_public_url(None)
     ts_url = await asyncio.to_thread(_try_tailscale_funnel)
     if ts_url:
@@ -904,13 +965,13 @@ def dashboard(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return_to = request.query_params.get("return_to")
+    return_to = safe_return_to(request.query_params.get("return_to"))
     force = request.query_params.get("force") == "1"
     session_token = request.cookies.get(SESSION_COOKIE) or request.query_params.get("session_token")
     user = get_user_from_request(request)
 
     if user is not None and session_token and not force:
-        if return_to:
+        if return_to and return_to != "/":
             sep = "&" if "?" in return_to else "?"
             user_data = json.dumps({
                 "id": user["id"],
@@ -1314,6 +1375,29 @@ def logout(request: Request, response: Response):
     return {"ok": True}
 
 
+def safe_return_to(value: str | None) -> str:
+    if not value:
+        return "/"
+    if value.startswith("/") and not value.startswith("//"):
+        return value
+    parsed = urlparse(value)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    if parsed.scheme == "https" and origin in ALLOWED_ORIGINS and not parsed.username:
+        return value
+    if not os.environ.get("RENDER") and parsed.hostname in {"localhost", "127.0.0.1"}:
+        return value
+    return "/"
+
+
+@app.get("/logout")
+def logout_page(request: Request):
+    # Top-level navigation keeps HttpOnly + SameSite=Lax cookies working when
+    # the public site and Render have different domains.
+    response = RedirectResponse(safe_return_to(request.query_params.get("return_to")), status_code=303)
+    logout(request, response)
+    return response
+
+
 
 # =========================================================================
 # Мои материалы (ImgBB-подобный медиахостинг с поддержкой Google Диска)
@@ -1519,6 +1603,8 @@ async def upload_materials_endpoint(request: Request, files: list[UploadFile] = 
     user = get_user_from_request(request)
     if user is None:
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
+    if os.environ.get("RENDER"):
+        raise HTTPException(status_code=409, detail="Загрузка файлов в облако пока отключена. Можно добавлять внешние ссылки.")
 
     folder = folder.strip() or "Общие"
     target_dir = MATERIALS_DIR / folder
@@ -1866,5 +1952,5 @@ if __name__ == "__main__":
     import uvicorn
 
     host = os.environ.get("PERSONAL_CABINET_HOST", "0.0.0.0")
-    port = int(os.environ.get("PERSONAL_CABINET_PORT", "8010"))
+    port = int(os.environ.get("PORT", os.environ.get("PERSONAL_CABINET_PORT", "8010")))
     uvicorn.run("server:app", host=host, port=port, reload=False, access_log=False, forwarded_allow_ips="*")

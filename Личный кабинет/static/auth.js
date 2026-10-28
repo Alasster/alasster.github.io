@@ -125,7 +125,16 @@ loginForm.addEventListener('submit', async (event) => {
         localStorage.setItem('alasster_logged_in', '1');
       } catch (e) {}
     }
-    const returnTo = new URLSearchParams(window.location.search).get('return_to');
+    const requestedReturn = new URLSearchParams(window.location.search).get('return_to');
+    let returnTo = '';
+    if (requestedReturn) {
+      try {
+        const target = new URL(requestedReturn, location.origin);
+        const allowed = [location.origin, 'https://alasster.site', 'https://www.alasster.site', 'https://alasster.github.io'];
+        const local = ['localhost', '127.0.0.1'].includes(location.hostname) && ['localhost', '127.0.0.1'].includes(target.hostname);
+        if (allowed.includes(target.origin) || local) returnTo = target.href;
+      } catch (_) {}
+    }
     if (returnTo) {
       try {
         const userJson = JSON.stringify(data.user);
