@@ -1,3 +1,19 @@
+from __future__ import annotations
+
+"""Small sqlite-compatible adapter for Turso's documented SQL-over-HTTP API.
+
+Only server-side environment variables contain credentials. Connections keep
+their own transaction baton; uncertain writes are never automatically retried.
+"""
+
+import asyncio
+import base64
+import os
+import sqlite3
+from urllib.parse import urlparse
+
+import httpx
+
 _SHARED_CLIENTS: dict[str, httpx.Client] = {}
 
 def _get_shared_client(kind: str) -> httpx.Client:
@@ -7,21 +23,6 @@ def _get_shared_client(kind: str) -> httpx.Client:
         client = httpx.Client(timeout=30.0, limits=limits)
         _SHARED_CLIENTS[kind] = client
     return client
-
-"""Small sqlite-compatible adapter for Turso's documented SQL-over-HTTP API.
-
-Only server-side environment variables contain credentials. Connections keep
-their own transaction baton; uncertain writes are never automatically retried.
-"""
-from __future__ import annotations
-
-import asyncio
-import base64
-import os
-import sqlite3
-from urllib.parse import urlparse
-
-import httpx
 
 
 def configured(kind: str) -> bool:
