@@ -323,11 +323,6 @@ def is_local_request(request: Request) -> bool:
 def get_user_from_request(request: Request) -> sqlite3.Row | None:
     token = request.cookies.get(SESSION_COOKIE) or request.query_params.get("session_token")
     if not token:
-        if is_local_request(request) and request.url.path not in ("/login", "/register"):
-            with closing(open_db()) as db:
-                return db.execute(
-                    "SELECT id, username, display_name, first_name, last_name, role, class_name FROM users WHERE role = 'superadmin' ORDER BY id LIMIT 1"
-                ).fetchone()
         return None
 
     with closing(open_db()) as db:
@@ -1106,7 +1101,7 @@ def login(payload: LoginRequest, request: Request, response: Response):
     email = payload.username.strip().lower()
     with closing(open_db()) as db:
         user = db.execute(
-            "SELECT id, username, display_name, password_hash, role FROM users WHERE username = ?",
+            "SELECT id, username, display_name, first_name, last_name, password_hash, role, class_name FROM users WHERE username = ?",
             (email,),
         ).fetchone()
 
@@ -1131,8 +1126,20 @@ def login(payload: LoginRequest, request: Request, response: Response):
         httponly=True,
         samesite="lax",
         secure=is_https,
+        path="/",
     )
-    return {"ok": True, "user": {"username": user["username"], "display_name": user["display_name"], "role": user["role"]}}
+    return {
+        "ok": True,
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "display_name": user["display_name"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "role": user["role"],
+            "class_name": user["class_name"],
+        }
+    }
 
 
 @app.post("/api/register")
@@ -1303,7 +1310,7 @@ def logout(request: Request, response: Response):
         with closing(open_db()) as db:
             db.execute("DELETE FROM sessions WHERE token_hash = ?", (token_digest(token),))
             db.commit()
-    response.delete_cookie(SESSION_COOKIE)
+    response.delete_cookie(SESSION_COOKIE, path="/")
     return {"ok": True}
 
 

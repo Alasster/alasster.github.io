@@ -125,9 +125,24 @@
     const generatorUrl = `${base}/generator/teacher`;
 
     if (user) {
-      const displayName = user.display_name || user.first_name || user.username || 'Учитель';
-      const roleLabel = (user.role === 'superadmin' || user.role === 'admin') ? 'Администратор' : 'Учитель';
-      const initials = getUserInitials(displayName);
+      let displayName = user.display_name;
+      if (!displayName && (user.first_name || user.last_name)) {
+        displayName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+      }
+      if (!displayName) displayName = user.username || 'Пользователь';
+
+      let roleLabel = 'УЧЕНИК';
+      if (user.role === 'superadmin') {
+        roleLabel = 'СУПЕР-АДМИН';
+      } else if (user.role === 'admin') {
+        roleLabel = 'АДМИНИСТРАТОР';
+      } else if (user.role === 'teacher') {
+        roleLabel = 'УЧИТЕЛЬ';
+      } else if (user.role === 'user') {
+        roleLabel = 'УЧЕНИК';
+      }
+
+      const initials = getUserInitials(user, displayName);
 
       container.innerHTML = `
         <div class="neu-auth-wrapper">
@@ -184,10 +199,17 @@
     }
   }
 
-  function getUserInitials(name) {
-    const parts = String(name || 'Учитель').trim().split(/\s+/).filter(Boolean);
+  function getUserInitials(user, name) {
+    if (user && user.first_name && user.last_name) {
+      const f = String(user.first_name).trim();
+      const l = String(user.last_name).trim();
+      if (f && l) return (f[0] + l[0]).toUpperCase();
+    }
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
     if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return parts[0].slice(0, 2).toUpperCase();
+    if (parts.length === 1 && parts[0].length >= 2) return parts[0].slice(0, 2).toUpperCase();
+    if (parts.length === 1 && parts[0].length === 1) return parts[0].toUpperCase();
+    return '??';
   }
 
   function escapeHtml(str) {
