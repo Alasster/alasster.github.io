@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 
 <html lang="ru">
   <head>
@@ -12,7 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../стили/lessons.css?v=neumorph-2026-10-28-26">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v43">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
   <body class="lesson-page lesson-9-4" data-lesson-id="9-4">
 
@@ -74,14 +75,21 @@
 
       <section class="slide active" aria-label="Начинаем">
         <div class="wrap">
-          <header class="slidehead"><span class="eyebrow">01 / 07 · Начинаем</span>
+          <header class="slidehead"><span class="eyebrow">01 · ВВЕДЕНИЕ</span>
             <button class="action advance" data-next>Далее</button>
           </header>
           <div class="hero">
-            <div><span class="tag">9 класс · урок 4</span>
-              <h1>IP-адрес.<br><span class="accent">Маска подсети</span></h1>
+            <div><h1>IP-адрес.<br><span class="accent">Маска подсети</span></h1>
               <p class="lead">Как по IP-адресу понять, какая часть относится к сети, а какая — к компьютеру?</p>
-              <p>Будем читать маску, работать с битами и находить адрес сети.</p>
+<div class="chips">
+  <span class="chip"><i data-flaticon="settings-sliders"></i> маска подсети</span>
+  <span class="chip"><i data-flaticon="network"></i> адрес сети</span>
+  <span class="chip"><i data-flaticon="computer"></i> адрес узла</span>
+  <span class="chip"><i data-flaticon="binary"></i> двоичная маска</span>
+</div>
+            <div class="definition">
+              <strong>9.1.2.2 — определять адрес сети по заданному IP-адресу узла и маске</strong>
+            </div>
             </div>
             <div class="paper">
               <div class="bigicon">🧭</div>
@@ -96,24 +104,38 @@
       <section class="slide" aria-label="Повторение">
         <div class="wrap">
           <header class="slidehead">
-            <span class="eyebrow">02 / 07 · Вспоминаем урок 3</span>
+            <span class="eyebrow">02 · АДРЕС ПРОТОКОЛЫ</span>
             <button class="action advance" data-next>Далее</button>
           </header>
           <h2>IP-адрес и протоколы: что помним?</h2>
           <p>Пять вопросов по одному. Выбери ответ, прочитай пояснение и переходи к следующему вопросу.</p>
-          <div class="paper">
-            <p class="score" id="reviewCount"></p>
+                    <div class="paper" id="reviewQuiz">
+            <div class="controlsrow review-top"><p class="score" id="reviewCount"></p></div>
             <h3 id="reviewQuestion" tabindex="-1"></h3>
             <div class="quiz-options" id="reviewOptions" role="group" aria-labelledby="reviewQuestion"></div>
             <div class="result" id="reviewFeedback" role="status">Выбери один из четырёх вариантов.</div>
             <button class="action below" id="reviewNext" hidden>Следующий вопрос</button>
+          </div>
+          <div id="reviewSummary" hidden>
+            <div class="paper review-celebration">
+              <div id="reviewConfetti" class="review-confetti" aria-hidden="true"></div>
+              <div class="bigicon" aria-hidden="true">🎉</div>
+              <h3 id="reviewSummaryTitle" tabindex="-1">Ты молодец!</h3>
+              <div class="review-total" id="reviewTotal">5 из 5</div>
+              <p class="small">баллов за повторение</p>
+              <p id="reviewMessage"></p>
+            </div>
+            <details class="card explanation below" id="reviewDetails">
+              <summary>Мои ответы и правильные решения</summary>
+              <ol id="reviewAnswerList" class="review-answers"></ol>
+            </details>
           </div>
         </div>
       </section>
 
       <section class="slide" aria-label="Маска">
         <div class="wrap spaced">
-          <header class="slidehead"><span class="eyebrow">03 / 07 · Что показывает маска</span>
+          <header class="slidehead"><span class="eyebrow">03 · ЧТО ПОКАЗЫВАЕТ МАСКА</span>
             <button class="action advance" data-next>Далее</button>
           </header>
           <h2>Где сеть, а где компьютер?</h2>
@@ -141,7 +163,7 @@
 
       <section class="slide" aria-label="Биты">
         <div class="wrap">
-          <header class="slidehead"><span class="eyebrow">04 / 07 · Биты</span>
+          <header class="slidehead"><span class="eyebrow">04 · БИТЫ</span>
             <button class="action advance" data-next>Далее</button>
           </header>
           <h2>Восемь переключателей — один октет</h2>
@@ -179,7 +201,7 @@
 
       <section class="slide" aria-label="Фильтр">
         <div class="wrap">
-          <header class="slidehead"><span class="eyebrow">05 / 07 · Маска как фильтр</span>
+          <header class="slidehead"><span class="eyebrow">05 · МАСКА КАК ФИЛЬТР</span>
             <button class="action advance" data-next>Далее</button>
           </header>
           <h2>Из адреса компьютера — адрес его сети</h2>
@@ -219,7 +241,7 @@
 
       <section class="slide" aria-label="Маска по шагам">
         <div class="wrap">
-          <header class="slidehead"><span class="eyebrow">06 / 07 · По шагам</span>
+          <header class="slidehead"><span class="eyebrow">06 · ПО ШАГАМ</span>
             <button class="action advance" data-next>Далее</button>
           </header>
           <h2>Почему получается 128?</h2>
@@ -261,8 +283,8 @@
 
       <section class="slide" aria-label="Практика">
         <div class="wrap">
-          <header class="slidehead"><span class="eyebrow">07 / 07 · Практика</span>
-            <button class="action advance" data-next>К началу</button>
+          <header class="slidehead"><span class="eyebrow">07 · ПРАКТИКА</span>
+            <button class="action advance" data-next>Далее</button>
           </header>
           <h2>Найди адрес сети</h2>
           <p>Выбери вкладку и реши три примера. В каждом запиши полный адрес сети. Ответы сохраняются при переключении вкладок до перезагрузки страницы.</p>
@@ -280,6 +302,49 @@
         </div>
       </section>
 
+          <section class="slide" aria-label="Итоги урока">
+        <div class="wrap hero">
+          <div>
+            <header class="slidehead">
+              <span class="eyebrow">08 · ИТОГИ УРОКА</span>
+              <button class="action advance" data-next>К началу</button>
+            </header>
+            <h2>Как оценить результат</h2>
+            <p class="rubric-subtitle"><strong>Всего 10 баллов:</strong> 5 баллов за повторение и 5 баллов за вычисление адресов сети по маске.</p>
+            <div class="rubric">
+              <div class="row rubric-card">
+                <div class="rs">9–10</div>
+                <div><strong>Отлично</strong><span class="sub">Безошибочно определяешь сеть по любой маске, включая побитовое наложение.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">7–8</div>
+                <div><strong>Хорошо</strong><span class="sub">Уверенно работаешь со стандартными масками (255.255.255.0), 1 ошибка в битах.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">5–6</div>
+                <div><strong>Понял основы</strong><span class="sub">Понимаешь деление на сеть и узел, но путаешься в двоичном умножении AND.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">0–4</div>
+                <div><strong>Нужно потренироваться</strong><span class="sub">Вернись к слайдам 4–6 и повтори, как маска накладывается на октеты.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="paper pad summary-panel">
+            <h3><i data-flaticon="graduation-cap"></i> После урока вы умеете</h3>
+            <div class="summary summary-list">
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Объяснять роль маски подсети как границы между сетью и узлом.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Вычислять адрес сети для масок 255.255.255.0 и 255.255.0.0 без калькулятора.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Применять побитовую операцию AND для нестандартных масок (например, .128).</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Определять, находятся ли два устройства в одной подсети или им нужен роутер.</span></div>
+            </div>
+            <div class="definition conclusion-box">
+              <div class="conclusion-badge"><i data-flaticon="bulb"></i> Главный вывод</div>
+              <p>Маска подсети — это фильтр. Единицы маски показывают, какие биты адреса обозначают сеть, а нули — какие относятся к устройству.</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
     <nav class="dots" id="dots" aria-label="Слайды урока">
     </nav>
@@ -289,8 +354,9 @@
         <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-01"></script>
-            <script src="../../скрипты/lessons.js?v=neumorph-2026-10-28-26"></script>
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v03"></script>
+            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v43"></script>
 </body>
 </html>
+
 

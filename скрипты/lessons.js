@@ -1163,11 +1163,12 @@ const recallBank=[
 {q:"Как цифровая этика связана с IP-адресом?",a:"IP входит в цифровой след, поэтому важны приватность и безопасность данных",w:["По одному IP всегда можно точно установить личность и домашний адрес","IP не относится к персональным данным ни при каких обстоятельствах","Публикация IP всегда безопасна, потому что это всего лишь четыре числа"]}
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-let recallOrder=[],recallIndex=0,recallPoints=0,recallLocked=false;
-function renderRecall(){const item=recallOrder[recallIndex];recallLocked=false;recallCount.textContent="Вопрос "+(recallIndex+1)+" / "+recallOrder.length;recallScore.textContent="Верно: "+recallPoints;recallQuestion.textContent=item.q;recallFeedback.textContent="Выберите наиболее точный ответ.";recallNext.hidden=true;recallOptions.innerHTML="";shuffle([item.a,...item.w]).forEach(text=>{const b=document.createElement("button");b.className="recalloption";b.textContent=text;b.onclick=()=>answerRecall(b,item);recallOptions.appendChild(b)})}
-function answerRecall(button,item){if(recallLocked)return;recallLocked=true;const ok=button.textContent===item.a;if(ok)recallPoints++;document.querySelectorAll(".recalloption").forEach(b=>{b.disabled=true;if(b.textContent===item.a)b.classList.add("correct")});if(!ok)button.classList.add("wrong");recallScore.textContent="Верно: "+recallPoints;recallFeedback.textContent=ok?"Верно — смысл выбран точно.":"Сравните формулировки: зелёным отмечен точный ответ.";recallNext.hidden=false;recallNext.textContent=recallIndex===recallOrder.length-1?"Завершить тест":"Следующий →"}
-function startRecall(){recallOrder=shuffle([...recallBank]);recallIndex=0;recallPoints=0;recallNext.onclick=nextRecall;renderRecall()}
-function finishRecall(){recallCount.textContent="Тест завершён";recallScore.textContent="Результат: "+recallPoints+" / 6";recallQuestion.textContent=recallPoints>=5?"Отлично! Прошлая тема усвоена.":recallPoints>=3?"Неплохо. Обсудите ошибки перед новой темой.":"Стоит коротко повторить социальные и этические аспекты ИИ.";recallOptions.innerHTML="";recallFeedback.textContent="Ответы сохранены до повторного запуска.";recallNext.hidden=false;recallNext.textContent="Пройти тест ещё раз ↻";recallNext.onclick=startRecall}
+let recallOrder=[],recallIndex=0,recallPoints=0,recallLocked=false,recallFinished=false;
+const recallAnswers=[];
+function renderRecall(){if(recallFinished)return;const item=recallOrder[recallIndex];recallLocked=false;recallCount.textContent="Вопрос "+(recallIndex+1)+" / "+recallOrder.length;recallScore.textContent="Верно: "+recallPoints;recallQuestion.textContent=item.q;recallFeedback.textContent="Выберите наиболее точный ответ.";recallNext.hidden=true;recallOptions.innerHTML="";shuffle([item.a,...item.w]).forEach(text=>{const b=document.createElement("button");b.className="recalloption";b.textContent=text;b.onclick=()=>answerRecall(b,item);recallOptions.appendChild(b)})}
+function answerRecall(button,item){if(recallLocked||recallFinished)return;recallLocked=true;recallAnswers.push(button.textContent);const ok=button.textContent===item.a;if(ok)recallPoints++;document.querySelectorAll(".recalloption").forEach(b=>{b.disabled=true;if(b.textContent===item.a)b.classList.add("correct")});if(!ok)button.classList.add("wrong");recallScore.textContent="Верно: "+recallPoints;recallFeedback.textContent=ok?"Верно — смысл выбран точно.":"Сравните формулировки: зелёным отмечен точный ответ.";recallNext.hidden=false;recallNext.textContent=recallIndex===recallOrder.length-1?"Завершить тест":"Следующий →"}
+function startRecall(){recallOrder=shuffle([...recallBank]);recallIndex=0;recallPoints=0;recallFinished=false;recallAnswers.length=0;const rq=document.getElementById("recallQuiz"),rs=document.getElementById("recallSummary");if(rq)rq.hidden=false;if(rs)rs.hidden=true;recallNext.onclick=nextRecall;renderRecall()}
+function finishRecall(){if(recallFinished)return;recallFinished=true;const rq=document.getElementById("recallQuiz"),rs=document.getElementById("recallSummary"),rt=document.getElementById("recallTotal"),rtitle=document.getElementById("recallSummaryTitle"),rm=document.getElementById("recallMessage"),ral=document.getElementById("recallAnswerList");if(rq)rq.hidden=true;if(rs)rs.hidden=false;if(rt)rt.textContent=`${recallPoints} из ${recallOrder.length}`;if(rtitle)rtitle.textContent=recallPoints>=5?"Ты молодец!":"Повторим прошлый урок";if(rm)rm.textContent=recallPoints>=5?"Все ответы верные — отличная работа! Прошлая тема усвоена.":"Нужно ещё повторить прошлый урок. Посмотри разбор и попробуй ещё раз.";if(ral){ral.replaceChildren();recallOrder.forEach((q,i)=>{const li=document.createElement("li"),isOk=recallAnswers[i]===q.a;li.className="review-answer "+(isOk?"is-correct":"is-incorrect");const h=document.createElement("h3");h.textContent=q.q;li.append(h);[["Твой ответ: ",recallAnswers[i]||"—"],["Правильный ответ: ",q.a]].forEach(([lbl,val])=>{const p=document.createElement("p"),s=document.createElement("strong");s.textContent=lbl;p.append(s,document.createTextNode(val));li.append(p)});const st=document.createElement("span");st.className="tag";st.textContent=isOk?"✓ Верно":"✕ Ошибка";li.prepend(st);ral.append(li)});}}
 function nextRecall(){if(recallIndex<recallOrder.length-1){recallIndex++;renderRecall()}else finishRecall()}
 recallNext.onclick=nextRecall;
 document.querySelectorAll(".octet").forEach((x,i)=>x.onclick=()=>{document.querySelectorAll(".octet").forEach(y=>y.classList.remove("active"));x.classList.add("active");octetInfo.textContent=(i+1)+"-й октет: "+x.querySelector("strong").textContent+"₁₀ = "+x.dataset.bits+"₂ · 8 бит"});
@@ -1193,21 +1194,21 @@ const r=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),shuffle=a=>a.sort(()=>Math.ra
 const split=(value,count)=>{const cuts=[];while(cuts.length<count-1){const n=r(1,value.length-1);if(!cuts.includes(n))cuts.push(n)}cuts.sort((a,b)=>a-b);return [0,...cuts,value.length].slice(0,-1).map((n,i)=>value.slice(n,[...cuts,value.length][i]))};
 const addresses=[ip(),ip(),ip()],fragments=[addresses[0].split(/(?<=\.)/),[...split(addresses[1].split('.')[0],2).map((x,i)=>i===1?x+'.':x),...addresses[1].split('.').slice(1).map((x,i)=>i<2?x+'.':x)],[addresses[2].split('.')[0]+'.',...split(addresses[2].split('.')[1],2).map((x,i)=>i===1?x+'.':x),addresses[2].split('.')[2]+'.',...split(addresses[2].split('.')[3],2)]];
 document.getElementById('builders').innerHTML=fragments.map((parts,i)=>'<div class="build" data-answer="'+addresses[i]+'"><div><strong>Пакет '+(i+1)+' · '+['легко','разогрев','средне'][i]+'</strong><div class="small">'+[4,5,6][i]+' фрагментов, адрес новый при каждом открытии</div></div><div class="pieces">'+shuffle(parts).map(x=>'<button class="piece">'+x+'</button>').join('')+'</div><span class="buildstatus"></span></div>').join('')+'<div class="controlsrow"><button class="action" id="checkBuild">Проверить все три</button></div><div class="result" id="buildScore">Используй все фрагменты. Адреса и порядок фрагментов меняются при каждом открытии.</div>';
-all[2].querySelector('.wrap').innerHTML='<header class="slidehead"><span class="eyebrow">03 / 05 · Что такое протокол</span><button class="action advance" data-next>Далее</button></header><h2>У интернета есть правила</h2><div class="definition" style="margin:0 0 20px"><strong>Сетевой протокол — это набор правил, по которым устройства обмениваются данными.</strong> Он задаёт, как отправить сообщение и как его понять.</div><div class="protocol-demo" id="protocolDemo" data-phase="0"><div class="demohead"><h3>От сообщения до доставки</h3><div class="demotools"><button class="action" id="playDelivery">Запустить</button><button class="action secondary" id="stepDelivery">По шагам</button><button class="choice" id="resetDelivery">Сначала</button></div></div><div class="stations"><div class="station"><span class="screen">💬</span><strong>Компьютер 1 · отправитель</strong><code>192.168.1.7</code></div><div class="station"><span class="screen receiver">💻</span><strong>Компьютер 2 · получатель</strong><code>192.168.1.25</code></div></div><div class="shipment"><div class="demo-message" id="demoMessage">«ПРИВЕТ, ДРУГ!»</div><div class="demo-packets"><div class="demo-packet"><strong>№ 1 · ПРИ</strong><small class="packet-address">Кому: 192.168.1.25</small></div><div class="demo-packet"><strong>№ 2 · ВЕТ,</strong><small class="packet-address">Кому: 192.168.1.25</small></div><div class="demo-packet"><strong>№ 3 · ДРУГ!</strong><small class="packet-address">Кому: 192.168.1.25</small></div></div></div><div class="road"><div class="ack">Получение подтверждено ✓</div><div class="truck" id="deliveryTruck"><div class="trailer"><div class="truckload"><span>1</span><span>2</span><span>3</span></div>TCP/IP</div><div class="cab"></div><div class="wheel back"></div><div class="wheel front"></div></div></div><p class="demo-caption" id="deliveryCaption">1 / 6. Компьютер 1 хочет отправить сообщение «ПРИВЕТ, ДРУГ!» компьютеру 2.</p><details class="demo-foot"><summary>Как читать эту модель</summary><p>Грузовик — учебная аналогия передачи данных. IP указывает адреса, TCP следит за порядком и получением.</p></details></div><div class="grid2"><div class="card peach"><h3 class="protocolword">IP — доставить по адресу</h3><span class="en">Internet Protocol · интернет-протокол</span><p><strong>IP — протокол адресации и передачи пакетов между сетями.</strong></p><p>Пакет — небольшая порция данных с адресом получателя.</p><span class="stepchip">Как адрес на посылке</span></div><div class="card sage"><h3 class="protocolword">TCP — собрать без пропусков</h3><span class="en">Transmission Control Protocol</span><p><strong>TCP — протокол надёжной передачи данных в правильном порядке.</strong></p><p>Контролирует получение и повторно передаёт потерянные данные.</p><span class="stepchip">Как проверка: всё ли пришло?</span></div></div></div>';
-all[3].querySelector('.wrap').innerHTML='<header class="slidehead"><span class="eyebrow">04 / 05 · Мини-исследование</span><button class="action advance" data-next>Далее</button></header><h2>Исследуем протоколы</h2><p class="lead">Работа в паре · 15–20 минут · результат — таблица в тетради и короткий вывод.</p><div class="grid2"><div class="paper"><span class="tag">Задание в тетради</span><h3>Составьте сравнительную таблицу</h3><table class="research-table"><thead><tr><th>Протокол</th><th>Для чего нужен</th><th>Пример ситуации</th><th>Что будет без него?</th></tr></thead><tbody><tr><td><code>IP</code></td><td></td><td></td><td></td></tr><tr><td><code>TCP</code></td><td></td><td></td><td></td></tr><tr><td><code>FTP</code></td><td></td><td></td><td></td></tr><tr><td><code>HTTPS</code></td><td></td><td></td><td></td></tr></tbody></table><p class="small">Перерисуйте таблицу в тетрадь; в каждой ячейке достаточно одной точной фразы.</p></div><div class="card sage"><span class="tag">План исследования</span><ol class="research-steps"><li><strong>Распределите роли:</strong> исследователь и секретарь.</li><li>По материалам третьего слайда заполните первые два столбца.</li><li>Придумайте свои школьные примеры: дневник, отправка файла, видеосвязь, школьный сайт.</li><li>Для каждой строки ответьте: «Что сломается или станет опасным без этого протокола?»</li><li><strong>Вывод:</strong> внизу таблицы напишите 2 предложения: чем IP отличается от TCP и почему HTTPS важнее обычного HTTP при входе в аккаунт.</li></ol><div class="definition"><strong>Защита:</strong> каждая пара называет один пример и объясняет свой выбор за 30 секунд.</div></div></div></div>';
+all[2].querySelector('.wrap').innerHTML='<header class="slidehead"><span class="eyebrow">03 · ПРОТОКОЛЫ</span><button class="action advance" data-next>Далее</button></header><h2>У интернета есть правила</h2><div class="definition" style="margin:0 0 20px"><strong>Сетевой протокол — это набор правил, по которым устройства обмениваются данными.</strong> Он задаёт, как отправить сообщение и как его понять.</div><div class="protocol-demo" id="protocolDemo" data-phase="0"><div class="demohead"><h3>От сообщения до доставки</h3><div class="demotools"><button class="action" id="playDelivery">Запустить</button><button class="action secondary" id="stepDelivery">По шагам</button><button class="choice" id="resetDelivery">Сначала</button></div></div><div class="stations"><div class="station"><span class="screen">💬</span><strong>Компьютер 1 · отправитель</strong><code>192.168.1.7</code></div><div class="station"><span class="screen receiver">💻</span><strong>Компьютер 2 · получатель</strong><code>192.168.1.25</code></div></div><div class="shipment"><div class="demo-message" id="demoMessage">«ПРИВЕТ, ДРУГ!»</div><div class="demo-packets"><div class="demo-packet"><strong>№ 1 · ПРИ</strong><small class="packet-address">Кому: 192.168.1.25</small></div><div class="demo-packet"><strong>№ 2 · ВЕТ,</strong><small class="packet-address">Кому: 192.168.1.25</small></div><div class="demo-packet"><strong>№ 3 · ДРУГ!</strong><small class="packet-address">Кому: 192.168.1.25</small></div></div></div><div class="road"><div class="ack">Получение подтверждено ✓</div><div class="truck" id="deliveryTruck"><div class="trailer"><div class="truckload"><span>1</span><span>2</span><span>3</span></div>TCP/IP</div><div class="cab"></div><div class="wheel back"></div><div class="wheel front"></div></div></div><p class="demo-caption" id="deliveryCaption">1 / 6. Компьютер 1 хочет отправить сообщение «ПРИВЕТ, ДРУГ!» компьютеру 2.</p><details class="demo-foot"><summary>Как читать эту модель</summary><p>Грузовик — учебная аналогия передачи данных. IP указывает адреса, TCP следит за порядком и получением.</p></details></div><div class="grid2"><div class="card peach"><h3 class="protocolword">IP — доставить по адресу</h3><span class="en">Internet Protocol · интернет-протокол</span><p><strong>IP — протокол адресации и передачи пакетов между сетями.</strong></p><p>Пакет — небольшая порция данных с адресом получателя.</p><span class="stepchip">Как адрес на посылке</span></div><div class="card sage"><h3 class="protocolword">TCP — собрать без пропусков</h3><span class="en">Transmission Control Protocol</span><p><strong>TCP — протокол надёжной передачи данных в правильном порядке.</strong></p><p>Контролирует получение и повторно передаёт потерянные данные.</p><span class="stepchip">Как проверка: всё ли пришло?</span></div></div></div>';
+all[3].querySelector('.wrap').innerHTML='<header class="slidehead"><span class="eyebrow">04 · ПРАКТИКА</span><button class="action advance" data-next>Далее</button></header><h2>Исследуем протоколы</h2><p class="lead">Работа в паре · 15–20 минут · результат — таблица в тетради и короткий вывод.</p><div class="grid2"><div class="paper"><span class="tag">Задание в тетради</span><h3>Составьте сравнительную таблицу</h3><table class="research-table"><thead><tr><th>Протокол</th><th>Для чего нужен</th><th>Пример ситуации</th><th>Что будет без него?</th></tr></thead><tbody><tr><td><code>IP</code></td><td></td><td></td><td></td></tr><tr><td><code>TCP</code></td><td></td><td></td><td></td></tr><tr><td><code>FTP</code></td><td></td><td></td><td></td></tr><tr><td><code>HTTPS</code></td><td></td><td></td><td></td></tr></tbody></table><p class="small">Перерисуйте таблицу в тетрадь; в каждой ячейке достаточно одной точной фразы.</p></div><div class="card sage"><span class="tag">План исследования</span><ol class="research-steps"><li><strong>Распределите роли:</strong> исследователь и секретарь.</li><li>По материалам третьего слайда заполните первые два столбца.</li><li>Придумайте свои школьные примеры: дневник, отправка файла, видеосвязь, школьный сайт.</li><li>Для каждой строки ответьте: «Что сломается или станет опасным без этого протокола?»</li><li><strong>Вывод:</strong> внизу таблицы напишите 2 предложения: чем IP отличается от TCP и почему HTTPS важнее обычного HTTP при входе в аккаунт.</li></ol><div class="definition"><strong>Защита:</strong> каждая пара называет один пример и объясняет свой выбор за 30 секунд.</div></div></div></div>';
 let phase=0,timer;const text=['1 / 6. Компьютер 1 хочет отправить сообщение «ПРИВЕТ, ДРУГ!» компьютеру 2.','2 / 6. TCP делит сообщение на части и задаёт им порядок.','3 / 6. Части упакованы в IP-пакеты с адресом получателя 192.168.1.25.','4 / 6. Пакеты едут: IP отвечает за адрес, TCP — за надёжность передачи.','5 / 6. Компьютер 2 получил пакеты. TCP проверяет порядок и наличие всех частей.','6 / 6. Получатель собрал сообщение и подтвердил получение.'];const demo=document.getElementById('protocolDemo'),caption=document.getElementById('deliveryCaption');const draw=()=>{demo.dataset.phase=phase;caption.textContent=text[phase];document.getElementById('playDelivery').textContent=phase===5?'Ещё раз':'Запустить'};const reset=()=>{clearTimeout(timer);phase=0;draw()};const run=()=>{clearTimeout(timer);if(phase===5)phase=0;const next=()=>{draw();if(phase<5){phase++;timer=setTimeout(next,phase===3?4000:2100)}};next()};document.getElementById('playDelivery').onclick=run;document.getElementById('stepDelivery').onclick=()=>{clearTimeout(timer);phase=(phase+1)%6;draw()};document.getElementById('resetDelivery').onclick=reset;draw()})();
 
-(()=>{const slide=document.querySelectorAll('.slide')[3];slide.querySelector('.wrap').innerHTML='<header class="slidehead"><span class="eyebrow">04 / 05 · Протоколы в жизни</span><button class="action advance" data-next>Далее</button></header><h2>Загрузить файл или открыть сайт?</h2><div class="grid2"><div class="card"><div class="bigicon">📁</div><h3 class="protocolword">FTP — передача файлов</h3><span class="en">File Transfer Protocol</span><p><strong>Протокол обмена файлами между компьютером и сервером.</strong></p><p>Например, загрузить папку с работами на файловый сервер.</p><p class="small">Обычный FTP не шифрует файлы и пароль.</p></div><div class="card"><div class="bigicon">🔒</div><h3 class="protocolword">HTTPS — защищённый веб</h3><span class="en">HTTP с защитой TLS</span><p><strong>Протокол защищённого обмена данными между браузером и сайтом.</strong></p><p>Например, безопасно передать пароль при входе в электронный дневник.</p><p class="small">TLS шифрует данные и защищает их от подмены.</p></div></div><div class="paper" style="margin-top:20px"><span class="tag">Мини-исследование · 15–20 минут · работа в паре</span><h3>Сравните четыре протокола в тетради</h3><p>Один ученик — исследователь: ищет ответ в материалах урока и приводит школьный пример. Второй — секретарь: заполняет таблицу. Затем поменяйтесь ролями.</p><table class="research-table"><thead><tr><th>Протокол</th><th>Для чего нужен</th><th>Пример работы</th><th>Что будет без него?</th></tr></thead><tbody><tr><td><code>IP</code></td><td></td><td></td><td></td></tr><tr><td><code>TCP</code></td><td></td><td></td><td></td></tr><tr><td><code>FTP</code></td><td></td><td></td><td></td></tr><tr><td><code>HTTPS</code></td><td></td><td></td><td></td></tr></tbody></table><div class="definition"><strong>Финальный вывод:</strong> под таблицей напишите 2 предложения: чем IP отличается от TCP и почему HTTPS нужен для электронного дневника. Подготовьте один пример для защиты за 30 секунд.</div></div></div>'})();
+(()=>{const slide=document.querySelectorAll('.slide')[3];slide.querySelector('.wrap').innerHTML='<header class="slidehead"><span class="eyebrow">04 · ПРОТОКОЛЫ В ЖИЗНИ</span><button class="action advance" data-next>Далее</button></header><h2>Загрузить файл или открыть сайт?</h2><div class="grid2"><div class="card"><div class="bigicon">📁</div><h3 class="protocolword">FTP — передача файлов</h3><span class="en">File Transfer Protocol</span><p><strong>Протокол обмена файлами между компьютером и сервером.</strong></p><p>Например, загрузить папку с работами на файловый сервер.</p><p class="small">Обычный FTP не шифрует файлы и пароль.</p></div><div class="card"><div class="bigicon">🔒</div><h3 class="protocolword">HTTPS — защищённый веб</h3><span class="en">HTTP с защитой TLS</span><p><strong>Протокол защищённого обмена данными между браузером и сайтом.</strong></p><p>Например, безопасно передать пароль при входе в электронный дневник.</p><p class="small">TLS шифрует данные и защищает их от подмены.</p></div></div><div class="paper" style="margin-top:20px"><span class="tag">Мини-исследование · 15–20 минут · работа в паре</span><h3>Сравните четыре протокола в тетради</h3><p>Один ученик — исследователь: ищет ответ в материалах урока и приводит школьный пример. Второй — секретарь: заполняет таблицу. Затем поменяйтесь ролями.</p><table class="research-table"><thead><tr><th>Протокол</th><th>Для чего нужен</th><th>Пример работы</th><th>Что будет без него?</th></tr></thead><tbody><tr><td><code>IP</code></td><td></td><td></td><td></td></tr><tr><td><code>TCP</code></td><td></td><td></td><td></td></tr><tr><td><code>FTP</code></td><td></td><td></td><td></td></tr><tr><td><code>HTTPS</code></td><td></td><td></td><td></td></tr></tbody></table><div class="definition"><strong>Финальный вывод:</strong> под таблицей напишите 2 предложения: чем IP отличается от TCP и почему HTTPS нужен для электронного дневника. Подготовьте один пример для защиты за 30 секунд.</div></div></div>'})();
 
 (()=>{const lesson=[...document.querySelectorAll('.slide')],protocol=lesson[2],life=lesson[3],finish=lesson[4];
 protocol.querySelector('.wrap').insertAdjacentHTML('beforeend','<div class="definition"><strong>TCP/IP — семейство протоколов для работы сетей.</strong> В паре IP + TCP один отвечает за адресацию и доставку пакетов, другой — за надёжность и порядок данных.</div>');
 life.querySelector('.paper').remove();
 life.querySelector('.wrap').insertAdjacentHTML('beforeend','<div class="paper" style="margin-top:20px"><span class="tag">Факты и примеры</span><h3>Почему важно не путать FTP и HTTPS?</h3><p><strong>FTP</strong> удобен для передачи файлов на сервер, но обычный FTP не защищает пароль и содержимое файла. Для важных данных используют защищённые варианты передачи.</p><p><strong>HTTPS</strong> нужен, когда браузер обменивается данными с сайтом: например, при входе в электронный дневник, оплате или отправке формы. Значок замка означает защищённое соединение, но всё равно проверяй адрес сайта.</p><p class="small">Пример: архив с проектом для школьного сервера — задача передачи файла; пароль от дневника — задача защищённого веб-соединения.</p></div>');
-life.querySelector('.eyebrow').textContent='04 / 06 · Протоколы в жизни';
-const research=document.createElement('section');research.className='slide';research.setAttribute('aria-label','Мини-исследование');research.innerHTML='<div class="wrap"><header class="slidehead"><span class="eyebrow">05 / 06 · Мини-исследование</span><button class="action advance" data-next>Далее</button></header><h2>Исследуем протоколы</h2><p class="lead">Индивидуальная работа · 15–20 минут · результат — таблица в тетради.</p><div class="paper"><span class="tag">Задание в тетради</span><h3>Сравните четыре протокола</h3><table class="research-table"><thead><tr><th>Протокол</th><th>Для чего нужен</th><th>Пример работы</th><th>Что будет без него?</th></tr></thead><tbody><tr><td><code>IP</code></td><td></td><td></td><td></td></tr><tr><td><code>TCP</code></td><td></td><td></td><td></td></tr><tr><td><code>FTP</code></td><td></td><td></td><td></td></tr><tr><td><code>HTTPS</code></td><td></td><td></td><td></td></tr></tbody></table><div class="definition"><strong>Финальный вывод:</strong> под таблицей напишите 2 предложения: чем IP отличается от TCP и почему HTTPS нужен для электронного дневника. Подготовьте один пример для защиты за 30 секунд.</div></div></div>';
+life.querySelector('.eyebrow').textContent='04 · ПРОТОКОЛЫ В ЖИЗНИ';
+const research=document.createElement('section');research.className='slide';research.setAttribute('aria-label','Мини-исследование');research.innerHTML='<div class="wrap"><header class="slidehead"><span class="eyebrow">05 · МИНИ-ИССЛЕДОВАНИЕ</span><button class="action advance" data-next>Далее</button></header><h2>Исследуем протоколы</h2><p class="lead">Индивидуальная работа · 15–20 минут · результат — таблица в тетради.</p><div class="paper"><span class="tag">Задание в тетради</span><h3>Сравните четыре протокола</h3><table class="research-table"><thead><tr><th>Протокол</th><th>Для чего нужен</th><th>Пример работы</th><th>Что будет без него?</th></tr></thead><tbody><tr><td><code>IP</code></td><td></td><td></td><td></td></tr><tr><td><code>TCP</code></td><td></td><td></td><td></td></tr><tr><td><code>FTP</code></td><td></td><td></td><td></td></tr><tr><td><code>HTTPS</code></td><td></td><td></td><td></td></tr></tbody></table><div class="definition"><strong>Финальный вывод:</strong> под таблицей напишите 2 предложения: чем IP отличается от TCP и почему HTTPS нужен для электронного дневника. Подготовьте один пример для защиты за 30 секунд.</div></div></div>';
 research.querySelector('.lead').textContent='Работа в паре · 15–20 минут · результат — сравнительная таблица в тетради.';
 const table=research.querySelector('.research-table');table.querySelector('thead tr').insertAdjacentHTML('beforeend','<th>Полное название АНГЛ - РУС</th>');table.querySelectorAll('tbody tr').forEach(row=>row.insertAdjacentHTML('beforeend','<td></td>'));research.querySelector('.definition').remove();
-finish.before(research);finish.querySelector('.eyebrow').textContent='06 / 06 · Финиш';})();
+finish.before(research);finish.querySelector('.eyebrow').textContent='06 · ИТОГИ УРОКА';})();
 
 'use strict';const $=id=>document.getElementById(id),slides=[...document.querySelectorAll('.slide')];let current=0;slides.forEach((s,i)=>{const b=document.createElement('button');b.className='dotbutton';b.title=`Слайд ${i+1}: ${s.getAttribute('aria-label')}`;b.dataset.tooltip=b.title;b.onclick=()=>show(i);$('dots').append(b);s.querySelector('[data-next]').onclick=()=>show(i===slides.length-1?0:i+1)});window._lessonShowSlide = show; function show(n){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(n,slides.length-1));slides.forEach((s,i)=>s.classList.toggle('active',i===current));document.querySelectorAll('.dotbutton').forEach((b,i)=>b.toggleAttribute('aria-current',i===current));slides[current].scrollTop=0;$('progress').style.width=((current+1)/slides.length*100)+'%';history.replaceState(null,'','#'+(current+1))}window.addEventListener('hashchange',()=>show((parseInt(location.hash.slice(1))||1)-1));document.addEventListener('keydown',e=>{if(e.target.closest('button,input,summary')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='ArrowRight'||e.key==='PageDown')show(current+1);if(e.key==='ArrowLeft'||e.key==='PageUp')show(current-1)});
 function valid(v){const a=v.split('.');return a.length===4&&a.every(x=>/^(0|[1-9]\d{0,2})$/.test(x)&&+x<=255)}const builds=[...document.querySelectorAll('.build')];builds.forEach(b=>{b.parts=[];const pcs=[...b.querySelectorAll('.piece')],out=b.querySelector('.buildstatus'),tools=document.createElement('div');tools.className='buildtools';tools.innerHTML='<button class="choice">Убрать последний</button><button class="choice">Сначала</button>';b.append(tools);const draw=()=>{out.textContent=b.parts.map(x=>x.textContent).join('');pcs.forEach(x=>x.disabled=b.parts.includes(x))};pcs.forEach(x=>x.onclick=()=>{b.parts.push(x);draw()});tools.children[0].onclick=()=>{b.parts.pop();draw()};tools.children[1].onclick=()=>{b.parts=[];draw()};draw()});$('checkBuild').onclick=()=>{let n=0;builds.forEach(b=>{const v=b.parts.map(x=>x.textContent).join(''),ok=b.parts.length===4&&valid(v);n+=+ok;b.classList.toggle('correct',ok);b.classList.toggle('wrong',!ok);b.querySelector('.buildstatus').textContent=(v||'Адрес ещё не собран')+(ok?' ✓':' — проверь запись')});$('buildScore').className='result '+(n===3?'good':'bad');$('buildScore').textContent=`Верно: ${n} из 3. `+(n===3?'Во всех адресах четыре октета от 0 до 255.':'Проверь порядок фрагментов и диапазон каждого октета.')};
@@ -1293,6 +1294,8 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
       let reviewIndex = 0;
       let reviewScore = 0;
       let reviewAnswered = false;
+      let reviewFinished = false;
+      const reviewAnswers = [];
 
       function shuffled(values) {
         const result = [...values];
@@ -1303,7 +1306,63 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
         return result;
       }
 
+      function finishReview() {
+        if (reviewFinished) return;
+        reviewFinished = true;
+        if ($('reviewQuiz')) $('reviewQuiz').hidden = true;
+        if ($('reviewSummary')) $('reviewSummary').hidden = false;
+        if ($('reviewTotal')) $('reviewTotal').textContent = `${reviewScore} из ${reviewQuestions.length}`;
+        if ($('reviewSummaryTitle')) $('reviewSummaryTitle').textContent = reviewScore >= 4 ? 'Ты молодец!' : 'Повторим прошлый урок';
+        if ($('reviewMessage')) $('reviewMessage').textContent = reviewScore >= 4
+          ? 'Все ответы верные — отличная работа! Ты уверенно знаешь IP-адреса и протоколы.'
+          : 'Нужно ещё повторить прошлый урок. Посмотри разбор и попробуй ещё раз.';
+
+        if ($('reviewAnswerList')) {
+          $('reviewAnswerList').replaceChildren();
+          reviewQuestions.forEach((q, i) => {
+            const li = document.createElement('li');
+            const isOk = reviewAnswers[i] === q.answer;
+            li.className = 'review-answer ' + (isOk ? 'is-correct' : 'is-incorrect');
+            const heading = document.createElement('h3');
+            heading.textContent = q.question;
+            li.append(heading);
+
+            [
+              ['Твой ответ: ', reviewAnswers[i] || '—'],
+              ['Правильный ответ: ', q.answer],
+              ['Почему: ', q.explanation]
+            ].forEach(([label, value]) => {
+              const p = document.createElement('p'), strong = document.createElement('strong');
+              strong.textContent = label;
+              p.append(strong, document.createTextNode(value));
+              li.append(p);
+            });
+
+            const status = document.createElement('span');
+            status.className = 'tag';
+            status.textContent = isOk ? '✓ Верно' : '✕ Ошибка';
+            li.prepend(status);
+            $('reviewAnswerList').append(li);
+          });
+        }
+
+        if ($('reviewConfetti') && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          for (let i = 0; i < 28; i++) {
+            const piece = document.createElement('i');
+            piece.style.setProperty('--left', `${(i * 37) % 100}%`);
+            piece.style.setProperty('--delay', `${(i % 7) * .08}s`);
+            piece.style.setProperty('--drift', `${(i % 2 ? 1 : -1) * (20 + i * 3)}px`);
+            piece.style.background = ['#8067D8', '#9333ea', '#8b5cf6', '#a855f7'][i % 4];
+            $('reviewConfetti').append(piece);
+          }
+          setTimeout(() => $('reviewConfetti') && $('reviewConfetti').replaceChildren(), 2600);
+        }
+        if ($('reviewSummaryTitle')) $('reviewSummaryTitle').focus({ preventScroll: true });
+        if (slides[1]) slides[1].scrollTop = 0;
+      }
+
       function drawReview() {
+        if (reviewFinished) return;
         const question = reviewQuestions[reviewIndex];
         reviewAnswered = false;
         $('reviewCount').textContent = `Вопрос ${reviewIndex + 1} из 5 · верно: ${reviewScore}`;
@@ -1319,10 +1378,17 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
           button.textContent = `${index + 1}. ${option}`;
           button.dataset.option = option;
           button.onclick = () => {
-            if (reviewAnswered) return;
+            if (reviewAnswered || reviewFinished) return;
             reviewAnswered = true;
+            reviewAnswers.push(option);
             const correct = option === question.answer;
             if (correct) reviewScore++;
+
+            if (reviewIndex === reviewQuestions.length - 1) {
+              finishReview();
+              return;
+            }
+
             [...$('reviewOptions').children].forEach(choice => {
               choice.disabled = true;
               if (choice.dataset.option === question.answer) {
@@ -1337,10 +1403,7 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
             $('reviewCount').textContent = `Вопрос ${reviewIndex + 1} из 5 · верно: ${reviewScore}`;
             $('reviewFeedback').className = 'result ' + (correct ? 'good' : 'bad');
             $('reviewFeedback').textContent = (correct ? 'Верно! ' : `Правильный ответ: ${question.answer}. `) + question.explanation;
-            if (reviewIndex === reviewQuestions.length - 1) {
-              $('reviewFeedback').textContent += ` Повторение завершено: ${reviewScore} из 5.`;
-            }
-            $('reviewNext').textContent = reviewIndex === reviewQuestions.length - 1 ? 'Повторить пять вопросов' : 'Следующий вопрос';
+            $('reviewNext').textContent = 'Следующий вопрос';
             $('reviewNext').hidden = false;
             $('reviewNext').focus({preventScroll: true});
           };
@@ -1349,13 +1412,8 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
       }
 
       $('reviewNext').onclick = () => {
-        if (!reviewAnswered) return;
-        if (reviewIndex === reviewQuestions.length - 1) {
-          reviewIndex = 0;
-          reviewScore = 0;
-        } else {
-          reviewIndex++;
-        }
+        if (!reviewAnswered || reviewFinished) return;
+        reviewIndex++;
         drawReview();
         $('reviewQuestion').focus({preventScroll: true});
       };
@@ -1670,7 +1728,7 @@ document.getElementById('checkBuild').onclick=()=>{let score=0;document.querySel
   function inputFor(name){return zoneBody.querySelector('.zone-row[data-name="'+name+'"] .zone-input');}
 
   var zoneScore=0;
-  function updateScore(){byId('dnsTotal').textContent='За зону: '+zoneScore+' из 6 баллов';}
+  function updateScore(){var el=byId('dnsTotal');if(el)el.textContent='За зону: '+zoneScore+' из 6 баллов';}
   function rows(){return zoneBody.querySelectorAll('.zone-row');}
   function eachRow(fn){Array.prototype.forEach.call(rows(),fn);}
 

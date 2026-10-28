@@ -1,3 +1,4 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 /* ==========================================================================
    ALASSTER.SITE — UNIFIED LESSON DESIGN SYSTEM (NEUMORPHISM)
    Matching Личный кабинет theme & design tokens
@@ -589,12 +590,8 @@ a {
 }
 
 /* Redundant badge hiding: remove class/lesson eyebrow badge from slides (designated already in navbar) */
-.hero .eyebrow,
-.hero-layout .eyebrow,
-.slide:first-child .eyebrow,
-.slide:first-of-type .eyebrow,
-.slide-badge,
-.slide-header .eyebrow {
+/* Legacy redundant badge classes */
+.slide-header-redundant {
   display: none !important;
 }
 
@@ -21764,11 +21761,11 @@ body.lesson-page .piecewise .cases {
   color: var(--text) !important;
 }
 
-body.lesson-page :is(.vs, .era-year, .era-btn.active, .case-btn.active, .summary-total, .lesson-10ogn-4 .total, .lesson-10ogn-4 .topic-badge) {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--primary))) !important;
-  color: #FFFFFF !important;
+body.lesson-page :is(.vs, .era-year, .summary-total, .lesson-10ogn-4 .total, .lesson-10ogn-4 .topic-badge) {
+  background: var(--surface) !important;
+  color: var(--primary) !important;
   border-color: transparent !important;
-  box-shadow: 0 8px 20px -4px var(--primary-glow) !important;
+  box-shadow: var(--shadow-in) !important;
 }
 
 
@@ -21888,14 +21885,11 @@ body.lesson-page #progress {
   background: linear-gradient(90deg, var(--primary), var(--violet, var(--primary-dark))) !important;
 }
 
-body.lesson-page .eyebrow,
 body.lesson-page .pill,
 body.lesson-page .tag,
 body.lesson-page .tag-blue,
-body.lesson-page .chip,
 body.lesson-page .badge,
 body.lesson-page .stepchip,
-body.lesson-page .quiz-counter,
 body.lesson-page .ratio-badge-clay,
 body.lesson-page .ratio-badge-sage,
 body.lesson-page .badge-input,
@@ -23854,4 +23848,2156 @@ body.lesson-page[data-lesson-id] .neu-auth-initials {
   body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) {
     display: none !important;
   }
+}
+
+
+/* ==========================================================================
+   USER REFINEMENTS (OCT 28, 2026):
+   1. Brand icon box is square with border-radius 18px across all lessons.
+   2. Remove all solid color fills from buttons (pure inset neumorphism).
+   3. Normal font and weights (Manrope, no heavy chunky font).
+   4. Pure tactile neumorphic quote cards (.quote, .quote-box, .hero-quote-box).
+   ========================================================================== */
+
+/* 1. Square Brand Icon Box with border-radius 18px on all lessons */
+body.lesson-page .brand-icon-box,
+body.lesson-page .navbar .brand-icon-box,
+body.lesson-page .brand-logo-group .brand-icon-box,
+body.lesson-page[data-lesson-id] .brand-icon-box {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  font-size: 1.15rem !important;
+  transition: all 0.22s ease !important;
+}
+
+body.lesson-page .brand-logo-group:hover .brand-icon-box {
+  box-shadow: var(--shadow-in) !important;
+  transform: none !important;
+  color: var(--primary) !important;
+}
+
+/* 2. Normal typography on Lesson 1 and everywhere (Manrope, regular weight) */
+body.lesson-page,
+body.lesson-page *,
+.lesson-9-1,
+.lesson-9-1 * {
+  font-family: var(--font-main, "Manrope", system-ui, -apple-system, sans-serif) !important;
+}
+
+body.lesson-page .neu-auth-initials,
+.lesson-9-1 .neu-auth-initials {
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.02em !important;
+  color: var(--primary) !important;
+}
+
+.lesson-9-1 .case-btn,
+.lesson-9-1 .quiz-option,
+.lesson-9-1 .chip,
+.lesson-9-1 .rubric-row b {
+  font-weight: 600 !important;
+}
+
+/* 3. Pure Neumorphic Quote Card */
+body.lesson-page .quote,
+body.lesson-page .quote-box,
+body.lesson-page .hero-quote-box,
+body.lesson-page blockquote,
+.lesson-9-1 .quote {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+  padding: 22px 26px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  margin-top: 24px !important;
+  color: var(--text-dark, #1e293b) !important;
+  transition: all 0.22s ease !important;
+}
+
+
+
+body.lesson-page .quote-badge {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  font-size: 1.15rem !important;
+  flex-shrink: 0 !important;
+}
+
+body.lesson-page .quote-content {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+body.lesson-page .quote p,
+body.lesson-page .quote-text,
+body.lesson-page .hero-quote,
+.lesson-9-1 .quote p {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  line-height: 1.55 !important;
+  font-weight: 600 !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-style: italic !important;
+  letter-spacing: -0.01em !important;
+}
+
+body.lesson-page .quote:not(:has(.quote-badge))::before {
+  content: "\f10d" !important;
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  border-radius: 13px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  font-size: 1.1rem !important;
+  font-style: normal !important;
+  flex-shrink: 0 !important;
+}
+
+/* 4. Remove ALL solid color background fills from buttons across lessons */
+body.lesson-page :is(.case-btn, .era-btn, .worktab, .tab-btn, .filter-btn, .quiz-option, .choice, .option-btn, .k-btn, .step-btn, .tool-btn) {
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--text-dark) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+
+
+body.lesson-page :is(.case-btn, .era-btn, .worktab, .tab-btn, .filter-btn, .quiz-option, .choice, .option-btn, .k-btn, .step-btn, .tool-btn):is(.active, .selected, [aria-selected="true"], [aria-pressed="true"]) {
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  transform: none !important;
+  font-weight: 700 !important;
+}
+
+body.lesson-page :is(.case-btn, .era-btn, .worktab, .tab-btn, .filter-btn, .quiz-option, .choice, .option-btn, .k-btn, .step-btn, .tool-btn):is(.active, .selected) :is(i, svg) {
+  color: var(--primary) !important;
+}
+
+/* Case item icon box without solid fill */
+body.lesson-page .case-title i,
+.lesson-9-1 .case-title i {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-size: 1.15rem !important;
+}
+
+
+/* ==========================================================================
+   USER REFINEMENTS (QUIZ, CHECKLIST & INSET PILLS)
+   1. Inset pills for .quiz-counter and .quiz-status ("ВДАВЛЕННЫЕ").
+   2. Clear visibility for .quiz-option.correct and .quiz-option.wrong.
+   3. Neumorphic checklist cards (.check-line, .clean-list li) on Slide 4.
+   ========================================================================== */
+
+/* 1. Inset Pills for Quiz counters ("ВДАВЛЕННЫЕ") */
+body.lesson-page :is(.quiz-counter, .quiz-status, .quiz-score),
+.lesson-9-1 :is(.quiz-counter, .quiz-status, .quiz-score) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 18px !important;
+  min-height: 38px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  color: var(--primary) !important;
+  letter-spacing: 0.02em !important;
+}
+
+body.lesson-page .quiz-status,
+body.lesson-page .quiz-score,
+.lesson-9-1 .quiz-status,
+.lesson-9-1 .quiz-score {
+  color: #059669 !important;
+}
+
+/* 2. Clear visibility for Quiz answers (Correct & Wrong) */
+body.lesson-page .quiz-option,
+.lesson-9-1 .quiz-option {
+  min-height: 54px !important;
+  padding: 16px 22px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-weight: 600 !important;
+  font-size: 0.98rem !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+}
+
+body.lesson-page .quiz-option:hover:not(.correct):not(.wrong) {
+  box-shadow: var(--shadow-soft-hover) !important;
+  color: var(--primary) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Correct Answer: soft green background, NO harsh border */
+body.lesson-page .quiz-option.correct,
+.lesson-9-1 .quiz-option.correct,
+body.lesson-page .slide .quiz-option.correct {
+  background: #e6f9f0 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: inset 2px 2px 6px rgba(16, 185, 129, 0.15), inset -2px -2px 6px rgba(255, 255, 255, 0.8), 0 3px 10px rgba(16, 185, 129, 0.08) !important;
+  color: #065f46 !important;
+  font-weight: 700 !important;
+  transform: none !important;
+}
+
+/* Wrong Answer: soft red background, NO harsh border */
+body.lesson-page .quiz-option.wrong,
+.lesson-9-1 .quiz-option.wrong,
+body.lesson-page .slide .quiz-option.wrong {
+  background: #fef2f2 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: inset 2px 2px 6px rgba(239, 68, 68, 0.15), inset -2px -2px 6px rgba(255, 255, 255, 0.8), 0 3px 10px rgba(239, 68, 68, 0.08) !important;
+  color: #991b1b !important;
+  font-weight: 700 !important;
+  transform: none !important;
+}
+
+/* Feedback panel in pure inset neumorphism */
+body.lesson-page #quizFeedback,
+.lesson-9-1 #quizFeedback {
+  min-height: 54px !important;
+  padding: 18px 24px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-size: 0.96rem !important;
+  line-height: 1.55 !important;
+  font-weight: 600 !important;
+  margin-top: 18px !important;
+}
+
+/* 3. Neumorphic Checklist & Cards on Slide 4 ("СДЕЛАЙ В ДИЗАЙНЕ") */
+body.lesson-page .clean-list,
+.lesson-9-1 .clean-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+body.lesson-page .clean-list li,
+body.lesson-page .check-line,
+.lesson-9-1 .check-line,
+.lesson-9-1 .goal-box li {
+  list-style: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 20px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  color: var(--text-dark, #1e293b) !important;
+  transition: all 0.22s ease !important;
+  margin: 0 !important;
+}
+
+
+
+/* Checklist icon in tactile inset box */
+body.lesson-page .clean-list li i,
+body.lesson-page .check-line i,
+.lesson-9-1 .check-line i,
+.lesson-9-1 .goal-box li i {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  font-size: 1.1rem !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+body.lesson-page .clean-list li b,
+body.lesson-page .check-line b,
+.lesson-9-1 .check-line b {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Rubric rows in Neumorphism */
+body.lesson-page .rubric-row,
+.lesson-9-1 .rubric-row {
+  display: grid !important;
+  grid-template-columns: 180px 1fr !important;
+  gap: 16px !important;
+  padding: 16px 20px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+  align-items: center !important;
+  margin-bottom: 12px !important;
+  transition: all 0.22s ease !important;
+}
+
+
+
+body.lesson-page .rubric-row b,
+body.lesson-page .rubric-row strong,
+.lesson-9-1 .rubric-row b {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+}
+
+body.lesson-page .rubric-row p,
+.lesson-9-1 .rubric-row p {
+  margin: 0 !important;
+  color: var(--text-dark) !important;
+  font-size: 0.92rem !important;
+  line-height: 1.45 !important;
+}
+
+
+/* ==========================================================================
+   INTERACTIVE-ONLY NEUMORPHIC HOVER LAW:
+   1. CARDS DO NOT REACT TO HOVER (stay calm, steady, zero jump, zero indentation).
+   2. ONLY INTERACTIVE ELEMENTS (buttons, links, options) REACT ON HOVER WITH ВДАВЛИВАНИЕ.
+   ========================================================================== */
+
+/* 1. Eliminate any transform jumping across everything */
+body.lesson-page *:hover {
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+/* 2. Static Cards DO NOT react to hover (remain steady, no indent, no lift) */
+body.lesson-page .slide :is(
+  .card, .part-card, .step-card, .concept-card, .topic-card, .feature-card,
+  .task-card, .sim-card, .gesture-card, .formula-card, .paper, .box,
+  .panel, .glass, .glass-card, .quote, .quote-box, .hero-quote-box, blockquote,
+  .flow-step, .flowstep, .step, .pipe,
+  .clean-list li, .check-line, .checklist-item, .rubric-row, .goal-box li,
+  .goal, .goalitem, [class$="-card"]:not(button):not(a), [class*="-card "]:not(button):not(a)
+):hover {
+  box-shadow: var(--shadow-soft) !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+/* 3. ONLY INTERACTIVE ELEMENTS react on hover with indentation / вдавливание */
+body.lesson-page :is(
+  button:not(:disabled),
+  a[href],
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  .case-btn,
+  .quiz-option:not(.correct):not(.wrong),
+  .nav-btn,
+  .mobile-nav-btn,
+  .classes-menu-btn,
+  .neu-auth-btn,
+  .class-tab-pill,
+  .tab-home-link,
+  .btn-close-modal,
+  .start-btn,
+  .era-btn,
+  .worktab,
+  .tab-btn,
+  .filter-btn,
+  .k-btn,
+  .step-btn,
+  .tool-btn,
+  :is(#dots, #dotsNav, .dots, .dots-nav) :is(button, .dot, .dotbutton)
+):is(:hover, :focus-visible):not(:disabled) {
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  transform: none !important;
+  cursor: pointer !important;
+}
+
+/* Prevent icons or text inside hovered elements from shifting */
+body.lesson-page *:hover > :is(i, svg, img, .icon, span, b, p) {
+  transform: none !important;
+}
+
+
+/* ==========================================================================
+   UNIFIED PLATFORM DESIGN SYSTEM: QUIZZES, EYEBROWS, CHIPS & INTERACTIONS
+   Enforces consistent inset Neumorphism and exact layout across ALL grades.
+   ========================================================================== */
+
+/* 1. All Slide Eyebrows (ALWAYS INSET / ВДАВЛЕННЫЕ) */
+body.lesson-page .eyebrow,
+.eyebrow,
+.slide .eyebrow,
+.wrap .eyebrow,
+.narrow .eyebrow,
+.hero .eyebrow,
+.slide-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 6px 16px !important;
+  min-height: 32px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  color: var(--primary) !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 16px !important;
+  line-height: 1.2 !important;
+  width: fit-content !important;
+}
+
+body.lesson-page .eyebrow i,
+.eyebrow i {
+  color: var(--primary) !important;
+  font-size: 0.85rem !important;
+}
+
+/* 2. All Quiz Question Counters & Scores (ALWAYS INSET / ВДАВЛЕННЫЕ) */
+body.lesson-page :is(
+  .quizcount, .quizscore, .quiz-counter, .quiz-status, .quiz-score,
+  .quizcount span, .quizscore span, .quiztop span, .quiz-top span,
+  #recallCount, #recallScore, #quizCounter, #quizScore,
+  [id$="Count"], [id$="Score"], [class*="quiz-counter"], [class*="quiz-status"]
+) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 18px !important;
+  min-height: 38px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  color: var(--primary) !important;
+  letter-spacing: 0.02em !important;
+}
+
+body.lesson-page :is(.quizscore, .quiz-status, .quiz-score, #recallScore, #quizScore, [id$="Score"]) {
+  color: #059669 !important;
+}
+
+/* 3. All Quiz Options (NO BORDERS, SOFT INSET HOVER & STATES) */
+body.lesson-page :is(
+  .quiz-option, .quizoption, .recalloption, .choice, .option-btn,
+  .recalloptions button, .quiz-options button, .choices button
+) {
+  min-height: 54px !important;
+  padding: 16px 22px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-weight: 600 !important;
+  font-size: 0.98rem !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page :is(
+  .quiz-option, .quizoption, .recalloption, .choice, .option-btn,
+  .recalloptions button, .quiz-options button, .choices button
+):hover:not(.correct):not(.wrong):not(:disabled) {
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  transform: none !important;
+  color: var(--primary) !important;
+  border: 0 !important;
+  outline: none !important;
+}
+
+/* CORRECT ANSWER: Soft green, ZERO harsh outline */
+body.lesson-page :is(
+  .quiz-option, .quizoption, .recalloption, .choice, .option-btn,
+  .recalloptions button, .quiz-options button, .choices button
+).correct,
+body.lesson-page .quiz-option.correct,
+body.lesson-page .recalloption.correct {
+  background: #e6f9f0 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: inset 2px 2px 6px rgba(16, 185, 129, 0.18), inset -2px -2px 6px rgba(255, 255, 255, 0.85), 0 3px 10px rgba(16, 185, 129, 0.08) !important;
+  color: #065f46 !important;
+  font-weight: 700 !important;
+  transform: none !important;
+}
+
+/* WRONG ANSWER: Soft red, ZERO harsh outline */
+body.lesson-page :is(
+  .quiz-option, .quizoption, .recalloption, .choice, .option-btn,
+  .recalloptions button, .quiz-options button, .choices button
+).wrong,
+body.lesson-page .quiz-option.wrong,
+body.lesson-page .recalloption.wrong {
+  background: #fef2f2 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: inset 2px 2px 6px rgba(239, 68, 68, 0.18), inset -2px -2px 6px rgba(255, 255, 255, 0.85), 0 3px 10px rgba(239, 68, 68, 0.08) !important;
+  color: #991b1b !important;
+  font-weight: 700 !important;
+  transform: none !important;
+}
+
+/* Feedback & Next Button */
+body.lesson-page :is(
+  #quizFeedback, #recallFeedback, .quizfeedback, .quiz-feedback,
+  .quizfoot span, .quiz-foot span
+) {
+  min-height: 52px !important;
+  padding: 16px 22px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-size: 0.96rem !important;
+  line-height: 1.55 !important;
+  font-weight: 600 !important;
+  margin-top: 16px !important;
+}
+
+body.lesson-page :is(
+  #recallNext, .quizfoot button, .quiz-foot button, .action.advance, .quiz-next
+) {
+  min-height: 46px !important;
+  padding: 12px 26px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  margin-left: auto !important;
+}
+
+body.lesson-page :is(
+  #recallNext, .quizfoot button, .quiz-foot button, .action.advance, .quiz-next
+):hover:not(:disabled) {
+  box-shadow: var(--shadow-in) !important;
+  transform: none !important;
+}
+
+/* 4. Grade 9 Lesson 2: IP Address & Route Neumorphism */
+body.lesson-page .ipbig,
+.lesson-9-2 .ipbig {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  padding: 24px 0 !important;
+  margin: 12px 0 !important;
+}
+
+body.lesson-page .ipbig span,
+body.lesson-page .ipbig > span,
+.lesson-9-2 .ipbig > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 76px !important;
+  width: 76px !important;
+  height: 72px !important;
+  padding: 0 !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+body.lesson-page .ipbig > span:after {
+  display: none !important;
+  content: none !important;
+}
+
+body.lesson-page .ipbig b,
+.lesson-9-2 .ipbig b {
+  font-size: 2.2rem !important;
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+  padding: 0 2px !important;
+}
+
+body.lesson-page .paper.visual .label {
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--primary) !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+}
+
+body.lesson-page .route,
+.lesson-9-2 .route {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  margin-top: 18px !important;
+}
+
+body.lesson-page .route .node,
+.lesson-9-2 .route .node {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  color: var(--text-dark, #1e293b) !important;
+}
+
+body.lesson-page .route .arrow,
+.lesson-9-2 .route .arrow {
+  color: var(--primary) !important;
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+}
+
+/* 5. Keywords Chips (.chips .chip) (ALWAYS INSET / ВДАВЛЕННЫЕ) */
+body.lesson-page .chips,
+.lesson-page .chips {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 20px !important;
+}
+
+body.lesson-page .chips .chip,
+body.lesson-page .chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  min-height: 36px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+}
+
+body.lesson-page .chips .chip i,
+body.lesson-page .chip i {
+  font-size: 0.95rem !important;
+  color: var(--primary) !important;
+}
+
+
+/* ==========================================================================
+   TARGETED REFINEMENTS & CONSISTENT DESIGN ACROSS ALL LESSONS:
+   1. 2^128 Formula correctly aligned together as base + exponent.
+   2. IP Address (.ipbig) displays numbers clearly via data-value.
+   3. Card icons (.card .icon, .icon) are strictly INSET / ВДАВЛЕННЫЕ.
+   4. Tags & example pills (.card .tag, .tag) are strictly INSET / ВДАВЛЕННЫЕ.
+   5. Remove grey background from .workpanel, clean soft neumorphic cards for .build.
+   6. Worktabs & pieces in pure Neumorphism.
+   ========================================================================== */
+
+/* 1. 2^128 Formula (Proper exponent alignment) */
+.power,
+body.lesson-page .power {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 24px auto !important;
+  padding: 30px !important;
+  background: var(--surface) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  max-width: 720px !important;
+}
+
+.power .formula,
+body.lesson-page .power .formula {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  margin: 0 auto 12px auto !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-size: 3.8rem !important;
+  font-weight: 800 !important;
+  color: var(--primary) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  grid-template-columns: none !important;
+}
+
+.power .formula sup,
+body.lesson-page .power .formula sup {
+  font-size: 1.9rem !important;
+  font-weight: 800 !important;
+  color: var(--primary) !important;
+  margin-left: 4px !important;
+  position: relative !important;
+  top: -0.65em !important;
+}
+
+.power .number,
+body.lesson-page .power .number {
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: var(--text-dark, #1e293b) !important;
+  line-height: 1.4 !important;
+  word-break: break-all !important;
+  margin-top: 12px !important;
+}
+
+/* 2. IP Address Numbers (.ipbig) */
+body.lesson-page .ipbig,
+.lesson-9-2 .ipbig {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  padding: 24px 0 !important;
+  margin: 12px 0 !important;
+}
+
+body.lesson-page .ipbig > span,
+.lesson-9-2 .ipbig > span {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 76px !important;
+  width: 76px !important;
+  height: 72px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+  overflow: visible !important;
+}
+
+body.lesson-page .ipbig > span:after,
+.lesson-9-2 .ipbig > span:after {
+  content: attr(data-value) !important;
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+  z-index: 4 !important;
+}
+
+/* 3. Inset Icons (.card .icon, .icon everywhere) */
+body.lesson-page :is(.card .icon, .compare .icon, .analogy .big, .analogy-icon, .icon-box, .myth .icon, .device i, .router i, .hero .big, .slide .icon:not(.brand-icon-box)) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  color: var(--primary) !important;
+  font-size: 1.4rem !important;
+  margin-bottom: 14px !important;
+}
+
+/* 4. Inset Tags & Example Pills (.tag, .card .tag, "пример: ...") */
+body.lesson-page :is(.tag, .card .tag, .compare .tag, .tag-blue, .card-tag) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  min-height: 30px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  color: var(--primary) !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  width: fit-content !important;
+  margin-top: 10px !important;
+}
+
+/* 5. Remove grey background from .workpanel */
+body.lesson-page .workpanel,
+.workpanel,
+.workpanel.active {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+body.lesson-page .build,
+.build {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 16px 22px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  margin-bottom: 14px !important;
+}
+
+body.lesson-page :is(.worktab, .worktabs button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 20px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+body.lesson-page :is(.worktab.active, .worktabs button.active) {
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+
+body.lesson-page .piece,
+.piece {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+body.lesson-page .piece:hover,
+body.lesson-page .piece.used {
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+}
+
+
+/* ==========================================================================
+   ERGONOMIC SIZING & FLATICON INTEGRATION (OCT 28, 2026):
+   1. .paper.visual and .ipbig sized perfectly to NEVER overflow card.
+   2. .route stays strictly in ONE horizontal row (flex-wrap: nowrap).
+   3. Octet numbers render cleanly with NO brown shadow or duplicate text.
+   4. Flaticon icons in chips, cards and badges sized and aligned properly.
+   ========================================================================== */
+
+/* 1. Ergonomic .paper.visual container */
+body.lesson-page .paper.visual,
+.lesson-9-2 .paper.visual {
+  padding: 24px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--surface) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+body.lesson-page .paper.visual .label,
+.lesson-9-2 .paper.visual .label {
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--primary) !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  margin-bottom: 14px !important;
+}
+
+/* 2. Ergonomic .ipbig: fits 100% inside container */
+body.lesson-page .ipbig,
+.lesson-9-2 .ipbig {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 10px 0 16px 0 !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page .ipbig > span,
+.lesson-9-2 .ipbig > span {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1 1 0 !important;
+  max-width: 64px !important;
+  min-width: 48px !important;
+  height: 58px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-size: 1.55rem !important;
+  font-weight: 800 !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+  overflow: hidden !important;
+}
+
+/* Completely suppress any old inner elements / flip leafs */
+body.lesson-page .ipbig > span *,
+.lesson-9-2 .ipbig > span * {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Crisp number display with zero brown blur / shadow */
+body.lesson-page .ipbig > span:after,
+.lesson-9-2 .ipbig > span:after {
+  content: attr(data-value) !important;
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--primary) !important;
+  font-size: 1.55rem !important;
+  font-weight: 800 !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1 !important;
+  text-shadow: none !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+body.lesson-page .ipbig b,
+.lesson-9-2 .ipbig b {
+  font-size: 1.7rem !important;
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+  padding: 0 1px !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* 3. Ergonomic .route: fits in ONE line without wrapping */
+body.lesson-page .route,
+.lesson-9-2 .route {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+  flex-wrap: nowrap !important;
+  margin-top: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page .route .node,
+.lesson-9-2 .route .node {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 7px 9px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  color: var(--text-dark, #1e293b) !important;
+  white-space: nowrap !important;
+  flex: 0 1 auto !important;
+}
+
+body.lesson-page .route .node i,
+.lesson-9-2 .route .node i {
+  font-size: 0.95rem !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+}
+
+body.lesson-page .route .arrow,
+.lesson-9-2 .route .arrow {
+  color: var(--primary) !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  flex: 0 0 auto !important;
+  padding: 0 2px !important;
+  animation: none !important;
+}
+
+/* 4. Chips and Flaticon icons */
+body.lesson-page .chips .chip i[data-flaticon],
+body.lesson-page .chip i[data-flaticon],
+body.lesson-page .chip [data-flaticon] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  color: var(--primary) !important;
+}
+
+
+/* ==========================================================================
+   USER REFINEMENTS (OCT 28, 2026 - PART 2):
+   5. IP Builder Layout & Compact Tool Buttons (.build, .buildtools).
+   6. Strict Inset Neumorphism for Informational Chips (.stepchip, .tag).
+      Static badges are INSET by default and NEVER react to hover.
+   ========================================================================== */
+
+/* 5. IP Builder (.build & .buildtools) */
+body.lesson-page .build,
+.lesson-9-2 .build,
+.lesson-9-3 .build {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 14px 20px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  margin-bottom: 12px !important;
+  flex-wrap: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page .build > div:first-child,
+.lesson-9-3 .build > div:first-child {
+  flex: 0 0 190px !important;
+  min-width: 190px !important;
+  max-width: 210px !important;
+}
+
+body.lesson-page .build .pieces,
+.lesson-9-3 .build .pieces {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  flex: 0 1 auto !important;
+}
+
+body.lesson-page .build .buildstatus,
+.lesson-9-3 .build .buildstatus {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  color: var(--primary) !important;
+  margin-left: 8px !important;
+  min-width: 20px !important;
+  white-space: nowrap !important;
+}
+
+/* Compact tool buttons: "Убрать последний" and "Сначала" */
+body.lesson-page .buildtools,
+.lesson-9-3 .buildtools,
+.buildtools {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+}
+
+body.lesson-page .buildtools :is(button, .choice, .action),
+.lesson-9-3 .buildtools :is(button, .choice, .action) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  max-height: 32px !important;
+  padding: 4px 12px !important;
+  border-radius: 10px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+  width: auto !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+body.lesson-page .buildtools :is(button, .choice, .action):hover,
+.lesson-9-3 .buildtools :is(button, .choice, .action):hover {
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+}
+
+body.lesson-page .buildtools :is(button, .choice, .action):active,
+.lesson-9-3 .buildtools :is(button, .choice, .action):active {
+  box-shadow: var(--shadow-in) !important;
+  transform: scale(0.98) !important;
+}
+
+/* 6. Static Informational Badges & Chips: Strictly INSET by default, ZERO hover reaction */
+body.lesson-page :is(.stepchip, .chip-info, .fact-badge),
+body.lesson-page .card :is(.tag, .stepchip),
+body.lesson-page .paper :is(.tag, .stepchip),
+.lesson-9-3 :is(.stepchip, .tag) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  min-height: 28px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  color: var(--primary) !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  width: fit-content !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  margin-top: 10px !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+body.lesson-page :is(.stepchip, .chip-info, .fact-badge):hover,
+body.lesson-page .card :is(.tag, .stepchip):hover,
+body.lesson-page .paper :is(.tag, .stepchip):hover,
+.lesson-9-3 :is(.stepchip, .tag):hover {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  transform: none !important;
+  color: var(--primary) !important;
+  border: 0 !important;
+}
+
+
+/* ==========================================================================
+   USER REFINEMENTS (OCT 28, 2026 - PART 3):
+   7. Speedometer Dial Gauge Fix (Strict circular border-radius: 50%).
+   8. Lesson 9-5 & 9-6 Palette Harmonization (Pure Grade 9 Violet Neumorphism).
+   ========================================================================== */
+
+/* 7. Speedometer Gauge Fix */
+body.lesson-page .speedtest-dial-light,
+.lesson-9-6 .speedtest-dial-light,
+.speedtest-dial-light {
+  width: 200px !important;
+  height: 200px !important;
+  border-radius: 50% !important;
+  border: 14px solid rgba(124, 58, 237, 0.12) !important;
+  border-top-color: var(--primary) !important;
+  border-right-color: var(--primary) !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  box-sizing: border-box !important;
+  transform: rotate(-45deg) !important;
+}
+
+body.lesson-page .speedtest-needle-light,
+.lesson-9-6 .speedtest-needle-light,
+.speedtest-needle-light {
+  position: absolute !important;
+  width: 4px !important;
+  height: 88px !important;
+  background: var(--primary) !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform-origin: bottom center !important;
+  border-radius: 4px 4px 0 0 !important;
+  will-change: transform !important;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.45) !important;
+  z-index: 5 !important;
+}
+
+body.lesson-page .speedtest-go-btn,
+.lesson-9-6 .speedtest-go-btn,
+.speedtest-go-btn {
+  width: 72px !important;
+  height: 72px !important;
+  border-radius: 50% !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--primary) !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  border: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  margin: 12px auto 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.lesson-page .speedtest-go-btn:hover,
+.lesson-9-6 .speedtest-go-btn:hover {
+  box-shadow: var(--shadow-in) !important;
+  transform: scale(0.98) !important;
+  color: var(--primary) !important;
+}
+
+body.lesson-page .speedtest-gauge-wrap,
+.lesson-9-6 .speedtest-gauge-wrap {
+  width: 200px !important;
+  height: 110px !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* 8. Pure Grade 9 Palette for Lesson 9-5 & 9-6 */
+body.lesson-page .lesson-9-5 .hero-visual,
+body.lesson-page .lesson-9-5 .hero-visual[data-mode=ip],
+.lesson-9-5 .hero-visual,
+.lesson-9-5 .hero-visual[data-mode=ip] {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: var(--shadow-soft) !important;
+  border-radius: 20px !important;
+}
+
+body.lesson-page .lesson-9-5 .hero-toolbar,
+.lesson-9-5 .hero-toolbar {
+  color: var(--primary) !important;
+}
+
+body.lesson-page .lesson-9-5 .hero-code .flip-cell,
+.lesson-9-5 .hero-code .flip-cell {
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  border-radius: 12px !important;
+}
+
+body.lesson-page .lesson-9-5 .hero-phases,
+.lesson-9-5 .hero-phases {
+  border-top: 1px solid rgba(124, 58, 237, 0.08) !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+}
+
+body.lesson-page .lesson-9-5 .hero-phases .active,
+.lesson-9-5 .hero-phases .active {
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+}
+
+body.lesson-page .lesson-9-5 .hero-motion,
+.lesson-9-5 .hero-motion {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--primary) !important;
+  border-radius: 10px !important;
+  border: 0 !important;
+}
+
+/* Lesson 9-6 PC Stage & Formula Cards */
+body.lesson-page .lesson-9-6 .hero-pc-stage,
+.lesson-9-6 .hero-pc-stage {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-soft) !important;
+  padding: 24px 20px !important;
+}
+
+body.lesson-page .lesson-9-6 .formula-banner,
+.lesson-9-6 .formula-banner {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: var(--primary) !important;
+}
+
+body.lesson-page .lesson-9-6 .formula-math,
+.lesson-9-6 .formula-math {
+  color: var(--primary) !important;
+}
+
+body.lesson-page .lesson-9-6 .sim-progress-track,
+.lesson-9-6 .sim-progress-track {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  border-radius: 14px !important;
+}
+
+body.lesson-page .lesson-9-6 .main-thought,
+.lesson-9-6 .main-thought {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 5px solid var(--primary) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+body.lesson-page .lesson-9-6 .summary-card,
+.lesson-9-6 .summary-card {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+}
+
+/* Universal Review Celebration & Total */
+body.lesson-page :is(.review-celebration, .paper.review-celebration) {
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  border-radius: 22px !important;
+  text-align: center !important;
+}
+
+body.lesson-page .review-total {
+  color: var(--primary) !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-weight: 800 !important;
+}
+
+
+/* ==========================================================================
+   OFFICIAL PALETTES BY GRADE (STRICT NEUMORPHISM WITH COLOR TINTS):
+   9 КЛАСС   - Лавандовый:
+     bg: #EEEBF8, surface: #FCFAFF, border: #C5BDE0, primary: #8067D8, text: #302A49
+   10 ЕМН    - Нежно-голубой:
+     bg: #E3F0FA, surface: #F6FBFF, border: #B2CEDF, primary: #3289CE, text: #244761
+   10 ОГН    - Мятный:
+     bg: #E5F2EC, surface: #F7FFFA, border: #B4D4C5, primary: #299A78, text: #24483C
+   11 КЛАСС  - Персиковый:
+     bg: #FFF0E7, surface: #FFFAF6, border: #EAC9B7, primary: #ED906C, text: #593C36
+   ========================================================================== */
+
+/* 9 КЛАСС: ЛАВАНДОВЫЙ */
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) {
+  --bg: #EEEBF8;
+  --page: #EEEBF8;
+  --surface: #FCFAFF;
+  --surface-lift: #FCFAFF;
+  --surface-recess: #F1EDFA;
+  --bg-card: #FCFAFF;
+  --primary: #8067D8;
+  --primary-dark: #674ebd;
+  --primary-light: rgba(128, 103, 216, 0.12);
+  --accent: #8067D8;
+  --clay: #8067D8;
+  --indigo: #8067D8;
+  --line: #C5BDE0;
+  --ink: #302A49;
+  --text-dark: #302A49;
+  --muted: #6B6388;
+  --shadow-soft: 8px 8px 20px rgba(197, 189, 224, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95);
+  --shadow-in: inset 3px 3px 7px rgba(197, 189, 224, 0.50), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+  background-color: #EEEBF8 !important;
+  color: #302A49 !important;
+}
+
+/* 10 ЕМН: НЕЖНО-ГОЛУБОЙ */
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) {
+  --bg: #E3F0FA;
+  --page: #E3F0FA;
+  --surface: #F6FBFF;
+  --surface-lift: #F6FBFF;
+  --surface-recess: #EAF4FC;
+  --bg-card: #F6FBFF;
+  --primary: #3289CE;
+  --primary-dark: #2072b2;
+  --primary-light: rgba(50, 137, 206, 0.12);
+  --accent: #3289CE;
+  --clay: #3289CE;
+  --indigo: #3289CE;
+  --line: #B2CEDF;
+  --ink: #244761;
+  --text-dark: #244761;
+  --muted: #5C7C96;
+  --shadow-soft: 8px 8px 20px rgba(178, 206, 223, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95);
+  --shadow-in: inset 3px 3px 7px rgba(178, 206, 223, 0.50), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+  background-color: #E3F0FA !important;
+  color: #244761 !important;
+}
+
+/* 10 ОГН: МЯТНЫЙ */
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) {
+  --bg: #E5F2EC;
+  --page: #E5F2EC;
+  --surface: #F7FFFA;
+  --surface-lift: #F7FFFA;
+  --surface-recess: #EDF7F2;
+  --bg-card: #F7FFFA;
+  --primary: #299A78;
+  --primary-dark: #1e7d60;
+  --primary-light: rgba(41, 154, 120, 0.12);
+  --accent: #299A78;
+  --clay: #299A78;
+  --indigo: #299A78;
+  --line: #B4D4C5;
+  --ink: #24483C;
+  --text-dark: #24483C;
+  --muted: #557A6C;
+  --shadow-soft: 8px 8px 20px rgba(180, 212, 197, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95);
+  --shadow-in: inset 3px 3px 7px rgba(180, 212, 197, 0.50), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+  background-color: #E5F2EC !important;
+  color: #24483C !important;
+}
+
+/* 11 КЛАСС: ПЕРСИКОВЫЙ */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) {
+  --bg: #FFF0E7;
+  --page: #FFF0E7;
+  --surface: #FFFAF6;
+  --surface-lift: #FFFAF6;
+  --surface-recess: #FBEFE8;
+  --bg-card: #FFFAF6;
+  --primary: #ED906C;
+  --primary-dark: #cf7350;
+  --primary-light: rgba(237, 144, 108, 0.12);
+  --accent: #ED906C;
+  --clay: #ED906C;
+  --indigo: #ED906C;
+  --line: #EAC9B7;
+  --ink: #593C36;
+  --text-dark: #593C36;
+  --muted: #8A675F;
+  --shadow-soft: 8px 8px 20px rgba(234, 201, 183, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95);
+  --shadow-in: inset 3px 3px 7px rgba(234, 201, 183, 0.50), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+  background-color: #FFF0E7 !important;
+  color: #593C36 !important;
+}
+
+/* Ensure all cards, papers, panels inherit the grade surface and soft shadow */
+body.lesson-page :is(.paper, .card, .panel, .paper.pad, .paper.visual) {
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #1e293b) !important;
+}
+
+/* Inset definition boxes */
+body.lesson-page :is(.definition, .paper.definition, .card.definition) {
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  border-left: 5px solid var(--primary) !important;
+  color: var(--text-dark, #1e293b) !important;
+}
+
+
+/* ==========================================================================
+   PERFECTED NEUMORPHIC COMPONENT STYLES & LAYOUT FIXES:
+   1. IP Builder (.build, .buildtools) - Compact, balanced, no erratic right-drift.
+   2. Static Badges (.stepchip, .tag, .chip-info) - Strictly INSET, NEVER react to hover.
+   3. Grade 9-5 DNS Visualizer & Grade 9-6 Stages - Pure Lavender Neumorphism.
+   ========================================================================== */
+
+/* 1. IP Builder (.build, .buildtools) */
+body.lesson-page .build,
+.lesson-9-2 .build,
+.lesson-9-3 .build {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 14px !important;
+  padding: 12px 18px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  margin-bottom: 12px !important;
+  flex-wrap: wrap !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page .build > div:first-child,
+.lesson-9-2 .build > div:first-child,
+.lesson-9-3 .build > div:first-child {
+  flex: 0 0 185px !important;
+  min-width: 175px !important;
+  max-width: 200px !important;
+}
+
+body.lesson-page .build .pieces,
+.lesson-9-2 .build .pieces,
+.lesson-9-3 .build .pieces {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+  flex: 0 1 auto !important;
+}
+
+body.lesson-page .build .piece,
+.lesson-9-2 .build .piece,
+.lesson-9-3 .build .piece {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 4px 12px !important;
+  border-radius: 10px !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--text-dark, #302A49) !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+body.lesson-page .build .piece:hover,
+.lesson-9-2 .build .piece:hover,
+.lesson-9-3 .build .piece:hover {
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+}
+
+body.lesson-page .build .piece:disabled,
+.lesson-9-2 .build .piece:disabled,
+.lesson-9-3 .build .piece:disabled {
+  box-shadow: var(--shadow-in) !important;
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+/* Compact helper tools: Убрать / Сначала */
+body.lesson-page .build .buildtools,
+.lesson-9-2 .build .buildtools,
+.lesson-9-3 .build .buildtools,
+.buildtools {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+  margin-left: 6px !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+}
+
+body.lesson-page .buildtools :is(button, .choice, .action),
+.lesson-9-2 .buildtools :is(button, .choice, .action),
+.lesson-9-3 .buildtools :is(button, .choice, .action) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 26px !important;
+  height: 26px !important;
+  max-height: 26px !important;
+  padding: 2px 10px !important;
+  border-radius: 8px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  color: var(--muted, #6B6388) !important;
+  width: auto !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+body.lesson-page .buildtools :is(button, .choice, .action):hover,
+.lesson-9-2 .buildtools :is(button, .choice, .action):hover,
+.lesson-9-3 .buildtools :is(button, .choice, .action):hover {
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+  transform: none !important;
+}
+
+body.lesson-page .buildtools :is(button, .choice, .action):active,
+.lesson-9-2 .buildtools :is(button, .choice, .action):active,
+.lesson-9-3 .buildtools :is(button, .choice, .action):active {
+  box-shadow: var(--shadow-in) !important;
+  transform: scale(0.97) !important;
+}
+
+body.lesson-page .build .buildstatus,
+.lesson-9-2 .build .buildstatus,
+.lesson-9-3 .build .buildstatus {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  color: var(--primary) !important;
+  margin-left: 10px !important;
+  white-space: nowrap !important;
+}
+
+/* 2. Static Badges (.stepchip, .tag, .chip-info): Strictly Inset, NEVER React on Hover */
+:is(.stepchip, .chip-info, .fact-badge, .badge-input, .badge-hidden, .badge-output),
+body.lesson-page :is(.stepchip, .chip-info, .fact-badge, .ratio-badge-clay, .ratio-badge-sage),
+body.lesson-page .card :is(.tag, .stepchip),
+body.lesson-page .paper :is(.tag, .stepchip),
+.lesson-9-3 :is(.stepchip, .tag) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 5px 12px !important;
+  min-height: 26px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  color: var(--primary) !important;
+  font-family: var(--font-main, "Manrope", sans-serif) !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  width: fit-content !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+:is(.stepchip, .chip-info, .fact-badge, .badge-input, .badge-hidden, .badge-output):hover,
+body.lesson-page :is(.stepchip, .chip-info, .fact-badge, .ratio-badge-clay, .ratio-badge-sage):hover,
+body.lesson-page .card :is(.tag, .stepchip):hover,
+body.lesson-page .paper :is(.tag, .stepchip):hover,
+.lesson-9-3 :is(.stepchip, .tag):hover {
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-in) !important;
+  transform: none !important;
+  color: var(--primary) !important;
+  border: 0 !important;
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+/* 3. Lesson 9-5 DNS Visualizer Neumorphism */
+body.lesson-page .lesson-9-5 .resolver-track,
+.lesson-9-5 .resolver-track {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 25px 24px !important;
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  color: var(--muted) !important;
+}
+
+body.lesson-page .lesson-9-5 .resolver-track b,
+.lesson-9-5 .resolver-track b {
+  background: var(--primary) !important;
+  color: #fff !important;
+  letter-spacing: 0.06em !important;
+  padding: 8px 14px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 14px rgba(128, 103, 216, 0.35) !important;
+}
+
+body.lesson-page .lesson-9-5 .signal-path,
+.lesson-9-5 .signal-path {
+  background: rgba(128, 103, 216, 0.20) !important;
+}
+
+body.lesson-page .lesson-9-5 .signal-path i,
+.lesson-9-5 .signal-path i {
+  background: var(--primary) !important;
+}
+
+/* 4. Lesson 9-6 Clean Devices & Metrics */
+body.lesson-page .lesson-9-6 .device-display,
+.lesson-9-6 .device-display {
+  background: var(--surface-recess, #F1EDFA) !important;
+  box-shadow: var(--shadow-in) !important;
+  color: var(--primary) !important;
+  border: 0 !important;
+}
+
+body.lesson-page .lesson-9-6 .stream-packet,
+.lesson-9-6 .stream-packet {
+  background: var(--primary) !important;
+  box-shadow: 0 4px 14px rgba(128, 103, 216, 0.40) !important;
+  color: #fff !important;
+}
+
+body.lesson-page .lesson-9-6 .sim-progress-bar,
+.lesson-9-6 .sim-progress-bar {
+  background: var(--primary) !important;
+}
+
+
+/* ==========================================================================
+   OFFICIAL NEUMORPHIC SUMMARY & RUBRIC DESIGN (ИТОГИ УРОКА И КРИТЕРИИ)
+   ========================================================================== */
+
+/* Subtitle for rubric */
+body.lesson-page .rubric-subtitle,
+.rubric-subtitle {
+  font-size: 0.95rem !important;
+  color: var(--muted, #6B6388) !important;
+  margin: 6px 0 16px 0 !important;
+  line-height: 1.5 !important;
+}
+
+body.lesson-page .rubric-subtitle strong,
+.rubric-subtitle strong {
+  color: var(--ink, #302A49) !important;
+}
+
+/* Rubric Container */
+body.lesson-page :is(.rubric, .paper.rubric) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 14px 0 !important;
+}
+
+/* Individual Rubric Card / Row */
+body.lesson-page :is(.rubric .row, .rubric .rubric-card, .rubric-row) {
+  display: grid !important;
+  grid-template-columns: 88px 1fr !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 14px 18px !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page :is(.rubric .row:hover, .rubric .rubric-card:hover, .rubric-row:hover) {
+  transform: translateY(-2px) !important;
+}
+
+/* Score Pill (.rs) */
+body.lesson-page :is(.rubric .rs, .rubric-card .rs, .rubric-row .rs) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 82px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: var(--surface-recess, #F1EDFA) !important;
+  box-shadow: var(--shadow-in) !important;
+  font-family: var(--font-mono, "JetBrains Mono", monospace) !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  color: var(--primary) !important;
+  letter-spacing: 0.02em !important;
+  border: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Accent colors for 4 levels */
+body.lesson-page :is(.rubric .row:nth-child(1), .rubric .rubric-card:nth-child(1), .rubric-row:nth-child(1)) .rs {
+  color: #10B981 !important; /* 9-10: Green/Emerald */
+}
+body.lesson-page :is(.rubric .row:nth-child(2), .rubric .rubric-card:nth-child(2), .rubric-row:nth-child(2)) .rs {
+  color: var(--primary) !important; /* 7-8: Primary Violet */
+}
+body.lesson-page :is(.rubric .row:nth-child(3), .rubric .rubric-card:nth-child(3), .rubric-row:nth-child(3)) .rs {
+  color: #3B82F6 !important; /* 5-6: Blue */
+}
+body.lesson-page :is(.rubric .row:nth-child(4), .rubric .rubric-card:nth-child(4), .rubric-row:nth-child(4)) .rs {
+  color: #8B5CF6 !important; /* 0-4: Soft Violet / Muted */
+}
+
+/* Rubric Titles & Subtitles */
+body.lesson-page :is(.rubric .row, .rubric .rubric-card, .rubric-row) strong {
+  display: block !important;
+  font-size: 1.02rem !important;
+  font-weight: 800 !important;
+  color: var(--ink, #302A49) !important;
+  margin-bottom: 2px !important;
+}
+
+body.lesson-page :is(.rubric .row, .rubric .rubric-card, .rubric-row) .sub {
+  display: block !important;
+  font-size: 0.86rem !important;
+  color: var(--muted, #6B6388) !important;
+  line-height: 1.42 !important;
+}
+
+/* Right Side: Summary Panel (.summary-panel, .paper.pad) */
+body.lesson-page :is(.summary-panel, .paper.pad, .hero .paper.pad) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 24px 26px !important;
+  border-radius: 20px !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 0 !important;
+}
+
+body.lesson-page :is(.summary-panel, .paper.pad) h3 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: var(--ink, #302A49) !important;
+  margin: 0 !important;
+}
+
+body.lesson-page :is(.summary-panel, .paper.pad) h3 i {
+  color: var(--primary) !important;
+  font-size: 1.35rem !important;
+}
+
+/* Summary Checklist (.summary, .summary-list) */
+body.lesson-page :is(.summary, .summary-list) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.lesson-page :is(.summary .sum, .summary-list .summary-item) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 12px 16px !important;
+  border-radius: 14px !important;
+  background: var(--surface-recess, #F1EDFA) !important;
+  box-shadow: var(--shadow-in) !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  color: var(--ink, #302A49) !important;
+  line-height: 1.4 !important;
+  border: 0 !important;
+}
+
+/* Checkmark Icon in Summary Items (ONLY the check-icon, NEVER text) */
+body.lesson-page :is(.sum > .check-icon, .sum > span:first-child:not(.sum-text), .summary-item > .check-icon, .summary-item > span:first-child:not(.sum-text)) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  border-radius: 50% !important;
+  background: var(--primary) !important;
+  color: #fff !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(128, 103, 216, 0.40) !important;
+  border: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Text in Summary Items */
+body.lesson-page :is(.sum > span:nth-child(2), .sum > .sum-text, .summary-item > .sum-text, .summary-item > span:not(.check-icon), .summary-item > div) {
+  display: block !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: var(--ink, #302A49) !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
+  overflow: visible !important;
+}
+
+/* Conclusion Box (.conclusion-box, .paper.pad .definition) */
+body.lesson-page :is(.conclusion-box, .paper.pad .definition) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin-top: 6px !important;
+  background: var(--surface-recess, #F1EDFA) !important;
+  box-shadow: var(--shadow-in) !important;
+  border-left: 5px solid var(--primary) !important;
+  border-radius: 14px !important;
+  padding: 14px 18px !important;
+  font-size: 0.92rem !important;
+  line-height: 1.5 !important;
+  color: var(--ink, #302A49) !important;
+}
+
+body.lesson-page .conclusion-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  color: var(--primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+body.lesson-page .conclusion-badge i {
+  font-size: 0.95rem !important;
+}
+
+body.lesson-page :is(.conclusion-box, .paper.pad .definition) p {
+  margin: 0 !important;
+  font-size: 0.92rem !important;
+  line-height: 1.5 !important;
+  color: var(--ink, #302A49) !important;
+}
+
+/* Capsule Chips on Slide 1 (.chips .chip) */
+body.lesson-page .chips .chip,
+body.lesson-page .chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 18px !important;
+  min-height: 38px !important;
+  border-radius: 9999px !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-in) !important;
+  border: 0 !important;
+  color: var(--primary) !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  cursor: default !important;
+  user-select: none !important;
+}
+
+body.lesson-page .chips .chip i[data-flaticon],
+body.lesson-page .chip i[data-flaticon] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.15rem !important;
+  line-height: 1 !important;
+  color: var(--primary) !important;
 }

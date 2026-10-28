@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../стили/lessons.css?v=neumorph-2026-10-28-26">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v43">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head><body class="lesson-page lesson-9-2" data-lesson-id="9-2">
 
   <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
@@ -65,25 +66,48 @@
   </div>
 
   <div class="progress" id="progress"></div><main>
-<section class="slide active"><div class="wrap hero"><div><span class="eyebrow">🌐 9 класс · урок 2</span><h1>IP-адрес<br><span class="accent">компьютера</span></h1><p class="lead">Как устройства находят друг друга в сети, почему адрес выглядит как <span class="mono">192.168.1.5</span> и что он действительно может рассказать о нас.</p></div><div class="paper visual"><div class="label">СЕТЕВОЙ АДРЕС УСТРОЙСТВА</div><div class="ipbig"><span>192</span><b>.</b><span>168</span><b>.</b><span>1</span><b>.</b><span>5</span></div><div class="route"><div class="node"><i>💻</i>компьютер</div><div class="arrow">→</div><div class="node"><i>📶</i>роутер</div><div class="arrow">→</div><div class="node"><i>🌍</i>интернет</div></div></div></div></section>
+<section class="slide active"><div class="wrap hero"><div><span class="eyebrow">01 · ВВЕДЕНИЕ</span><h1>IP-адрес<br><span class="accent">компьютера</span></h1><p class="lead">Как устройства находят друг друга в сети, почему адрес выглядит как <span class="mono">192.168.1.5</span> и что он действительно может рассказать о нас.</p>
+<div class="chips">
+  <span class="chip"><i data-flaticon="network"></i> IP-адрес</span>
+  <span class="chip"><i data-flaticon="binary"></i> октет</span>
+  <span class="chip"><i data-flaticon="sitemap"></i> маршрутизация</span>
+  <span class="chip"><i data-flaticon="computer"></i> локальная сеть</span>
+</div>
+<div class="definition">
+  <strong>9.1.2.1 — описывать назначение протоколов (IP, TCP/IP, FTP, HTTPS); 9.1.2.2 — определять адрес сети по заданному IP-адресу узла и маске</strong>
+</div></div><div class="paper visual"><div class="label">СЕТЕВОЙ АДРЕС УСТРОЙСТВА</div><div class="ipbig"><span data-value="192">192</span><b>.</b><span data-value="168">168</span><b>.</b><span data-value="1">1</span><b>.</b><span data-value="5">5</span></div><div class="route"><div class="node"><i>💻</i>компьютер</div><div class="arrow">→</div><div class="node"><i>📶</i>роутер</div><div class="arrow">→</div><div class="node"><i>🌍</i>интернет</div></div></div></div></section>
 
-<section class="slide"><div class="narrow"><span class="eyebrow">01 · Вспоминаем</span><h2>Тест по прошлой теме</h2><p class="sub">6 вопросов об ИИ. Порядок вопросов и вариантов меняется при каждом запуске.</p><div class="paper recallquiz"><div class="quiztop"><span class="quizcount" id="recallCount">Вопрос 1 / 6</span><span class="quizscore" id="recallScore">Верно: 0</span></div><h3 class="recallquestion" id="recallQuestion"></h3><div class="recalloptions" id="recallOptions"></div><div class="quizfoot"><span class="quizfeedback" id="recallFeedback">Выберите наиболее точный ответ.</span><button class="action" id="recallNext" hidden>Следующий →</button></div></div></div></section>
+<section class="slide"><div class="narrow"><span class="eyebrow">02 · ВСПОМИНАЕМ</span><h2>Тест по прошлой теме</h2><p class="sub">6 вопросов об ИИ. Порядок вопросов и вариантов меняется при каждом запуске.</p><div class="paper recallquiz" id="recallQuiz"><div class="quiztop"><span class="quizcount" id="recallCount">Вопрос 1 / 6</span><span class="quizscore" id="recallScore">Верно: 0</span></div><h3 class="recallquestion" id="recallQuestion"></h3><div class="recalloptions" id="recallOptions"></div><div class="quizfoot"><span class="quizfeedback" id="recallFeedback">Выберите наиболее точный ответ.</span><button class="action" id="recallNext" hidden>Следующий →</button></div></div>
+<div id="recallSummary" hidden>
+  <div class="paper review-celebration">
+    <div id="recallConfetti" class="review-confetti" aria-hidden="true"></div>
+    <div class="bigicon" aria-hidden="true">🎉</div>
+    <h3 id="recallSummaryTitle" tabindex="-1">Ты молодец!</h3>
+    <div class="review-total" id="recallTotal">6 из 6</div>
+    <p class="small">баллов за повторение</p>
+    <p id="recallMessage"></p>
+  </div>
+  <details class="card explanation below" id="recallDetails">
+    <summary>Мои ответы и правильные решения</summary>
+    <ol id="recallAnswerList" class="review-answers"></ol>
+  </details>
+</div></div></section>
 
-<section class="slide"><div class="narrow"><span class="eyebrow">02 · Главная идея</span><h2>Устройству тоже нужен адрес</h2><div class="analogy"><div class="paper"><div class="big">🏠</div><h3>Почтовый адрес</h3><p>Помогает доставить письмо в нужный дом.</p></div><div class="equals">≈</div><div class="paper"><div class="big">💻</div><h3>IP-адрес</h3><p>Помогает доставить данные нужному устройству.</p></div></div><div class="definition"><strong>IP-адрес</strong> — уникальный сетевой адрес устройства, использующего интернет-протокол. По нему сеть понимает, <strong>откуда</strong> пришли данные и <strong>куда</strong> их отправить.</div><p style="text-align:center;margin-top:15px">IP = <strong>Internet Protocol</strong> · интернет-протокол</p></div></section>
+<section class="slide"><div class="narrow"><span class="eyebrow">03 · ГЛАВНАЯ ИДЕЯ</span><h2>Устройству тоже нужен адрес</h2><div class="analogy"><div class="paper"><div class="big">🏠</div><h3>Почтовый адрес</h3><p>Помогает доставить письмо в нужный дом.</p></div><div class="equals">≈</div><div class="paper"><div class="big">💻</div><h3>IP-адрес</h3><p>Помогает доставить данные нужному устройству.</p></div></div><div class="definition"><strong>IP-адрес</strong> — уникальный сетевой адрес устройства, использующего интернет-протокол. По нему сеть понимает, <strong>откуда</strong> пришли данные и <strong>куда</strong> их отправить.</div><p style="text-align:center;margin-top:15px">IP = <strong>Internet Protocol</strong> · интернет-протокол</p></div></section>
 
-<section class="slide"><div class="wrap"><span class="eyebrow">03 · IPv4</span><h2>Четыре числа — 32 бита</h2><p class="sub">Нажмите на октет. Каждая группа содержит 8 бит и принимает значение от 0 до 255.</p><div class="octets"><button class="octet" data-bits="11000000"><strong>192</strong><small>1-й октет</small></button><span class="ip-dot">.</span><button class="octet" data-bits="10101000"><strong>168</strong><small>2-й октет</small></button><span class="ip-dot">.</span><button class="octet" data-bits="00000001"><strong>1</strong><small>3-й октет</small></button><span class="ip-dot">.</span><button class="octet" data-bits="00000101"><strong>5</strong><small>4-й октет</small></button></div><div class="octetinfo mono" id="octetInfo">192.168.1.5 — пример корректного IPv4-адреса</div><div class="grid3" style="margin-top:17px"><div class="card"><span class="tag">Правило 1</span><h3>Ровно 4 октета</h3><p>Группы разделены точками.</p></div><div class="card"><span class="tag">Правило 2</span><h3>От 0 до 255</h3><p><span class="mono">256.1.1.1</span> — ошибка.</p></div><div class="card"><span class="tag">Масштаб</span><h3>2³² адресов</h3><p>Около 4,3 миллиарда комбинаций.</p></div></div></div></section>
-<section class="slide"><div class="narrow"><span class="eyebrow">04 · IPv6</span><h2>IPv6 — адресов хватит надолго</h2><p class="sub"><strong>IPv6</strong> — новая версия интернет-протокола. Адрес состоит из <strong>128 бит</strong> и записывается восемью группами шестнадцатеричных символов.</p><div class="ipv6-example">2001:0db8:85a3:0000:0000:8a2e:0370:7334</div><div class="power"><div class="formula">2<sup>128</sup></div><p>Столько разных адресов может быть у IPv6:</p><div class="number">340 282 366 920 938 463 463 374 607 431 768 211 456</div></div><div class="reading"><strong>Читается:</strong> 340 ундециллионов 282 дециллиона 366 нониллионов 920 октиллионов 938 септиллионов 463 секстиллиона 463 квинтиллиона 374 квадриллиона 607 триллионов 431 миллиард 768 миллионов 211 тысяч 456.</div></div></section>
+<section class="slide"><div class="wrap"><span class="eyebrow">04 · IPV4</span><h2>Четыре числа — 32 бита</h2><p class="sub">Нажмите на октет. Каждая группа содержит 8 бит и принимает значение от 0 до 255.</p><div class="octets"><button class="octet" data-bits="11000000"><strong>192</strong><small>1-й октет</small></button><span class="ip-dot">.</span><button class="octet" data-bits="10101000"><strong>168</strong><small>2-й октет</small></button><span class="ip-dot">.</span><button class="octet" data-bits="00000001"><strong>1</strong><small>3-й октет</small></button><span class="ip-dot">.</span><button class="octet" data-bits="00000101"><strong>5</strong><small>4-й октет</small></button></div><div class="octetinfo mono" id="octetInfo">192.168.1.5 — пример корректного IPv4-адреса</div><div class="grid3" style="margin-top:17px"><div class="card"><span class="tag">Правило 1</span><h3>Ровно 4 октета</h3><p>Группы разделены точками.</p></div><div class="card"><span class="tag">Правило 2</span><h3>От 0 до 255</h3><p><span class="mono">256.1.1.1</span> — ошибка.</p></div><div class="card"><span class="tag">Масштаб</span><h3>2³² адресов</h3><p>Около 4,3 миллиарда комбинаций.</p></div></div></div></section>
+<section class="slide"><div class="narrow"><span class="eyebrow">05 · IPV6</span><h2>IPv6 — адресов хватит надолго</h2><p class="sub"><strong>IPv6</strong> — новая версия интернет-протокола. Адрес состоит из <strong>128 бит</strong> и записывается восемью группами шестнадцатеричных символов.</p><div class="ipv6-example">2001:0db8:85a3:0000:0000:8a2e:0370:7334</div><div class="power"><div class="formula">2<sup>128</sup></div><p>Столько разных адресов может быть у IPv6:</p><div class="number">340 282 366 920 938 463 463 374 607 431 768 211 456</div></div><div class="reading"><strong>Читается:</strong> 340 ундециллионов 282 дециллиона 366 нониллионов 920 октиллионов 938 септиллионов 463 секстиллиона 463 квинтиллиона 374 квадриллиона 607 триллионов 431 миллиард 768 миллионов 211 тысяч 456.</div></div></section>
 
-<section class="slide"><div class="wrap"><span class="eyebrow">05 · Виды адресов</span><h2>Один IP — разные роли</h2><div class="grid2" style="margin-top:20px"><div class="card compare peach"><div class="icon">🌍</div><h3>Публичный</h3><p>Виден в интернете. Обычно его получает роутер от провайдера.</p><span class="tag">пример: 8.8.8.8</span></div><div class="card compare sage"><div class="icon">🏠</div><h3>Частный</h3><p>Работает внутри домашней, школьной или офисной сети.</p><span class="tag">пример: 192.168.1.5</span></div><div class="card compare"><div class="icon">📌</div><h3>Статический</h3><p>Закреплён и обычно не меняется. Удобен для серверов.</p></div><div class="card compare"><div class="icon">🔄</div><h3>Динамический</h3><p>Выдаётся на время и может измениться при новом подключении.</p></div></div></div></section>
+<section class="slide"><div class="wrap"><span class="eyebrow">06 · ВИДЫ АДРЕСОВ</span><h2>Один IP — разные роли</h2><div class="grid2" style="margin-top:20px"><div class="card compare peach"><div class="icon">🌍</div><h3>Публичный</h3><p>Виден в интернете. Обычно его получает роутер от провайдера.</p><span class="tag">пример: 8.8.8.8</span></div><div class="card compare sage"><div class="icon">🏠</div><h3>Частный</h3><p>Работает внутри домашней, школьной или офисной сети.</p><span class="tag">пример: 192.168.1.5</span></div><div class="card compare"><div class="icon">📌</div><h3>Статический</h3><p>Закреплён и обычно не меняется. Удобен для серверов.</p></div><div class="card compare"><div class="icon">🔄</div><h3>Динамический</h3><p>Выдаётся на время и может измениться при новом подключении.</p></div></div></div></section>
 
-<section class="slide"><div class="wrap hero"><div><span class="eyebrow">06 · Домашняя сеть</span><h2>Как один адрес делится на всех?</h2><p class="lead">Внутри сети каждому устройству роутер выдаёт частный IP. В интернет они выходят через публичный адрес роутера.</p><div class="definition"><strong>NAT</strong> преобразует сетевые адреса и запоминает, какому устройству вернуть каждый ответ.</div><p style="margin-top:15px"><strong>Важно:</strong> устройства в разных домашних сетях могут иметь одинаковый частный IP — конфликта не будет.</p></div><div class="paper net"><div class="devices"><div class="device"><i>💻</i><strong>Ноутбук</strong><br><code>192.168.1.5</code></div><div class="device"><i>📱</i><strong>Телефон</strong><br><code>192.168.1.8</code></div><div class="device"><i>🖨️</i><strong>Принтер</strong><br><code>192.168.1.12</code></div></div><div class="router">📶 <strong>Роутер + NAT</strong><br><code>публичный: 77.42.18.9</code></div><div class="cloud">☁️ Интернет</div><p style="margin:12px 0 0">частные адреса → один публичный</p></div></div></section>
-
-
+<section class="slide"><div class="wrap hero"><div><span class="eyebrow">07 · ДОМАШНЯЯ СЕТЬ</span><h2>Как один адрес делится на всех?</h2><p class="lead">Внутри сети каждому устройству роутер выдаёт частный IP. В интернет они выходят через публичный адрес роутера.</p><div class="definition"><strong>NAT</strong> преобразует сетевые адреса и запоминает, какому устройству вернуть каждый ответ.</div><p style="margin-top:15px"><strong>Важно:</strong> устройства в разных домашних сетях могут иметь одинаковый частный IP — конфликта не будет.</p></div><div class="paper net"><div class="devices"><div class="device"><i>💻</i><strong>Ноутбук</strong><br><code>192.168.1.5</code></div><div class="device"><i>📱</i><strong>Телефон</strong><br><code>192.168.1.8</code></div><div class="device"><i>🖨️</i><strong>Принтер</strong><br><code>192.168.1.12</code></div></div><div class="router">📶 <strong>Роутер + NAT</strong><br><code>публичный: 77.42.18.9</code></div><div class="cloud">☁️ Интернет</div><p style="margin:12px 0 0">частные адреса → один публичный</p></div></div></section>
 
 
-<section class="slide"><div class="wrap"><span class="eyebrow">07 · Мини-лаборатория</span><h2>IP-детектор</h2><p class="sub">Введите IPv4: программа проверит формат и узнает основные частные диапазоны.</p><div class="grid2"><div class="paper pad"><h3>Проверьте адрес</h3><div class="inputrow"><input class="textinput mono" id="ipInput" value="192.168.1.5" aria-label="IP-адрес"><button class="action" id="validateIp">Проверить</button></div><div class="result" id="ipResult">Готов к проверке.</div></div><div class="paper pad"><h3>Испытайте примеры</h3><p>Предположите результат, затем нажмите:</p><div class="choices" id="examples"><button class="choice mono">10.0.0.7</button><button class="choice mono">172.20.4.1</button><button class="choice mono">8.8.8.8</button><button class="choice mono">256.10.1.4</button><button class="choice mono">192.168.1</button></div></div></div><div class="definition"><strong>Частные диапазоны:</strong> <span class="mono">10.0.0.0–10.255.255.255</span> · <span class="mono">172.16.0.0–172.31.255.255</span> · <span class="mono">192.168.0.0–192.168.255.255</span></div></div></section>
 
-<section class="slide"><div class="wrap"><span class="eyebrow">08 · Цифровая безопасность</span><h2>Что IP знает о вас?</h2><p class="sub">Нажмите на утверждение и раскройте правду.</p><div class="grid3">
+
+<section class="slide"><div class="wrap"><span class="eyebrow">08 · МИНИ-ЛАБОРАТОРИЯ</span><h2>IP-детектор</h2><p class="sub">Введите IPv4: программа проверит формат и узнает основные частные диапазоны.</p><div class="grid2"><div class="paper pad"><h3>Проверьте адрес</h3><div class="inputrow"><input class="textinput mono" id="ipInput" value="192.168.1.5" aria-label="IP-адрес"><button class="action" id="validateIp">Проверить</button></div><div class="result" id="ipResult">Готов к проверке.</div></div><div class="paper pad"><h3>Испытайте примеры</h3><p>Предположите результат, затем нажмите:</p><div class="choices" id="examples"><button class="choice mono">10.0.0.7</button><button class="choice mono">172.20.4.1</button><button class="choice mono">8.8.8.8</button><button class="choice mono">256.10.1.4</button><button class="choice mono">192.168.1</button></div></div></div><div class="definition"><strong>Частные диапазоны:</strong> <span class="mono">10.0.0.0–10.255.255.255</span> · <span class="mono">172.16.0.0–172.31.255.255</span> · <span class="mono">192.168.0.0–192.168.255.255</span></div></div></section>
+
+<section class="slide"><div class="wrap"><span class="eyebrow">09 · ЦИФРОВАЯ БЕЗОПАСНОСТЬ</span><h2>Что IP знает о вас?</h2><p class="sub">Нажмите на утверждение и раскройте правду.</p><div class="grid3">
 <button class="card myth"><div class="icon">📍</div><h3>«По IP виден мой дом»</h3><p class="truth"><strong>Обычно нет.</strong> Геолокация приблизительная: страна, город или район провайдера.</p></button>
 <button class="card myth"><div class="icon">🔐</div><h3>«IP — это пароль»</h3><p class="truth"><strong>Нет.</strong> Это адрес, а не секрет для входа. Но лишние сетевые данные публиковать не стоит.</p></button>
 <button class="card myth"><div class="icon">👤</div><h3>«Один IP = один человек»</h3><p class="truth"><strong>Нет.</strong> Один публичный IP могут делить семья, школа или организация.</p></button>
@@ -92,7 +116,7 @@
 <button class="card myth"><div class="icon">🛡️</div><h3>Главное правило</h3><p class="truth">Обновляйте устройства, защищайте роутер паролем и не открывайте неизвестные ссылки.</p></button>
 </div></div></section>
 
-<section class="slide"><div class="wrap"><div class="missionhead"><div><span class="eyebrow">9 · Практическая работа</span><h2 style="margin-top:9px">Сетевая лаборатория</h2></div><div class="score">IP-блок: 10 баллов</div></div>
+<section class="slide"><div class="wrap"><div class="missionhead"><div><span class="eyebrow">10 · ПРАКТИЧЕСКАЯ РАБОТА</span><h2 style="margin-top:9px">Сетевая лаборатория</h2></div><div class="score">IP-блок: 10 баллов</div></div>
 <div class="worktabs"><button class="worktab active" data-panel="assemble">① Собери IP · 5</button><button class="worktab" data-panel="ipquiz">② Вопросы · 5</button></div>
 
 <div class="workpanel active" id="assemble"><p class="sub">Соберите <strong>любой корректный IPv4</strong> из всех частей пакета. Засчитывается любой вариант, если получилось четыре числа от 0 до 255. Каждый следующий пакет сложнее.</p><div class="builders">
@@ -113,7 +137,49 @@
 
 </div></section>
 
-<section class="slide"><div class="wrap hero"><div><span class="eyebrow">11 · Критерии</span><h2>Как оценить результат</h2><p><strong>Итого 10 баллов:</strong> сборка пяти адресов — 5 баллов, тест по теме — 5 баллов.</p><div class="paper rubric"><div class="row"><div class="rs">9–10</div><div><strong>Отлично</strong><br><span class="sub">Все адреса собраны, понятия применены уверенно.</span></div></div><div class="row"><div class="rs">7–8</div><div><strong>Хорошо</strong><br><span class="sub">Есть одна-две неточности.</span></div></div><div class="row"><div class="rs">5–6</div><div><strong>Есть основа</strong><br><span class="sub">Повторите структуру IPv4 и виды адресов.</span></div></div><div class="row"><div class="rs">0–4</div><div><strong>Нужна тренировка</strong><br><span class="sub">Вернитесь к слайдам 3–8 и попробуйте снова.</span></div></div></div></div><div class="paper pad"><h3>После практики я умею</h3><div class="summary"><div class="sum"><span>✓</span>Собирать корректный IPv4 из отдельных фрагментов.</div><div class="sum"><span>✓</span>Проверять четыре октета и диапазон 0–255.</div><div class="sum"><span>✓</span>Различать публичные и частные IP-адреса.</div><div class="sum"><span>✓</span>Объяснять роль IP, DHCP, NAT и роутера.</div></div><div class="definition"><strong>Выходной билет:</strong> объясните путь запроса от телефона до сайта словами IP, роутер и NAT.</div></div></div></section>
+<section class="slide" aria-label="Итоги урока">
+        <div class="wrap hero">
+          <div>
+            <header class="slidehead">
+              <span class="eyebrow">11 · ИТОГИ УРОКА</span>
+              <button class="action advance" data-next>К началу</button>
+            </header>
+            <h2>Как оценить результат</h2>
+            <p class="rubric-subtitle"><strong>Итого 10 баллов:</strong> сборка пяти адресов — 5 баллов, тест по теме — 5 баллов.</p>
+            <div class="rubric">
+              <div class="row rubric-card">
+                <div class="rs">9–10</div>
+                <div><strong>Отлично</strong><span class="sub">Все адреса собраны, понятия применены уверенно.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">7–8</div>
+                <div><strong>Хорошо</strong><span class="sub">Есть одна-две неточности.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">5–6</div>
+                <div><strong>Есть основа</strong><span class="sub">Повторите структуру IPv4 и виды адресов.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">0–4</div>
+                <div><strong>Нужна тренировка</strong><span class="sub">Вернитесь к слайдам 3–8 и попробуйте снова.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="paper pad summary-panel">
+            <h3><i data-flaticon="graduation-cap"></i> После практики я умею</h3>
+            <div class="summary summary-list">
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Собирать корректный IPv4 из отдельных фрагментов.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Проверять четыре октета и диапазон 0–255.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Различать публичные и частные IP-адреса.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Объяснять роль IP, DHCP, NAT и роутера.</span></div>
+            </div>
+            <div class="definition conclusion-box">
+              <div class="conclusion-badge"><i data-flaticon="bulb"></i> Выходной билет</div>
+              <p>Объясните путь запроса от телефона до сайта словами IP, роутер и NAT.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 </main>
 <nav class="dots" id="dots" aria-label="Слайды урока"></nav>
 
@@ -121,6 +187,7 @@
         <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-01"></script>
-            <script src="../../скрипты/lessons.js?v=neumorph-2026-10-28-26"></script>
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v03"></script>
+            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v43"></script>
 </body></html>
+

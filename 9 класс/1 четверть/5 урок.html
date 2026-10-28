@@ -1,11 +1,12 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#e7ebf3"><title>9 класс · 5 урок</title>
   <!-- Favicon -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../стили/lessons.css?v=neumorph-2026-10-28-26">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v43">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head><body class="lesson-page lesson-9-5" data-lesson-id="9-5">
 
   <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
@@ -61,10 +62,15 @@
   </div>
 
   <div class="progress" id="progress"></div><main><section class="slide active" aria-label="Начинаем"><div class="wrap">
-    <header class="slidehead"><span class="eyebrow">01 / 06 · Начинаем</span><button class="action advance" data-next>Далее</button></header>
-<div class="hero"><div><span class="tag">9 класс · урок 5</span>
-<h1>Доменная<br>система <span class="accent">имён</span></h1>
+    <header class="slidehead"><span class="eyebrow">01 · ВВЕДЕНИЕ</span><button class="action advance" data-next>Далее</button></header>
+<div class="hero"><div><h1>Доменная<br>система <span class="accent">имён</span></h1>
 <p class="lead">Ты вводишь имя сайта. Как браузер узнаёт, куда отправить запрос?</p>
+<div class="chips">
+  <span class="chip"><i data-flaticon="globe"></i> доменное имя</span>
+  <span class="chip"><i data-flaticon="database"></i> DNS-сервер</span>
+  <span class="chip"><i data-flaticon="search"></i> сопоставление IP</span>
+  <span class="chip"><i data-flaticon="sitemap"></i> доменные зоны</span>
+</div>
 <div class="definition"><strong>9.1.2.3 — объяснять назначение и структуру DNS</strong></div>
 </div><div class="paper hero-studio"><h3>Удобно человеку.<br>Понятно компьютеру.</h3>
 <div class="hero-visual" id="heroVisual" data-mode="name">
@@ -76,7 +82,7 @@
 <span class="sr-only">DNS сопоставляет имя alasster.site с IP-адресом 192.178.25.19.</span></div>
 </div></section>
 <section class="slide" aria-label="Повторение"><div class="wrap">
-    <header class="slidehead"><span class="eyebrow">02 / 06 · Повторение</span><button class="action advance" data-next>Далее</button></header>
+    <header class="slidehead"><span class="eyebrow">02 · ПОВТОРЕНИЕ</span><button class="action advance" data-next>Далее</button></header>
 <h2>Вспомним IP-адрес и маску подсети</h2><p>Пять вопросов по прошлому уроку. За каждый верный ответ — 1 балл. В конце увидишь результат и разбор своих ответов.</p>
 <div class="paper" id="reviewQuiz"><div class="controlsrow review-top"><p class="score" id="reviewCount"></p></div><h3 id="reviewQuestion" tabindex="-1"></h3>
 <div class="quiz-options" id="reviewOptions" role="group" aria-labelledby="reviewQuestion"></div>
@@ -87,7 +93,7 @@
 </div><details class="card explanation below" id="reviewDetails"><summary>Мои ответы и правильные решения</summary><ol id="reviewAnswerList" class="review-answers"></ol></details></div>
 </div></section>
 <section class="slide" aria-label="Устройство DNS"><div class="wrap">
-    <header class="slidehead"><span class="eyebrow">03 / 06 · Устройство DNS</span><button class="action advance" data-next>Далее</button></header>
+    <header class="slidehead"><span class="eyebrow">03 · УСТРОЙСТВО DNS</span><button class="action advance" data-next>Далее</button></header>
 <h2>DNS — телефонный справочник интернета</h2>
 <div class="definition"><strong>DNS (Domain Name System)</strong> — распределённая система доменных имён. Она помогает найти IP-адрес сервера по его доменному имени.</div>
 <div class="analogy below"><span class="analogy-icon" aria-hidden="true">☎</span><div><strong>В контактах: имя человека → номер. В DNS: имя сайта → IP-адрес.</strong><p>Проще запомнить «Алия», чем её номер телефона. Так же и с сайтом: человек вводит <code>google.com</code>, а DNS помогает компьютеру найти нужный IP. Это сравнение: DNS хранится на множестве серверов, а не в одной книге.</p></div></div>
@@ -105,7 +111,7 @@
 <p><code>www</code> — обычная метка поддомена, а не обязательное начало каждого имени. <code>example.org</code> тоже может иметь адрес.</p></details>
 </div></section>
 <section class="slide" aria-label="Конструктор"><div class="wrap">
-    <header class="slidehead"><span class="eyebrow">04 / 06 · Конструктор</span><button class="action advance" data-next>Далее</button></header>
+    <header class="slidehead"><span class="eyebrow">04 · КОНСТРУКТОР</span><button class="action advance" data-next>Далее</button></header>
 <h2>Узнай сервис. Собери домен.</h2><p>Нажимай на карточки или перетаскивай их в строку. Используй все части. Их можно переставить перетаскиванием, а убрать — нажатием.</p>
 <div class="bits-layout"><div class="paper"><h3 id="buildTitle" class="sr-only"></h3><div class="brand-name" id="buildBrand"></div><p id="buildPrompt"></p>
 <div class="choices" id="buildPool" role="group" aria-label="Карточки для сборки"></div>
@@ -116,7 +122,7 @@
 <div class="fact below"><strong>Маленькая деталь:</strong> <code>www</code> — тоже поддомен. У сайта может быть адрес без www: например, <code>kaspi.kz</code>.</div>
 </div></section>
 <section class="slide" aria-label="Протоколы"><div class="wrap">
-    <header class="slidehead"><span class="eyebrow">05 / 06 · Протоколы</span><button class="action advance" data-next>Далее</button></header>
+    <header class="slidehead"><span class="eyebrow">05 · ПРОТОКОЛЫ</span><button class="action advance" data-next>Далее</button></header>
 <h2>У каждого протокола своя работа</h2><p><strong>Протокол</strong> — согласованные правила обмена данными. Нажми на карточку, затем выбери протокол для каждой ситуации.</p>
 <div class="grid2"><div class="paper"><div class="protocol-grid" id="protocolCards"></div><div class="result" id="protocolInfo" role="status"></div></div>
 <div class="paper"><p class="score" id="protocolCount"></p><h3 id="protocolQuestion" tabindex="-1"></h3><div class="choices" id="protocolOptions" role="group" aria-labelledby="protocolQuestion"></div><div class="result" id="protocolFeedback" role="status">Выбери протокол.</div><button class="action below" id="protocolNext" hidden>Следующая ситуация</button></div></div>
@@ -124,7 +130,7 @@
 <div class="fact below"><strong>А ты знал?</strong> Буква S в HTTPS связана с защитой соединения. Но даже зашифрованный сайт может содержать неправду — информацию всё равно нужно проверять.</div>
 </div></section>
 <section class="slide" aria-label="Индивидуальная работа"><div class="wrap">
-    <header class="slidehead"><span class="eyebrow">06 / 06 · DNS-проект</span><button class="action advance" data-next>К началу</button></header>
+    <header class="slidehead"><span class="eyebrow">06 · ПРАКТИКА</span><button class="action advance" data-next>Далее</button></header>
 <h2>Мастерская DNS: запусти школьную олимпиаду</h2>
 <p>Ты — DNS-администратор школьного сервера. Через час начинается онлайн-олимпиада, но зону DNS нужно заполнить. Сверь её со стойкой серверов, придумай новые сервисы и проверь популярные домены из командной строки.</p>
 <p class="dns-worktime">Индивидуальная работа · 10–15 минут · практика на ПК · 10 баллов</p>
@@ -136,17 +142,58 @@
 </div>
 <section class="card below"><h3>3. Дополни олимпиаду</h3><p>Придумай два новых онлайн-сервиса для олимпиады. Для каждого придумай понятное доменное имя внутри <code>festival.mektep.kz</code>, назначь новый уникальный IP из учебного диапазона <code>203.0.113.101–203.0.113.199</code> (не используй адреса со стойки) и объясни, почему это имя подходит сервису.</p><table class="dns-project-table"><thead><tr><th>Сервис и назначение</th><th>Доменное имя</th><th>Новый IP</th><th>Почему выбрал такое имя?</th></tr></thead><tbody><tr><td><input aria-label="Название и назначение нового сервиса 1"></td><td><input class="domain-input" aria-label="Доменное имя нового сервиса 1" placeholder="например, results.festival.mektep.kz"></td><td><input class="ip-input" aria-label="IP нового сервиса 1" placeholder="203.0.113.101"></td><td><textarea aria-label="Объяснение доменного имени сервиса 1"></textarea></td></tr><tr><td><input aria-label="Название и назначение нового сервиса 2"></td><td><input class="domain-input" aria-label="Доменное имя нового сервиса 2" placeholder="например, teams.festival.mektep.kz"></td><td><input class="ip-input" aria-label="IP нового сервиса 2" placeholder="203.0.113.102"></td><td><textarea aria-label="Объяснение доменного имени сервиса 2"></textarea></td></tr></tbody></table></section>
 <section class="card below"><h3>4. Практикум в командной строке</h3><p>Нажми комбинацию <strong>WIN </strong> + <strong>R</strong><p>Открой <strong>CMD</strong>. Для каждого домена выполни обе команды:<p><strong>nslookup</strong>  (подставь <code>домен</code>):</p><p class="dns-task-note">Из <code>nslookup</code> запиши IP-адрес из ответа для домена. В графе ping отметь среднее время приема-передачи. Если ping не отвечает, это не обязательно ошибка DNS: сервер может блокировать ping.</p><table class="dns-project-table dns-cli-table"><thead><tr><th>Популярный домен</th><th>IP из nslookup</th><th>Результат ping</th></tr></thead><tbody><tr><td>google.com</td><td><input class="ip-input" aria-label="IP google.com из nslookup"></td><td><input aria-label="Результат ping google.com"></td></tr><tr><td>youtube.com</td><td><input class="ip-input" aria-label="IP youtube.com из nslookup"></td><td><input aria-label="Результат ping youtube.com"></td></tr><tr><td>instagram.com</td><td><input class="ip-input" aria-label="IP instagram.com из nslookup"></td><td><input aria-label="Результат ping instagram.com"></td></tr><tr><td>wikipedia.org</td><td><input class="ip-input" aria-label="IP wikipedia.org из nslookup"></td><td><input aria-label="Результат ping wikipedia.org"></td></tr><tr><td>kaspi.kz</td><td><input class="ip-input" aria-label="IP kaspi.kz из nslookup"></td><td><input aria-label="Результат ping kaspi.kz"></td></tr></tbody></table><p class="small">За таблицу IP-адресов после nslookup — 1 балл; за выполненные команды ping и записанные результаты (включая тайм-аут) — 1 балл.</p></section>
-<div class="grid2"><br>
-<section class="card"><h3>Оценивание — 10 баллов</h3><p class="score" id="dnsTotal">За зону: 0 из 6 баллов</p><ul class="dns-score-list"><li>Зона DNS: шесть верных соответствий — <strong>6 баллов</strong> (по 1 за запись).</li><li>Мини-проект: для каждого сервиса — понятное доменное имя (0,5), уникальный IP (0,25) и объяснение выбора (0,25) — всего <strong>2 балла</strong>.</li><li>Командная строка: IP из nslookup записаны для пяти доменов — <strong>1 балл</strong>; выполнены ping-команды и записан результат для каждого — <strong>1 балл</strong>.</li></ul></section>
-<section class="card"><h3>План работы на 10–15 минут</h3><ol class="dns-score-list"><li>Сопоставь стойку и пустую зону, заполни шесть записей — 5 минут.</li><li>Придумай два сервиса олимпиады и оформи их DNS-записи — 4 минуты.</li><li>Выполни nslookup и ping для пяти доменов, заполни таблицу — 5 минут.</li></ol></section>
-</div>
+
 </div>
 
-</div></section></main><nav class="dots" id="dots" aria-label="Слайды урока"></nav>
+</div></section>      <section class="slide" aria-label="Итоги урока">
+        <div class="wrap hero">
+          <div>
+            <header class="slidehead">
+              <span class="eyebrow">07 · ИТОГИ УРОКА</span>
+              <button class="action advance" data-next>К началу</button>
+            </header>
+            <h2>Как оценить результат</h2>
+            <p class="rubric-subtitle"><strong>Всего 10 баллов:</strong> 5 баллов за повторение прошлого урока и 5 баллов за настройку доменной зоны.</p>
+            <div class="rubric">
+              <div class="row rubric-card">
+                <div class="rs">9–10</div>
+                <div><strong>Отлично</strong><span class="sub">Безошибочно разбираешь доменные имена по уровням и сопоставляешь DNS-записи.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">7–8</div>
+                <div><strong>Хорошо</strong><span class="sub">Понимаешь структуру доменов и назначение DNS, допустил 1 неточность.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">5–6</div>
+                <div><strong>Понял основы</strong><span class="sub">Знаешь, зачем нужен DNS, но путаешься в уровнях доменов справа налево.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">0–4</div>
+                <div><strong>Нужно потренироваться</strong><span class="sub">Вернись к слайдам 3–5 и повтори, как иерархия DNS связывает имена с IP-адресами.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="paper pad summary-panel">
+            <h3><i data-flaticon="graduation-cap"></i> После урока вы умеете</h3>
+            <div class="summary summary-list">
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Объяснять назначение и структуру распределённой системы DNS.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Разбирать доменные имена по уровням справа налево (домены 1, 2 и 3-го уровней).</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Сопоставлять доменные имена сервисов с IP-адресами серверов.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Объяснять разницу между доменным именем и веб-протоколом передачи (HTTP/HTTPS).</span></div>
+            </div>
+            <div class="definition conclusion-box">
+              <div class="conclusion-badge"><i data-flaticon="bulb"></i> Главный вывод</div>
+              <p>DNS — это телефонный справочник интернета. Человек запоминает удобное текстовое имя сайта, а DNS находит для компьютера точный цифровой IP-адрес.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main><nav class="dots" id="dots" aria-label="Слайды урока"></nav>
     <div class="nav-controls">
         <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-01"></script>
-            <script src="../../скрипты/lessons.js?v=neumorph-2026-10-28-26"></script>
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v03"></script>
+            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v43"></script>
 </body></html>
+
