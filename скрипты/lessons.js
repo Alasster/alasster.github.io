@@ -93,52 +93,15 @@
   // Dynamic lesson detection & synchronization
   function syncDynamicLessons() {
     try {
-      const stored = localStorage.getItem('alasster_dynamic_lessons');
-      if (stored) {
-        const extra = JSON.parse(stored);
-        for (const [cid, list] of Object.entries(extra)) {
-          if (LESSONS_DATABASE[cid]) {
-            list.forEach(item => {
-              if (!LESSONS_DATABASE[cid].lessons.some(l => l.file === item.file)) {
-                LESSONS_DATABASE[cid].lessons.push(item);
-              }
-            });
-          }
-        }
-      }
+      localStorage.removeItem('alasster_dynamic_lessons');
     } catch (e) {}
 
-    const currentPath = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
-    const classId = detectCurrentClass();
-    const data = LESSONS_DATABASE[classId];
-    if (data && currentPath.includes('.html')) {
-      const match = currentPath.match(/([^/]+\/[^/]+\/[^/]+\.html)$/i);
-      if (match) {
-        const relativeFile = match[1];
-        const exists = data.lessons.some(l => l.file.toLowerCase() === relativeFile.toLowerCase() || currentPath.endsWith(l.file));
-        if (!exists) {
-          const numMatch = relativeFile.match(/(\d+(?:\s*-\s*\d+)?)\s*урок/i);
-          const num = numMatch ? numMatch[1].replace(/\s+/g, '') : (data.lessons.length + 1);
-          const docTitle = document.querySelector('.nav-badge-topic')?.textContent?.trim() ||
-                           document.querySelector('h1')?.textContent?.trim() ||
-                           `Урок ${num}`;
-          const newLesson = { num, title: docTitle, file: relativeFile };
-          data.lessons.push(newLesson);
-          try {
-            let extra = {};
-            const stored = localStorage.getItem('alasster_dynamic_lessons');
-            if (stored) extra = JSON.parse(stored);
-            if (!extra[classId]) extra[classId] = [];
-            if (!extra[classId].some(l => l.file === relativeFile)) {
-              extra[classId].push(newLesson);
-              localStorage.setItem('alasster_dynamic_lessons', JSON.stringify(extra));
-            }
-          } catch (e) {}
-        }
-      }
-    }
-
+    // Deduplicate lesson 13, keeping only "13 СОЧ"
     Object.values(LESSONS_DATABASE).forEach(group => {
+      const hasSoch13 = group.lessons.some(l => String(l.num).includes('13') && String(l.num).toUpperCase().includes('СОЧ'));
+      if (hasSoch13) {
+        group.lessons = group.lessons.filter(l => !(String(l.num).trim() === '13'));
+      }
       group.lessons.sort((a, b) => {
         const na = parseInt(String(a.num), 10) || 0;
         const nb = parseInt(String(b.num), 10) || 0;
@@ -167,7 +130,23 @@
 
     const currentPath = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
 
-    listEl.innerHTML = data.lessons.filter(lesson => lessonIsPublic(lesson.file)).map(lesson => {
+    // Deduplicate lessons: strictly remove plain "13", leave only "13 СОЧ"
+    const has13Soch = data.lessons.some(l => String(l.num).includes('13') && String(l.num).toUpperCase().includes('СОЧ'));
+    const seenFiles = new Set();
+    const cleanLessons = [];
+
+    data.lessons.forEach(lesson => {
+      const numStr = String(lesson.num).trim();
+      if (has13Soch && (numStr === '13' || (numStr.startsWith('13') && !numStr.toUpperCase().includes('СОЧ')))) {
+        return;
+      }
+      const normFile = (lesson.file || '').toLowerCase().replace(/\\/g, '/').split('/').pop();
+      if (seenFiles.has(normFile)) return;
+      seenFiles.add(normFile);
+      cleanLessons.push(lesson);
+    });
+
+    listEl.innerHTML = cleanLessons.filter(lesson => lessonIsPublic(lesson.file)).map(lesson => {
       const isCurrent = currentPath.endsWith(lesson.file);
       return `
         <a href="../../${lesson.file}" class="lesson-row-card ${isCurrent ? 'current-lesson' : ''}">
@@ -2896,8 +2875,10 @@ let currentSlide = 0;
 
         function renderEra(key) {
             const era = eraData[key];
+            if (!era) return;
             document.querySelectorAll('.era-btn').forEach((button) => {
-                button.classList.toggle('active', button.getAttribute('onclick').includes(`'${key}'`));
+                const clickAttr = button.getAttribute('onclick') || '';
+                button.classList.toggle('active', clickAttr.includes(`'${key}'`));
             });
 
             document.getElementById('eraContent').innerHTML = `
@@ -3133,6 +3114,7 @@ let currentSlide = 0;
         }
 
         window.addEventListener('resize', initParticles);
+        window.renderEra = renderEra;
         renderEra('dream');
         updateLab();
         startQuiz();
@@ -3146,7 +3128,8 @@ let currentSlide = 0;
 const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress"),dotsNav=document.getElementById("dotsNav");let current=0;
 const dotLabels=["Старт","Повторение","Смена подхода","Карта понятий","Данные","Признаки","Обучение","Модель","Прогноз","Итог","Завершение"];
 const imageModal=document.getElementById("imageModal");document.querySelector(".zoomable-image").onclick=()=>imageModal.showModal();imageModal.querySelector("button").onclick=()=>imageModal.close();imageModal.onclick=e=>{if(e.target===imageModal)imageModal.close()};
-slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=n===slides.length-1?"В начало":"Далее →";nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
+const nextLabels=["К тесту по истории ИИ →","К смене подхода →","К карте понятий →","К разделу «Данные» →","К разделу «Признаки» →","К обучению модели →","К понятию «Модель» →","К прогнозированию →","К итогам урока →","К завершению →","В начало ↺"];
+slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=nextLabels[n]||(n===slides.length-1?"В начало ↺":"Далее →");nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
 const dots=[...document.querySelectorAll(".dot")];
 window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
@@ -4961,23 +4944,36 @@ let currentSlide = 0;
 
         function renderEra(key) {
             const era = eraData[key];
+            if (!era) return;
             document.querySelectorAll('.era-btn').forEach((button) => {
-                button.classList.toggle('active', button.getAttribute('onclick').includes(`'${key}'`));
+                const clickAttr = button.getAttribute('onclick') || '';
+                button.classList.toggle('active', clickAttr.includes(`'${key}'`));
             });
 
-            document.getElementById('eraContent').innerHTML = `
-                <h3>${era.title}</h3>
-                <p>${era.text}</p>
-                <div class="mini-grid">
-                    <div class="mini"><strong>Алгоритмы</strong><p>${era.algorithm}</p></div>
-                    <div class="mini"><strong>Технологии</strong><p>${era.tech}</p></div>
-                    <div class="mini"><strong>Данные</strong><p>${era.data}</p></div>
-                </div>
-                <div class="insight" style="margin-top: 18px;">
-                    <p><b>Аналитический вывод:</b> чтобы объяснить этот этап, связывайте научную идею с тем, какие компьютеры и какие данные были доступны в то время.</p>
-                </div>
-            `;
+            const contentEl = document.getElementById('eraContent');
+            if (contentEl) {
+                contentEl.innerHTML = `
+                    <h3>${era.title}</h3>
+                    <p>${era.text}</p>
+                    <div class="mini-grid">
+                        <div class="mini"><strong>Алгоритмы</strong><p>${era.algorithm}</p></div>
+                        <div class="mini"><strong>Технологии</strong><p>${era.tech}</p></div>
+                        <div class="mini"><strong>Данные</strong><p>${era.data}</p></div>
+                    </div>
+                    <div class="insight" style="margin-top: 18px;">
+                        <p><b>Аналитический вывод:</b> чтобы объяснить этот этап, связывайте научную идею с тем, какие компьютеры и какие данные были доступны в то время.</p>
+                    </div>
+                `;
+            }
         }
+        window.renderEra = renderEra;
+        document.querySelectorAll('.era-btn').forEach((btn) => {
+            btn.addEventListener('click', function(e) {
+                const clickAttr = this.getAttribute('onclick') || '';
+                const match = clickAttr.match(/renderEra\('([^']+)'\)/);
+                if (match) renderEra(match[1]);
+            });
+        });
 
         const algRange = document.getElementById('algRange');
         const computeRange = document.getElementById('computeRange');
@@ -5247,7 +5243,8 @@ startRecall();show(Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.s
   LESSON_SCRIPTS['10ogn-3'] = function() {
 const slides=[...document.querySelectorAll(".slide")],progress=document.getElementById("progress"),dots=document.getElementById("dots");let current=0;
 const dotLabels=["Старт","Вход в тему","Три парадигмы","С учителем","Без учителя","С подкреплением","Сравнение","Практика","Оценивание"];
-slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dots.appendChild(dot);const next=document.createElement("button");next.className="slide-next";next.type="button";next.textContent=n===slides.length-1?"В начало":"Далее →";next.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(next)});
+const nextLabels3=["К примерам из жизни →","К трём парадигмам →","Обучение с учителем →","Обучение без учителя →","С подкреплением →","К сравнению методов →","К практическим кейсам →","К оцениванию →","В начало ↺"];
+slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dots.appendChild(dot);const next=document.createElement("button");next.className="slide-next";next.type="button";next.textContent=nextLabels3[n]||(n===slides.length-1?"В начало ↺":"Далее →");next.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(next)});
 window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>{s.classList.toggle("active",n===current);const eyebrow=s.querySelector(".eyebrow");if(eyebrow&&n>0){const title=eyebrow.textContent.replace(/^\d{2}\s*·\s*/,"");eyebrow.textContent=String(n+1).padStart(2,"0")+" · "+title}});[...dots.children].forEach((d,n)=>d.classList.toggle("active",n===current));progress.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
 function full(){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}
@@ -5267,8 +5264,9 @@ requestAnimationFrame(animateSpheres);
 const slides=[...document.querySelectorAll('.slide')],dots=document.getElementById('dots'),progress=document.getElementById('progress');let current=0;
 const labels=['1 · Старт','2 · Результат','3 · Темы','4 · Содержание','5 · Дескриптор','6 · Итог'];
 labels.forEach((label,i)=>{const b=document.createElement('button');b.className='dot';b.dataset.label=label;b.onclick=()=>show(i);dots.appendChild(b)});
-function alignNext(){const badge=document.querySelector('.slide.active .eyebrow'),next=document.getElementById('next');if(badge&&next)next.style.top=Math.max(18,badge.getBoundingClientRect().top)+'px'}
-window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,n)=>s.classList.toggle('active',n===current));[...dots.children].forEach((d,n)=>d.classList.toggle('active',n===current));progress.style.width=((current+1)/slides.length*100)+'%';document.getElementById('next').textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →';document.getElementById('prev').disabled=current===0;requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,450)})}
+const nextLabels4=["К результатам исследования →","К выбору темы →","К содержанию презентации →","К дескрипторам →","К итогам →","В начало ↺"];
+function alignNext(){const next=document.getElementById('next');if(next){next.style.top='';next.style.right='';}}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,n)=>s.classList.toggle('active',n===current));[...dots.children].forEach((d,n)=>d.classList.toggle('active',n===current));progress.style.width=((current+1)/slides.length*100)+'%';const nextBtnEl=document.getElementById('next');if(nextBtnEl)nextBtnEl.textContent=nextLabels4[current]||'Следующий слайд →';document.getElementById('prev').disabled=current===0;requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,450)})}
 function step(n){show(current===slides.length-1&&n>0?0:current+n)}document.getElementById('next').onclick=()=>step(1);document.getElementById('prev').onclick=()=>step(-1);document.getElementById('mnext').onclick=()=>step(1);document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')step(1);if(e.key==='ArrowLeft')step(-1)});show(0);
 window.addEventListener('resize',alignNext);document.querySelectorAll('#topics .choice').forEach(button=>button.onclick=()=>{document.querySelectorAll('#topics .choice').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');document.getElementById('topicResponse').textContent='Выбрано: '+button.querySelector('strong').textContent+' Теперь сформулируйте главный вопрос одним предложением.'});
   };
@@ -5277,7 +5275,8 @@ window.addEventListener('resize',alignNext);document.querySelectorAll('#topics .
   LESSON_SCRIPTS['10ogn-5'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),slideNext=document.getElementById('slideNext'),dotLabels=['01 · Старт','02 · Машинное обучение','03 · Структура','04 · Взвешенная сумма','05 · Функция активации','06 · Ограничения','07 · Практика','08 · Оценивание'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));const activeSlide=slides[current];requestAnimationFrame(()=>activeSlide.getAnimations({subtree:true}).forEach(animation=>{animation.cancel();animation.play()}));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →'}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));const activeSlide=slides[current];requestAnimationFrame(()=>activeSlide.getAnimations({subtree:true}).forEach(animation=>{animation.cancel();animation.play()}));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';const nextLabels5=["К машинному обучению →","К структуре перцептрона →","К взвешенной сумме →","К функции активации →","К ограничениям →","К практическому тренажёру →","К дескрипторам оценивания →","В начало ↺"];
+prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=nextLabels5[current]||'Следующий слайд →'}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
 document.addEventListener('keydown',e=>{const typing=['INPUT','TEXTAREA'].includes(document.activeElement.tagName);if(!typing&&['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}});
 document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badge').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.click-node,.click-sum,.click-activation,.weight-badge').forEach(item=>item.classList.remove('active'));button.classList.add('active');document.getElementById('clickInfo').innerHTML=button.dataset.info}));
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let points=[];function init(){canvas.width=innerWidth;canvas.height=innerHeight;points=Array.from({length:48},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:1+Math.random()*2}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(5, 150, 105, 0.10)';points.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.fillStyle='rgba(16, 185, 129, 0.18)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();for(let j=i+1;j<points.length;j++){const q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<145){ctx.globalAlpha=1-d/145;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.globalAlpha=1}}});requestAnimationFrame(draw)}addEventListener('resize',init);init();draw();show(0);
@@ -5287,7 +5286,8 @@ const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');l
   LESSON_SCRIPTS['10ogn-6'] = function() {
 const slides=[...document.querySelectorAll('.slide')],bar=document.getElementById('progress'),dotsNav=document.getElementById('dotsNav'),slideNext=document.getElementById('slideNext'),dotLabels=['01 · Старт','02 · Повторение','03 · Практика','04 · Excel','05 · Итог и дескрипторы'];let current=0;
 slides.forEach((slide,n)=>{const dot=document.createElement('button');dot.className='dot';dot.type='button';dot.title=dotLabels[n];dot.setAttribute('aria-label','Перейти к слайду: '+dotLabels[n]);dot.onclick=()=>show(n);dotsNav.appendChild(dot)});const dots=[...document.querySelectorAll('.dot')],prev=document.getElementById('mobilePrev'),next=document.getElementById('mobileNext');
-window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;slideNext.textContent=current===slides.length-1?'Начать заново →':'Следующий слайд →';requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,470)});if(slides[current].classList.contains('excel-slide'))window.getSelection()?.removeAllRanges()}function alignNext(){const badge=slides[current].querySelector('.eyebrow');if(badge&&getComputedStyle(slideNext).display!=='none')slideNext.style.top=Math.max(18,badge.getBoundingClientRect().top)+'px'}addEventListener('resize',alignNext);prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle('active',n===current));dots.forEach((d,n)=>d.classList.toggle('active',n===current));bar.style.width=((current+1)/slides.length*100)+'%';prev.disabled=current===0;next.disabled=current===slides.length-1;const nextLabels6=["К повторению структуры →","К моделированию в Excel →","К вычислению net →","К функции активации →","К итогам практики →","В начало ↺"];
+slideNext.textContent=nextLabels6[current]||'Следующий слайд →';requestAnimationFrame(()=>{alignNext();setTimeout(alignNext,470)});if(slides[current].classList.contains('excel-slide'))window.getSelection()?.removeAllRanges()}function alignNext(){if(slideNext){slideNext.style.top='';slideNext.style.right='';}}addEventListener('resize',alignNext);prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);slideNext.onclick=()=>show(current===slides.length-1?0:current+1);
 // Classroom restriction for the Excel slide only; normal navigation remains available.
 const excelSlide=document.querySelector('.excel-slide');
 ['selectstart','dragstart','contextmenu'].forEach(type=>excelSlide.addEventListener(type,e=>e.preventDefault()));

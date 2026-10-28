@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v53">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v57">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="lesson-page lesson-10emn-3" data-lesson-id="10emn-3">
@@ -68,7 +68,16 @@
   </div>
 
   <canvas id="network-bg" aria-hidden="true"></canvas><div class="bg-spheres" aria-hidden="true"><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span></div><div class="progress" id="progress"></div><nav class="dots" id="dotsNav" aria-label="Навигация по слайдам"></nav><main>
-<section class="slide active"><div class="wrap hero"><div><span class="eyebrow">01 · ВВЕДЕНИЕ</span><h1>Основные понятия<br><span class="accent">машинного обучения</span></h1><p class="lead">Как компьютер учится на примерах, превращает данные в модель и делает прогноз для нового объекта.</p><div class="goal"><div class="goalitem"><b>✓</b><div><strong>Цель урока</strong><br><span style="color:var(--muted)">Объяснять понятия: модель, обучение, обучающие данные, признаки и прогнозирование.</span></div></div></div></div><img class="hero-art" src="https://st5.depositphotos.com/2379655/81514/v/450/depositphotos_815142092-stock-illustration-robot-making-errors-hallucinating-vector.jpg " alt="Схема: данные, модель, прогноз"></div></section>
+<section class="slide active"><div class="wrap hero"><div><span class="eyebrow">01 · ВВЕДЕНИЕ</span><h1>Основные понятия<br><span class="accent">машинного обучения</span></h1><p class="lead">Как компьютер учится на примерах, превращает данные в модель и делает прогноз для нового объекта.</p><div class="lesson-goal-card">
+  <div class="goal-header">
+    <span class="goal-code-badge"><i class="lesson-flaticon" data-flaticon="target"></i> 10.1.2.2</span>
+    <span class="goal-title-badge">Цель обучения</span>
+  </div>
+  <p class="goal-description">Объяснять основные понятия машинного обучения (модель, обучение, обучающие данные, признаки и прогнозирование).</p>
+</div>
+<div style="margin-top: 24px;">
+  <button class="start-btn" onclick="goToSlide(1)">К тесту по истории ИИ <i class="fas fa-arrow-right"></i></button>
+</div></div><img class="hero-art" src="https://st5.depositphotos.com/2379655/81514/v/450/depositphotos_815142092-stock-illustration-robot-making-errors-hallucinating-vector.jpg " alt="Схема: данные, модель, прогноз"></div></section>
 
 <section class="slide"><div class="narrow"><span class="eyebrow">02 · ВСПОМИНАЕМ</span><h2>Тест по прошлой теме</h2><p class="sub">6 вопросов об истории развития ИИ. Вопросы и ответы перемешиваются при каждом запуске.</p><div class="paper quizbox"><div class="quiztop"><span class="pill" id="recallCount">Вопрос 1 / 6</span><span class="pill" id="recallScore">Верно: 0</span></div><h3 class="quizq" id="recallQuestion"></h3><div class="quizoptions" id="recallOptions"></div><div class="quizfoot"><span class="feedback" id="recallFeedback">Выберите наиболее точный ответ.</span><button class="action" id="recallNext" hidden>Следующий →</button></div></div></div></section>
 
@@ -113,6 +122,6 @@
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
             <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v04"></script>
-            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v53"></script>
+            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v57"></script>
 </body></html>
 

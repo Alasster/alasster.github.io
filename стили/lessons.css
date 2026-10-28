@@ -9640,7 +9640,7 @@ background:linear-gradient(145deg,#fff,#eff6ff);border:1px solid #bfdbfe;box-sha
 }
 
 .lesson-10emn-5 .task .answer {
-border-left:4px solid var(--mint)
+border-left: 0 !important;
 }
 
 .lesson-10emn-5 .task ol li {
@@ -14737,7 +14737,7 @@ position:absolute;z-index:4;left:24px;bottom:18px;padding:9px 13px;border-radius
 }
 
 .lesson-10ogn-3 .definition {
-margin-top:18px;padding:17px 21px;border-left:5px solid var(--blue);border-radius:18px;background:#f0fdf4;font-size:1.08rem;line-height:1.48
+margin-top:18px;padding:17px 21px;border-left: 0 !important;border-radius:18px;background:#f0fdf4;font-size:1.08rem;line-height:1.48
 }
 
 .lesson-10ogn-3 .versus {
@@ -15311,7 +15311,7 @@ position:absolute;bottom:21px;left:25px;padding:10px 13px;border-radius:18px;bac
 }
 
 .lesson-10ogn-4 .definition {
-margin-top:18px;padding:17px 21px;border-left:5px solid var(--blue);border-radius:18px;background:#f0fdf4;font-size:1.08rem;line-height:1.48
+margin-top:18px;padding:17px 21px;border-left: 0 !important;border-radius:18px;background:#f0fdf4;font-size:1.08rem;line-height:1.48
 }
 
 .lesson-10ogn-4 .flow {
@@ -16477,7 +16477,7 @@ background:linear-gradient(145deg,#fff,#f7f1ff);border:1px solid #e5d9f7;box-sha
 }
 
 .lesson-10ogn-5 .task .answer {
-border-left:4px solid var(--mint)
+border-left: 0 !important;
 }
 
 .lesson-10ogn-5 .task ol li {
@@ -16537,7 +16537,7 @@ background:#ecfdf5;color:var(--blue,#059669)
 }
 
 .lesson-10ogn-5 .definition {
-border-left-color:var(--blue,#059669);background:#f0fdf4
+border-left: 0 !important;background:#f0fdf4
 }
 
 .lesson-10ogn-5 .year {
@@ -17252,7 +17252,7 @@ width:auto;min-width:31px;padding:0 10px;background:#ecfdf5;color:#059669;font-s
 }
 
 .lesson-10ogn-6 .definition {
-border-left-color:#059669;background:#f0fdf4
+border-left: 0 !important;background:#f0fdf4
 }
 
 .lesson-10ogn-6 .answer {
@@ -25341,7 +25341,7 @@ body.lesson-page .lesson-9-6 .main-thought,
   background: var(--surface) !important;
   background-image: none !important;
   border: 0 !important;
-  border-left: 5px solid var(--primary) !important;
+  border-left: 0 !important;
   box-shadow: var(--shadow-soft) !important;
 }
 
@@ -25492,7 +25492,7 @@ body.lesson-page :is(.definition, .paper.definition, .card.definition) {
   background-image: none !important;
   box-shadow: var(--shadow-in) !important;
   border: 0 !important;
-  border-left: 5px solid var(--primary) !important;
+  border-left: 0 !important;
   color: var(--text-dark, #1e293b) !important;
 }
 
@@ -25943,7 +25943,7 @@ body.lesson-page :is(.conclusion-box, .paper.pad .definition) {
   margin-top: 6px !important;
   background: var(--surface-recess, #F1EDFA) !important;
   box-shadow: var(--shadow-in) !important;
-  border-left: 5px solid var(--primary) !important;
+  border-left: 0 !important;
   border-radius: 14px !important;
   padding: 14px 18px !important;
   font-size: 0.92rem !important;
@@ -26612,7 +26612,7 @@ html body.lesson-page[data-lesson-id] .slide :is(.lesson-goal-card, .goal, .goal
   padding: 14px 20px !important;
   margin: 16px 0 22px !important;
   border: 1px solid var(--line, rgba(0, 0, 0, 0.08)) !important;
-  border-left: 5px solid var(--primary) !important;
+  border-left: 0 !important;
   box-shadow: inset 4px 4px 9px rgba(0, 0, 0, 0.14), inset -4px -4px 9px rgba(255, 255, 255, 0.9) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -26915,4 +26915,316 @@ body.lesson-page code:is(.formula-line, .excel-formula, [class*="formula"], [cla
   display: inline !important;
   line-height: inherit !important;
   vertical-align: baseline !important;
+}
+
+
+/* ==========================================================================
+   GLOBAL FIXES (CACHE BUSTER V54):
+   1. Absolute removal of thick colored left borders on all cards & definitions
+   2. Absolute suppression of scrollbars on slide icons rail (desktop & mobile)
+   3. Prevention of nested goal frames ("рамка вокруг рамки")
+   4. Unified Grade 10 ОГН Mint Palette for Goal Cards & Buttons
+   ========================================================================== */
+
+/* 1. Never show left border stripes on any card, definition, callout or insight */
+html body.lesson-page .slide :is(.card, .panel, .paper, .glass, .glass-card, .definition, .concept-definition, .ml-definition, .callout, .lesson-goal-card, .goal, .goal-box, .goalitem, .topic, .box, .insight, .rule, .rule-card, .part-card, .task-card, .rubric-card) {
+  border-left: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* 2. Absolute suppression of scrollbar on slide dots navigation */
+html body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav)::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 3. Never nest frames if goal contains goalitem */
+body.lesson-page .slide .goal:has(.goalitem),
+body.lesson-page .slide .goal-box:has(.goalitem) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 4. Grade 10 ОГН (Mint) Inset Goal Cards */
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .slide .lesson-goal-card {
+  background: #E8F7F0 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  box-shadow: inset 3px 3px 7px rgba(165, 205, 185, 0.45), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .slide .lesson-goal-card .goal-code-badge {
+  background: #FFFFFF !important;
+  background-image: none !important;
+  color: #059669 !important;
+  border: 0 !important;
+  box-shadow: 2px 2px 5px rgba(165, 205, 185, 0.40), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .slide .lesson-goal-card .goal-title-badge {
+  color: #047857 !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .slide .lesson-goal-card .goal-description {
+  color: #1E293B !important;
+}
+
+
+/* ==========================================================================
+   GLOBAL FIXES (CACHE BUSTER V55):
+   1. Absolute ban on cards reacting on hover (no lifting, jumping, scaling, or shadow shift)
+   2. Slide next buttons never jump on hover and never sit under top navigation
+   3. Grade 10 ОГН Lesson 4 Topic Cards: vertical layout, intact text, and inset pressed state
+   4. Grade 10 ОГН Lesson 5 & 6 Slide Next Buttons: bottom centered, zero top nav overlap
+   ========================================================================== */
+
+/* 1. Cards MUST NEVER react on hover */
+html body.lesson-page .slide :is(
+  .card, .panel, .paper, .glass, .glass-card, .card-featured,
+  .concept-card, .feature-card, .task-card, .rubric-card, .rubric-row,
+  .part-card, .step-card, .definition, .concept-definition, .ml-definition,
+  .lesson-goal-card, .goal, .goal-box, .goalitem,
+  .flow-step, .step, .work-step, .pipeline-step, .trainstep,
+  .callout, .info-box, .box, .fact, .insight, .rule, .rule-card,
+  .scenario, .task, .era, .workbench, .workpanel, .case-content, .summary-box, .topic
+) {
+  transition: none !important;
+}
+
+html body.lesson-page .slide :is(
+  .card, .panel, .paper, .glass, .glass-card, .card-featured,
+  .concept-card, .feature-card, .task-card, .rubric-card, .rubric-row,
+  .part-card, .step-card, .definition, .concept-definition, .ml-definition,
+  .lesson-goal-card, .goal, .goal-box, .goalitem,
+  .flow-step, .step, .work-step, .pipeline-step, .trainstep,
+  .callout, .info-box, .box, .fact, .insight, .rule, .rule-card,
+  .scenario, .task, .era, .workbench, .workpanel, .case-content, .summary-box, .topic
+):hover {
+  transform: none !important;
+}
+
+html body.lesson-page .slide :is(
+  .card, .panel, .paper, .glass, .glass-card, .card-featured,
+  .concept-card, .feature-card, .task-card, .rubric-card, .rubric-row,
+  .part-card, .step-card, .definition, .concept-definition, .ml-definition,
+  .lesson-goal-card, .goal, .goal-box, .goalitem,
+  .flow-step, .step, .work-step, .pipeline-step, .trainstep,
+  .callout, .info-box, .box, .fact, .insight, .rule, .rule-card,
+  .scenario, .task, .era, .workbench, .workpanel, .case-content, .summary-box, .topic
+):hover :is(i, svg, .icon, img, .sphere-img, span, p, h2, h3, h4, small, strong) {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+html body.lesson-page .slide :is(
+  .card, .panel, .paper, .glass, .glass-card, .card-featured,
+  .concept-card, .feature-card, .task-card, .rubric-card, .rubric-row,
+  .part-card, .step-card, .definition, .concept-definition, .ml-definition,
+  .lesson-goal-card, .goal, .goal-box, .goalitem,
+  .flow-step, .step, .work-step, .pipeline-step, .trainstep,
+  .callout, .info-box, .box, .fact, .insight, .rule, .rule-card,
+  .scenario, .task, .era, .workbench, .workpanel, .case-content, .summary-box, .topic
+):hover::before,
+html body.lesson-page .slide :is(
+  .card, .panel, .paper, .glass, .glass-card, .card-featured,
+  .concept-card, .feature-card, .task-card, .rubric-card, .rubric-row,
+  .part-card, .step-card, .definition, .concept-definition, .ml-definition,
+  .lesson-goal-card, .goal, .goal-box, .goalitem,
+  .flow-step, .step, .work-step, .pipeline-step, .trainstep,
+  .callout, .info-box, .box, .fact, .insight, .rule, .rule-card,
+  .scenario, .task, .era, .workbench, .workpanel, .case-content, .summary-box, .topic
+):hover::after {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Neutralize legacy specific card hover translateY */
+.lesson-9-1 .card:hover,
+.lesson-10emn-1-2 .card:hover,
+.lesson-10ogn-1 .card:hover,
+.lesson-11-1 .card:hover,
+.lesson-11-2 .task-card:hover {
+  transform: none !important;
+}
+
+/* 2. Slide Next and Start Buttons NEVER jump on hover */
+html body.lesson-page :is(.slide-next, .slide-next-btn, .start-btn, [data-next], .action.advance, #slideNext, #next):hover {
+  transform: none !important;
+}
+
+html body.lesson-page .slide-next:hover,
+html body.lesson-page #slideNext:hover,
+html body.lesson-page #next.slide-next:hover {
+  transform: translateX(-50%) !important;
+}
+
+/* 3. Positioning for 10 ОГН slide-next buttons: Bottom Center, never under top nav */
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.slide-next, #slideNext, #next.slide-next) {
+  position: fixed !important;
+  z-index: 90 !important;
+  top: auto !important;
+  right: auto !important;
+  left: 50% !important;
+  bottom: 32px !important;
+  transform: translateX(-50%) !important;
+  padding: 12px 26px !important;
+  border-radius: 999px !important;
+  font-size: 0.94rem !important;
+  font-weight: 700 !important;
+  background: #FFFFFF !important;
+  color: #059669 !important;
+  border: 0 !important;
+  box-shadow: 4px 4px 14px rgba(165, 205, 185, 0.45), -4px -4px 14px rgba(255, 255, 255, 0.95) !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.slide-next, #slideNext, #next.slide-next):hover {
+  transform: translateX(-50%) !important;
+  box-shadow: 2px 2px 7px rgba(165, 205, 185, 0.40), -2px -2px 7px rgba(255, 255, 255, 0.95) !important;
+  color: #047857 !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.slide-next, #slideNext, #next.slide-next):active {
+  transform: translateX(-50%) !important;
+  box-shadow: inset 2px 2px 5px rgba(165, 205, 185, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+@media (max-width: 860px) {
+  html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.slide-next, #slideNext, #next.slide-next) {
+    display: none !important;
+  }
+}
+
+/* 4. Grade 10 ОГН 4 урок: Topic Cards */
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-board {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 14px !important;
+  margin-top: 20px !important;
+}
+
+@media (max-width: 1100px) {
+  html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-board {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+@media (max-width: 700px) {
+  html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-board {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 140px !important;
+  padding: 16px 14px !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  border-radius: 18px !important;
+  background: #F7FFFA !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: 4px 4px 10px rgba(165, 205, 185, 0.45), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
+  cursor: pointer !important;
+  transition: box-shadow 0.2s ease, background 0.2s ease !important;
+  transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card:hover {
+  transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card .topic-num {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 9px !important;
+  background: #059669 !important;
+  color: #FFFFFF !important;
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  margin-bottom: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card strong {
+  display: block !important;
+  font-size: 0.88rem !important;
+  line-height: 1.32 !important;
+  font-weight: 700 !important;
+  color: #064E3B !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  word-break: normal !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card small {
+  display: block !important;
+  margin-top: auto !important;
+  padding-top: 8px !important;
+  font-size: 0.74rem !important;
+  line-height: 1.25 !important;
+  color: #047857 !important;
+  opacity: 0.85 !important;
+  white-space: normal !important;
+}
+
+/* SELECTED TOPIC CARD: Stays recessed / inset ("вдавленной") */
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card.selected {
+  background: #E0F2E9 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 7px rgba(165, 205, 185, 0.75), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card.selected .topic-num {
+  background: #047857 !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+
+/* Grade 10 ЕМН (Ice Blue) Inset Goal Cards */
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide .lesson-goal-card {
+  background: #EEF4FB !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  box-shadow: inset 3px 3px 7px rgba(180, 200, 225, 0.45), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide .lesson-goal-card .goal-code-badge {
+  background: #FFFFFF !important;
+  background-image: none !important;
+  color: #2563EB !important;
+  border: 0 !important;
+  box-shadow: 2px 2px 5px rgba(180, 200, 225, 0.40), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide .lesson-goal-card .goal-title-badge {
+  color: #1E40AF !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide .lesson-goal-card .goal-description {
+  color: #1E293B !important;
 }

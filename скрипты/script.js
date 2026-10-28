@@ -130,10 +130,21 @@ function showClassModal(id) {
     list.innerHTML = '';
     list.scrollTop = 0;
 
+    const has13Soch = data.lessons.some(l => String(l.num).includes('13') && String(l.num).toUpperCase().includes('СОЧ'));
+    const seenFiles = new Set();
     const latestLessons = [...data.lessons].sort((a, b) =>
       (parseInt(String(b.num), 10) || 0) - (parseInt(String(a.num), 10) || 0)
-    );
-    latestLessons.filter(l => lessonIsPublic(l.path)).forEach(l => {
+    ).filter(l => {
+      const numStr = String(l.num).trim();
+      if (has13Soch && (numStr === '13' || (numStr.startsWith('13') && !numStr.toUpperCase().includes('СОЧ')))) {
+        return false;
+      }
+      const norm = (l.path || l.file || '').toLowerCase().replace(/\\/g, '/').split('/').pop();
+      if (seenFiles.has(norm)) return false;
+      seenFiles.add(norm);
+      return lessonIsPublic(l.path || l.file);
+    });
+    latestLessons.forEach(l => {
       const row = document.createElement('a');
       row.className = 'lesson-card-item lesson-row-card';
       row.href = encodeURI(l.path);
