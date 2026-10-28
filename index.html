@@ -25,7 +25,7 @@
   <!-- Google Analytics 4 -->
   <script src="скрипты/analytics.js"></script>
 
-  <link rel="stylesheet" href="стили/styles.css?v=neu-2026-v4">
+  <link rel="stylesheet" href="стили/styles.css?v=layout-2026-10-28-17">
 </head>
 <body>
 
@@ -68,8 +68,7 @@
        HERO SECTION WITH 3D MOTION STAGE
        ========================================================================== -->
   <section class="hero-section">
-    <div class="container hero-grid">
-      <!-- Left Content -->
+    <div class="container hero-top-grid">
       <div>
         <h1 class="hero-heading">
           Добро пожаловать!<br>
@@ -90,40 +89,24 @@
 
       </div>
 
-      <!-- Right 3D Motion Stage -->
       <div class="hero-3d-stage" id="stage-3d-container">
-        <!-- Interactive 3D WebGL Canvas -->
         <canvas id="three-canvas"></canvas>
+      </div>
+    </div>
 
-        <!-- Floating Glass Micro-Widgets -->
-        <div class="hero-glass-overlay">
-          <!-- Interactive Widget (PC / Goal Card) -->
-          <div class="glass-voice-box">
-            <div class="voice-play-icon">
-              <i class="fa-solid fa-desktop"></i>
-            </div>
-            <div class="voice-content">
-              <div class="voice-title">Интерактивные уроки и задания</div>
-              <p class="voice-desc">Цель сайта — помочь вам освоить информатику легко и интересно.</p>
-            </div>
-          </div>
-
-          <!-- Glass Stats Bar -->
-          <div class="glass-stats-bar">
-            <div class="stats-item" style="text-align: center; flex: 1;">
-              <div class="stats-item-digit text-indigo" style="text-align: center;">40+</div>
-              <div class="stats-item-desc" style="text-align: center;">Уроков<br>с практикой</div>
-            </div>
-            <div class="stats-item" style="text-align: center; flex: 1;">
-              <div class="stats-item-digit text-teal" style="text-align: center;">9–11</div>
-              <div class="stats-item-desc" style="text-align: center;">Классы<br>обучения</div>
-            </div>
-            <div class="stats-item" style="text-align: center; flex: 1;">
-              <div class="stats-item-digit text-amber" style="text-align: center;">24/7</div>
-              <div class="stats-item-desc" style="text-align: center;">Любое<br>устройство</div>
-            </div>
-          </div>
+    <div class="container hero-info-grid">
+      <div class="glass-voice-box">
+        <div class="voice-play-icon" aria-hidden="true"><i class="fa-solid fa-desktop"></i></div>
+        <div class="voice-content">
+          <div class="voice-title">Интерактивные уроки и задания</div>
+          <p class="voice-desc">Цель сайта — помочь вам освоить информатику легко и интересно.</p>
         </div>
+      </div>
+
+      <div class="glass-stats-bar">
+        <div class="stats-item"><div class="stats-item-digit text-indigo">40+</div><div class="stats-item-desc">Уроков<br>с практикой</div></div>
+        <div class="stats-item"><div class="stats-item-digit text-teal">9–11</div><div class="stats-item-desc">Классы<br>обучения</div></div>
+        <div class="stats-item"><div class="stats-item-digit text-amber">24/7</div><div class="stats-item-desc">Любое<br>устройство</div></div>
       </div>
     </div>
   </section>
@@ -184,6 +167,6 @@
        JAVASCRIPT: THREE.JS 3D MOTION & INTERACTIONS
        ========================================================================== -->
   <script src="скрипты/auth-widget.js?v=neu-2026-12-profile56"></script>
-  <script src="скрипты/script.js?v=neu-2026-12"></script>
+  <script src="скрипты/script.js?v=layout-2026-10-28-03"></script>
 </body>
 </html>

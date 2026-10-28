@@ -229,14 +229,20 @@ document.addEventListener('keydown', event => {
   const canvas = document.getElementById('three-canvas');
   if (!container || !canvas || typeof THREE === 'undefined') return;
 
+  const getStageSize = () => ({
+    width: canvas.clientWidth || canvas.parentElement.clientWidth,
+    height: canvas.clientHeight || 240
+  });
+  const initialSize = getStageSize();
+
   const scene = new THREE.Scene();
 
-  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+  const camera = new THREE.PerspectiveCamera(45, initialSize.width / initialSize.height, 0.1, 100);
   camera.position.set(0, 1.2, 6.4);
   camera.lookAt(0, 0.2, 0);
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setSize(initialSize.width, initialSize.height, false);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   // Lighting: crisp bright studio lighting for light metallic materials
@@ -484,7 +490,7 @@ document.addEventListener('keydown', event => {
   let targetX = 0, targetY = 0;
 
   window.addEventListener('mousemove', (e) => {
-    const rect = container.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouseY = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
   });
@@ -492,9 +498,10 @@ document.addEventListener('keydown', event => {
   // Window Resize
   function onWindowResize() {
     if (!container) return;
-    camera.aspect = container.clientWidth / container.clientHeight;
+    const size = getStageSize();
+    camera.aspect = size.width / size.height;
     camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(size.width, size.height, false);
   }
   window.addEventListener('resize', onWindowResize);
 
