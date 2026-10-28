@@ -23,7 +23,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, Red
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import init_db, get_db, DB_PATH
+from database import init_db, get_db, DB_PATH, set_current_db_path, get_current_db_path
 from auth import (
     hash_password, verify_password,
     create_teacher_session, destroy_teacher_session,
@@ -305,8 +305,12 @@ async def list_tests(
     search: Optional[str] = None,
     teacher: dict = Depends(get_current_teacher)
 ):
-    query = "SELECT * FROM tests WHERE teacher_id = ? AND is_archived = ?"
-    params = [teacher["id"], 1 if archived else 0]
+    if teacher.get("role") == "superadmin":
+        query = "SELECT * FROM tests WHERE is_archived = ?"
+        params = [1 if archived else 0]
+    else:
+        query = "SELECT * FROM tests WHERE teacher_id = ? AND is_archived = ?"
+        params = [teacher["id"], 1 if archived else 0]
 
     if subject:
         query += " AND subject = ?"
@@ -392,7 +396,10 @@ async def create_test(req: CreateTestRequest, teacher: dict = Depends(get_curren
 @app.get("/api/tests/{test_id}")
 async def get_test(test_id: str, teacher: dict = Depends(get_current_teacher)):
     async with get_db() as db:
-        cursor = await db.execute("SELECT * FROM tests WHERE id = ? AND teacher_id = ?", (test_id, teacher["id"]))
+        if teacher.get("role") == "superadmin":
+            cursor = await db.execute("SELECT * FROM tests WHERE id = ?", (test_id,))
+        else:
+            cursor = await db.execute("SELECT * FROM tests WHERE id = ? AND teacher_id = ?", (test_id, teacher["id"]))
         test = await cursor.fetchone()
         if not test:
             raise HTTPException(status_code=404, detail="Работа не найдена")
@@ -811,11 +818,18 @@ async def create_launch(req: CreateLaunchRequest, teacher: dict = Depends(get_cu
 @app.get("/api/launches")
 async def list_launches(test_id: Optional[str] = None, teacher: dict = Depends(get_current_teacher)):
     remove_lesson_from_database_files(os.path.dirname(BASE_DIR))
-    query = "SELECT l.*, t.subject, t.grade_level, t.exam_type FROM launches l JOIN tests t ON l.test_id = t.id WHERE l.teacher_id = ?"
-    params = [teacher["id"]]
-    if test_id:
-        query += " AND l.test_id = ?"
-        params.append(test_id)
+    if teacher.get("role") == "superadmin":
+        query = "SELECT l.*, t.subject, t.grade_level, t.exam_type FROM launches l JOIN tests t ON l.test_id = t.id"
+        params = []
+        if test_id:
+            query += " WHERE l.test_id = ?"
+            params.append(test_id)
+    else:
+        query = "SELECT l.*, t.subject, t.grade_level, t.exam_type FROM launches l JOIN tests t ON l.test_id = t.id WHERE l.teacher_id = ?"
+        params = [teacher["id"]]
+        if test_id:
+            query += " AND l.test_id = ?"
+            params.append(test_id)
     query += " ORDER BY l.created_at DESC"
 
     async with get_db() as db:

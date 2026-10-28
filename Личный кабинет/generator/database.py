@@ -15,16 +15,19 @@ from contextlib import asynccontextmanager
 logger = logging.getLogger("bagalau.db")
 
 _current_db_path: ContextVar[str | None] = ContextVar("current_db_path", default=None)
+_fallback_db_path: str | None = None
 
 def set_current_db_path(path: str | None) -> None:
+    global _fallback_db_path
+    _fallback_db_path = path
     _current_db_path.set(path)
 
 def get_current_db_path() -> str:
-    return _current_db_path.get() or DB_PATH
+    return _current_db_path.get() or _fallback_db_path or DB_PATH
 
 @asynccontextmanager
 async def get_db(db_path: str | None = None):
-    target_path = str(db_path or _current_db_path.get() or DB_PATH)
+    target_path = str(db_path or _current_db_path.get() or _fallback_db_path or DB_PATH)
     target_dir = os.path.dirname(os.path.abspath(target_path))
     os.makedirs(target_dir, exist_ok=True)
     db = await aiosqlite.connect(target_path, timeout=30)

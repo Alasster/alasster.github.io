@@ -180,6 +180,34 @@
 
               <label class="profile-field profile-field-wide"><span>Email / логин</span><input class="field" id="profile-email-edit" name="email" type="email" maxlength="160" required></label>
 
+              <div class="profile-field profile-field-wide" id="profile-class-select-row" style="display: flex; gap: 14px;">
+                <label style="flex: 1;">
+                  <span style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Класс</span>
+                  <select class="field" id="profile-class-number" name="class_number" style="height: 44px; border-radius: 12px; width: 100%;">
+                    <option value="">Выберите класс...</option>
+                    <option value="7">7 класс</option>
+                    <option value="8">8 класс</option>
+                    <option value="9">9 класс</option>
+                    <option value="10">10 класс</option>
+                    <option value="11">11 класс</option>
+                  </select>
+                </label>
+                <label style="flex: 1;">
+                  <span style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Буква класса</span>
+                  <select class="field" id="profile-class-letter" name="class_letter" style="height: 44px; border-radius: 12px; width: 100%;">
+                    <option value="">Выберите букву...</option>
+                    <option value="А">А</option>
+                    <option value="Б">Б</option>
+                    <option value="В">В</option>
+                    <option value="Г">Г</option>
+                    <option value="Д">Д</option>
+                    <option value="Е">Е</option>
+                    <option value="Ж">Ж</option>
+                    <option value="З">З</option>
+                  </select>
+                </label>
+              </div>
+
               <label class="profile-field"><span>Новый пароль</span><input class="field" id="profile-password" name="new_password" type="password" minlength="8" autocomplete="new-password"></label>
 
               <label class="profile-field"><span>Подтверждение пароля</span><input class="field" id="profile-password-confirm" name="new_password_confirm" type="password" minlength="8" autocomplete="new-password"></label>
@@ -1783,8 +1811,7 @@
 
   <script src="/static/materials.js?v=5"></script>
 
-    <script src="/static/dashboard.js?v=profile-management-18"></script>
-
+    
 
   <div class="modal-backdrop" id="admin-edit-name-modal" hidden>
     <section class="confirm-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="admin-edit-name-title">
@@ -1802,6 +1829,33 @@
       <div class="modal-field">
         <label class="field-label" for="admin-edit-displayname">Отображаемое имя (ФИО)</label>
         <input class="field" id="admin-edit-displayname" type="text" autocomplete="off" placeholder="Фамилия Имя">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 8px;">
+        <div class="modal-field" style="flex: 1;">
+          <label class="field-label" for="admin-edit-class-number">Класс (цифра)</label>
+          <select class="field" id="admin-edit-class-number" style="height: 42px; border-radius: 10px; width: 100%;">
+            <option value="">Без класса</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex: 1;">
+          <label class="field-label" for="admin-edit-class-letter">Буква класса</label>
+          <select class="field" id="admin-edit-class-letter" style="height: 42px; border-radius: 10px; width: 100%;">
+            <option value="">Без буквы</option>
+            <option value="А">А</option>
+            <option value="Б">Б</option>
+            <option value="В">В</option>
+            <option value="Г">Г</option>
+            <option value="Д">Д</option>
+            <option value="Е">Е</option>
+            <option value="Ж">Ж</option>
+            <option value="З">З</option>
+          </select>
+        </div>
       </div>
       <p class="panel-message" id="admin-edit-message" role="status"></p>
       <div class="modal-actions">
@@ -1823,6 +1877,7 @@
     </section>
   </div>
 
+  <script src="/static/dashboard.js?v=profile-management-22"></script>
 </body>
 
 </html>

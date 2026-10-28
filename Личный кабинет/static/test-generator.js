@@ -640,23 +640,27 @@ function setArchiveFilter(isArchived) {
 }
 
 async function loadTests() {
-
   try {
-
     const res = await fetch(`/api/tests?archived=${isArchiveView}`);
-
-    if (!res.ok) throw new Error("Не удалось загрузить список работ");
-
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error(`Ошибка загрузки (${res.status}): ${errTxt}`);
+    }
     currentTests = await res.json();
-
     filterAndRenderTests();
-
   } catch (err) {
-
-    console.error(err);
-
+    console.error("loadTests error:", err);
+    const grid = document.getElementById("tests-grid");
+    if (grid) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #ef4444;">
+          <p style="font-size: 1.1rem; font-weight: 600;">Не удалось загрузить тесты</p>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">${escapeHtml(err.message)}</p>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="loadTests()" style="margin-top: 1rem;">Повторить попытку</button>
+        </div>
+      `;
+    }
   }
-
 }
 
 function filterAndRenderTests() {
@@ -4787,23 +4791,21 @@ async function handleDeleteSitePage() {
 // =========================================================================
 
 async function loadLaunches() {
-
   try {
-
     const res = await fetch("/api/launches");
-
-    if (!res.ok) throw new Error("Не удалось загрузить проведения");
-
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error(`Ошибка загрузки (${res.status}): ${errTxt}`);
+    }
     currentLaunches = await res.json();
-
     renderLaunchesTable();
-
   } catch (err) {
-
-    console.error(err);
-
+    console.error("loadLaunches error:", err);
+    const tbody = document.getElementById("launches-table-body");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #ef4444;">Ошибка загрузки сессий проведения: ${escapeHtml(err.message)}</td></tr>`;
+    }
   }
-
 }
 
 function renderLaunchesTable() {

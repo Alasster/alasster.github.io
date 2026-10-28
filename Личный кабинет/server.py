@@ -172,6 +172,7 @@ class ProfileUpdateRequest(BaseModel):
     first_name: str
     last_name: str
     email: str
+    class_name: str = ""
     new_password: str = ""
     new_password_confirm: str = ""
 
@@ -325,14 +326,14 @@ def get_user_from_request(request: Request) -> sqlite3.Row | None:
         if is_local_request(request) and request.url.path not in ("/login", "/register"):
             with closing(open_db()) as db:
                 return db.execute(
-                    "SELECT id, username, display_name, first_name, last_name, role FROM users WHERE role = 'superadmin' ORDER BY id LIMIT 1"
+                    "SELECT id, username, display_name, first_name, last_name, role, class_name FROM users WHERE role = 'superadmin' ORDER BY id LIMIT 1"
                 ).fetchone()
         return None
 
     with closing(open_db()) as db:
         row = db.execute(
             """
-            SELECT users.id, users.username, users.display_name, users.first_name, users.last_name, users.role
+            SELECT users.id, users.username, users.display_name, users.first_name, users.last_name, users.role, users.class_name
             FROM sessions
             JOIN users ON users.id = sessions.user_id
             WHERE sessions.token_hash = ? AND CAST(sessions.expires_at AS INTEGER) > CAST(strftime('%s', 'now') AS INTEGER)
@@ -969,6 +970,7 @@ def update_current_user(payload: ProfileUpdateRequest, request: Request):
         return JSONResponse({"detail": "Пароли не совпадают"}, status_code=400)
 
     display_name = f"{first_name} {last_name}"
+    class_name = payload.class_name.strip()
     with closing(open_db()) as db:
         duplicate = db.execute(
             "SELECT id FROM users WHERE username = ? AND id != ?",
@@ -978,17 +980,17 @@ def update_current_user(payload: ProfileUpdateRequest, request: Request):
             return JSONResponse({"detail": "Пользователь с таким email уже зарегистрирован"}, status_code=409)
         if new_password:
             db.execute(
-                "UPDATE users SET username = ?, display_name = ?, first_name = ?, last_name = ?, password_hash = ? WHERE id = ?",
-                (email, display_name, first_name, last_name, hash_password(new_password), user["id"]),
+                "UPDATE users SET username = ?, display_name = ?, first_name = ?, last_name = ?, class_name = ?, password_hash = ? WHERE id = ?",
+                (email, display_name, first_name, last_name, class_name, hash_password(new_password), user["id"]),
             )
         else:
             db.execute(
-                "UPDATE users SET username = ?, display_name = ?, first_name = ?, last_name = ? WHERE id = ?",
-                (email, display_name, first_name, last_name, user["id"]),
+                "UPDATE users SET username = ?, display_name = ?, first_name = ?, last_name = ?, class_name = ? WHERE id = ?",
+                (email, display_name, first_name, last_name, class_name, user["id"]),
             )
         db.commit()
         updated = db.execute(
-            "SELECT id, username, display_name, first_name, last_name, role FROM users WHERE id = ?",
+            "SELECT id, username, display_name, first_name, last_name, role, class_name FROM users WHERE id = ?",
             (user["id"],),
         ).fetchone()
     return dict(updated)
@@ -1211,19 +1213,29 @@ def update_user_name(user_id: int, payload: dict, request: Request):
     first_name = str(payload.get("first_name", "")).strip()
     last_name = str(payload.get("last_name", "")).strip()
     display_name = str(payload.get("display_name", "")).strip()
+    class_name = str(payload.get("class_name", "")).strip() if "class_name" in payload else None
     if not display_name and (first_name or last_name):
         display_name = f"{first_name} {last_name}".strip()
     if not display_name:
         return JSONResponse({"detail": "Имя не может быть пустым"}, status_code=400)
     with closing(open_db()) as db:
-        cursor = db.execute(
-            "UPDATE users SET first_name = ?, last_name = ?, display_name = ? WHERE id = ?",
-            (first_name, last_name, display_name, user_id)
-        )
+        if class_name is not None:
+            cursor = db.execute(
+                "UPDATE users SET first_name = ?, last_name = ?, display_name = ?, class_name = ? WHERE id = ?",
+                (first_name, last_name, display_name, class_name, user_id)
+            )
+        else:
+            cursor = db.execute(
+                "UPDATE users SET first_name = ?, last_name = ?, display_name = ? WHERE id = ?",
+                (first_name, last_name, display_name, user_id)
+            )
         db.commit()
     if cursor.rowcount == 0:
         return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)
-    return {"ok": True, "display_name": display_name, "first_name": first_name, "last_name": last_name}
+    res = {"ok": True, "display_name": display_name, "first_name": first_name, "last_name": last_name}
+    if class_name is not None:
+        res["class_name"] = class_name
+    return res
 
 
 @app.delete("/api/users/{user_id}")

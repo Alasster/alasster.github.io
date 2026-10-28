@@ -4,6 +4,8 @@ const profileLastName = document.getElementById('profile-last-name');
 const profileEmailEdit = document.getElementById('profile-email-edit');
 const profilePassword = document.getElementById('profile-password');
 const profilePasswordConfirm = document.getElementById('profile-password-confirm');
+const profileClassNumber = document.getElementById('profile-class-number');
+const profileClassLetter = document.getElementById('profile-class-letter');
 const profileMessage = document.getElementById('profile-message');
 const profileConfirmModal = document.getElementById('profile-confirm-modal');
 const profileConfirmCancel = document.getElementById('profile-confirm-cancel');
@@ -218,6 +220,18 @@ async function loadCurrentUser() {
   profileFirstName.value = user.first_name || '';
   profileLastName.value = user.last_name || '';
   profileEmailEdit.value = user.username || '';
+  const profileClassRow = document.getElementById('profile-class-select-row');
+  if (profileClassRow) {
+    profileClassRow.style.display = (userRole === 'user') ? 'flex' : 'none';
+  }
+  if (userRole === 'user' && user.class_name) {
+    const parts = user.class_name.split(' ');
+    if (profileClassNumber) profileClassNumber.value = parts[0] || '';
+    if (profileClassLetter) profileClassLetter.value = parts[1] || '';
+  } else {
+    if (profileClassNumber) profileClassNumber.value = '';
+    if (profileClassLetter) profileClassLetter.value = '';
+  }
   profileSnapshot = collectProfileChanges();
   profileDirty = false;
 
@@ -368,44 +382,51 @@ function renderUsersRows(users) {
     nameWrap.append(avatar, nameText);
     nameCell.append(nameWrap);
 
-    // 2. Class input (editable by teacher)
+    // 2. Class input: ONLY for student (role === 'user')
     const classCell = document.createElement('td');
-    const classInput = document.createElement('input');
-    classInput.type = 'text';
-    classInput.className = 'class-input';
-    classInput.value = user.class_name || '';
-    classInput.placeholder = 'Класс...';
-    classInput.title = 'Введите класс и нажмите Enter или кликните в сторону для сохранения';
+    if (user.role === 'user') {
+      const classInput = document.createElement('input');
+      classInput.type = 'text';
+      classInput.className = 'class-input';
+      classInput.value = user.class_name || '';
+      classInput.placeholder = 'Класс...';
+      classInput.title = 'Введите класс (например: 10 А) и нажмите Enter или кликните в сторону';
 
-    let lastVal = user.class_name || '';
-    const saveClass = async () => {
-      const newVal = classInput.value.trim();
-      if (newVal === lastVal) return;
-      try {
-        const resp = await fetch(`/api/users/${user.id}/class`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ class_name: newVal }),
-        });
-        if (!resp.ok) throw new Error('Ошибка сохранения');
-        lastVal = newVal;
-        user.class_name = newVal;
-        classInput.classList.add('is-saved');
-        setTimeout(() => classInput.classList.remove('is-saved'), 1500);
-        updateClassFilterOptions();
-      } catch (err) {
-        classInput.value = lastVal;
-        if (adminMessage) adminMessage.textContent = 'Не удалось обновить класс.';
-      }
-    };
+      let lastVal = user.class_name || '';
+      const saveClass = async () => {
+        const newVal = classInput.value.trim();
+        if (newVal === lastVal) return;
+        try {
+          const resp = await fetch(`/api/users/${user.id}/class`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ class_name: newVal }),
+          });
+          if (!resp.ok) throw new Error('Ошибка обновления');
+          lastVal = newVal;
+          user.class_name = newVal;
+          classInput.classList.add('is-saved');
+          setTimeout(() => classInput.classList.remove('is-saved'), 1500);
+          updateClassFilterOptions();
+        } catch (err) {
+          classInput.value = lastVal;
+          if (adminMessage) adminMessage.textContent = 'Не удалось обновить класс.';
+        }
+      };
 
-    classInput.addEventListener('blur', saveClass);
-    classInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        classInput.blur();
-      }
-    });
-    classCell.append(classInput);
+      classInput.addEventListener('blur', saveClass);
+      classInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          classInput.blur();
+        }
+      });
+      classCell.append(classInput);
+    } else {
+      const dash = document.createElement('span');
+      dash.style.cssText = 'color: var(--text-muted); opacity: 0.5; display: block; text-align: center; font-size: 1.1rem;';
+      dash.textContent = '—';
+      classCell.append(dash);
+    }
 
     // 3. Email Cell
     const emailCell = document.createElement('td');
@@ -518,95 +539,129 @@ function renderUsersRows(users) {
 
 function openAdminEditNameModal(user) {
   editingUserId = user.id;
-  if (adminEditNameUser) adminEditNameUser.textContent = `${user.display_name || user.username} (${user.username})`;
-  if (adminEditFirstname) adminEditFirstname.value = user.first_name || '';
-  if (adminEditLastname) adminEditLastname.value = user.last_name || '';
-  if (adminEditDisplayname) adminEditDisplayname.value = user.display_name || '';
-  if (adminEditMessage) adminEditMessage.textContent = '';
-  showModal(adminEditNameModal);
-  adminEditDisplayname?.focus();
+  const modal = document.getElementById('admin-edit-name-modal');
+  const userLabel = document.getElementById('admin-edit-name-user');
+  const firstInput = document.getElementById('admin-edit-firstname');
+  const lastInput = document.getElementById('admin-edit-lastname');
+  const displayInput = document.getElementById('admin-edit-displayname');
+  const classNumInput = document.getElementById('admin-edit-class-number');
+  const classLetInput = document.getElementById('admin-edit-class-letter');
+  const msgEl = document.getElementById('admin-edit-message');
+
+  if (userLabel) userLabel.textContent = `${user.display_name || user.username} (${user.username})`;
+  if (firstInput) firstInput.value = user.first_name || '';
+  if (lastInput) lastInput.value = user.last_name || '';
+  if (displayInput) displayInput.value = user.display_name || '';
+  if (msgEl) msgEl.textContent = '';
+
+  const editClassRow = document.getElementById('admin-edit-class-row');
+  if (editClassRow) {
+    editClassRow.style.display = (user.role === 'user') ? 'block' : 'none';
+  }
+  const parts = (user.class_name || '').split(' ');
+  if (classNumInput) classNumInput.value = parts[0] || '';
+  if (classLetInput) classLetInput.value = parts[1] || '';
+
+  showModal(modal);
+  displayInput?.focus();
 }
 
 function closeAdminEditNameModal() {
-  hideModal(adminEditNameModal);
+  const modal = document.getElementById('admin-edit-name-modal');
+  hideModal(modal);
   editingUserId = null;
 }
 
-if (adminEditCancel) adminEditCancel.addEventListener('click', closeAdminEditNameModal);
+document.getElementById('admin-edit-cancel')?.addEventListener('click', closeAdminEditNameModal);
 
-if (adminEditConfirm) {
-  adminEditConfirm.addEventListener('click', async () => {
-    if (!editingUserId) return;
-    const first = (adminEditFirstname?.value || '').trim();
-    const last = (adminEditLastname?.value || '').trim();
-    let display = (adminEditDisplayname?.value || '').trim();
-    if (!display && (first || last)) display = `${first} ${last}`.trim();
-    if (!display) {
-      if (adminEditMessage) adminEditMessage.textContent = 'Введите имя или ФИО.';
-      return;
+document.getElementById('admin-edit-confirm')?.addEventListener('click', async () => {
+  if (!editingUserId) return;
+  const confirmBtn = document.getElementById('admin-edit-confirm');
+  const firstInput = document.getElementById('admin-edit-firstname');
+  const lastInput = document.getElementById('admin-edit-lastname');
+  const displayInput = document.getElementById('admin-edit-displayname');
+  const classNumInput = document.getElementById('admin-edit-class-number');
+  const classLetInput = document.getElementById('admin-edit-class-letter');
+  const msgEl = document.getElementById('admin-edit-message');
+
+  const first = (firstInput?.value || '').trim();
+  const last = (lastInput?.value || '').trim();
+  let display = (displayInput?.value || '').trim();
+  if (!display && (first || last)) display = `${first} ${last}`.trim();
+  if (!display) {
+    if (msgEl) msgEl.textContent = 'Введите имя или ФИО.';
+    return;
+  }
+
+  const num = (classNumInput?.value || '').trim();
+  const let_val = (classLetInput?.value || '').trim();
+  const newClass = num && let_val ? `${num} ${let_val}` : (num || let_val || '');
+
+  if (confirmBtn) confirmBtn.disabled = true;
+  try {
+    const resp = await fetch(`/api/users/${editingUserId}/name`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ first_name: first, last_name: last, display_name: display, class_name: newClass }),
+    });
+    const res = await resp.json();
+    if (!resp.ok) throw new Error(res.detail || 'Не удалось обновить пользователя.');
+    const u = allUsersData.find((x) => x.id === editingUserId);
+    if (u) {
+      u.first_name = first;
+      u.last_name = last;
+      u.display_name = display;
+      u.class_name = newClass;
     }
-    adminEditConfirm.disabled = true;
-    try {
-      const resp = await fetch(`/api/users/${editingUserId}/name`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ first_name: first, last_name: last, display_name: display }),
-      });
-      const res = await resp.json();
-      if (!resp.ok) throw new Error(res.detail || 'Не удалось обновить имя.');
-      const u = allUsersData.find((x) => x.id === editingUserId);
-      if (u) {
-        u.first_name = first;
-        u.last_name = last;
-        u.display_name = display;
-      }
-      closeAdminEditNameModal();
-      applyUsersFilterAndSort();
-      if (adminMessage) adminMessage.textContent = 'Имя пользователя обновлено.';
-    } catch (e) {
-      if (adminEditMessage) adminEditMessage.textContent = e.message;
-    } finally {
-      adminEditConfirm.disabled = false;
-    }
-  });
-}
+    closeAdminEditNameModal();
+    updateClassFilterOptions();
+    applyUsersFilterAndSort();
+    if (adminMessage) adminMessage.textContent = 'Данные пользователя обновлены.';
+  } catch (e) {
+    if (msgEl) msgEl.textContent = e.message;
+  } finally {
+    if (confirmBtn) confirmBtn.disabled = false;
+  }
+});
 
 function openAdminDeleteUserModal(user) {
   deletingUserId = user.id;
-  if (adminDeleteDesc) {
-    adminDeleteDesc.textContent = `Вы действительно хотите удалить пользователя ${user.display_name || user.username} (${user.username})? Все результаты и сессии будут удалены.`;
+  const modal = document.getElementById('admin-delete-user-modal');
+  const descEl = document.getElementById('admin-delete-desc');
+  if (descEl) {
+    descEl.textContent = `Вы действительно хотите удалить пользователя ${user.display_name || user.username} (${user.username})? Все результаты и сессии будут удалены.`;
   }
-  showModal(adminDeleteUserModal);
+  showModal(modal);
 }
 
 function closeAdminDeleteUserModal() {
-  hideModal(adminDeleteUserModal);
+  const modal = document.getElementById('admin-delete-user-modal');
+  hideModal(modal);
   deletingUserId = null;
 }
 
-if (adminDeleteCancel) adminDeleteCancel.addEventListener('click', closeAdminDeleteUserModal);
+document.getElementById('admin-delete-cancel')?.addEventListener('click', closeAdminDeleteUserModal);
 
-if (adminDeleteConfirm) {
-  adminDeleteConfirm.addEventListener('click', async () => {
-    if (!deletingUserId) return;
-    adminDeleteConfirm.disabled = true;
-    try {
-      const resp = await fetch(`/api/users/${deletingUserId}`, { method: 'DELETE' });
-      const res = await resp.json();
-      if (!resp.ok) throw new Error(res.detail || 'Не удалось удалить пользователя.');
-      allUsersData = allUsersData.filter((u) => u.id !== deletingUserId);
-      closeAdminDeleteUserModal();
-      updateClassFilterOptions();
-      applyUsersFilterAndSort();
-      if (adminMessage) adminMessage.textContent = 'Пользователь успешно удален.';
-    } catch (e) {
-      if (adminMessage) adminMessage.textContent = e.message;
-      closeAdminDeleteUserModal();
-    } finally {
-      adminDeleteConfirm.disabled = false;
-    }
-  });
-}
+document.getElementById('admin-delete-confirm')?.addEventListener('click', async () => {
+  if (!deletingUserId) return;
+  const confirmBtn = document.getElementById('admin-delete-confirm');
+  if (confirmBtn) confirmBtn.disabled = true;
+  try {
+    const resp = await fetch(`/api/users/${deletingUserId}`, { method: 'DELETE' });
+    const res = await resp.json();
+    if (!resp.ok) throw new Error(res.detail || 'Не удалось удалить пользователя.');
+    allUsersData = allUsersData.filter((u) => u.id !== deletingUserId);
+    closeAdminDeleteUserModal();
+    updateClassFilterOptions();
+    applyUsersFilterAndSort();
+    if (adminMessage) adminMessage.textContent = 'Пользователь успешно удален.';
+  } catch (e) {
+    if (adminMessage) adminMessage.textContent = e.message;
+    closeAdminDeleteUserModal();
+  } finally {
+    if (confirmBtn) confirmBtn.disabled = false;
+  }
+});
 
 // Setup sortable headers
 document.querySelectorAll('.sortable-th').forEach((th) => {
@@ -678,10 +733,21 @@ function hideModal(modal) {
 
 function collectProfileChanges() {
   const newPassword = profilePassword?.value || '';
+  let className = '';
+  if (window.currentUserRole === 'user') {
+    const num = (profileClassNumber?.value || '').trim();
+    const lettr = (profileClassLetter?.value || '').trim();
+    if (num && lettr) {
+      className = `${num} ${lettr}`;
+    } else if (num) {
+      className = num;
+    }
+  }
   return {
     first_name: profileFirstName?.value.trim() || '',
     last_name: profileLastName?.value.trim() || '',
     email: profileEmailEdit?.value.trim().toLowerCase() || '',
+    class_name: className,
     new_password: newPassword,
     new_password_confirm: newPassword ? (profilePasswordConfirm?.value || '') : '',
   };
