@@ -9,14 +9,25 @@ from datetime import datetime, timezone
 DB_DIR = os.environ.get("BAGALAU_DB_DIR", os.path.join(os.path.dirname(__file__), "data"))
 DB_PATH = os.path.join(DB_DIR, "bagalau.sqlite3")
 
+from contextvars import ContextVar
 from contextlib import asynccontextmanager
 
 logger = logging.getLogger("bagalau.db")
 
+_current_db_path: ContextVar[str | None] = ContextVar("current_db_path", default=None)
+
+def set_current_db_path(path: str | None) -> None:
+    _current_db_path.set(path)
+
+def get_current_db_path() -> str:
+    return _current_db_path.get() or DB_PATH
+
 @asynccontextmanager
-async def get_db():
-    os.makedirs(DB_DIR, exist_ok=True)
-    db = await aiosqlite.connect(DB_PATH, timeout=30)
+async def get_db(db_path: str | None = None):
+    target_path = str(db_path or _current_db_path.get() or DB_PATH)
+    target_dir = os.path.dirname(os.path.abspath(target_path))
+    os.makedirs(target_dir, exist_ok=True)
+    db = await aiosqlite.connect(target_path, timeout=30)
     db.row_factory = aiosqlite.Row
 
     # Robust commit with automatic retry on transient cloud-drive locks / disk I/O errors
@@ -41,9 +52,11 @@ async def get_db():
     finally:
         await db.close()
 
-async def init_db():
-    os.makedirs(DB_DIR, exist_ok=True)
-    async with get_db() as db:
+async def init_db(db_path: str | None = None):
+    target_path = str(db_path or _current_db_path.get() or DB_PATH)
+    target_dir = os.path.dirname(os.path.abspath(target_path))
+    os.makedirs(target_dir, exist_ok=True)
+    async with get_db(target_path) as db:
         # Teachers
         await db.execute("""
         CREATE TABLE IF NOT EXISTS teachers (
@@ -265,5 +278,23 @@ async def init_db():
                 VALUES (?, ?, ?, ?, ?)
             """, (default_id, "teacher", pass_hash, "Кадыржанов Жанас Кайыржанович", datetime.now().isoformat()))
 
+        # Launches Registry table in central DB
+        if os.path.abspath(target_path) == os.path.abspath(DB_PATH):
+            await db.execute("""
+            CREATE TABLE IF NOT EXISTS launches_registry (
+                launch_id TEXT PRIMARY KEY,
+                db_path TEXT NOT NULL,
+                teacher_id TEXT,
+                created_at TEXT NOT NULL
+            );
+            """)
+            try:
+                await db.execute("""
+                INSERT OR IGNORE INTO launches_registry (launch_id, db_path, teacher_id, created_at)
+                SELECT id, ?, teacher_id, created_at FROM launches;
+                """, (DB_PATH,))
+            except Exception:
+                pass
+
         await db.commit()
-    logger.info("Database initialized successfully at %s", DB_PATH)
+    logger.info("Database initialized successfully at %s", target_path)

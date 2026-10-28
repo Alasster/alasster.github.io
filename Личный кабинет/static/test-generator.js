@@ -4645,6 +4645,10 @@ function closeStudentPreview() {
 let sitePageLaunchId = "";
 
 function openCreateSitePageModal(lId = null) {
+  if (window.currentUserRole && window.currentUserRole !== "superadmin") {
+    alert("Создание страниц на сайте доступно только главному администратору.");
+    return;
+  }
 
   sitePageLaunchId = lId || (activeLaunch ? activeLaunch.id : "");
 

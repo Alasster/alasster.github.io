@@ -1,3 +1,8 @@
+STUDENT_TOKEN_DB_MAP: dict[str, str] = {}
+
+def register_student_token_db(token: str, db_path: str) -> None:
+    STUDENT_TOKEN_DB_MAP[token] = db_path
+
 import hashlib
 import hmac
 import secrets
@@ -73,7 +78,26 @@ async def get_current_student_attempt(request: Request) -> dict:
             detail="Сессия ученика не найдена. Пожалуйста, войдите в работу снова.",
         )
 
-    async with get_db() as db:
+    db_path = STUDENT_TOKEN_DB_MAP.get(token)
+    if not db_path:
+        try:
+            from database import DB_PATH
+            async with get_db(DB_PATH) as central_db:
+                cursor = await central_db.execute(
+                    "SELECT db_path FROM student_tokens_registry WHERE token = ?",
+                    (token,)
+                )
+                row = await cursor.fetchone()
+                if row and row["db_path"] and os.path.exists(row["db_path"]):
+                    db_path = row["db_path"]
+                    STUDENT_TOKEN_DB_MAP[token] = db_path
+        except Exception:
+            pass
+    if db_path:
+        from database import set_current_db_path
+        set_current_db_path(db_path)
+
+    async with get_db(db_path) as db:
         cursor = await db.execute("""
             SELECT sa.*, l.status as launch_status, l.duration_minutes, l.title as launch_title,
                    l.shuffle_questions, l.shuffle_options, l.allow_back_nav, l.show_all_at_once,

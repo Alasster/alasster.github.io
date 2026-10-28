@@ -111,6 +111,12 @@ document.addEventListener('click', (event) => {
   if (!sidebar?.contains(event.target)) setSidebarExpanded(false);
 });
 
+const ROLE_SECTIONS = {
+  superadmin: ['overview', 'profile', 'lessons', 'tests', 'materials'],
+  teacher: ['profile', 'tests'],
+  user: ['profile']
+};
+
 function syncSidebarActive() {
   const requestedSection = (window.location.hash || '#overview').slice(1);
   const requestedLink = document.querySelector(`.sidebar-link[href="#${requestedSection}"]`);
@@ -175,16 +181,49 @@ async function loadCurrentUser() {
   }
   if (!response.ok) throw new Error('Не удалось загрузить профиль.');
   const user = await response.json();
+  const userRole = user.role || 'user';
+  window.currentUserRole = userRole;
   currentDisplayName = user.display_name || user.username;
-  workspaceRole.textContent = user.role === 'superadmin' ? 'Супер-админ' : user.role;
+
+  // Filter sidebar links based on role
+  const allowed = ROLE_SECTIONS[userRole] || ['profile'];
+  document.querySelectorAll('.sidebar-link').forEach((link) => {
+    const sec = (link.getAttribute('href') || '').replace('#', '');
+    if (allowed.includes(sec)) {
+      link.hidden = false;
+      link.style.display = '';
+    } else {
+      link.hidden = true;
+      link.style.display = 'none';
+    }
+  });
+
+  if (userRole === 'superadmin') {
+    workspaceRole.textContent = 'Супер-админ';
+    workspaceRole.style.display = '';
+    canManageUsers = true;
+    await loadUsers();
+    loadSiteOverview().catch(() => {});
+  } else if (userRole === 'teacher') {
+    workspaceRole.textContent = 'Учитель';
+    workspaceRole.style.display = '';
+    canManageUsers = false;
+  } else {
+    // Student: profile only, hide role tag, hide admin panel
+    workspaceRole.textContent = 'Ученик';
+    workspaceRole.style.display = 'none';
+    canManageUsers = false;
+  }
+
   profileFirstName.value = user.first_name || '';
   profileLastName.value = user.last_name || '';
   profileEmailEdit.value = user.username || '';
   profileSnapshot = collectProfileChanges();
   profileDirty = false;
-  if (user.role === 'superadmin') {
-    canManageUsers = true;
-    await loadUsers();
+
+  const currentHash = (window.location.hash || '').replace('#', '');
+  if (!allowed.includes(currentHash)) {
+    window.location.hash = '#' + allowed[0];
   }
   syncSidebarActive();
 }
@@ -1153,12 +1192,16 @@ window.addEventListener('beforeunload', (event) => {
 });
 
 loadCurrentUser().catch(() => window.location.replace('/login'));
-loadSiteOverview().catch((error) => {
-  summaryStatus.textContent = 'Нет данных';
-  summaryStatus.title = error?.name === 'AbortError' ? 'Сервер аналитики не ответил вовремя.' : 'Не удалось получить данные аналитики.';
-});
+if (window.currentUserRole === 'superadmin') {
+  loadSiteOverview().catch((error) => {
+    summaryStatus.textContent = 'Нет данных';
+    summaryStatus.title = error?.name === 'AbortError' ? 'Сервер аналитики не ответил вовремя.' : 'Не удалось получить данные аналитики.';
+  });
+}
 window.setInterval(() => {
-  loadSiteOverview().catch(() => {});
+  if (window.currentUserRole === 'superadmin') {
+    loadSiteOverview().catch(() => {});
+  }
 }, 60_000);
 
 document.addEventListener('click', () => {

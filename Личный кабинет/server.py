@@ -516,23 +516,61 @@ async def get_generator_teacher(request: Request) -> dict:
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Требуется авторизация")
     if user["role"] not in {"teacher", "admin", "superadmin"}:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Раздел доступен учителям и администраторам")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Раздел доступен только учителям и администраторам")
 
-    async with generator_server.get_db() as db:
-        cursor = await db.execute(
-            "SELECT id, username, full_name, created_at FROM teachers WHERE lower(username) = lower(?)",
-            (user["username"],),
-        )
-        teacher = await cursor.fetchone()
-        if teacher is None and user["role"] in {"admin", "superadmin"}:
+    # Superadmin keeps the primary bagalau.sqlite3 database intact
+    if user["role"] == "superadmin":
+        generator_server.set_current_db_path(str(generator_server.DB_PATH))
+        async with generator_server.get_db(generator_server.DB_PATH) as db:
             cursor = await db.execute(
-                "SELECT id, username, full_name, created_at FROM teachers ORDER BY created_at, id"
+                "SELECT id, username, full_name, created_at FROM teachers WHERE lower(username) = lower(?)",
+                (user["username"],),
             )
-            legacy_teachers = await cursor.fetchall()
-            if len(legacy_teachers) == 1:
-                teacher = legacy_teachers[0]
+            teacher = await cursor.fetchone()
+            if teacher is None:
+                cursor = await db.execute(
+                    "SELECT id, username, full_name, created_at FROM teachers ORDER BY created_at, id"
+                )
+                legacy_teachers = await cursor.fetchall()
+                if legacy_teachers:
+                    teacher = legacy_teachers[0]
+            if teacher is None:
+                teacher_id = str(uuid.uuid4())
+                await db.execute(
+                    "INSERT INTO teachers (id, username, password_hash, full_name, created_at) VALUES (?, ?, ?, ?, ?)",
+                    (
+                        teacher_id,
+                        user["username"],
+                        generator_server.hash_password(secrets.token_urlsafe(48)),
+                        user["display_name"] or user["username"],
+                        datetime.now().isoformat(),
+                    ),
+                )
+                await db.commit()
+                cursor = await db.execute(
+                    "SELECT id, username, full_name, created_at FROM teachers WHERE id = ?",
+                    (teacher_id,),
+                )
+                teacher = await cursor.fetchone()
+        res = dict(teacher)
+        res["role"] = "superadmin"
+        res["db_path"] = str(generator_server.DB_PATH)
+        return res
+
+    # Dedicated isolated SQLite database per teacher
+    teachers_dir = GENERATOR_DATA_DIR / "teachers"
+    teachers_dir.mkdir(parents=True, exist_ok=True)
+    teacher_db_path = str(teachers_dir / f"teacher_{user['id']}.sqlite3")
+    generator_server.set_current_db_path(teacher_db_path)
+
+    if not os.path.exists(teacher_db_path) or os.path.getsize(teacher_db_path) == 0:
+        await generator_server.init_db(teacher_db_path)
+
+    async with generator_server.get_db(teacher_db_path) as db:
+        cursor = await db.execute("SELECT id, username, full_name, created_at FROM teachers LIMIT 1")
+        teacher = await cursor.fetchone()
         if teacher is None:
-            teacher_id = str(uuid.uuid4())
+            teacher_id = f"teacher_{user['id']}"
             await db.execute(
                 "INSERT INTO teachers (id, username, password_hash, full_name, created_at) VALUES (?, ?, ?, ?, ?)",
                 (
@@ -544,12 +582,13 @@ async def get_generator_teacher(request: Request) -> dict:
                 ),
             )
             await db.commit()
-            cursor = await db.execute(
-                "SELECT id, username, full_name, created_at FROM teachers WHERE id = ?",
-                (teacher_id,),
-            )
+            cursor = await db.execute("SELECT id, username, full_name, created_at FROM teachers WHERE id = ?", (teacher_id,))
             teacher = await cursor.fetchone()
-    return dict(teacher)
+
+    res = dict(teacher)
+    res["role"] = user["role"]
+    res["db_path"] = teacher_db_path
+    return res
 
 
 def load_generator_server():
@@ -1008,6 +1047,9 @@ async def site_overview(request: Request):
 
 @app.get("/api/lessons-catalog")
 def lessons_catalog(request: Request):
+    user = get_user_from_request(request)
+    if user is None or user["role"] not in {"teacher", "admin", "superadmin"}:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
     if get_user_from_request(request) is None:
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)
     return {"classes": site_lesson_catalog(include_hidden=True), "visibility": _visibility_rows()}
@@ -1018,6 +1060,11 @@ class LessonVisibilityRequest(BaseModel):
     grade: str | None = None
     quarter: str | None = None
     is_visible: bool
+
+
+@app.get("/api/lesson-visibility-public")
+def lesson_visibility_public():
+    return {"version": 1, "lessons": _visibility_rows()}
 
 
 @app.get("/api/lesson-visibility")
@@ -1388,6 +1435,9 @@ def build_material_links(item: dict, base_url: str) -> dict:
 
 @app.get("/api/materials")
 def get_materials(request: Request, folder: str = "", media_type: str = "all", search: str = ""):
+    user = get_user_from_request(request)
+    if user is None or user["role"] not in {"superadmin"}:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен")
     user = get_user_from_request(request)
     if user is None:
         return JSONResponse({"detail": "Требуется авторизация"}, status_code=401)

@@ -15507,11 +15507,11 @@ color:var(--ink);background:#ecfdf5;box-shadow:none
 }
 
 .lesson-10ogn-4 .slide-next {
-position:fixed;z-index:20;top:22px;right:58px;left:auto;bottom:auto;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:18px;color:var(--blue);background:#ffffffd8;font-size:.82rem;font-weight:900;transform:none;box-shadow:0 8px 18px #17203318;/* neumorphic solid */
+position:fixed;z-index:90;top:auto;right:auto;left:50%;bottom:32px;padding:12px 26px;cursor:pointer;border:0;border-radius:999px;color:#059669;background:#FFFFFF;font-size:0.94rem;font-weight:700;transform:translateX(-50%);box-shadow:4px 4px 14px rgba(165,205,185,0.45),-4px -4px 14px rgba(255,255,255,0.95);white-space:nowrap;margin:0;
 }
 
 .lesson-10ogn-4 .slide-next:hover {
-background:#fff;border-color:var(--blue);box-shadow:0 10px 22px #05966925
+transform:translateX(-50%) !important;color:#047857;box-shadow:2px 2px 7px rgba(165,205,185,0.40),-2px -2px 7px rgba(255,255,255,0.95);
 }
 
 .lesson-10ogn-4 .mobile {
@@ -16569,11 +16569,11 @@ stroke:var(--orange)
 }
 
 .lesson-10ogn-5 .slide-next {
-position:fixed;z-index:140;top:22px;right:58px;padding:8px 13px;cursor:pointer;border:1px solid #a7f3d0;border-radius:18px;color:var(--blue,#059669);background:#ffffffd8;font-size:.82rem;font-weight:900;box-shadow:0 8px 18px #17203318;/* neumorphic solid */
+position:fixed;z-index:90;top:auto;right:auto;left:50%;bottom:32px;padding:12px 26px;cursor:pointer;border:0;border-radius:999px;color:#059669;background:#FFFFFF;font-size:0.94rem;font-weight:700;transform:translateX(-50%);box-shadow:4px 4px 14px rgba(165,205,185,0.45),-4px -4px 14px rgba(255,255,255,0.95);white-space:nowrap;margin:0;
 }
 
 .lesson-10ogn-5 .slide-next:hover {
-background:#fff;border-color:var(--blue,#059669);box-shadow:0 10px 22px #05966925
+transform:translateX(-50%) !important;color:#047857;box-shadow:2px 2px 7px rgba(165,205,185,0.40),-2px -2px 7px rgba(255,255,255,0.95);
 }
 
 .lesson-10ogn-5 .slide-nav {
@@ -27111,28 +27111,35 @@ html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is
 html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-board {
   display: grid !important;
   grid-template-columns: repeat(5, 1fr) !important;
-  gap: 14px !important;
+  gap: 16px !important;
   margin-top: 20px !important;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-board {
     grid-template-columns: repeat(3, 1fr) !important;
   }
 }
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-board {
     grid-template-columns: 1fr !important;
   }
 }
 
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card {
+/* Eliminate decorative pseudo-elements that block text */
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-card:before,
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-card:after {
+  display: none !important;
+}
+
+/* Topic Card: Pure vertical flex column, crisp layout */
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) :is(.topic-card, .topic-card.choice, .slide .topic-card) {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
   justify-content: flex-start !important;
   width: 100% !important;
-  min-height: 140px !important;
+  min-height: 155px !important;
   padding: 16px 14px !important;
   box-sizing: border-box !important;
   text-align: left !important;
@@ -27142,15 +27149,30 @@ html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) 
   border-color: transparent !important;
   box-shadow: 4px 4px 10px rgba(165, 205, 185, 0.45), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
   cursor: pointer !important;
-  transition: box-shadow 0.2s ease, background 0.2s ease !important;
+  transform: none !important;
+  transition: background 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+/* STRICTLY ZERO HOVER REACTION ON TOPIC CARDS: "КАРТОЧКИ НЕ ДОЛЖНЫ РЕАГИРОВАТЬ НА НАВЕДЕНИЕ" */
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) :is(.topic-card, .topic-card.choice, .slide .topic-card):hover {
+  transform: none !important;
+  background: #F7FFFA !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: 4px 4px 10px rgba(165, 205, 185, 0.45), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* SELECTED / PRESSED STATE: Stays INSET ("нажатая карточка должна остаться вдавленной") */
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) :is(.topic-card, .topic-card.choice, .slide .topic-card).selected,
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) :is(.topic-card, .topic-card.choice, .slide .topic-card).selected:hover {
+  background: #E0F2E9 !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 7px rgba(165, 205, 185, 0.75), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
   transform: none !important;
 }
 
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card:hover {
-  transform: none !important;
-}
-
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card .topic-num {
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-card .topic-num {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -27162,47 +27184,38 @@ html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) 
   color: #FFFFFF !important;
   font-size: 0.8rem !important;
   font-weight: 800 !important;
-  margin-bottom: 10px !important;
+  margin-bottom: 12px !important;
   flex-shrink: 0 !important;
 }
 
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card strong {
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) :is(.topic-card, .topic-card.choice).selected .topic-num {
+  background: #047857 !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-card strong {
   display: block !important;
+  width: 100% !important;
   font-size: 0.88rem !important;
-  line-height: 1.32 !important;
+  line-height: 1.35 !important;
   font-weight: 700 !important;
   color: #064E3B !important;
-  margin: 0 !important;
+  margin: 0 0 8px 0 !important;
   white-space: normal !important;
   word-break: normal !important;
 }
 
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card small {
+html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .topic-card small {
   display: block !important;
+  width: 100% !important;
   margin-top: auto !important;
-  padding-top: 8px !important;
+  padding-top: 6px !important;
   font-size: 0.74rem !important;
   line-height: 1.25 !important;
   color: #047857 !important;
   opacity: 0.85 !important;
   white-space: normal !important;
 }
-
-/* SELECTED TOPIC CARD: Stays recessed / inset ("вдавленной") */
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card.selected {
-  background: #E0F2E9 !important;
-  background-image: none !important;
-  border: 0 !important;
-  border-color: transparent !important;
-  box-shadow: inset 3px 3px 7px rgba(165, 205, 185, 0.75), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
-  transform: none !important;
-}
-
-html body.lesson-page:is([class*="lesson-10ogn-4"], [data-lesson-id="10ogn-4"]) .slide .topic-card.selected .topic-num {
-  background: #047857 !important;
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.25) !important;
-}
-
 
 /* Grade 10 ЕМН (Ice Blue) Inset Goal Cards */
 body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide .lesson-goal-card {

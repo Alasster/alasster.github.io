@@ -84,11 +84,54 @@
   let activeTabId = detectCurrentClass();
   let publicVisibility = {};
   const lessonIsPublic = (file) => {
-    const normalized = file.replace(/\\/g, '/');
-    const parts = normalized.split('/');
-    const quarterKey = parts.length >= 2 ? `__quarter__|${parts[0]}|${parts[1]}` : '';
-    return publicVisibility[quarterKey] !== false && publicVisibility[normalized] !== false;
+    if (!file) return true;
+    const normalized = file.replace(/\\/g, '/').replace(/^\/+/, '');
+    let decoded = normalized;
+    try { decoded = decodeURIComponent(normalized); } catch (e) {}
+
+    const parts = decoded.split('/');
+    if (parts.length >= 2) {
+      const quarterKey = `__quarter__|${parts[0]}|${parts[1]}`;
+      if (publicVisibility[quarterKey] === false) return false;
+    }
+
+    if (publicVisibility[decoded] === false || publicVisibility[normalized] === false) {
+      return false;
+    }
+    return true;
   };
+
+  function blockHiddenLesson() {
+    const main = document.querySelector('main');
+    if (main) main.style.display = 'none';
+    document.querySelectorAll('.slide, .dots, .progress, .nav-controls, .slide-next, .mobile').forEach(el => el.style.display = 'none');
+
+    let overlay = document.getElementById('lesson-hidden-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'lesson-hidden-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#f8fafc;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:Manrope,sans-serif;';
+      overlay.innerHTML = `
+        <div style="max-width:440px;background:#ffffff;padding:36px 28px;border-radius:24px;box-shadow:0 12px 36px rgba(0,0,0,0.08);border:1px solid #e2e8f0;">
+          <div style="width:56px;height:56px;margin:0 auto 18px;border-radius:16px;background:#fef2f2;color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:24px;">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h2 style="font-size:1.35rem;font-weight:800;color:#0f172a;margin:0 0 10px;">Урок временно недоступен</h2>
+          <p style="font-size:0.92rem;color:#64748b;line-height:1.5;margin:0 0 24px;">Преподаватель временно скрыл этот урок или четверть.</p>
+          <a href="../../index.html" style="display:inline-block;padding:12px 24px;background:#059669;color:#ffffff;text-decoration:none;border-radius:14px;font-weight:700;font-size:0.92rem;box-shadow:0 4px 12px rgba(5,150,105,0.25);">← На главную</a>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+  }
+
+  function checkCurrentLessonAccess() {
+    const curPath = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
+    const relPath = curPath.replace(/^\/+/, '');
+    if (!lessonIsPublic(relPath)) {
+      blockHiddenLesson();
+    }
+  }
 
   // Dynamic lesson detection & synchronization
   function syncDynamicLessons() {
@@ -5208,10 +5251,11 @@ let currentSlide = 0;
   LESSON_SCRIPTS['10ogn-2'] = function() {
 const slides=[...document.querySelectorAll(".slide")],bar=document.getElementById("progress"),dotsNav=document.getElementById("dotsNav");let current=0;
 const dotLabels=["Старт","Повторение","Смена подхода","Карта понятий","Данные","Признаки","Обучение","Модель","Прогноз","Итог","Завершение"];
+const nextLabels2=["К повторению изученного →","К смене подхода →","К карте понятий →","К понятию «Данные» →","К признакам объектов →","К процессу обучения →","К понятию «Модель» →","К прогнозированию →","К практическим заданиям →","К итогам урока →","В начало ↺"];
 const imageModal=document.getElementById("imageModal");document.querySelector(".zoomable-image").onclick=()=>imageModal.showModal();imageModal.querySelector("button").onclick=()=>imageModal.close();imageModal.onclick=e=>{if(e.target===imageModal)imageModal.close()};
-slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=n===slides.length-1?"В начало":"Далее →";nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
+slides.forEach((slide,n)=>{const dot=document.createElement("button");dot.className="dot";dot.type="button";dot.dataset.label=dotLabels[n]||`Слайд ${n+1}`;dot.title=dot.dataset.label;dot.setAttribute("aria-label","Перейти к слайду: "+dot.dataset.label);dot.onclick=()=>show(n);dotsNav.appendChild(dot);const nextBtn=document.createElement("button");nextBtn.className="slide-next";nextBtn.type="button";nextBtn.textContent=nextLabels2[n]||(n===slides.length-1?"В начало ↺":"Следующий слайд →");nextBtn.onclick=()=>show(n===slides.length-1?0:n+1);slide.appendChild(nextBtn)});
 const dots=[...document.querySelectorAll(".dot")];
-window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>s.classList.toggle("active",n===current));dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
+window._lessonShowSlide = show; function show(i){if(!window._inSlideSync&&typeof window.goToSlide==='function'){window.goToSlide(arguments[0]);return;}current=Math.max(0,Math.min(i,slides.length-1));slides.forEach((s,n)=>{s.classList.toggle("active",n===current);const btn=s.querySelector(".slide-next");if(btn)btn.textContent=nextLabels2[n]||"Следующий слайд →"});dots.forEach((d,n)=>d.classList.toggle("active",n===current));bar.style.width=((current+1)/slides.length*100)+"%";mobilePrev.disabled=current===0;mobileNext.disabled=current===slides.length-1}
 mobilePrev.onclick=()=>show(current-1);mobileNext.onclick=()=>show(current+1);
 function toggleFullScreen(){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}
 document.addEventListener("keydown",e=>{if(imageModal.open)return;const typing=["INPUT","TEXTAREA"].includes(document.activeElement.tagName);if(!typing&&["ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault();show(current+1)}if(!typing&&["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(current-1)}if(!typing&&e.key.toLowerCase()==="f")toggleFullScreen()});
@@ -7150,9 +7194,28 @@ const slides = [...document.querySelectorAll('.slide')];
     syncDynamicLessons();
     updateDocumentTitle();
     initClassesModal();
-    fetch('/скрипты/lesson-visibility.json', { cache: 'no-store' })
+    const applyVisibility = (payload) => {
+      if (!payload?.lessons) return;
+      publicVisibility = Object.assign(publicVisibility, payload.lessons);
+      checkCurrentLessonAccess();
+      try { renderClassesList(activeTabId); } catch (_) {}
+    };
+
+    fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' })
       .then(response => response.ok ? response.json() : null)
-      .then(payload => { publicVisibility = payload?.lessons || {}; })
+      .then(applyVisibility)
+      .catch(() => {});
+
+    fetch('/скрипты/cabinet_url.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.url) {
+          fetch(data.url + '/api/lesson-visibility-public?t=' + Date.now(), { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : null)
+            .then(applyVisibility)
+            .catch(() => {});
+        }
+      })
       .catch(() => {});
     initUniversalSlideController();
 

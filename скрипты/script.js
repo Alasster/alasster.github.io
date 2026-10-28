@@ -97,14 +97,43 @@ const LESSONS_DATABASE = {
 
 let publicVisibility = {};
 const lessonIsPublic = (file) => {
-  const normalized = file.replace(/\\/g, '/');
-  const parts = normalized.split('/');
-  const quarterKey = parts.length >= 2 ? `__quarter__|${parts[0]}|${parts[1]}` : '';
-  return publicVisibility[quarterKey] !== false && publicVisibility[normalized] !== false;
+  if (!file) return true;
+  const normalized = file.replace(/\\/g, '/').replace(/^\/+/, '');
+  let decoded = normalized;
+  try { decoded = decodeURIComponent(normalized); } catch (e) {}
+
+  const parts = decoded.split('/');
+  if (parts.length >= 2) {
+    const quarterKey = `__quarter__|${parts[0]}|${parts[1]}`;
+    if (publicVisibility[quarterKey] === false) return false;
+  }
+
+  if (publicVisibility[decoded] === false || publicVisibility[normalized] === false) {
+    return false;
+  }
+  return true;
 };
-fetch('/скрипты/lesson-visibility.json', { cache: 'no-store' })
+
+const applyHomeVisibility = (payload) => {
+  if (!payload?.lessons) return;
+  publicVisibility = Object.assign(publicVisibility, payload.lessons);
+};
+
+fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' })
   .then(response => response.ok ? response.json() : null)
-  .then(payload => { publicVisibility = payload?.lessons || {}; })
+  .then(applyHomeVisibility)
+  .catch(() => {});
+
+fetch('/скрипты/cabinet_url.json?t=' + Date.now(), { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(data => {
+    if (data?.url) {
+      fetch(data.url + '/api/lesson-visibility-public?t=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(applyHomeVisibility)
+        .catch(() => {});
+    }
+  })
   .catch(() => {});
 
 function showClassModal(id) {
