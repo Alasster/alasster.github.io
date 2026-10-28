@@ -4,10 +4,10 @@
  */
 
 (function() {
-  const CLOUD_TUNNEL_FALLBACK = 'https://bowl-lane-lip-pork.trycloudflare.com';
+  const PUBLIC_BACKEND_FALLBACK = 'https://alasster-cabinet.onrender.com';
 
   try {
-    fetch('/скрипты/cabinet_url.json')
+    fetch('/скрипты/backend-config.json')
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d && d.url) window.ALASSTER_CABINET_URL = d.url; })
       .catch(() => {});
@@ -24,7 +24,7 @@
     // If running on HTTPS public domain (e.g. alasster.site)
     if (window.location.protocol === 'https:') {
       // If user provided a custom tunnel endpoint, use it, else cloud tunnel
-      return window.ALASSTER_CABINET_URL || CLOUD_TUNNEL_FALLBACK;
+      return window.ALASSTER_CABINET_URL || PUBLIC_BACKEND_FALLBACK;
     }
     return 'http://127.0.0.1:8010';
   }

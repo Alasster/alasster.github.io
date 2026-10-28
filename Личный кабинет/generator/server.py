@@ -2491,6 +2491,8 @@ def cleanup_site_lessons_for_launches(site_root: str, launch_ids: list):
     remove_lesson_from_database_files(site_root)
 
 def get_teacher_network_urls(request: Optional[Request] = None) -> List[str]:
+    if os.environ.get("RENDER") and os.environ.get("RENDER_EXTERNAL_URL"):
+        return [os.environ["RENDER_EXTERNAL_URL"].rstrip("/")]
     urls = []
     port = int(os.environ.get("BAGALAU_STUDENT_PORT", "8001"))
     env_url = None

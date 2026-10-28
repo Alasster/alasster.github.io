@@ -1,7 +1,7 @@
 // Start backend discovery before initializing the lesson's account button.
 (() => {
   if (window.AlassterBackend || window.AlassterBackendLoading) return;
-  const source = new URL('backend-connection.js?v=20261029-1', document.currentScript.src);
+  const source = new URL('backend-connection.js?v=20261029-2', document.currentScript.src);
   window.AlassterBackendLoading = new Promise(resolve => {
     const script = document.createElement('script');
     script.src = source.href;
@@ -7217,7 +7217,7 @@ const slides = [...document.querySelectorAll('.slide')];
       .then(applyVisibility)
       .catch(() => {});
 
-    fetch('/скрипты/cabinet_url.json?t=' + Date.now(), { cache: 'no-store' })
+    fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data?.url) {
@@ -7289,8 +7289,8 @@ const slides = [...document.querySelectorAll('.slide')];
     if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
       return 'http://127.0.0.1:8010';
     }
-    // Production / public domain fallback
-    return 'http://127.0.0.1:8010';
+    // Production uses the permanent HTTPS server.
+    return window.ALASSTER_CABINET_URL || 'https://alasster-cabinet.onrender.com';
   }
 
   function getStoredUser() {

@@ -124,7 +124,7 @@ fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-sto
   .then(applyHomeVisibility)
   .catch(() => {});
 
-fetch('/скрипты/cabinet_url.json?t=' + Date.now(), { cache: 'no-store' })
+fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' })
   .then(r => r.ok ? r.json() : null)
   .then(data => {
     if (data?.url) {

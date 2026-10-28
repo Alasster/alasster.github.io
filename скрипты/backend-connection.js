@@ -23,7 +23,7 @@
       backend.url = 'http://127.0.0.1:8010';
     } else {
       const fixed = await configuration('backend-config.json');
-      const settings = fixed?.url ? fixed : await configuration('cabinet_url.json');
+      const settings = fixed;
       if (settings?.url) {
         try {
           const url = new URL(settings.url);

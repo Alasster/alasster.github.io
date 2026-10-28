@@ -254,7 +254,7 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-          <a id="open-soch-btn" href="https://treatments-jessica-management-anyway.trycloudflare.com/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
+          <a id="open-soch-btn" href="https://alasster-cabinet.onrender.com/generator/exam/01ee6361-dac7-444b-8718-79f97b6eed43" target="_blank" rel="noopener" class="soch-open-btn">
             <i class="fa-solid fa-up-right-from-square"></i> Открыть СОЧ
           </a>
           <button type="button" class="start-btn" style="background: #FFFFFF; color: var(--primary); border: 1.5px solid rgba(79,70,229,0.3);" onclick="changeSlide(1)">
@@ -325,7 +325,7 @@
     </div>
   </section>
 
-  <script id="exam-embedded-config" type="application/json">{"launch_id": "01ee6361-dac7-444b-8718-79f97b6eed43", "grade": "10 ЕМН", "quarter": "1 четверть", "lesson_num": "13 . СОЧ", "title": "Суммативная работа за четверть", "exam_type": "СОЧ", "allowed_classes": ["10 ЕМН Г", "10 ЕМН Д", "10 ЕМН Е"], "duration_minutes": 40, "bg_color_v1": "#fce8e6", "bg_color_v2": "#e6f4ea", "server_urls": ["https://treatments-jessica-management-anyway.trycloudflare.com", "http://192.168.68.103:8000", "http://100.116.229.4:8000", "http://127.0.0.1:8000"], "tasks": [{"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 3.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 3.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}]}</script>
+  <script id="exam-embedded-config" type="application/json">{"launch_id": "01ee6361-dac7-444b-8718-79f97b6eed43", "grade": "10 ЕМН", "quarter": "1 четверть", "lesson_num": "13 . СОЧ", "title": "Суммативная работа за четверть", "exam_type": "СОЧ", "allowed_classes": ["10 ЕМН Г", "10 ЕМН Д", "10 ЕМН Е"], "duration_minutes": 40, "bg_color_v1": "#fce8e6", "bg_color_v2": "#e6f4ea", "server_urls": ["https://alasster-cabinet.onrender.com"], "tasks": [{"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 3.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "1", "max_score": 1.0}, {"variant": "1", "max_score": 2.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 3.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 2.0}, {"variant": "2", "max_score": 1.0}]}</script>
   <script>
     (function() {
       const cfgEl = document.getElementById('exam-embedded-config');
@@ -351,63 +351,14 @@
       const scEl = document.getElementById('slide1-score');
       if (scEl) scEl.textContent = scorePerVar + ' б. · ' + (CFG.duration_minutes || 40) + ' мин';
 
-      function cleanBaseUrl(u) { return (u && u.endsWith('/')) ? u.slice(0, -1) : (u || ''); }
-      // Внешняя HTTPS-ссылка работает независимо от локального IP и сети ученика.
       const btn = document.getElementById('open-soch-btn');
-      const publicBase = (Array.isArray(CFG.server_urls) ? CFG.server_urls : [])
-        .find(u => typeof u === 'string' && u.startsWith('https://'));
-      if (btn && CFG.launch_id && publicBase) {
-        btn.href = cleanBaseUrl(publicBase) + '/exam/' + encodeURIComponent(CFG.launch_id);
-        return;
+      if (btn && CFG.launch_id) {
+        btn.href = 'https://alasster-cabinet.onrender.com/generator/exam/' + encodeURIComponent(CFG.launch_id);
       }
-
-      // Локальный поиск остаётся для старых конфигураций без внешнего адреса.
-      const candidateBases = [];
-      if (Array.isArray(CFG.server_urls)) {
-        CFG.server_urls.forEach(u => {
-          if (u && !candidateBases.includes(u)) candidateBases.push(u);
-        });
-      }
-      if (window.location.protocol.startsWith('http') && window.location.hostname && !window.location.hostname.includes('github.io') && !window.location.hostname.includes('alasster.site')) {
-        const localHostUrl = 'http://' + window.location.hostname + ':8000';
-        if (!candidateBases.includes(localHostUrl)) candidateBases.push(localHostUrl);
-      }
-      if (!candidateBases.includes('https://treatments-jessica-management-anyway.trycloudflare.com')) {
-        candidateBases.unshift('https://treatments-jessica-management-anyway.trycloudflare.com');
-      }
-      if (!candidateBases.includes('http://192.168.68.103:8000')) {
-        candidateBases.push('http://192.168.68.103:8000');
-      }
-      if (!candidateBases.includes('http://100.116.229.4:8000')) {
-        candidateBases.push('http://100.116.229.4:8000');
-      }
-      if (!candidateBases.includes('http://127.0.0.1:8000')) {
-        candidateBases.push('http://127.0.0.1:8000');
-      }
-
-      if (btn && CFG.launch_id && candidateBases.length > 0) {
-        btn.href = cleanBaseUrl(candidateBases[0]) + '/exam/' + encodeURIComponent(CFG.launch_id);
-      }
-
-      (async function detectReachableServer() {
-        if (!btn || !CFG.launch_id) return;
-        for (const base of candidateBases) {
-          try {
-            const ctrl = new AbortController();
-            const tid = setTimeout(() => ctrl.abort(), 1500);
-            const res = await fetch(cleanBaseUrl(base) + '/api/health', { signal: ctrl.signal });
-            clearTimeout(tid);
-            if (res.ok) {
-              btn.href = cleanBaseUrl(base) + '/exam/' + encodeURIComponent(CFG.launch_id);
-              return;
-            }
-          } catch (e) {}
-        }
-      })();
     })();
   </script>
   <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v04"></script>
-  <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v57"></script>
+  <script src="../../скрипты/lessons.js?v=cloud-20261029-1"></script>
 </body>
 </html>
 
