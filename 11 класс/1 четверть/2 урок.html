@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v43">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-10-28-v53">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="lesson-page lesson-11-2" data-lesson-id="11-2">
@@ -84,7 +84,14 @@
             <span class="eyebrow">01 · ВВЕДЕНИЕ</span>
             <h1>Задачи <span class="accent-text">нейронных сетей</span></h1>
             <p style="font-size: 1.2rem; max-width: 700px;">Нейронные сети не просто "умные" — они решают три фундаментальных типа задач. Сегодня мы разберем, как отличить классификацию от регрессии и почему распознавание образов — это магия математики.</p>
-            <div style="margin-top: 40px;">
+            <div class="lesson-goal-card">
+                <div class="goal-header">
+                    <span class="goal-code-badge"><i class="lesson-flaticon" data-flaticon="target"></i> 11.1.2.2</span>
+                    <span class="goal-title-badge">Цель обучения</span>
+                </div>
+                <p class="goal-description">Сравнивать функции активации (функцию единичного скачка, Sigmoid и ReLU), объясняя особенности их применения в искусственных нейронных сетях.</p>
+            </div>
+            <div style="margin-top: 24px;">
                 <button class="start-btn" onclick="changeSlide(1)">Начать изучение <i class="fas fa-play" style="margin-left: 10px;"></i></button>
             </div>
         </div>
@@ -110,9 +117,11 @@
                     <span class="type-tag">CATEGORICAL</span>
                     <div class="viz-box">
                         <div class="dots-classification">
-                            <div class="dot red"></div><div class="dot red"></div>
-                            <div style="width: 2px; height: 40px; background: #e2e8f0; margin: 0 15px;"></div>
-                            <div class="dot blue"></div><div class="dot blue"></div>
+                            <div class="dot red" title="Класс 1 (Красный)"></div>
+                            <div class="dot red" title="Класс 1 (Красный)"></div>
+                            <div class="classification-divider"></div>
+                            <div class="dot blue" title="Класс 2 (Синий)"></div>
+                            <div class="dot blue" title="Класс 2 (Синий)"></div>
                         </div>
                     </div>
                     <p style="text-align: center; margin-top: 20px; color: var(--muted);">Сеть проводит "границу" между классами в пространстве данных.</p>
@@ -256,8 +265,8 @@
 
     
 
-            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v03"></script>
-            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v43"></script>
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-10-28-v04"></script>
+            <script src="../../скрипты/lessons.js?v=neu-2026-10-28-v53"></script>
 </body>
 </html>
 

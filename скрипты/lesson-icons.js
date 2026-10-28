@@ -893,9 +893,9 @@
       }
     ],
     "11-3": [
-{
+      {
         "icon": "home",
-        "title": "Классификациязадач ИИ"
+        "title": "Классификация задач ИИ"
       },
       {
         "icon": "layers",
@@ -908,34 +908,6 @@
       {
         "icon": "flag",
         "title": "Оценивается не объём текста, а собственное исследование"
-      },
-      {
-        "icon": "brain",
-        "title": "Генеративные модели GenAI"
-      },
-      {
-        "icon": "comment-alt",
-        "title": "Два направления: речь и текст"
-      },
-      {
-        "icon": "volume",
-        "title": "Одна колонка — три функции ИИ"
-      },
-      {
-        "icon": "search",
-        "title": "Найди, как ИИ работает в реальном сервисе"
-      },
-      {
-        "icon": "check",
-        "title": "Какая технология решает задачу?"
-      },
-      {
-        "icon": "computer",
-        "title": "Разберите голосового помощника банка"
-      },
-      {
-        "icon": "flag",
-        "title": "Выбери технологию и обоснуй"
       }
     ],
     "11-4": [
@@ -1192,16 +1164,7 @@
 
   function init() {
     decorate(document.body);
-    const modal = document.querySelector('.modal-glass-container');
-    if (modal && !modal.querySelector('.lesson-icon-credit')) {
-      const credit = document.createElement('a');
-      credit.className = 'lesson-icon-credit';
-      credit.href = 'https://www.flaticon.com/uicons';
-      credit.target = '_blank';
-      credit.rel = 'noopener noreferrer';
-      credit.textContent = 'Иконки — Flaticon';
-      modal.append(credit);
-    }
+
     const observer = new MutationObserver(records => {
       const roots = new Set();
       for (const record of records) {

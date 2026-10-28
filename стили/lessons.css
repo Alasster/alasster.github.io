@@ -21511,34 +21511,36 @@ body.lesson-page[data-lesson-id^="11-"] {
 
 body.lesson-page[class*="lesson-11-"] .orb-1,
 body.lesson-page[data-lesson-id^="11-"] .orb-1 {
-  background: radial-gradient(circle, rgba(253, 230, 138, 0.60) 0%, transparent 70%) !important;
+  background: radial-gradient(circle, rgba(237, 144, 108, 0.30) 0%, transparent 70%) !important;
 }
 body.lesson-page[class*="lesson-11-"] .orb-2,
 body.lesson-page[data-lesson-id^="11-"] .orb-2 {
-  background: radial-gradient(circle, rgba(254, 215, 170, 0.52) 0%, transparent 70%) !important;
+  background: radial-gradient(circle, rgba(234, 201, 183, 0.35) 0%, transparent 70%) !important;
 }
 body.lesson-page[class*="lesson-11-"] .orb-3,
 body.lesson-page[data-lesson-id^="11-"] .orb-3 {
-  background: radial-gradient(circle, rgba(254, 240, 138, 0.48) 0%, transparent 70%) !important;
+  background: radial-gradient(circle, rgba(255, 240, 231, 0.40) 0%, transparent 70%) !important;
 }
 
 body.lesson-page[class*="lesson-11-"] .brand-icon-box,
 body.lesson-page[data-lesson-id^="11-"] .brand-icon-box {
-  background: linear-gradient(135deg, #FEF9C3, #FEF3C7) !important;
-  color: #D97706 !important;
-  border-color: rgba(245, 158, 11, 0.32) !important;
+  background: #FFFAF6 !important;
+  color: #ED906C !important;
+  border: 0 !important;
+  box-shadow: 4px 4px 10px rgba(234, 201, 183, 0.50), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
 }
 body.lesson-page[class*="lesson-11-"] .classes-menu-btn,
 body.lesson-page[data-lesson-id^="11-"] .classes-menu-btn {
-  background: linear-gradient(135deg, #FFFBEB, #FEF3C7) !important;
-  color: #B45309 !important;
-  border-color: rgba(251, 191, 36, 0.50) !important;
+  background: #FFFAF6 !important;
+  color: #ED906C !important;
+  border: 0 !important;
+  box-shadow: 4px 4px 10px rgba(234, 201, 183, 0.50), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
 }
 body.lesson-page[class*="lesson-11-"] .classes-menu-btn:hover,
 body.lesson-page[data-lesson-id^="11-"] .classes-menu-btn:hover {
-  background: linear-gradient(135deg, #F59E0B, #B45309) !important;
-  color: #FFFFFF !important;
-  border-color: transparent !important;
+  background: #FFFAF6 !important;
+  color: #cf7350 !important;
+  box-shadow: inset 2px 2px 5px rgba(234, 201, 183, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
 }
 
 
@@ -23740,7 +23742,7 @@ body.lesson-page[data-lesson-id] {
   --lesson-card-inset: inset 3px 3px 7px color-mix(in srgb, var(--text-dark) 17%, transparent), inset -3px -3px 7px rgba(255,255,255,.35);
 }
 
-body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .goal, .goalitem, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box)) {
+body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box, .lesson-goal-card, .goal, .goalitem, .goal-box, [class*="goal-card"])) {
   border-radius: 18px !important;
   box-shadow: var(--lesson-card-shadow) !important;
   border: 0 !important;
@@ -23749,16 +23751,16 @@ body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel
   transition: box-shadow .18s ease !important;
 }
 
-body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .goal, .goalitem, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box)):not(:where(.correct, .wrong, .incorrect, .right, .selected, .is-selected, [aria-pressed="true"], [data-state="correct"], [data-state="wrong"])) {
+body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box, .lesson-goal-card, .goal, .goalitem, .goal-box, [class*="goal-card"])):not(:where(.correct, .wrong, .incorrect, .right, .selected, .is-selected, [aria-pressed="true"], [data-state="correct"], [data-state="wrong"])) {
   background: var(--surface) !important;
 }
 
-body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .goal, .goalitem, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box)):hover {
+body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box, .lesson-goal-card, .goal, .goalitem, .goal-box, [class*="goal-card"])):hover {
   box-shadow: var(--lesson-card-shadow) !important;
   transform: none !important;
 }
 
-body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .goal, .goalitem, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box)):not(:where(.correct, .wrong, .incorrect, .right, .selected, .is-selected, [aria-pressed="true"], [data-state="correct"], [data-state="wrong"])):hover {
+body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box, .lesson-goal-card, .goal, .goalitem, .goal-box, [class*="goal-card"])):not(:where(.correct, .wrong, .incorrect, .right, .selected, .is-selected, [aria-pressed="true"], [data-state="correct"], [data-state="wrong"])):hover {
   background: var(--surface) !important;
 }
 
@@ -23769,7 +23771,7 @@ body.lesson-page[data-lesson-id][class] .slide :is(.formula-box, .bp-formula-box
   box-shadow: var(--lesson-card-inset) !important;
 }
 
-body.lesson-page[data-lesson-id][class] .slide :is(button, a, [role="button"]):is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .goal, .goalitem, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box)):is(:hover, :focus-visible, :active) {
+body.lesson-page[data-lesson-id][class] .slide :is(button, a, [role="button"]):is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box, .lesson-goal-card, .goal, .goalitem, .goal-box, [class*="goal-card"])):is(:hover, :focus-visible, :active) {
   box-shadow: var(--lesson-card-inset) !important;
   transform: none !important;
 }
@@ -26000,4 +26002,917 @@ body.lesson-page .chip i[data-flaticon] {
   font-size: 1.15rem !important;
   line-height: 1 !important;
   color: var(--primary) !important;
+}
+
+
+/* Hide Flaticon Credit Link */
+.lesson-icon-credit, body.lesson-page .lesson-icon-credit { display: none !important; }
+
+
+/* ==========================================================================
+   OFFICIAL GRADE 11 PEACH PALETTE (EXACT IMAGE CODES):
+   #FFF0E7 - Page Background (Soft Warm Peach)
+   #FFFAF6 - Card & Surface (Pure Cream Peach)
+   #EAC9B7 - Lines, Borders, Inset Shadow (Warm Peach Clay)
+   #ED906C - Primary & Accent (Vibrant Peach Coral)
+   #593C36 - Dark Text & Headings (Deep Cocoa Espresso)
+   #8A675F - Muted Text (Warm Muted Brown)
+   ========================================================================== */
+
+/* 1. Global Variable Overrides for Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) {
+  --bg: #FFF0E7 !important;
+  --page: #FFF0E7 !important;
+  --surface: #FFFAF6 !important;
+  --surface-lift: #FFFAF6 !important;
+  --surface-recess: #FBEFE8 !important;
+  --bg-card: #FFFAF6 !important;
+  --primary: #ED906C !important;
+  --primary-dark: #cf7350 !important;
+  --primary-light: rgba(237, 144, 108, 0.14) !important;
+  --primary-soft: rgba(237, 144, 108, 0.12) !important;
+  --accent: #ED906C !important;
+  --clay: #ED906C !important;
+  --indigo: #ED906C !important;
+  --line: #EAC9B7 !important;
+  --border: #EAC9B7 !important;
+  --border-light: #EAC9B7 !important;
+  --ink: #593C36 !important;
+  --text: #593C36 !important;
+  --text-dark: #593C36 !important;
+  --muted: #8A675F !important;
+  --shadow-soft: 8px 8px 20px rgba(234, 201, 183, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+  --shadow-in: inset 3px 3px 7px rgba(234, 201, 183, 0.50), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
+  --shadow-out: 8px 8px 20px rgba(234, 201, 183, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+  background-color: #FFF0E7 !important;
+  color: #593C36 !important;
+}
+
+/* 2. All Cards, Panels, Papers in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.paper, .card, .panel, .glass, .task-card, .rubric-card, .card-featured, .workbench) {
+  background: #FFFAF6 !important;
+  background-image: none !important;
+  box-shadow: 8px 8px 20px rgba(234, 201, 183, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+  border: 0 !important;
+  color: #593C36 !important;
+}
+
+/* 3. All Inset Elements: Tags, Chips, Badges, Recesses in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.tag, .chip, .stepchip, .topic-chip, .badge, .status-pill, .tag-accent, .tag-blue, .tag-green) {
+  background: #FBEFE8 !important;
+  background-image: none !important;
+  box-shadow: inset 2px 2px 5px rgba(234, 201, 183, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  border: 0 !important;
+  color: #ED906C !important;
+  font-weight: 700 !important;
+}
+
+/* 4. Definition, Callout and Quote Boxes in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.definition, .callout, .paper.definition, .card.definition, .topic) {
+  background: #FBEFE8 !important;
+  background-image: none !important;
+  box-shadow: inset 3px 3px 7px rgba(234, 201, 183, 0.50), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  color: #593C36 !important;
+}
+
+/* 5. Headings and Accents in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(h1, h2, h3, h4, strong) {
+  color: #593C36 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.accent, .accent-text, .eyebrow) {
+  color: #ED906C !important;
+  background: none !important;
+  -webkit-text-fill-color: #ED906C !important;
+}
+
+/* 6. Primary Action Buttons in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.action, .advance, .start-btn, button.action) {
+  background: #ED906C !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 14px rgba(237, 144, 108, 0.40) !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.action, .advance, .start-btn, button.action):hover {
+  background: #cf7350 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(237, 144, 108, 0.50) !important;
+}
+
+/* 7. Secondary Buttons and Choice Buttons */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.choice, .action.secondary, .q-btn, .opt) {
+  background: #FFFAF6 !important;
+  color: #593C36 !important;
+  box-shadow: 4px 4px 10px rgba(234, 201, 183, 0.45), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
+  border: 0 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.choice, .action.secondary, .q-btn, .opt):hover {
+  box-shadow: inset 2px 2px 5px rgba(234, 201, 183, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  color: #ED906C !important;
+}
+
+/* 8. Tables and Rubric Rows in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) th {
+  background: #FBEFE8 !important;
+  color: #593C36 !important;
+  border-bottom: 2px solid #EAC9B7 !important;
+  font-weight: 800 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.step-number, .num-badge) {
+  background: #FFFAF6 !important;
+  box-shadow: 4px 4px 10px rgba(234, 201, 183, 0.50), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
+  color: #ED906C !important;
+  border: 0 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.rubric .row, .rubric-row) {
+  background: #FFFAF6 !important;
+  box-shadow: 8px 8px 20px rgba(234, 201, 183, 0.50), -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+  border: 0 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.rubric .rs, .rubric-row > strong) {
+  background: #FBEFE8 !important;
+  box-shadow: inset 2px 2px 5px rgba(234, 201, 183, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  color: #ED906C !important;
+  border: 0 !important;
+}
+
+/* 9. Interactive Inputs, Sliders, and Controls in Grade 11 */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(input, select, textarea) {
+  background: #FBEFE8 !important;
+  box-shadow: inset 2px 2px 5px rgba(234, 201, 183, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(234, 201, 183, 0.40) !important;
+  color: #593C36 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) input:focus {
+  border-color: #ED906C !important;
+  outline: none !important;
+}
+
+
+/* ==========================================================================
+   UNIFIED PAGE BACKGROUND & NAVIGATION BLOCK COLOR
+   Matches page background (html, body, slide) exactly to navigation block
+   ========================================================================== */
+html,
+body.lesson-page {
+  background-color: var(--page) !important;
+  background-image: none !important;
+}
+
+body.lesson-page .slide,
+body.lesson-page main,
+body.lesson-page .nav-wrapper {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* 9 класс: Лавандовый */
+html:has(body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"])),
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) {
+  background-color: #EEEBF8 !important;
+  background-image: none !important;
+}
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.navbar, #dots, .dots, #dotsNav, .dots-nav) {
+  background: #EEEBF8 !important;
+  background-color: #EEEBF8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  box-shadow: 
+    8px 8px 22px rgba(185, 175, 215, 0.70),
+    3px 3px 8px rgba(185, 175, 215, 0.45),
+    -8px -8px 22px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(#dots, #dotsNav, .dots, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) {
+  background: #FCFAFF !important;
+  box-shadow: 3px 3px 8px rgba(185, 175, 215, 0.50), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(#dots, #dotsNav, .dots, .dots-nav) button:is(:hover, :active, .active, [aria-current="step"]) {
+  background: #EEEBF8 !important;
+  box-shadow: inset 2px 2px 5px rgba(185, 175, 215, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 10 ЕМН: Нежно-голубой */
+html:has(body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"])),
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) {
+  background-color: #E3F0FA !important;
+  background-image: none !important;
+}
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.navbar, #dots, .dots, #dotsNav, .dots-nav) {
+  background: #E3F0FA !important;
+  background-color: #E3F0FA !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  box-shadow: 
+    8px 8px 22px rgba(160, 195, 222, 0.70),
+    3px 3px 8px rgba(160, 195, 222, 0.45),
+    -8px -8px 22px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(#dots, #dotsNav, .dots, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) {
+  background: #F6FBFF !important;
+  box-shadow: 3px 3px 8px rgba(160, 195, 222, 0.50), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(#dots, #dotsNav, .dots, .dots-nav) button:is(:hover, :active, .active, [aria-current="step"]) {
+  background: #E3F0FA !important;
+  box-shadow: inset 2px 2px 5px rgba(160, 195, 222, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 10 ОГН: Мятный */
+html:has(body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"])),
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) {
+  background-color: #E5F2EC !important;
+  background-image: none !important;
+}
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.navbar, #dots, .dots, #dotsNav, .dots-nav) {
+  background: #E5F2EC !important;
+  background-color: #E5F2EC !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  box-shadow: 
+    8px 8px 22px rgba(165, 205, 185, 0.70),
+    3px 3px 8px rgba(165, 205, 185, 0.45),
+    -8px -8px 22px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(#dots, #dotsNav, .dots, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) {
+  background: #F7FFFA !important;
+  box-shadow: 3px 3px 8px rgba(165, 205, 185, 0.50), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(#dots, #dotsNav, .dots, .dots-nav) button:is(:hover, :active, .active, [aria-current="step"]) {
+  background: #E5F2EC !important;
+  box-shadow: inset 2px 2px 5px rgba(165, 205, 185, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 11 класс: Персиковый */
+html:has(body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"])),
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) {
+  background-color: #FFF0E7 !important;
+  background-image: none !important;
+}
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.navbar, #dots, .dots, #dotsNav, .dots-nav) {
+  background: #FFF0E7 !important;
+  background-color: #FFF0E7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  box-shadow: 
+    8px 8px 22px rgba(215, 168, 148, 0.70),
+    3px 3px 8px rgba(215, 168, 148, 0.45),
+    -8px -8px 22px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(#dots, #dotsNav, .dots, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav) {
+  background: #FFFAF6 !important;
+  box-shadow: 3px 3px 8px rgba(215, 168, 148, 0.50), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(#dots, #dotsNav, .dots, .dots-nav) button:is(:hover, :active, .active, [aria-current="step"]) {
+  background: #FFF0E7 !important;
+  box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+
+/* ==========================================================================
+   TACTILE INSET LESSON GOAL CARD (ВДАВЛЕННЫЙ БЛОК ЦЕЛИ УРОКА)
+   ========================================================================== */
+body.lesson-page .lesson-goal-card {
+  background: var(--surface-recess, #F1EDFA) !important;
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  margin: 16px 0 22px !important;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.05)) !important;
+  border-left: 0 !important;
+  box-shadow: var(--shadow-in) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  text-align: left !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page .lesson-goal-card .goal-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+body.lesson-page .lesson-goal-card .goal-code-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: var(--surface, #FFFFFF) !important;
+  color: var(--primary) !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  padding: 3px 10px !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-soft) !important;
+  letter-spacing: 0.02em !important;
+}
+
+body.lesson-page .lesson-goal-card .goal-code-badge i {
+  color: inherit !important;
+  font-size: 0.85rem !important;
+}
+
+body.lesson-page .lesson-goal-card .goal-title-badge {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--muted) !important;
+}
+
+body.lesson-page .lesson-goal-card .goal-description {
+  font-size: 0.95rem !important;
+  line-height: 1.55 !important;
+  color: var(--ink, var(--text)) !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+/* Specific Grade 11 Palette for Goal Card */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .lesson-goal-card {
+  background: #FBEFE8 !important;
+  border-color: rgba(234, 201, 183, 0.50) !important;
+  border-left: 0 !important;
+  box-shadow: inset 3px 3px 7px rgba(215, 168, 148, 0.45), inset -3px -3px 7px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .lesson-goal-card .goal-code-badge {
+  background: #FFFAF6 !important;
+  color: #ED906C !important;
+  box-shadow: 2px 2px 5px rgba(215, 168, 148, 0.35), -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .lesson-goal-card .goal-title-badge {
+  color: #8A675F !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .lesson-goal-card .goal-description {
+  color: #593C36 !important;
+}
+
+
+/* ==========================================================================
+   NEUMORPHIC SCROLLBARS (ВСЕ ПОЛОСЫ ПРОКРУТКИ В НЕОМОРФИЗМЕ)
+   ========================================================================== */
+* {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--line, rgba(163, 174, 195, 0.45)) var(--page, var(--bg, #eeebf8)) !important;
+}
+
+::-webkit-scrollbar {
+  width: 9px !important;
+  height: 9px !important;
+  background: var(--page, var(--bg, #eeebf8)) !important;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--page, var(--bg, #eeebf8)) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.12), inset -1px -1px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line, #c5bde0) !important;
+  border-radius: 10px !important;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15), inset 1px 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary, #8067d8) !important;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ==========================================================================
+   ALL ICON BADGES STRICTLY INSET / RECESSED (ИКОНКИ ВДАВЛЕНЫ ВЕЗДЕ)
+   ========================================================================== */
+body.lesson-page :is(
+  .card > i:first-child,
+  .concept-card > i:first-child,
+  .task-card > i:first-child,
+  .step > i:first-child,
+  .pipe i,
+  .icon-box,
+  .analogy-icon,
+  .part-icon,
+  .card-icon,
+  .rule-icon-wrap,
+  .gesture-card .icon,
+  .part-card .part-icon
+) {
+  background: var(--surface-recess, #F1EDFA) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  font-size: 1.25rem !important;
+  transform: none !important;
+  margin-bottom: 12px !important;
+}
+
+/* Icons inside inset wrappers have zero shadow/bg */
+body.lesson-page :is(.icon-box, .rule-icon-wrap, .part-icon, .gesture-card .icon) i {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: inherit !important;
+  transform: none !important;
+}
+
+/* Grade 11 specific Inset Icon styling */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(
+  .card > i:first-child,
+  .concept-card > i:first-child,
+  .task-card > i:first-child,
+  .step > i:first-child,
+  .pipe i,
+  .icon-box,
+  .analogy-icon,
+  .part-icon,
+  .card-icon,
+  .rule-icon-wrap,
+  .gesture-card .icon,
+  .part-card .part-icon
+) {
+  background: #FBEFE8 !important;
+  color: #ED906C !important;
+  border: 1px solid rgba(234, 201, 183, 0.45) !important;
+  box-shadow: inset 3px 3px 6px rgba(215, 168, 148, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* ==========================================================================
+   HOVER STABILIZATION (NO ERRATIC JUMPING / BOUNCING DOWN)
+   ========================================================================== */
+.probabilities,
+.lesson-11-1 .probabilities,
+.lesson-11-6 .probabilities {
+  transform: translateY(-50%) !important;
+}
+
+.probabilities:hover,
+.probabilities *:hover,
+.lesson-11-1 .probabilities:hover,
+.lesson-11-1 .probabilities *:hover,
+.lesson-11-6 .probabilities:hover,
+.lesson-11-6 .probabilities *:hover {
+  transform: translateY(-50%) !important;
+}
+
+.probability,
+.probability:hover,
+.lesson-11-1 .probability,
+.lesson-11-1 .probability:hover,
+.lesson-11-6 .probability,
+.lesson-11-6 .probability:hover {
+  transform: none !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+
+/* ==========================================================================
+   STRICT INSET GOALS & CONVEX NUMBERS (ЦЕЛИ ВДАВЛЕНЫ, НОМЕРА ВЫПУКЛЫ)
+   ========================================================================== */
+body.lesson-page .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem) {
+  background: var(--surface-recess, #F1EDFA) !important;
+  background-image: none !important;
+  border-radius: 16px !important;
+  padding: 14px 20px !important;
+  margin: 16px 0 22px !important;
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.05)) !important;
+  border-left: 0 !important;
+  box-shadow: var(--shadow-in, inset 3px 3px 7px rgba(163, 174, 195, 0.45), inset -3px -3px 7px rgba(255, 255, 255, 0.85)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  text-align: left !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem) {
+  background: #FBEFE8 !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  box-shadow: inset 3px 3px 8px rgba(215, 168, 148, 0.55), inset -3px -3px 8px rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Number / Code badges are strictly RAISED / CONVEX (ВЫПУКЛЫМИ) */
+body.lesson-page :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background: var(--surface, #FFFFFF) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  padding: 4px 12px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--shadow-soft, 3px 3px 8px rgba(163, 174, 195, 0.40), -3px -3px 8px rgba(255, 255, 255, 0.9)) !important;
+  letter-spacing: 0.02em !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  background: #FFFAF6 !important;
+  color: #ED906C !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 3px 3px 8px rgba(215, 168, 148, 0.50), -3px -3px 8px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page .lesson-goal-card .goal-code-badge i {
+  color: #ED906C !important;
+  font-size: 0.9rem !important;
+  line-height: 1 !important;
+}
+
+/* Lesson 11-2 Classification Dots Viz: 2 dots on each side */
+.dots-classification {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  min-height: 80px !important;
+  padding: 18px !important;
+}
+
+.dots-classification .dot {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.dots-classification .dot.red {
+  background: #ED906C !important;
+  box-shadow: 2px 2px 6px rgba(215, 168, 148, 0.45), 0 0 10px rgba(237, 144, 108, 0.50), -2px -2px 6px rgba(255, 255, 255, 0.9) !important;
+}
+
+.dots-classification .dot.blue {
+  background: #593C36 !important;
+  box-shadow: 2px 2px 6px rgba(215, 168, 148, 0.45), 0 0 10px rgba(89, 60, 54, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.9) !important;
+}
+
+.dots-classification .classification-divider {
+  width: 2px !important;
+  height: 48px !important;
+  background: #EAC9B7 !important;
+  border-radius: 4px !important;
+  margin: 0 18px !important;
+}
+
+
+/* ==========================================================================
+   MAXIMUM SPECIFICITY INSET GOAL CARDS (СТРОГО ВДАВЛЕННЫЕ ЦЕЛИ)
+   ========================================================================== */
+html body.lesson-page .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]),
+html body.lesson-page[data-lesson-id] .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]) {
+  background: var(--surface-recess, #F1EDFA) !important;
+  background-image: none !important;
+  border-radius: 16px !important;
+  padding: 14px 20px !important;
+  margin: 16px 0 22px !important;
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.08)) !important;
+  border-left: 5px solid var(--primary) !important;
+  box-shadow: inset 4px 4px 9px rgba(0, 0, 0, 0.14), inset -4px -4px 9px rgba(255, 255, 255, 0.9) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  text-align: left !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]),
+html body.lesson-page[data-lesson-id^="11-"] .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]) {
+  background: #F5E5DC !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  box-shadow: inset 4px 4px 9px rgba(195, 145, 125, 0.55), inset -4px -4px 9px rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Numbers inside goal cards are strictly convex / raised (ВЫПУКЛЫЕ) */
+html body.lesson-page .slide :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background: #FFFFFF !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  padding: 4px 12px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.12), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  background: #FFFAF6 !important;
+  color: #ED906C !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 3px 3px 8px rgba(195, 145, 125, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.98) !important;
+}
+
+
+/* ==========================================================================
+   PURE INSET STATIC GOAL CARD (КАК РИС 1 - БЕЗ РЕАКЦИИ НА НАВЕДЕНИЕ)
+   ========================================================================== */
+html body.lesson-page .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]) {
+  background: var(--surface-recess, #F1EDFA) !important;
+  background-image: none !important;
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  margin: 16px 0 22px !important;
+  border: 0 !important;
+  box-shadow: inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  text-align: left !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+/* Zero reaction on hover for goal card and all its children */
+html body.lesson-page .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]):hover,
+html body.lesson-page .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]) *:hover {
+  transform: none !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+/* Grade 11 exact match to Рис 1 (Soft warm peach inset) */
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]),
+html body.lesson-page[data-lesson-id^="11-"] .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]) {
+  background: #FBEFE8 !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]):hover {
+  box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+}
+
+/* Number badge is strictly raised, also zero reaction to hover */
+html body.lesson-page .slide :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background: #FFFFFF !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  padding: 4px 12px !important;
+  border-radius: 10px !important;
+  border: 0 !important;
+  box-shadow: 2px 2px 5px rgba(163, 174, 195, 0.40), -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  background: #FFFAF6 !important;
+  color: #ED906C !important;
+  border: 0 !important;
+  box-shadow: 2px 2px 5px rgba(215, 168, 148, 0.40), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+html body.lesson-page .slide :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge):hover {
+  transform: none !important;
+  cursor: default !important;
+  box-shadow: 2px 2px 5px rgba(215, 168, 148, 0.40), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+
+/* ==========================================================================
+   FIX BRAND LOGO: NO CONTOUR AROUND GROUP, ONLY ICON BOX INSET ON HOVER
+   ========================================================================== */
+body.lesson-page .brand-logo-group,
+body.lesson-page .brand-logo-group:hover,
+body.lesson-page .brand-logo-group:focus,
+body.lesson-page .brand-logo-group:active,
+body.lesson-page .navbar .brand-logo-group,
+body.lesson-page .navbar .brand-logo-group:hover {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  transform: none !important;
+}
+
+body.lesson-page .brand-logo-group .brand-title-text,
+body.lesson-page .brand-logo-group:hover .brand-title-text {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Resting state for brand icon box: raised */
+body.lesson-page .brand-logo-group .brand-icon-box,
+body.lesson-page .brand-icon-box {
+  border-radius: 14px !important;
+  background: var(--surface, #FFFFFF) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.10), -2px -2px 6px rgba(255, 255, 255, 0.9) !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-logo-group .brand-icon-box,
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-icon-box {
+  background: #FFFAF6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 2px 2px 6px rgba(215, 168, 148, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.98) !important;
+}
+
+/* On hover: ONLY brand-icon-box becomes inset (вдавленным) */
+body.lesson-page .brand-logo-group:hover .brand-icon-box,
+body.lesson-page .brand-icon-box:hover {
+  box-shadow: var(--shadow-in, inset 2px 2px 5px rgba(163, 174, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.85)) !important;
+  transform: none !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-logo-group:hover .brand-icon-box,
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-icon-box:hover {
+  background: #FBEFE8 !important;
+  box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.55), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+}
+
+/* ==========================================================================
+   PROMINENT RAISED CARDS: STRONG TACTILE 3D SHADOWS ACROSS ALL LESSONS
+   ========================================================================== */
+body.lesson-page .slide :is(.card, .glass, .glass-card, .paper, .panel, .panel-section, .task-card, .rubric-card, .card-featured, .workbench, .workpanel, .hero-structure-card, .hero-media):not(:where(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"])) {
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  box-shadow: 
+    8px 8px 24px rgba(163, 174, 195, 0.55),
+    3px 3px 8px rgba(163, 174, 195, 0.35),
+    -8px -8px 24px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 9 (Lavender) Cards */
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .slide :is(.card, .glass, .glass-card, .paper, .panel, .panel-section, .task-card, .rubric-card, .card-featured, .workbench, .workpanel, .hero-structure-card, .hero-media):not(:where(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"])) {
+  background: #FCFAFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 
+    8px 8px 24px rgba(185, 175, 215, 0.65),
+    3px 3px 8px rgba(185, 175, 215, 0.40),
+    -8px -8px 24px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 10 ЕМН (Sky Blue) Cards */
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide :is(.card, .glass, .glass-card, .paper, .panel, .panel-section, .task-card, .rubric-card, .card-featured, .workbench, .workpanel, .hero-structure-card, .hero-media):not(:where(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"])) {
+  background: #F6FBFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 
+    8px 8px 24px rgba(160, 195, 222, 0.65),
+    3px 3px 8px rgba(160, 195, 222, 0.40),
+    -8px -8px 24px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 10 ОГН (Mint) Cards */
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .slide :is(.card, .glass, .glass-card, .paper, .panel, .panel-section, .task-card, .rubric-card, .card-featured, .workbench, .workpanel, .hero-structure-card, .hero-media):not(:where(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"])) {
+  background: #F7FFFA !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 
+    8px 8px 24px rgba(165, 205, 185, 0.65),
+    3px 3px 8px rgba(165, 205, 185, 0.40),
+    -8px -8px 24px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 11 (Peach) Cards */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .slide :is(.card, .glass, .glass-card, .paper, .panel, .panel-section, .task-card, .rubric-card, .card-featured, .workbench, .workpanel, .hero-structure-card, .hero-media):not(:where(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"])) {
+  background: #FFFAF6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 
+    8px 8px 24px rgba(215, 168, 148, 0.65),
+    3px 3px 8px rgba(215, 168, 148, 0.40),
+    -8px -8px 24px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Hover stabilization on cards */
+body.lesson-page .slide :is(.card, .glass, .glass-card, .paper, .panel, .panel-section, .task-card, .rubric-card, .card-featured, .workbench, .workpanel, .hero-structure-card, .hero-media):hover {
+  transform: none !important;
+}
+
+
+/* ==========================================================================
+   GLOBAL FIXES (CACHE BUSTER V52):
+   1. Universal removal of colored left-border stripes on cards & callouts
+   2. Start button generous margin-top (prevents sticking to cards)
+   3. Single slide counter safeguard (prevents duplication in mobile bar)
+   ========================================================================== */
+
+/* 1. Prevent colored left-edge highlight stripes on cards, topics, callouts */
+body.lesson-page :is(.callout, .definition, .topic, .paper.definition, .card.definition, .lesson-goal-card, .goal, .goal-box, .goalitem, .task-card, .box) {
+  border-left: 0 !important;
+}
+
+/* 2. Start buttons always have breathing room above and never stick */
+body.lesson-page :is(.start-btn, button.start-btn, a.start-btn) {
+  margin-top: 28px !important;
+  margin-bottom: 12px !important;
+}
+
+.lesson-11-4 .grid-2 {
+  margin-bottom: 28px !important;
+}
+
+/* 3. Slide counter deduplication guard */
+.nav-controls #counter ~ #navSlideCounter,
+.nav-controls #navSlideCounter ~ #counter {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   EXCEL & SPREADSHEET FORMULAS: REMOVE ALL CONTOURS & INSET SHADOWS (V53)
+   ========================================================================== */
+body.lesson-page table code,
+body.lesson-page :is(.sheet-table, .excel-table, .sheet-formula, .cell-calc, [class*="excel"], [class*="sheet"]) code,
+body.lesson-page table :is(.sheet-formula, .cell-calc, td, th) code,
+body.lesson-page code:is(.formula-line, .excel-formula, [class*="formula"], [class*="calc"]) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', Consolas, monospace) !important;
+  font-size: 0.9em !important;
+  color: inherit !important;
+  display: inline !important;
+  line-height: inherit !important;
+  vertical-align: baseline !important;
 }

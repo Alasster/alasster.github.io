@@ -134,13 +134,8 @@ body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) i.lesson
   transform: none !important;
 }
 
+.lesson-icon-credit,
 body.lesson-page .lesson-icon-credit {
-  flex: 0 0 auto;
-  align-self: flex-end;
-  padding: 4px 20px 10px;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.4;
-  text-decoration: underline;
+  display: none !important;
 }
 

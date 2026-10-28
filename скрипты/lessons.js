@@ -268,11 +268,15 @@
       navBar.className = 'nav-controls';
       navBar.innerHTML = `
         <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fas fa-chevron-left"></i></button>
-        <span id="navSlideCounter" class="nav-counter">1 / 1</span>
+        <span id="counter" class="nav-counter" aria-live="polite">1 / 1</span>
         <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fas fa-chevron-right"></i></button>
       `;
     }
-
+    const duplicate = navBar.querySelector('#navSlideCounter');
+    const primary = navBar.querySelector('#counter');
+    if (duplicate && primary && duplicate !== primary) {
+      duplicate.remove();
+    }
     if (navBar.parentElement !== document.body) {
       document.body.appendChild(navBar);
     }
@@ -406,14 +410,20 @@
       slideNextBtn.textContent = globalCurrentSlide === total - 1 ? 'Начать заново →' : 'Следующий слайд →';
     }
 
-    let counter = document.getElementById('navSlideCounter');
     const navBar = document.querySelector('.nav-controls');
+    let counter = document.getElementById('counter') || document.getElementById('navSlideCounter');
     if (navBar && !counter) {
       counter = document.createElement('span');
-      counter.id = 'navSlideCounter';
+      counter.id = 'counter';
       counter.className = 'nav-counter';
       if (nextBtn) navBar.insertBefore(counter, nextBtn);
       else navBar.appendChild(counter);
+    }
+    const duplicate = document.getElementById('navSlideCounter');
+    const primaryCounter = document.getElementById('counter');
+    if (duplicate && primaryCounter && duplicate !== primaryCounter) {
+      duplicate.remove();
+      counter = primaryCounter;
     }
     if (counter) {
       counter.textContent = `${globalCurrentSlide + 1} / ${total}`;
@@ -5597,9 +5607,7 @@ function fillOptions(select){options.forEach(([value,label])=>select.add(new Opt
 const matchData=[['Логистика: камера находит вмятины на коробках.','cv','Система анализирует изображение упаковки.'],['Торговля: система определяет тему письменной жалобы.','nlp','Система анализирует смысл текста.'],['Дизайн: сервис создаёт эскиз логотипа по описанию.','gen','Система создаёт новое изображение.'],['Медиа: сервис записывает интервью текстом из аудио.','stt','Вход — речь, выход — текст.'],['Транспорт: помощник читает вслух готовое уведомление.','tts','Вход — текст, выход — речь.']];
 const decompData=[['1. Превращает голос клиента в текст.','stt','Этот шаг записывает произнесённые слова.'],['2. Определяет, что клиент хочет заблокировать карту.','nlp','Этот шаг определяет намерение по тексту.'],['3. Произносит готовую инструкцию.','tts','Этот шаг озвучивает текст ответа.']];
 function createPractice(hostId,formId,resultId,data){const host=document.getElementById(hostId);data.forEach(([prompt],i)=>{const row=document.createElement('div');row.className='match-row';const label=document.createElement('label');label.htmlFor=`${hostId}-${i}`;label.textContent=prompt;const select=document.createElement('select');select.id=label.htmlFor;fillOptions(select);const feedback=document.createElement('p');feedback.className='feedback';feedback.id=`${select.id}-feedback`;select.setAttribute('aria-describedby',feedback.id);row.append(label,select,feedback);host.appendChild(row);select.addEventListener('change',()=>{feedback.textContent='';feedback.className='feedback';select.removeAttribute('aria-invalid');document.getElementById(resultId).textContent='';});});document.getElementById(formId).addEventListener('submit',e=>{e.preventDefault();let correct=0,filled=0;[...host.children].forEach((row,i)=>{const select=row.querySelector('select'),feedback=row.querySelector('.feedback');const ok=select.value===data[i][1];if(select.value)filled++;if(ok)correct++;feedback.className=`feedback ${ok?'correct':'incorrect'}`;feedback.textContent=!select.value?'Выбери технологию.':ok?`Верно. ${data[i][2]}`:'Пока неверно. Сравни входные данные и требуемый результат; попробуй ещё раз.';select.setAttribute('aria-invalid',String(!ok));});document.getElementById(resultId).textContent=filled<data.length?`Заполнено ${filled} из ${data.length}. Верно: ${correct}.`:`Верно: ${correct} из ${data.length}. ${correct===data.length?'Теперь объясни выбор своими словами.':'Исправь отмеченные ответы и проверь снова.'}`;});}
-createPractice('matchItems','matching','matchResult',matchData);createPractice('decompItems','decomposition','decompResult',decompData);fillOptions(document.getElementById('exitTech'));
-document.getElementById('exitTech').addEventListener('change',()=>{document.getElementById('exitResult').textContent='';});
-document.getElementById('exitCheck').addEventListener('click',()=>{const value=document.getElementById('exitTech').value;const result=document.getElementById('exitResult');result.className=`result ${value==='cv'?'correct':'incorrect'}`;result.textContent=!value?'Сначала выбери технологию.':value==='cv'?'Верно: CV анализирует изображение и находит повреждения. Назови сферу применения.':'Подумай: сервис анализирует готовое фото или создаёт новый контент? Попробуй ещё раз.';});
+if(document.getElementById('matching'))createPractice('matchItems','matching','matchResult',matchData);if(document.getElementById('decomposition'))createPractice('decompItems','decomposition','decompResult',decompData);if(document.getElementById('exitTech')){fillOptions(document.getElementById('exitTech'));document.getElementById('exitTech').addEventListener('change',()=>{document.getElementById('exitResult').textContent='';});document.getElementById('exitCheck').addEventListener('click',()=>{const value=document.getElementById('exitTech').value;const result=document.getElementById('exitResult');result.className=`result ${value==='cv'?'correct':'incorrect'}`;result.textContent=!value?'Сначала выбери технологию.':value==='cv'?'Верно: CV анализирует изображение и находит повреждения. Назови сферу применения.':'Подумай: сервис анализирует готовое фото или создаёт новый контент? Попробуй ещё раз.';});}
 const canvas=document.getElementById('network-bg'),ctx=canvas.getContext('2d');let particles=[];
 function initParticles(){canvas.width=innerWidth;canvas.height=innerHeight;particles=Array.from({length:35},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.9,vy:(Math.random()-.5)*.9,radius:Math.random()*1.5+1}));drawBackground(false);}
 function drawBackground(move){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach((p,i)=>{if(move){p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=canvas.width+30;if(p.x>canvas.width+30)p.x=-30;if(p.y<-30)p.y=canvas.height+30;if(p.y>canvas.height+30)p.y=-30;}particles.slice(i+1).forEach(q=>{const distance=Math.hypot(p.x-q.x,p.y-q.y);if(distance<190){ctx.strokeStyle=`rgba(217, 119, 6, ${.14 * (1 - distance / 190)})`;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}});ctx.fillStyle='rgba(245, 158, 11, .22)';ctx.beginPath();ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);ctx.fill();});}
