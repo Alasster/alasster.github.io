@@ -2131,7 +2131,7 @@ async function submitWork(isAutoExpired = false) {
       }
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
 
       const res = await fetch("/api/student/submit", {
         method: "POST",

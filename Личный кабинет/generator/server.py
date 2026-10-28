@@ -337,27 +337,34 @@ async def list_tests(
         rows = await cursor.fetchall()
         
         # Получаем количество заданий и суммарный балл
+        # Получаем количество заданий и суммарный балл одним запросом (без N+1 сетевых вызовов)
+        c_stats = await db.execute("""
+            SELECT test_id, COUNT(*) as count, COALESCE(SUM(max_score), 0) as total_score
+            FROM tasks
+            WHERE COALESCE(variant, '1') IN ('1', 'all', '1,2')
+            GROUP BY test_id
+        """)
+        stats_map = {row["test_id"]: row for row in await c_stats.fetchall()}
+
+        c_all_stats = await db.execute("""
+            SELECT test_id, COUNT(*) as count, COALESCE(SUM(max_score), 0) as total_score
+            FROM tasks
+            GROUP BY test_id
+        """)
+        all_stats_map = {row["test_id"]: row for row in await c_all_stats.fetchall()}
+
         tests_list = []
         for r in rows:
             td = dict(r)
-            has_vars = bool(td.get("has_variants", 1))
-            if has_vars:
-                c2 = await db.execute("SELECT COUNT(*) as count, COALESCE(SUM(max_score), 0) as total_score FROM tasks WHERE test_id = ? AND COALESCE(variant, '1') IN ('1', 'all', '1,2')", (td["id"],))
-                stat = await c2.fetchone()
-                if not stat or stat["count"] == 0:
-                    c2 = await db.execute("SELECT COUNT(*) as count, COALESCE(SUM(max_score), 0) as total_score FROM tasks WHERE test_id = ?", (td["id"],))
-                    stat = await c2.fetchone()
-            else:
-                c2 = await db.execute("SELECT COUNT(*) as count, COALESCE(SUM(max_score), 0) as total_score FROM tasks WHERE test_id = ?", (td["id"],))
-                stat = await c2.fetchone()
-            td["task_count"] = stat["count"]
-            td["total_score"] = stat["total_score"]
+            stat = stats_map.get(td["id"]) or all_stats_map.get(td["id"])
+            td["task_count"] = stat["count"] if stat else 0
+            td["total_score"] = stat["total_score"] if stat else 0
             td["class_letters"] = json.loads(td["class_letters_json"]) if td.get("class_letters_json") else []
             td["variant"] = td.get("variant") or "1"
             td["bg_color"] = td.get("bg_color") or "#f8fafc"
             td["bg_color_v1"] = td.get("bg_color_v1") or "#fce8e6"
             td["bg_color_v2"] = td.get("bg_color_v2") or "#e6f4ea"
-            td["has_variants"] = has_vars
+            td["has_variants"] = bool(td.get("has_variants", 1))
             td["duration_minutes"] = td.get("duration_minutes") if td.get("duration_minutes") is not None else 45
             tests_list.append(td)
         return tests_list
@@ -2241,6 +2248,11 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
             # Если вместе с подтверждением пришли ответы (req.answers), атомарно сохраняем их в базу
             if req.answers and isinstance(req.answers, dict):
                 await validate_attempt_tasks(db, attempt, req.answers.keys())
+                c_ex = await db.execute("SELECT id, task_id, version FROM student_answers WHERE attempt_id = ?", (attempt["id"],))
+                existing_answers = {str(row["task_id"]): row for row in await c_ex.fetchall()}
+
+                ans_updates = []
+                ans_inserts = []
                 for task_id, ans_val in req.answers.items():
                     if isinstance(ans_val, dict) and "answer" in ans_val:
                         raw_ans = ans_val["answer"]
@@ -2249,20 +2261,17 @@ async def student_submit(req: StudentSubmitRequest, attempt: dict = Depends(get_
                         raw_ans = ans_val
                         ver = 1
                     ans_json = json.dumps(raw_ans, ensure_ascii=False)
-                    c_ex = await db.execute("SELECT id, version FROM student_answers WHERE attempt_id = ? AND task_id = ?", (attempt["id"], str(task_id)))
-                    row_ex = await c_ex.fetchone()
+                    row_ex = existing_answers.get(str(task_id))
                     if row_ex:
-                        await db.execute("""
-                            UPDATE student_answers
-                            SET answer_json = ?, version = version + 1, updated_at = ?
-                            WHERE id = ?
-                        """, (ans_json, now, row_ex["id"]))
+                        ans_updates.append((ans_json, now, row_ex["id"]))
                     else:
                         ans_id = str(uuid.uuid4())
-                        await db.execute("""
-                            INSERT INTO student_answers (id, attempt_id, task_id, answer_json, version, updated_at)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                        """, (ans_id, attempt["id"], str(task_id), ans_json, ver, now))
+                        ans_inserts.append((ans_id, attempt["id"], str(task_id), ans_json, ver, now))
+
+                if ans_updates:
+                    await db.executemany("UPDATE student_answers SET answer_json = ?, version = version + 1, updated_at = ? WHERE id = ?", ans_updates)
+                if ans_inserts:
+                    await db.executemany("INSERT INTO student_answers (id, attempt_id, task_id, answer_json, version, updated_at) VALUES (?, ?, ?, ?, ?, ?)", ans_inserts)
 
             conf_code = f"BAG-{datetime.now().strftime('%Y')}-{secrets.token_hex(3).upper()}"
             await db.execute("""

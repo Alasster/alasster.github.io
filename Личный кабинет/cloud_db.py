@@ -1,3 +1,13 @@
+_SHARED_CLIENTS: dict[str, httpx.Client] = {}
+
+def _get_shared_client(kind: str) -> httpx.Client:
+    client = _SHARED_CLIENTS.get(kind)
+    if client is None or client.is_closed:
+        limits = httpx.Limits(max_keepalive_connections=20, max_connections=50, keepalive_expiry=60.0)
+        client = httpx.Client(timeout=30.0, limits=limits)
+        _SHARED_CLIENTS[kind] = client
+    return client
+
 """Small sqlite-compatible adapter for Turso's documented SQL-over-HTTP API.
 
 Only server-side environment variables contain credentials. Connections keep
@@ -102,7 +112,8 @@ class Connection:
             raise ValueError("Expected a secure Turso database URL")
         self._origin = f"https://{host}"
         self._endpoint = self._origin + "/v2/pipeline"
-        self._client = client or httpx.Client(timeout=30.0)
+        self._is_shared_client = client is None
+        self._client = client or _get_shared_client(kind)
         self._token = os.environ[f"TURSO_{kind}_TOKEN"]
         self._baton = None
         self._transaction = False
@@ -198,7 +209,8 @@ class Connection:
             if self._baton:
                 self._request([{"type": "close"}])
         finally:
-            self._client.close()
+            if not self._is_shared_client:
+                self._client.close()
             self._closed = True
 
 
