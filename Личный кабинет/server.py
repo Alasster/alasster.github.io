@@ -1975,7 +1975,10 @@ def dashboard(request: Request):
 
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
-    resp = HTMLResponse(page("dashboard.html"))
+    html = page("dashboard.html")
+    user_role = (user.get("role") or "user") if user else "user"
+    html = html.replace("<body>", f'<body data-user-role="{user_role}">')
+    resp = HTMLResponse(html)
 
     query_token = request.query_params.get("session_token")
 
