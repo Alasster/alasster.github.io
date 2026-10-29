@@ -7363,9 +7363,14 @@ const slides = [...document.querySelectorAll('.slide')];
   }
 
   async function checkServerSession() {
-    if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     const base = getCabinetBaseUrl();
-    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) return getStoredUser();
+    try {
+      const isCrossOrigin = Boolean(base && new URL(base, location.href).origin !== location.origin);
+      if (isCrossOrigin) return getStoredUser();
+    } catch (_) {
+      return getStoredUser();
+    }
+    if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     try {
       const res = await fetch(`${base}/api/me`, {
         method: 'GET',
@@ -7390,10 +7395,13 @@ const slides = [...document.querySelectorAll('.slide')];
     const base = getCabinetBaseUrl();
     setStoredUser(null);
     renderAuthButton(null);
-    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) {
-      location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
-      return;
-    }
+    try {
+      const isCrossOrigin = Boolean(base && new URL(base, location.href).origin !== location.origin);
+      if (isCrossOrigin) {
+        location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
+        return;
+      }
+    } catch (_) {}
     try {
       await fetch(`${base}/api/logout`, {
         method: 'POST',
@@ -7551,6 +7559,9 @@ const slides = [...document.querySelectorAll('.slide')];
       navbar.after(authContainer);
     }
   }
+
+  // Immediately parse user payload on script load
+  checkUrlUserPayload();
 
   // Cross-tab synchronization
   window.addEventListener('storage', (e) => {

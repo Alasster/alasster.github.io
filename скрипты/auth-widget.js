@@ -99,14 +99,14 @@
   }
 
   async function checkServerSession() {
-    if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     const base = getCabinetBaseUrl();
-    // On a separate Render domain, authentication happens on its own page.
-    // The cached name here is display-only; all permissions stay server-side.
-    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) return getStoredUser();
-    if (window.location.protocol === 'https:' && base.startsWith('http://')) {
+    try {
+      const isCrossOrigin = Boolean(base && new URL(base, location.href).origin !== location.origin);
+      if (isCrossOrigin) return getStoredUser();
+    } catch (_) {
       return getStoredUser();
     }
+    if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     try {
       const res = await fetch(`${base}/api/me`, {
         method: 'GET',
@@ -129,22 +129,21 @@
 
   async function performLogout() {
     const base = getCabinetBaseUrl();
-    if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) {
-      setStoredUser(null);
-      renderAuthButton(null);
-      location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
-      return;
-    }
-    if (!base.startsWith('http://') || window.location.protocol !== 'https:') {
-      try {
-        await fetch(`${base}/api/logout`, {
-          method: 'POST',
-          credentials: 'include'
-        });
-      } catch (e) {}
-    }
     setStoredUser(null);
     renderAuthButton(null);
+    try {
+      const isCrossOrigin = Boolean(base && new URL(base, location.href).origin !== location.origin);
+      if (isCrossOrigin) {
+        location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
+        return;
+      }
+    } catch (_) {}
+    try {
+      await fetch(`${base}/api/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (e) {}
   }
 
   function renderAuthButton(user) {
@@ -153,10 +152,8 @@
 
     const base = getCabinetBaseUrl();
     const currentUrl = window.location.href;
-    // Always pass force=1 so clicking login opens auth.html cleanly
-    const loginUrl = `${base}/login?force=1&return_to=${encodeURIComponent(currentUrl)}`;
+    const loginUrl = `${base}/login?return_to=${encodeURIComponent(currentUrl)}`;
     const cabinetUrl = `${base}/`;
-    const generatorUrl = `${base}/generator/teacher`;
 
     if (user) {
       let displayName = user.display_name;
@@ -297,6 +294,16 @@
       navbar.after(authContainer);
     }
   }
+
+  // Immediately parse user payload on script load
+  checkUrlUserPayload();
+
+  // Cross-tab synchronization
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'alasster_auth_user' || e.key === 'alasster_logged_in') {
+      renderAuthButton(getStoredUser());
+    }
+  });
 
   // Initialize
   async function initAuthWidget() {
