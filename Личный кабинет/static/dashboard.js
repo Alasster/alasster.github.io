@@ -1,4 +1,4 @@
-const profileForm = document.getElementById('profile-form');
+﻿const profileForm = document.getElementById('profile-form');
 
 const profileFirstName = document.getElementById('profile-first-name');
 
@@ -446,6 +446,8 @@ async function loadCurrentUser() {
   profileSnapshot = collectProfileChanges();
 
   profileDirty = false;
+
+  const allowed = ROLE_SECTIONS[userRole] || [getDefaultSectionForRole(userRole)];
 
   const currentHash = (window.location.hash || '').replace('#', '');
 
@@ -2335,7 +2337,7 @@ window.addEventListener('beforeunload', (event) => {
 
 });
 
-loadCurrentUser().catch(() => window.location.replace('/login'));
+loadCurrentUser().catch((err) => console.error('Failed to load user:', err));
 
 if (window.currentUserRole === 'superadmin') {
 
