@@ -676,20 +676,6 @@ function filterAndRenderTests() {
 
   const quarter = document.getElementById("filter-quarter")?.value || "";
 
-    ['filter-type', 'filter-grade', 'filter-quarter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      const hasVal = Boolean(el.value);
-      el.classList.toggle('is-filter-active', hasVal);
-      if (hasVal) {
-        const selectedText = el.options[el.selectedIndex]?.text || el.value;
-        el.title = selectedText;
-      } else {
-        el.title = el.getAttribute('data-default-title') || el.options[0]?.text || '';
-      }
-    }
-  });
-
   const filtered = currentTests.filter(t => {
 
     if (type && t.exam_type !== type) return false;
