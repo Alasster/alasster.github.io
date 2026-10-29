@@ -22,4 +22,3 @@ services:
         sync: false
       - key: GA4_PROPERTY_ID
         value: "560432914"
-      - fromGroup: ga4

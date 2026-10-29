@@ -907,6 +907,22 @@ def ga4_credentials_path() -> Path | None:
 _BUILTIN_GA4_DATA = "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"
 _BUILTIN_GA4_KEY = b"AlassterGA4SecretKey2026"
 
+def get_builtin_ga4_credentials():
+    if service_account is None:
+        return None
+    try:
+        raw_enc = base64.b64decode(_BUILTIN_GA4_DATA.encode("ascii"))
+        dec = bytes([b ^ _BUILTIN_GA4_KEY[i % len(_BUILTIN_GA4_KEY)] for i, b in enumerate(raw_enc)]).decode("utf-8")
+        info = json.loads(dec)
+        return service_account.Credentials.from_service_account_info(
+            info,
+            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
+        )
+    except Exception as exc:
+        LOGGER.error("Не удалось загрузить встроенный ключ GA4: %s", exc)
+        return None
+
+
 def get_ga4_credentials():
     if service_account is None:
         return None
@@ -949,138 +965,73 @@ def get_ga4_credentials():
             LOGGER.error("Ошибка чтения файла ключа GA4 (%s): %s", key_path, exc)
 
     # 3. Built-in cloud fallback
-    try:
-        raw_enc = base64.b64decode(_BUILTIN_GA4_DATA.encode("ascii"))
-        dec = bytes([b ^ _BUILTIN_GA4_KEY[i % len(_BUILTIN_GA4_KEY)] for i, b in enumerate(raw_enc)]).decode("utf-8")
-        info = json.loads(dec)
-        return service_account.Credentials.from_service_account_info(
-            info,
-            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
-        )
-    except Exception as exc:
-        LOGGER.error("Не удалось загрузить встроенный ключ GA4: %s", exc)
-
-    return None
+    return get_builtin_ga4_credentials()
 
 
 _GA4_CLIENT = None
-
 _GA4_CLIENT_LOCK = threading.Lock()
 
 
-
-
-
-def ga4_client():
-
+def ga4_client(force_builtin: bool = False):
     global _GA4_CLIENT
-
     if BetaAnalyticsDataClient is None or service_account is None:
-
         raise RuntimeError("Пакет Google Analytics Data API не установлен")
-
-    if _GA4_CLIENT is not None:
-
+    if not force_builtin and _GA4_CLIENT is not None:
         return _GA4_CLIENT
-
     with _GA4_CLIENT_LOCK:
-
-        if _GA4_CLIENT is not None:
-
+        if not force_builtin and _GA4_CLIENT is not None:
             return _GA4_CLIENT
-
-        creds = get_ga4_credentials()
-
+        creds = get_builtin_ga4_credentials() if force_builtin else get_ga4_credentials()
         if creds is None:
-
-            raise FileNotFoundError(
-
-                "Учетные данные Google Analytics не найдены. "
-
-                "Задайте переменную GA4_SERVICE_ACCOUNT_JSON или добавьте ga4-service-account.json"
-
-            )
-
+            creds = get_builtin_ga4_credentials()
+        if creds is None:
+            raise FileNotFoundError("Учетные данные Google Analytics не найдены.")
         _GA4_CLIENT = BetaAnalyticsDataClient(credentials=creds)
-
         return _GA4_CLIENT
-
-
-
 
 
 def ga4_realtime_users() -> int:
-
-    response = ga4_client().run_realtime_report(
-
-        RunRealtimeReportRequest(
-
-            property=f"properties/{GA4_PROPERTY_ID}",
-
-            metrics=[Metric(name="activeUsers")],
-
-            minute_ranges=[MinuteRange(start_minutes_ago=4)],
-
-        ),
-
-        timeout=5,
-
+    req = RunRealtimeReportRequest(
+        property=f"properties/{GA4_PROPERTY_ID}",
+        metrics=[Metric(name="activeUsers")],
+        minute_ranges=[MinuteRange(start_minutes_ago=4)],
     )
+    try:
+        response = ga4_client().run_realtime_report(req, timeout=10)
+    except Exception as exc:
+        LOGGER.warning("GA4 realtime report failed with primary client: %s. Retrying with builtin...", exc)
+        response = ga4_client(force_builtin=True).run_realtime_report(req, timeout=10)
 
     if not response.rows:
-
         return 0
-
     return int(response.rows[0].metric_values[0].value or 0)
 
 
-
-
-
 def ga4_traffic(mode: str) -> list[dict]:
-
     dimension_name = "date" if mode == "daily" else "yearMonth"
-
     start_date = "30daysAgo" if mode == "daily" else "365daysAgo"
-
-    response = ga4_client().run_report(
-
-        RunReportRequest(
-
-            property=f"properties/{GA4_PROPERTY_ID}",
-
-            dimensions=[Dimension(name=dimension_name)],
-
-            metrics=[Metric(name="activeUsers")],
-
-            date_ranges=[DateRange(start_date=start_date, end_date="today")],
-
-        ),
-
-        timeout=5,
-
+    req = RunReportRequest(
+        property=f"properties/{GA4_PROPERTY_ID}",
+        dimensions=[Dimension(name=dimension_name)],
+        metrics=[Metric(name="activeUsers")],
+        date_ranges=[DateRange(start_date=start_date, end_date="today")],
     )
+    try:
+        response = ga4_client().run_report(req, timeout=10)
+    except Exception as exc:
+        LOGGER.warning("GA4 traffic report failed with primary client: %s. Retrying with builtin...", exc)
+        response = ga4_client(force_builtin=True).run_report(req, timeout=10)
 
     points = []
-
     for row in response.rows:
-
         key = row.dimension_values[0].value
-
         if mode == "daily" and len(key) == 8:
-
             label = f"{key[:4]}-{key[4:6]}-{key[6:]}"
-
         elif mode == "monthly" and len(key) == 6:
-
             label = f"{key[:4]}-{key[4:]}"
-
         else:
-
             label = key
-
         points.append({"key": key, "label": label, "value": int(row.metric_values[0].value or 0)})
-
     return sorted(points, key=lambda item: item["key"])
 
 
@@ -2221,7 +2172,7 @@ async def site_overview(request: Request):
 
     try:
 
-        analytics = await asyncio.wait_for(asyncio.to_thread(ga4_summary), timeout=10)
+        analytics = await asyncio.wait_for(asyncio.to_thread(ga4_summary), timeout=25)
 
     except Exception:
 
