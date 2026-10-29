@@ -10,6 +10,7 @@ __pycache__/
 *.sqlite3-shm
 
 .runtime/
+.venv/
 *.exe
 .vscode/
 _backup_site_legacy/
@@ -18,5 +19,5 @@ _backup_site_legacy/
 *.db
 Личный кабинет/backups/
 Личный кабинет/generator/backups/
-_backup_site_legacy/
+
 
