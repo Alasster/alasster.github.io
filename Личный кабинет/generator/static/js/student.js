@@ -713,7 +713,12 @@ async function startExamSession() {
   isExamActive = true;
   showScreen("screen-testing");
   if (currentAttempt) {
-    document.getElementById("student-info-badge").textContent = `${currentAttempt.student_name} (${currentAttempt.student_class})`;
+    const sBadge = document.getElementById("student-info-badge");
+    if (sBadge) {
+      const fullText = `${currentAttempt.student_name} (${currentAttempt.student_class})`;
+      sBadge.textContent = fullText;
+      sBadge.title = fullText;
+    }
 
     if (currentAttempt.bg_color) {
       applyCustomBgColor(currentAttempt.bg_color);
@@ -1788,7 +1793,7 @@ function updateProgressIndicator() {
   const bar = document.getElementById("progress-fill");
   if (bar) bar.style.width = `${pct}%`;
   const text = document.getElementById("progress-text");
-  if (text) text.textContent = `${answered} из ${total} отвечено`;
+  if (text) text.textContent = `${answered} из ${total}`;
 }
 
 // Серверный таймер
