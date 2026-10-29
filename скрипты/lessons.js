@@ -7314,6 +7314,54 @@ const slides = [...document.querySelectorAll('.slide')];
     } catch (e) {}
   }
 
+  function decodeUserPayload(b64) {
+    if (!b64) return null;
+    const normalized = b64.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized + '==='.slice((normalized.length + 3) % 4);
+
+    // Format 1: btoa(encodeURIComponent(JSON.stringify(user)))
+    try {
+      return JSON.parse(decodeURIComponent(atob(padded)));
+    } catch (_) {}
+
+    // Format 2: utf-8 base64
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(padded))));
+    } catch (_) {}
+
+    // Format 3: raw json in base64 (Python ensure_ascii=True)
+    try {
+      return JSON.parse(atob(padded));
+    } catch (_) {}
+
+    // Format 4: direct unpadded decode
+    try {
+      return JSON.parse(decodeURIComponent(atob(b64)));
+    } catch (_) {}
+
+    return null;
+  }
+
+  // Parse returning user from redirect query parameter
+  function checkUrlUserPayload() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('alasster_user')) {
+        const b64 = urlParams.get('alasster_user');
+        const user = decodeUserPayload(b64);
+        if (user && (user.username || user.display_name || user.id)) {
+          setStoredUser(user);
+        }
+        urlParams.delete('alasster_user');
+        const cleanSearch = urlParams.toString();
+        const cleanUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '') + window.location.hash;
+        try {
+          window.history.replaceState({}, '', cleanUrl);
+        } catch (_) {}
+      }
+    } catch (e) {}
+  }
+
   async function checkServerSession() {
     if (window.AlassterBackend && !(await window.AlassterBackend.ready)) return getStoredUser();
     const base = getCabinetBaseUrl();
@@ -7340,9 +7388,9 @@ const slides = [...document.querySelectorAll('.slide')];
 
   async function performLogout() {
     const base = getCabinetBaseUrl();
+    setStoredUser(null);
+    renderAuthButton(null);
     if (location.protocol === 'https:' && new URL(base || location.origin, location.href).origin !== location.origin) {
-      setStoredUser(null);
-      renderAuthButton(null);
       location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
       return;
     }
@@ -7352,8 +7400,6 @@ const slides = [...document.querySelectorAll('.slide')];
         credentials: 'include'
       });
     } catch (e) {}
-    setStoredUser(null);
-    renderAuthButton(null);
   }
 
   function renderAuthButton(user) {
@@ -7364,11 +7410,27 @@ const slides = [...document.querySelectorAll('.slide')];
     const currentUrl = window.location.href;
     const loginUrl = `${base}/login?return_to=${encodeURIComponent(currentUrl)}`;
     const cabinetUrl = `${base}/`;
+    const generatorUrl = `${base}/generator/teacher`;
 
     if (user) {
-      const displayName = user.display_name || user.first_name || user.username || 'Учитель';
-      const roleLabel = (user.role === 'superadmin' || user.role === 'admin') ? 'Администратор' : 'Учитель';
-      const initials = getUserInitials(displayName);
+      let displayName = user.display_name;
+      if (!displayName && (user.first_name || user.last_name)) {
+        displayName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+      }
+      if (!displayName) displayName = user.username || 'Пользователь';
+
+      let roleLabel = 'УЧЕНИК';
+      if (user.role === 'superadmin') {
+        roleLabel = 'СУПЕР-АДМИН';
+      } else if (user.role === 'admin') {
+        roleLabel = 'АДМИНИСТРАТОР';
+      } else if (user.role === 'teacher') {
+        roleLabel = 'УЧИТЕЛЬ';
+      } else if (user.role === 'user') {
+        roleLabel = 'УЧЕНИК';
+      }
+
+      const initials = getUserInitials(user, displayName);
 
       container.innerHTML = `
         <div class="neu-auth-wrapper">
@@ -7384,6 +7446,11 @@ const slides = [...document.querySelectorAll('.slide')];
               <i class="fa-solid fa-user"></i>
               <span>Личный кабинет</span>
             </a>
+            ${user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin' ? `
+            <a href="${generatorUrl}" class="neu-auth-dropdown-item">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span>Генератор тестов (Бағалау)</span>
+            </a>` : ''}
             <div class="neu-auth-dropdown-divider"></div>
             <button type="button" class="neu-auth-dropdown-item neu-auth-logout-btn" id="neu-logout-btn">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -7425,7 +7492,13 @@ const slides = [...document.querySelectorAll('.slide')];
     }
   }
 
-  function getUserInitials(name) {
+  function getUserInitials(user, name) {
+    if (user) {
+      if (user.first_name && user.last_name) {
+        return (user.first_name[0] + user.last_name[0]).toUpperCase();
+      }
+      if (user.first_name) return user.first_name.slice(0, 2).toUpperCase();
+    }
     const parts = String(name || 'Учитель').trim().split(/\s+/).filter(Boolean);
     if (!parts.length) return 'УЧ';
     if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -7485,17 +7558,30 @@ const slides = [...document.querySelectorAll('.slide')];
     }
   }
 
+  // Cross-tab synchronization
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'alasster_auth_user' || e.key === 'alasster_logged_in') {
+      renderAuthButton(getStoredUser());
+    }
+  });
+
   async function initAuthWidget() {
     if (window.AlassterBackendLoading) await window.AlassterBackendLoading;
     if (window.AlassterBackend) await window.AlassterBackend.configReady;
     ensureAuthContainer();
+
+    // 0. Process any returning user payload from URL query parameter
+    checkUrlUserPayload();
+
     // 1. Instant render from cached localStorage (zero layout shift)
     const cachedUser = getStoredUser();
     renderAuthButton(cachedUser);
 
     // 2. Background verification with backend server
     const verifiedUser = await checkServerSession();
-    renderAuthButton(verifiedUser);
+    if (JSON.stringify(verifiedUser) !== JSON.stringify(cachedUser)) {
+      renderAuthButton(verifiedUser);
+    }
   }
 
   if (document.readyState === 'loading') {

@@ -50,27 +50,50 @@
     } catch (e) {}
   }
 
+  function decodeUserPayload(b64) {
+    if (!b64) return null;
+    const normalized = b64.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized + '==='.slice((normalized.length + 3) % 4);
+
+    // Format 1: btoa(encodeURIComponent(JSON.stringify(user)))
+    try {
+      return JSON.parse(decodeURIComponent(atob(padded)));
+    } catch (_) {}
+
+    // Format 2: utf-8 base64
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(padded))));
+    } catch (_) {}
+
+    // Format 3: raw json in base64 (Python ensure_ascii=True)
+    try {
+      return JSON.parse(atob(padded));
+    } catch (_) {}
+
+    // Format 4: direct unpadded decode
+    try {
+      return JSON.parse(decodeURIComponent(atob(b64)));
+    } catch (_) {}
+
+    return null;
+  }
+
   // Parse returning user from redirect query parameter
   function checkUrlUserPayload() {
     try {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('alasster_user')) {
         const b64 = urlParams.get('alasster_user');
-        let user = null;
-        try {
-          user = JSON.parse(decodeURIComponent(atob(b64)));
-        } catch (e1) {
-          try {
-            user = JSON.parse(atob(b64.replace(/-/g, '+').replace(/_/g, '/')));
-          } catch (e2) {}
-        }
-        if (user && (user.username || user.display_name)) {
+        const user = decodeUserPayload(b64);
+        if (user && (user.username || user.display_name || user.id)) {
           setStoredUser(user);
         }
         urlParams.delete('alasster_user');
         const cleanSearch = urlParams.toString();
         const cleanUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '') + window.location.hash;
-        window.history.replaceState({}, '', cleanUrl);
+        try {
+          window.history.replaceState({}, '', cleanUrl);
+        } catch (_) {}
       }
     } catch (e) {}
   }

@@ -130,8 +130,16 @@ loginForm.addEventListener('submit', async (event) => {
     if (requestedReturn) {
       try {
         const target = new URL(requestedReturn, location.origin);
-        const allowed = [location.origin, 'https://alasster.site', 'https://www.alasster.site', 'https://alasster.github.io'];
-        const local = ['localhost', '127.0.0.1'].includes(location.hostname) && ['localhost', '127.0.0.1'].includes(target.hostname);
+        const allowed = [
+          location.origin,
+          'https://alasster.site',
+          'https://www.alasster.site',
+          'https://alasster.github.io',
+          'http://alasster.site',
+          'http://www.alasster.site',
+          'http://alasster.github.io'
+        ];
+        const local = ['localhost', '127.0.0.1'].includes(target.hostname);
         if (allowed.includes(target.origin) || local) returnTo = target.href;
       } catch (_) {}
     }

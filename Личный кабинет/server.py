@@ -208,7 +208,14 @@ else:
 
 CLOUD_MODE = cloud_configured("GENERATOR")
 
-ALLOWED_ORIGINS = ["https://alasster.site", "https://www.alasster.site", "https://alasster.github.io"]
+ALLOWED_ORIGINS = [
+    "https://alasster.site",
+    "https://www.alasster.site",
+    "https://alasster.github.io",
+    "http://alasster.site",
+    "http://www.alasster.site",
+    "http://alasster.github.io",
+]
 
 ALLOWED_ORIGINS.extend(v.strip() for v in os.environ.get("ALASSTER_EXTRA_ORIGINS", "").split(",") if v.strip())
 
@@ -2838,12 +2845,9 @@ def safe_return_to(value: str | None) -> str:
 
     origin = f"{parsed.scheme}://{parsed.netloc}"
 
-    if parsed.scheme == "https" and origin in ALLOWED_ORIGINS and not parsed.username:
-
+    if parsed.scheme in {"https", "http"} and origin in ALLOWED_ORIGINS and not parsed.username:
         return value
-
-    if not os.environ.get("RENDER") and parsed.hostname in {"localhost", "127.0.0.1"}:
-
+    if parsed.hostname in {"localhost", "127.0.0.1"}:
         return value
 
     return "/"
