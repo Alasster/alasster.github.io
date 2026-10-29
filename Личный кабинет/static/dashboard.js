@@ -1838,6 +1838,10 @@ function visibilityKeyForQuarter(grade, quarter) {
 
 function renderLessonsCatalog(classes) {
 
+  const openCardNames = new Set(
+    Array.from(lessonCatalogGrid.querySelectorAll('.lesson-class-card[open] summary strong')).map(s => s.textContent)
+  );
+
   lessonCatalogGrid.replaceChildren();
 
   let totalLessons = 0;
@@ -1878,7 +1882,7 @@ function renderLessonsCatalog(classes) {
 
     card.className = 'lesson-class-card';
 
-    card.open = false;
+    card.open = openCardNames.has(item.name);
 
     card.addEventListener('toggle', syncOpenClassLayout);
 
@@ -1909,22 +1913,34 @@ function renderLessonsCatalog(classes) {
       heading.textContent = group.name;
 
       const quarterKey = visibilityKeyForQuarter(item.name, group.name);
+      const isQuarterVisible = lessonVisibility[quarterKey] !== false;
+
+      const quarterToggleWrap = document.createElement('div');
+      quarterToggleWrap.className = 'quarter-toggle-wrap';
+
+      const quarterLabel = document.createElement('span');
+      quarterLabel.className = 'quarter-toggle-label';
+      quarterLabel.textContent = isQuarterVisible ? 'Четверть видима' : 'Четверть скрыта';
 
       const quarterToggle = document.createElement('button');
-
       quarterToggle.type = 'button';
-
-      quarterToggle.className = 'lesson-visibility-toggle';
-
+      quarterToggle.className = 'neu-switch lesson-visibility-toggle';
       quarterToggle.dataset.visibilityKey = quarterKey;
-
       quarterToggle.dataset.visibilityKind = 'quarter';
+      quarterToggle.setAttribute('role', 'switch');
+      quarterToggle.setAttribute('aria-pressed', String(isQuarterVisible));
+      quarterToggle.title = isQuarterVisible ? 'Четверть видима' : 'Четверть скрыта';
 
-      quarterToggle.textContent = lessonVisibility[quarterKey] === false ? 'Четверть скрыта' : 'Четверть видима';
+      const quarterThumb = document.createElement('span');
+      quarterThumb.className = 'neu-switch-thumb';
+      quarterToggle.appendChild(quarterThumb);
 
-      quarterToggle.setAttribute('aria-pressed', String(lessonVisibility[quarterKey] !== false));
+      quarterToggleWrap.append(quarterLabel, quarterToggle);
+      heading.append(' ', quarterToggleWrap);
 
-      heading.append(' ', quarterToggle);
+      if (!isQuarterVisible) {
+        groupSection.classList.add('is-quarter-hidden');
+      }
 
       const links = document.createElement('div');
 
@@ -1936,19 +1952,25 @@ function renderLessonsCatalog(classes) {
 
         row.className = 'lesson-topic-row';
 
+        const lessonKey = lesson.href.replace('https://alasster.site/', '');
+        const isLessonVisible = lessonVisibility[lessonKey] !== false;
+
         const lessonToggle = document.createElement('button');
-
         lessonToggle.type = 'button';
-
-        lessonToggle.className = 'lesson-visibility-toggle lesson-visibility-toggle-lesson';
-
-        lessonToggle.dataset.visibilityKey = lesson.href.replace('https://alasster.site/', '');
-
+        lessonToggle.className = 'neu-switch lesson-visibility-toggle lesson-visibility-toggle-lesson';
+        lessonToggle.dataset.visibilityKey = lessonKey;
         lessonToggle.dataset.visibilityKind = 'lesson';
+        lessonToggle.setAttribute('role', 'switch');
+        lessonToggle.setAttribute('aria-pressed', String(isLessonVisible));
+        lessonToggle.title = isLessonVisible ? 'Урок виден' : 'Урок скрыт';
 
-        lessonToggle.textContent = lessonVisibility[lessonToggle.dataset.visibilityKey] === false ? 'Скрыт' : 'Виден';
+        const lessonThumb = document.createElement('span');
+        lessonThumb.className = 'neu-switch-thumb';
+        lessonToggle.appendChild(lessonThumb);
 
-        lessonToggle.setAttribute('aria-pressed', String(lessonVisibility[lessonToggle.dataset.visibilityKey] !== false));
+        if (!isLessonVisible) {
+          row.classList.add('is-lesson-hidden');
+        }
 
         const link = document.createElement('a');
 
@@ -2124,11 +2146,34 @@ lessonCatalogGrid?.addEventListener('click', async (event) => {
 
   const nextValue = toggle.getAttribute('aria-pressed') !== 'true';
 
+  const kind = toggle.dataset.visibilityKind;
+
+  // 1. Update UI immediately in-place (no lag, no reload, no collapse!)
+  toggle.setAttribute('aria-pressed', String(nextValue));
+  lessonVisibility[key] = nextValue;
+
+  if (kind === 'quarter') {
+    const groupSection = toggle.closest('.lesson-topic-group');
+    if (groupSection) {
+      groupSection.classList.toggle('is-quarter-hidden', !nextValue);
+      const label = groupSection.querySelector('.quarter-toggle-label');
+      if (label) label.textContent = nextValue ? 'Четверть видима' : 'Четверть скрыта';
+    }
+    toggle.title = nextValue ? 'Четверть видима' : 'Четверть скрыта';
+  } else {
+    const row = toggle.closest('.lesson-topic-row');
+    if (row) {
+      row.classList.toggle('is-lesson-hidden', !nextValue);
+    }
+    toggle.title = nextValue ? 'Урок виден' : 'Урок скрыт';
+  }
+
+  // 2. Send PATCH to server in background
   toggle.disabled = true;
 
   try {
 
-    const body = toggle.dataset.visibilityKind === 'quarter'
+    const body = kind === 'quarter'
 
       ? (() => { const [, grade, quarter] = key.split('|'); return { grade, quarter, is_visible: nextValue }; })()
 
@@ -2144,11 +2189,22 @@ lessonCatalogGrid?.addEventListener('click', async (event) => {
 
     if (!response.ok) throw new Error(data.detail || 'Не удалось сохранить видимость.');
 
-    lessonVisibility[key] = nextValue;
-
-    await loadLessonsCatalog();
-
   } catch (error) {
+
+    // Revert UI on error
+    toggle.setAttribute('aria-pressed', String(!nextValue));
+    lessonVisibility[key] = !nextValue;
+    if (kind === 'quarter') {
+      const groupSection = toggle.closest('.lesson-topic-group');
+      if (groupSection) {
+        groupSection.classList.toggle('is-quarter-hidden', nextValue);
+        const label = groupSection.querySelector('.quarter-toggle-label');
+        if (label) label.textContent = !nextValue ? 'Четверть видима' : 'Четверть скрыта';
+      }
+    } else {
+      const row = toggle.closest('.lesson-topic-row');
+      if (row) row.classList.toggle('is-lesson-hidden', nextValue);
+    }
 
     alert(error.message || 'Не удалось сохранить видимость.');
 
