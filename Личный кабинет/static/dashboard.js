@@ -1,4 +1,4 @@
-﻿const profileForm = document.getElementById('profile-form');
+const profileForm = document.getElementById('profile-form');
 
 const profileFirstName = document.getElementById('profile-first-name');
 
@@ -420,11 +420,14 @@ async function loadCurrentUser() {
   profileEmailEdit.value = user.username || '';
 
   const profileClassRow = document.getElementById('profile-class-select-row');
+  const profileEmailWrap = document.getElementById('profile-email-wrap');
 
   if (profileClassRow) {
-
-    profileClassRow.style.display = (userRole === 'user') ? 'flex' : 'none';
-
+    const isStudent = (userRole === 'user');
+    profileClassRow.style.display = isStudent ? '' : 'none';
+    if (profileEmailWrap) {
+      profileEmailWrap.style.gridColumn = isStudent ? 'auto' : '1 / -1';
+    }
   }
 
   if (userRole === 'user' && user.class_name) {
@@ -2372,30 +2375,4 @@ document.addEventListener('click', () => {
   });
 
 });
-
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-
-  let prevReloadToken = null;
-
-  window.setInterval(async () => {
-
-    try {
-
-      const response = await fetch('/static/reload.txt?t=' + Date.now());
-
-      if (response.ok) {
-
-        const token = await response.text();
-
-        if (prevReloadToken && token !== prevReloadToken) window.location.reload();
-
-        prevReloadToken = token;
-
-      }
-
-    } catch (_) {}
-
-  }, 1000);
-
-}
 

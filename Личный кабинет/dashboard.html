@@ -237,73 +237,45 @@
           <form id="profile-form" class="profile-form" autocomplete="off">
 
             <div class="profile-form-grid">
-
               <label class="profile-field"><span>Имя</span><input class="field" id="profile-first-name" name="first_name" maxlength="80" required></label>
-
               <label class="profile-field"><span>Фамилия</span><input class="field" id="profile-last-name" name="last_name" maxlength="80" required></label>
-
-              <label class="profile-field profile-field-wide"><span>Email / логин</span><input class="field" id="profile-email-edit" name="email" type="email" maxlength="160" required></label>
-
-              <div class="profile-field profile-field-wide" id="profile-class-select-row" style="display: flex; gap: 14px;">
-
-                <label style="flex: 1;">
-
-                  <span style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Класс</span>
-
-                  <select class="field" id="profile-class-number" name="class_number" style="height: 44px; border-radius: 12px; width: 100%;">
-
-                    <option value="">Выберите класс...</option>
-
-                    <option value="7">7 класс</option>
-
-                    <option value="8">8 класс</option>
-
-                    <option value="9">9 класс</option>
-
-                    <option value="10">10 класс</option>
-
-                    <option value="11">11 класс</option>
-
-                  </select>
-
-                </label>
-
-                <label style="flex: 1;">
-
-                  <span style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Буква класса</span>
-
-                  <select class="field" id="profile-class-letter" name="class_letter" style="height: 44px; border-radius: 12px; width: 100%;">
-
-                    <option value="">Выберите букву...</option>
-
-                    <option value="А">А</option>
-
-                    <option value="Б">Б</option>
-
-                    <option value="В">В</option>
-
-                    <option value="Г">Г</option>
-
-                    <option value="Д">Д</option>
-
-                    <option value="Е">Е</option>
-
-                    <option value="Ж">Ж</option>
-
-                    <option value="З">З</option>
-
-                  </select>
-
-                </label>
-
+              <label class="profile-field" id="profile-email-wrap"><span>Email / логин</span><input class="field" id="profile-email-edit" name="email" type="email" maxlength="160" required></label>
+              <div class="profile-field" id="profile-class-select-row">
+                <div class="profile-class-group">
+                  <label class="profile-class-col">
+                    <span>Класс</span>
+                    <select class="field profile-select" id="profile-class-number" name="class_number">
+                      <option value="">Выберите класс...</option>
+                      <option value="7">7 класс</option>
+                      <option value="8">8 класс</option>
+                      <option value="9">9 класс</option>
+                      <option value="10">10 класс</option>
+                      <option value="11">11 класс</option>
+                    </select>
+                  </label>
+                  <label class="profile-class-col">
+                    <span>Буква класса</span>
+                    <select class="field profile-select" id="profile-class-letter" name="class_letter">
+                      <option value="">Выберите букву...</option>
+                      <option value="А">А</option>
+                      <option value="Б">Б</option>
+                      <option value="В">В</option>
+                      <option value="Г">Г</option>
+                      <option value="Д">Д</option>
+                      <option value="Е">Е</option>
+                      <option value="Ж">Ж</option>
+                      <option value="З">З</option>
+                    </select>
+                  </label>
+                </div>
               </div>
-
-              <label class="profile-field"><span>Новый пароль</span><input class="field" id="profile-password" name="new_password" type="password" minlength="8" autocomplete="new-password"></label>
-
-              <label class="profile-field"><span>Подтверждение пароля</span><input class="field" id="profile-password-confirm" name="new_password_confirm" type="password" minlength="8" autocomplete="new-password"></label>
-
+              <div class="profile-password-divider">
+                <span>Безопасность и пароль</span>
+                <small>(заполняйте только для смены пароля)</small>
+              </div>
+              <label class="profile-field"><span>Новый пароль</span><input class="field" id="profile-password" name="new_password" type="password" minlength="8" autocomplete="new-password" placeholder="Минимум 8 символов"></label>
+              <label class="profile-field"><span>Подтверждение пароля</span><input class="field" id="profile-password-confirm" name="new_password_confirm" type="password" minlength="8" autocomplete="new-password" placeholder="Повторите новый пароль"></label>
             </div>
-
             <div class="profile-form-actions">
 
               <button class="button button-primary" id="profile-save" type="submit">Сохранить изменения</button>
