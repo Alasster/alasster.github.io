@@ -341,51 +341,59 @@
       <!-- Фильтры и поиск -->
 
       <div class="test-filter-bar">
-
         <input type="text" id="tests-search" class="form-control" placeholder="Поиск по названию или разделу...">
 
-        <select id="filter-type" class="form-control">
+        <div class="test-filter-item" data-filter="type" data-default-title="Все типы" title="Все типы">
+          <span class="test-filter-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+          </span>
+          <select id="filter-type" class="form-control" title="Тип работы">
+            <option value="">Все типы</option>
+            <option value="СОР">СОР</option>
+            <option value="СОЧ">СОЧ</option>
+          </select>
+          <span class="test-filter-active-dot" aria-hidden="true"></span>
+        </div>
 
-          <option value="">Все типы</option>
+        <div class="test-filter-item" data-filter="grade" data-default-title="Все классы" title="Все классы">
+          <span class="test-filter-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+            </svg>
+          </span>
+          <select id="filter-grade" class="form-control" title="Класс">
+            <option value="">Все классы</option>
+            <option value="7">7 класс</option>
+            <option value="8">8 класс</option>
+            <option value="9">9 класс</option>
+            <option value="10 ЕМН">10 ЕМН</option>
+            <option value="10 ОГН">10 ОГН</option>
+            <option value="11">11 класс</option>
+          </select>
+          <span class="test-filter-active-dot" aria-hidden="true"></span>
+        </div>
 
-          <option value="СОР">СОР</option>
-
-          <option value="СОЧ">СОЧ</option>
-
-        </select>
-
-        <select id="filter-grade" class="form-control">
-
-          <option value="">Все классы</option>
-
-          <option value="7">7 класс</option>
-
-          <option value="8">8 класс</option>
-
-          <option value="9">9 класс</option>
-
-          <option value="10 ЕМН">10 ЕМН</option>
-
-          <option value="10 ОГН">10 ОГН</option>
-
-          <option value="11">11 класс</option>
-
-        </select>
-
-        <select id="filter-quarter" class="form-control">
-
-          <option value="">Все четверти</option>
-
-          <option value="1">1 четверть</option>
-
-          <option value="2">2 четверть</option>
-
-          <option value="3">3 четверть</option>
-
-          <option value="4">4 четверть</option>
-
-        </select>
-
+        <div class="test-filter-item" data-filter="quarter" data-default-title="Все четверти" title="Все четверти">
+          <span class="test-filter-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </span>
+          <select id="filter-quarter" class="form-control" title="Четверть">
+            <option value="">Все четверти</option>
+            <option value="1">1 четверть</option>
+            <option value="2">2 четверть</option>
+            <option value="3">3 четверть</option>
+            <option value="4">4 четверть</option>
+          </select>
+          <span class="test-filter-active-dot" aria-hidden="true"></span>
+        </div>
       </div>
 
       <!-- Сетка карточек работ -->
