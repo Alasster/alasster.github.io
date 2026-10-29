@@ -15,7 +15,7 @@
   <!-- KaTeX for Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <link rel="stylesheet" href="/generator/static/css/app.css?v=3">
-  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=22">
+  <link rel="stylesheet" href="/generator/static/css/cabinet-theme.css?v=23">
   <style>
     /* Защита от Google Lens, Circle to Search, копирования и скриншотов */
     body {
@@ -283,37 +283,44 @@
   <div id="screen-testing" class="student-screen" style="display: none;">
     <header class="exam-header">
       <div class="exam-header-inner">
-        <div>
-          <div class="exam-title-text" style="font-weight: 800; font-size: 1.02rem; color: var(--text);"></div>
-          <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.35rem;">
+        <!-- 1 строчка: Тема работы -->
+        <div class="exam-header-title-row">
+          <div class="exam-title-text"></div>
+        </div>
+
+        <!-- 2 строчка: слева прогресс, справа всё остальное -->
+        <div class="exam-header-controls-row">
+          <!-- Слева: Прогресс -->
+          <div class="exam-header-progress-col">
             <div class="progress-track-neu">
               <div id="progress-fill" class="progress-fill-neu"></div>
             </div>
-            <span id="progress-text" style="font-size: 0.78rem; font-weight: 700; color: var(--muted);">0 из 0</span>
+            <span id="progress-text">0 из 0</span>
           </div>
-        </div>
 
-        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-          <span id="save-indicator" class="save-indicator saved">✓ Сохранено</span>
-          <span id="student-variant-badge" class="badge" style="font-weight: 800;">Вар. 1</span>
-          <span id="student-info-badge" class="badge"></span>
-          
-          <!-- Кнопка калькулятора (только иконка) -->
-          <button type="button" id="btn-calc" class="calc-btn-header" onclick="toggleCalculator()" title="Калькулятор" aria-label="Калькулятор">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="4" y="2" width="16" height="20" rx="2.5"/>
-              <rect x="8" y="6" width="8" height="4" rx="1"/>
-              <line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>
-              <line x1="8" y1="18" x2="8.01" y2="18"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="16" y1="18" x2="16.01" y2="18"/>
-            </svg>
-          </button>
-
-          <div id="timer-box" style="display: none;">
-            <div class="timer-pill" id="timer-pill">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          <!-- Справа: Всё остальное -->
+          <div class="exam-header-meta-col">
+            <span id="save-indicator" class="save-indicator saved">✓ Сохранено</span>
+            <span id="student-variant-badge" class="badge">Вар. 1</span>
+            <span id="student-info-badge" class="badge"></span>
+            
+            <!-- Кнопка калькулятора (только иконка) -->
+            <button type="button" id="btn-calc" class="calc-btn-header" onclick="toggleCalculator()" title="Калькулятор" aria-label="Калькулятор">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2.5"/>
+                <rect x="8" y="6" width="8" height="4" rx="1"/>
+                <line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>
+                <line x1="8" y1="18" x2="8.01" y2="18"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="16" y1="18" x2="16.01" y2="18"/>
               </svg>
-              <span id="timer-text">40:00</span>
+            </button>
+
+            <div id="timer-box" style="display: none;">
+              <div class="timer-pill" id="timer-pill">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span id="timer-text">40:00</span>
+              </div>
             </div>
           </div>
         </div>
