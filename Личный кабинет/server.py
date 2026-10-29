@@ -848,24 +848,57 @@ def site_lesson_catalog(include_hidden: bool = False) -> list[dict]:
                 continue
             content = lesson_file.read_text(encoding="utf-8")
             heading = re.search(r"<h1\b[^>]*>(.*?)</h1\s*>", content, re.IGNORECASE | re.DOTALL)
-            title = re.sub(r"\s+", " ", heading.group(1)).strip() if heading else lesson_file.stem
-            quarter_name = lesson_file.parent.name
+            title = heading.group(1) if heading else ""
+            title = re.sub(r"<[^>]*>", " ", title)
+            title = re.sub(r"\s+", " ", unescape(title)).strip()
+            if not title:
+                page_title = re.search(r"<title\b[^>]*>(.*?)</title\s*>", content, re.IGNORECASE | re.DOTALL)
+                title = re.sub(r"\s+", " ", unescape(page_title.group(1))).strip() if page_title else ""
+            if not title:
+                title = lesson_file.stem
+
+            quarter_name = lesson_file.parent.name if lesson_file.parent != directory else "Темы"
+            lesson_num = (
+                int(lesson_file.stem.split(maxsplit=1)[0].split(".", 1)[0])
+                if re.match(r"^\d+", lesson_file.stem)
+                else None
+            )
             groups.setdefault(quarter_name, []).append({
+                "number": lesson_num,
+                "title": title,
                 "name": title,
+                "href": f"https://alasster.site/{quote(relative_path, safe='/')}",
                 "path": f"/site/{relative_path}",
                 "file_path": relative_path,
                 "is_visible": is_visible,
             })
 
-        quarters = []
+        if not groups:
+            continue
+
+        formatted_groups = []
         for quarter_name, lessons in groups.items():
             quarter_key = f"__quarter__|{directory.name}|{quarter_name}"
-            quarters.append({
+            sorted_lessons = sorted(
+                lessons,
+                key=lambda lesson: (
+                    lesson["number"] is None,
+                    lesson["number"] if lesson["number"] is not None else 0,
+                    lesson["title"].casefold(),
+                ),
+            )
+            formatted_groups.append({
                 "name": quarter_name,
                 "is_visible": visibility.get(quarter_key, True),
-                "lessons": lessons,
+                "lessons": sorted_lessons,
             })
-        catalog.append({"name": directory.name, "quarters": quarters})
+
+        catalog.append({
+            "name": directory.name,
+            "lessons": len(lesson_files),
+            "groups": formatted_groups,
+            "quarters": formatted_groups,
+        })
 
     _SITE_LESSON_CATALOG_CACHE[include_hidden] = (now, catalog)
     return catalog

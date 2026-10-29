@@ -1019,8 +1019,14 @@ function renderLessonsCatalog(classes) {
       card.style.order = card.open ? '1' : '2';
     });
   };
-  classes.forEach((item) => {
-    totalLessons += item.lessons;
+  const classList = Array.isArray(classes) ? classes : [];
+  classList.forEach((item) => {
+    const groups = item.groups || item.quarters || [];
+    let countLessons = typeof item.lessons === 'number' ? item.lessons : 0;
+    if (!countLessons) {
+      groups.forEach((g) => { countLessons += (g.lessons || []).length; });
+    }
+    totalLessons += countLessons;
     const card = document.createElement('details');
     card.className = 'lesson-class-card';
     card.open = false;
@@ -1031,11 +1037,11 @@ function renderLessonsCatalog(classes) {
     const count = document.createElement('span');
     name.textContent = item.name;
     count.className = 'lesson-class-count';
-    count.textContent = `${formatNumber(item.lessons)} уроков`;
+    count.textContent = `${formatNumber(countLessons)} уроков`;
     summary.append(name, count);
     card.append(summary);
 
-    item.groups.forEach((group) => {
+    groups.forEach((group) => {
       const groupSection = document.createElement('section');
       groupSection.className = 'lesson-topic-group';
       const heading = document.createElement('h3');
