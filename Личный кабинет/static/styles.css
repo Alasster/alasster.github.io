@@ -366,68 +366,89 @@ select.profile-select {
 .lesson-topic-group.is-quarter-hidden .lesson-topic-list {
   display: none !important;
 }
-.neu-switch {
+.neu-switch,
+.lesson-visibility-toggle {
   position: relative;
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
-  width: 44px;
-  min-width: 44px;
-  max-width: 44px;
-  height: 26px;
-  min-height: 26px;
-  max-height: 26px;
-  padding: 3px;
-  border-radius: 999px;
-  border: 0;
-  outline: none;
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  max-height: 26px !important;
+  padding: 3px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  outline: none !important;
   cursor: pointer;
-  background: var(--surface);
-  box-shadow: inset 3px 3px 6px rgba(163, 174, 195, 0.55), inset -3px -3px 6px rgba(255, 255, 255, 0.85);
-  transition: box-shadow 0.25s ease, background-color 0.25s ease;
-  box-sizing: border-box;
+  background: var(--surface) !important;
+  box-shadow: inset 3px 3px 6px rgba(163, 174, 195, 0.55), inset -3px -3px 6px rgba(255, 255, 255, 0.85) !important;
+  transition: box-shadow 0.25s ease, background-color 0.25s ease !important;
+  box-sizing: border-box !important;
   flex-shrink: 0;
   user-select: none;
+  font-size: 0 !important;
+  color: transparent !important;
+  line-height: 0 !important;
   -webkit-tap-highlight-color: transparent;
+  margin: 0;
 }
 
-:root[data-theme="dark"] .neu-switch {
-  background: var(--surface);
-  box-shadow: inset 3px 3px 6px rgba(11, 15, 25, 0.65), inset -3px -3px 6px rgba(190, 205, 235, 0.1);
+:root[data-theme="dark"] .neu-switch,
+:root[data-theme="dark"] .lesson-visibility-toggle {
+  background: var(--surface) !important;
+  box-shadow: inset 3px 3px 6px rgba(11, 15, 25, 0.65), inset -3px -3px 6px rgba(190, 205, 235, 0.1) !important;
 }
 
-.neu-switch[aria-pressed="true"] {
-  background: rgba(83, 109, 254, 0.1);
-  box-shadow: inset 3px 3px 6px rgba(83, 109, 254, 0.38), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+.neu-switch[aria-pressed="true"],
+.lesson-visibility-toggle[aria-pressed="true"] {
+  background: rgba(83, 109, 254, 0.1) !important;
+  box-shadow: inset 3px 3px 6px rgba(83, 109, 254, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.9) !important;
 }
 
-:root[data-theme="dark"] .neu-switch[aria-pressed="true"] {
-  background: rgba(83, 109, 254, 0.18);
-  box-shadow: inset 3px 3px 6px rgba(83, 109, 254, 0.55), inset -3px -3px 6px rgba(190, 205, 235, 0.12);
+:root[data-theme="dark"] .neu-switch[aria-pressed="true"],
+:root[data-theme="dark"] .lesson-visibility-toggle[aria-pressed="true"] {
+  background: rgba(83, 109, 254, 0.18) !important;
+  box-shadow: inset 3px 3px 6px rgba(83, 109, 254, 0.55), inset -3px -3px 6px rgba(190, 205, 235, 0.12) !important;
+}
+
+.neu-switch::after,
+.lesson-visibility-toggle::after {
+  content: "" !important;
+  display: block !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  border-radius: 50% !important;
+  background: var(--surface) !important;
+  box-shadow: 2px 2px 5px rgba(163, 174, 195, 0.65), -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  transform: translateX(0) !important;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease !important;
+  pointer-events: none !important;
+  box-sizing: border-box !important;
+}
+
+:root[data-theme="dark"] .neu-switch::after,
+:root[data-theme="dark"] .lesson-visibility-toggle::after {
+  background: var(--surface) !important;
+  box-shadow: 2px 2px 5px rgba(11, 15, 25, 0.7), -2px -2px 5px rgba(190, 205, 235, 0.12) !important;
+}
+
+.neu-switch[aria-pressed="true"]::after,
+.lesson-visibility-toggle[aria-pressed="true"]::after {
+  transform: translateX(18px) !important;
+  box-shadow: 2px 2px 6px rgba(83, 109, 254, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+:root[data-theme="dark"] .neu-switch[aria-pressed="true"]::after,
+:root[data-theme="dark"] .lesson-visibility-toggle[aria-pressed="true"]::after {
+  box-shadow: 2px 2px 6px rgba(83, 109, 254, 0.55), -2px -2px 6px rgba(190, 205, 235, 0.15) !important;
 }
 
 .neu-switch-thumb {
-  display: block;
-  width: 20px;
-  min-width: 20px;
-  height: 20px;
-  min-height: 20px;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: 2px 2px 5px rgba(163, 174, 195, 0.6), -2px -2px 5px rgba(255, 255, 255, 0.9);
-  transform: translateX(0);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
-  pointer-events: none;
-  box-sizing: border-box;
-}
-
-:root[data-theme="dark"] .neu-switch-thumb {
-  background: var(--surface);
-  box-shadow: 2px 2px 5px rgba(11, 15, 25, 0.65), -2px -2px 5px rgba(190, 205, 235, 0.12);
-}
-
-.neu-switch[aria-pressed="true"] .neu-switch-thumb {
-  transform: translateX(18px);
-  box-shadow: 2px 2px 6px rgba(83, 109, 254, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.95);
+  display: none !important;
 }
 
 :root[data-theme="dark"] .neu-switch[aria-pressed="true"] .neu-switch-thumb {
