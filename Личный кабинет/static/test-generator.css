@@ -599,27 +599,36 @@ textarea.form-control,
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  color: var(--text-dark, #1e293b);
+  color: var(--text, #1e293b);
   background: var(--surface, #edf2f9);
   box-shadow: var(--shadow-soft, 4px 4px 10px rgba(163, 174, 195, 0.35), -4px -4px 10px rgba(255, 255, 255, 0.7));
-  border: 0;
+  border: 1px solid rgba(163, 174, 195, 0.18);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 :root[data-theme="dark"] .test-card-btn {
-  background: var(--surface, #1e293b);
-  box-shadow: 3px 3px 6px rgba(11, 15, 25, 0.46), -3px -3px 6px rgba(190, 205, 235, 0.1);
+  color: #e2e8f0;
+  background: #272f3f;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 3px 3px 8px rgba(10, 14, 23, 0.6), -2px -2px 6px rgba(255, 255, 255, 0.05);
 }
 .test-card-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-soft-hover, 6px 6px 14px rgba(163, 174, 195, 0.4), -6px -6px 14px rgba(255, 255, 255, 0.8));
 }
 :root[data-theme="dark"] .test-card-btn:hover {
-  box-shadow: 4px 4px 10px rgba(11, 15, 25, 0.55), -4px -4px 10px rgba(190, 205, 235, 0.14);
+  background: #313a4e;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 4px 4px 12px rgba(10, 14, 23, 0.75), -2px -2px 8px rgba(255, 255, 255, 0.08);
 }
 .test-card-btn:active {
   transform: translateY(0);
   box-shadow: var(--shadow-pressed, inset 2px 2px 5px rgba(163, 174, 195, 0.35));
+}
+:root[data-theme="dark"] .test-card-btn:active {
+  background: #222938;
+  box-shadow: inset 2px 2px 5px rgba(10, 14, 23, 0.7), inset -1px -1px 3px rgba(255, 255, 255, 0.05);
 }
 .test-card-btn:focus-visible {
   outline: 2px solid var(--primary);
@@ -632,6 +641,7 @@ textarea.form-control,
 .test-card-btn svg {
   display: block;
   flex-shrink: 0;
+  stroke: currentColor;
   transition: transform 0.2s ease, stroke 0.2s ease;
 }
 .test-card-btn:hover svg {
@@ -639,15 +649,51 @@ textarea.form-control,
 }
 .test-card-btn[data-action="edit"]:hover {
   color: var(--primary);
+  border-color: rgba(83, 109, 254, 0.35);
 }
 .test-card-btn[data-action="launch"]:hover {
   color: #10b981;
+  border-color: rgba(16, 185, 129, 0.35);
 }
 .test-card-btn[data-action="duplicate"]:hover {
   color: #6366f1;
+  border-color: rgba(99, 102, 241, 0.35);
 }
 .test-card-btn[data-action="archive"]:hover {
   color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+:root[data-theme="dark"] .test-card-btn[data-action="edit"]:hover {
+  color: #91a3ff;
+  background: rgba(83, 109, 254, 0.18);
+  border-color: rgba(145, 163, 255, 0.4);
+}
+:root[data-theme="dark"] .test-card-btn[data-action="launch"]:hover {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+:root[data-theme="dark"] .test-card-btn[data-action="duplicate"]:hover {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(165, 180, 252, 0.4);
+}
+:root[data-theme="dark"] .test-card-btn[data-action="archive"]:hover {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+:root[data-theme="dark"] .test-card-actions.archive-actions .test-card-btn.btn-danger {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+:root[data-theme="dark"] .test-card-actions.archive-actions .test-card-btn.btn-danger:hover {
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.6);
 }
 .test-card-actions.archive-actions .test-card-btn {
   gap: 8px;
