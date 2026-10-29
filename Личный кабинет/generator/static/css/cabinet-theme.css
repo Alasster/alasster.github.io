@@ -99,10 +99,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .card,
 .task-card {
-  background: #ffffff !important;
-  border: 1px solid rgba(163, 174, 195, 0.28) !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
   border-radius: 24px !important;
-  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.08), 0 4px 18px rgba(163, 174, 195, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 8px 8px 20px rgba(163, 174, 195, 0.42), -8px -8px 20px rgba(255, 255, 255, 0.85) !important;
   color: var(--text) !important;
   padding: 24px !important;
   margin-bottom: 20px;
@@ -177,10 +177,10 @@ textarea.form-control {
   width: 100%;
   min-height: 46px;
   padding: 11px 16px !important;
-  border: 1.5px solid rgba(163, 174, 195, 0.35) !important;
+  border: 1px solid rgba(163, 174, 195, 0.3) !important;
   border-radius: 14px !important;
-  background: #ffffff !important;
-  box-shadow: inset 2px 2px 5px rgba(163, 174, 195, 0.2), inset -1px -1px 3px rgba(255, 255, 255, 0.9) !important;
+  background: var(--surface) !important;
+  box-shadow: inset 3px 3px 6px rgba(163, 174, 195, 0.32), inset -3px -3px 6px rgba(255, 255, 255, 0.85) !important;
   color: var(--text) !important;
   font-family: var(--font) !important;
   font-size: 0.95rem !important;
@@ -193,7 +193,7 @@ input[type="text"].form-control:focus,
 input[type="number"].form-control:focus,
 textarea.form-control:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px rgba(83, 109, 254, 0.18), inset 1px 1px 3px rgba(163, 174, 195, 0.12) !important;
+  box-shadow: inset 3px 3px 6px rgba(163, 174, 195, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.85), 0 0 0 3px rgba(83, 109, 254, 0.18) !important;
 }
 
 .form-control::placeholder {
@@ -344,9 +344,9 @@ select.inline-select {
   padding: 12px 18px !important;
   min-height: 52px !important;
   border-radius: 18px !important;
-  border: 1.5px solid rgba(163, 174, 195, 0.28) !important;
-  background: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(163, 174, 195, 0.2), 0 1px 3px rgba(163, 174, 195, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  background: var(--surface) !important;
+  box-shadow: 5px 5px 12px rgba(163, 174, 195, 0.38), -5px -5px 12px rgba(255, 255, 255, 0.85) !important;
   cursor: pointer;
   transition: all 0.18s ease;
   user-select: none;
@@ -356,14 +356,14 @@ select.inline-select {
 
 .variant-pick-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(83, 109, 254, 0.45) !important;
-  box-shadow: 0 8px 22px rgba(83, 109, 254, 0.14), 0 2px 6px rgba(163, 174, 195, 0.2) !important;
+  border-color: rgba(83, 109, 254, 0.4) !important;
+  box-shadow: 7px 7px 16px rgba(163, 174, 195, 0.45), -7px -7px 16px rgba(255, 255, 255, 0.95) !important;
 }
 
 .variant-pick-card.active {
-  background: rgba(83, 109, 254, 0.05) !important;
+  background: var(--surface) !important;
+  box-shadow: inset 3px 3px 7px rgba(83, 109, 254, 0.25), inset -3px -3px 7px rgba(255, 255, 255, 0.85) !important;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(83, 109, 254, 0.2), 0 4px 14px rgba(83, 109, 254, 0.15) !important;
 }
 
 .variant-color-dot {
@@ -491,44 +491,48 @@ select.inline-select {
 
 /* =========================================================================
    ШАПКА ЭКРАНА ТЕСТИРОВАНИЯ (.exam-header, ТАЙМЕР, ПРОГРЕСС-БАР)
-   2-строчная структура: 1 стр. — тема, 2 стр. — слева прогресс, справа кнопки
+   Центрированная парящая плашка (как Navbar в уроке), 2 строки
    ========================================================================= */
 
 .exam-header {
-  background: rgba(240, 244, 250, 0.94) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1.5px solid rgba(163, 174, 195, 0.32) !important;
-  box-shadow: 0 4px 18px rgba(163, 174, 195, 0.22) !important;
-  padding: 10px 20px !important;
   position: sticky;
-  top: 0;
-  z-index: 40;
+  top: 12px;
+  z-index: 100;
+  max-width: 840px !important;
+  margin: 12px auto 0 auto !important;
+  padding: 0 1.25rem !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  box-sizing: border-box;
 }
 
 .exam-header-inner {
-  max-width: 860px;
-  margin: 0 auto;
+  width: 100% !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 20px !important;
+  box-shadow: 8px 8px 20px rgba(163, 174, 195, 0.42), -8px -8px 20px rgba(255, 255, 255, 0.85) !important;
+  padding: 14px 20px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 8px !important;
-  width: 100%;
+  gap: 10px !important;
+  box-sizing: border-box;
 }
 
-/* 1 строчка: Тема */
+/* 1 строчка: Тема работы */
 .exam-header-title-row {
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .exam-header-title-row .exam-title-text {
   font-weight: 800 !important;
-  font-size: 1.08rem !important;
+  font-size: 1.05rem !important;
   color: var(--text) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  line-height: 1.35 !important;
   letter-spacing: -0.01em;
 }
 
@@ -550,11 +554,11 @@ select.inline-select {
 }
 
 .progress-track-neu {
-  width: 160px;
+  width: 150px;
   height: 10px;
-  background: #ffffff !important;
-  border: 1px solid rgba(163, 174, 195, 0.3) !important;
-  box-shadow: inset 1px 1px 3px rgba(163, 174, 195, 0.25) !important;
+  background: var(--surface) !important;
+  box-shadow: inset 3px 3px 6px rgba(163, 174, 195, 0.35), inset -3px -3px 6px rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(163, 174, 195, 0.25) !important;
   border-radius: 999px;
   overflow: hidden;
   padding: 1.5px;
@@ -580,33 +584,34 @@ select.inline-select {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
   justify-content: flex-end !important;
+  flex-shrink: 0;
 }
 
 .save-indicator {
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 800;
   padding: 5px 11px;
   border-radius: 10px;
-  background: #ffffff !important;
-  border: 1px solid rgba(163, 174, 195, 0.28) !important;
-  box-shadow: 0 2px 6px rgba(163, 174, 195, 0.15) !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 3px 3px 7px rgba(163, 174, 195, 0.35), -3px -3px 7px rgba(255, 255, 255, 0.85) !important;
   color: var(--muted);
   white-space: nowrap;
 }
 .save-indicator.saving { color: var(--amber) !important; }
-.save-indicator.saved { color: #10b981 !important; font-weight: 800; }
+.save-indicator.saved { color: #10b981 !important; }
 .save-indicator.offline { color: #dc2626 !important; }
 
 #student-variant-badge {
-  background: #ef4444 !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
   color: #ffffff !important;
   font-size: 0.8rem !important;
   font-weight: 800 !important;
   padding: 5px 12px !important;
   border-radius: 10px !important;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  box-shadow: 0 3px 8px rgba(239, 68, 68, 0.35) !important;
   border: 0 !important;
   white-space: nowrap;
   letter-spacing: 0.03em;
@@ -614,9 +619,9 @@ select.inline-select {
 }
 
 #student-info-badge {
-  background: #ffffff !important;
-  border: 1px solid rgba(163, 174, 195, 0.28) !important;
-  box-shadow: 0 2px 6px rgba(163, 174, 195, 0.15) !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 3px 3px 7px rgba(163, 174, 195, 0.35), -3px -3px 7px rgba(255, 255, 255, 0.85) !important;
   color: var(--primary-dark) !important;
   font-size: 0.82rem !important;
   font-weight: 700 !important;
@@ -632,9 +637,9 @@ select.inline-select {
   width: 32px;
   height: 32px;
   border-radius: 10px !important;
-  background: #ffffff !important;
-  border: 1px solid rgba(163, 174, 195, 0.28) !important;
-  box-shadow: 0 2px 6px rgba(163, 174, 195, 0.18) !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 3px 3px 7px rgba(163, 174, 195, 0.35), -3px -3px 7px rgba(255, 255, 255, 0.85) !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -646,8 +651,7 @@ select.inline-select {
 }
 .calc-btn-header:hover {
   transform: translateY(-1px);
-  border-color: var(--primary) !important;
-  box-shadow: 0 4px 10px rgba(83, 109, 254, 0.25) !important;
+  box-shadow: 4px 4px 10px rgba(163, 174, 195, 0.45), -4px -4px 10px rgba(255, 255, 255, 0.95) !important;
 }
 
 .timer-pill {
@@ -659,9 +663,9 @@ select.inline-select {
   font-family: "JetBrains Mono", monospace;
   padding: 5px 11px !important;
   border-radius: 10px !important;
-  background: #ffffff !important;
+  background: var(--surface) !important;
   border: 1.5px solid rgba(83, 109, 254, 0.3) !important;
-  box-shadow: 0 2px 6px rgba(83, 109, 254, 0.15) !important;
+  box-shadow: inset 2px 2px 5px rgba(83, 109, 254, 0.15), inset -2px -2px 5px rgba(255, 255, 255, 0.85) !important;
   color: var(--primary-dark) !important;
   white-space: nowrap;
   flex-shrink: 0;
@@ -677,12 +681,17 @@ select.inline-select {
 }
 
 @media (max-width: 680px) {
+  .exam-header {
+    top: 6px;
+    margin-top: 6px !important;
+    padding: 0 0.75rem !important;
+  }
   .exam-header-controls-row {
     flex-wrap: wrap !important;
     gap: 8px !important;
   }
   .progress-track-neu {
-    width: 120px;
+    width: 110px;
   }
   #student-info-badge {
     max-width: 130px;
@@ -859,9 +868,9 @@ select.inline-select {
   align-items: center;
   gap: 12px;
   padding: 13px 18px !important;
-  background: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(163, 174, 195, 0.2), 0 1px 3px rgba(163, 174, 195, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
-  border: 1.5px solid rgba(163, 174, 195, 0.28) !important;
+  background: var(--surface) !important;
+  box-shadow: 4px 4px 11px rgba(163, 174, 195, 0.38), -4px -4px 11px rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
   border-radius: 16px !important;
   margin-bottom: 0 !important;
   cursor: pointer;
@@ -871,25 +880,13 @@ select.inline-select {
 }
 .option-label:hover {
   transform: translateY(-2px);
-  border-color: rgba(83, 109, 254, 0.45) !important;
-  box-shadow: 0 8px 22px rgba(83, 109, 254, 0.14), 0 2px 6px rgba(163, 174, 195, 0.2) !important;
+  border-color: rgba(83, 109, 254, 0.4) !important;
+  box-shadow: 6px 6px 14px rgba(163, 174, 195, 0.45), -6px -6px 14px rgba(255, 255, 255, 0.95) !important;
 }
-.option-label.selected {
-  background: rgba(83, 109, 254, 0.06) !important;
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(83, 109, 254, 0.2), 0 4px 14px rgba(83, 109, 254, 0.15) !important;
-}
-
-.option-label:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-out) !important;
-  color: var(--primary-dark) !important;
-}
-
 .option-label.selected {
   background: var(--surface) !important;
-  box-shadow: var(--shadow-in) !important;
-  border-color: rgba(83, 109, 254, 0.35) !important;
+  border-color: var(--primary) !important;
+  box-shadow: inset 3px 3px 7px rgba(83, 109, 254, 0.25), inset -3px -3px 7px rgba(255, 255, 255, 0.85), 0 0 0 1px var(--primary) !important;
   color: var(--primary-dark) !important;
   font-weight: 800;
 }
@@ -955,9 +952,9 @@ select.inline-select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(163, 174, 195, 0.2), 0 1px 3px rgba(163, 174, 195, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
-  border: 1.5px solid rgba(163, 174, 195, 0.28) !important;
+  background: var(--surface) !important;
+  box-shadow: 4px 4px 11px rgba(163, 174, 195, 0.38), -4px -4px 11px rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
   border-radius: 16px !important;
   padding: 12px 18px !important;
   gap: 12px;
@@ -982,9 +979,9 @@ select.inline-select {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f4fa !important;
-  box-shadow: 2px 2px 6px rgba(163, 174, 195, 0.3), -2px -2px 6px rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(163, 174, 195, 0.25) !important;
+  background: var(--surface) !important;
+  box-shadow: 3px 3px 7px rgba(163, 174, 195, 0.38), -3px -3px 7px rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
   border-radius: 12px !important;
   cursor: pointer;
   font-weight: 800;
