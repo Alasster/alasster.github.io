@@ -147,8 +147,9 @@ loginForm.addEventListener('submit', async (event) => {
       try {
         const userJson = JSON.stringify(data.user);
         const userB64 = btoa(encodeURIComponent(userJson));
-        const sep = returnTo.includes('?') ? '&' : '?';
-        window.location.assign(`${returnTo}${sep}alasster_user=${userB64}`);
+        const targetUrl = new URL(returnTo, location.origin);
+        targetUrl.searchParams.set('alasster_user', userB64);
+        window.location.assign(targetUrl.href);
         return;
       } catch (e) {
         window.location.assign(returnTo);

@@ -56,7 +56,7 @@ from functools import lru_cache
 
 from pathlib import Path
 
-from urllib.parse import quote, urlparse
+from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 
 
 
@@ -2029,7 +2029,12 @@ def login_page(request: Request):
 
             b64_user = base64.urlsafe_b64encode(user_data.encode()).decode()
 
-            return RedirectResponse(f"{return_to}{sep}alasster_user={b64_user}", status_code=status.HTTP_303_SEE_OTHER)
+            parsed_ret = urlparse(return_to)
+            qs = parse_qs(parsed_ret.query, keep_blank_values=True)
+            qs["alasster_user"] = [b64_user]
+            new_query = urlencode(qs, doseq=True)
+            target_url = urlunparse(parsed_ret._replace(query=new_query))
+            return RedirectResponse(target_url, status_code=status.HTTP_303_SEE_OTHER)
 
         return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
