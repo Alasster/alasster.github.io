@@ -7410,7 +7410,6 @@ const slides = [...document.querySelectorAll('.slide')];
     const currentUrl = window.location.href;
     const loginUrl = `${base}/login?return_to=${encodeURIComponent(currentUrl)}`;
     const cabinetUrl = `${base}/`;
-    const generatorUrl = `${base}/generator/teacher`;
 
     if (user) {
       let displayName = user.display_name;
@@ -7446,11 +7445,6 @@ const slides = [...document.querySelectorAll('.slide')];
               <i class="fa-solid fa-user"></i>
               <span>Личный кабинет</span>
             </a>
-            ${user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin' ? `
-            <a href="${generatorUrl}" class="neu-auth-dropdown-item">
-              <i class="fa-solid fa-graduation-cap"></i>
-              <span>Генератор тестов (Бағалау)</span>
-            </a>` : ''}
             <div class="neu-auth-dropdown-divider"></div>
             <button type="button" class="neu-auth-dropdown-item neu-auth-logout-btn" id="neu-logout-btn">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
