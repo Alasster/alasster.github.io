@@ -1,4 +1,4 @@
-"""Автономный сервер личного кабинета.
+﻿"""Автономный сервер личного кабинета.
 
 
 
@@ -1976,7 +1976,11 @@ def dashboard(request: Request):
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
     html = page("dashboard.html")
-    user_role = (user.get("role") or "user") if user else "user"
+    user_role = 'user'
+    try:
+        user_role = (user['role'] or 'user') if user else 'user'
+    except Exception:
+        user_role = 'user'
     html = html.replace("<body>", f'<body data-user-role="{user_role}">')
     resp = HTMLResponse(html)
 
