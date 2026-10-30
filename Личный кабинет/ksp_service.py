@@ -78,15 +78,26 @@ def get_google_drive_file_url(file_path: str | Path) -> str | None:
                 db_meta = sqlite3.connect(f'file:{p_meta}?mode=ro', uri=True)
                 db_mirror = sqlite3.connect(f'file:{p_mirror}?mode=ro', uri=True)
                 rows = db_mirror.execute(
-                    "SELECT stable_id FROM mirror_item WHERE local_filename=? OR cloud_filename=? ORDER BY local_mtime_ms DESC",
+                    "SELECT stable_id, parent_local_stable_id FROM mirror_item WHERE local_filename=? OR cloud_filename=? ORDER BY local_mtime_ms DESC",
                     (file_name, file_name)
                 ).fetchall()
-                for r in rows:
-                    stable_id = r[0]
+                want = [x for x in file_path.parts[:-1]][::-1]  # parent folders, nearest first
+                for stable_id, parent_id in rows:
+                    # verify folder chain (class / quarter) so same-named files in other classes don't collide
+                    ok, cur = True, parent_id
+                    for name in want[:3]:
+                        prow = db_mirror.execute(
+                            "SELECT local_filename, parent_local_stable_id FROM mirror_item WHERE local_stable_id=?", (cur,)
+                        ).fetchone()
+                        if not prow or prow[0] != name:
+                            ok = False
+                            break
+                        cur = prow[1]
+                    if not ok:
+                        continue
                     item_row = db_meta.execute("SELECT id FROM items WHERE stable_id=?", (stable_id,)).fetchone()
                     if item_row and item_row[0] and not str(item_row[0]).startswith('local-'):
-                        cloud_id = item_row[0]
-                        return f"https://docs.google.com/document/d/{cloud_id}/edit"
+                        return f"https://docs.google.com/document/d/{item_row[0]}/edit"
             except Exception:
                 pass
     return None
