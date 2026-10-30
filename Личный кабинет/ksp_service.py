@@ -22,7 +22,7 @@ from fastapi import HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
-from ksp_document import build_docx, docx_to_html
+from ksp_document import build_docx, docx_to_html, get_weekly_quote
 
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
@@ -84,7 +84,7 @@ def get_google_drive_file_url(file_path: str | Path) -> str | None:
                 for r in rows:
                     stable_id = r[0]
                     item_row = db_meta.execute("SELECT id FROM items WHERE stable_id=?", (stable_id,)).fetchone()
-                    if item_row and item_row[0]:
+                    if item_row and item_row[0] and not str(item_row[0]).startswith('local-'):
                         cloud_id = item_row[0]
                         return f"https://docs.google.com/document/d/{cloud_id}/edit"
             except Exception:
@@ -259,6 +259,7 @@ def generate(source: dict) -> dict:
 
     teacher_name = os.environ.get('KSP_TEACHER', 'Кадыржанов Ж.К.')
     school_name = 'ГПХ на ПХВ «Школа - гимназия №22»'
+    quote_info = get_weekly_quote(source.get('date', ''), source.get('number', ''))
 
     system_instructions = f"""Ты — главный методист по информатике в Республике Казахстан.
 Твоя задача — составить максимально подробный, глубокий, развёрнутый и высокопрофессиональный краткосрочный план урока (КСП) в формате JSON строго по структуре.
@@ -338,16 +339,19 @@ def generate(source: dict) -> dict:
    - Chat gpt, google ai studio, claude, copilot, gemini — конкретные сценарии применения учителем при подготовке и учениками для проверки.
 
 11. ПРИВИТИЕ ЦЕННОСТЕЙ И ЦИТАТА НЕДЕЛИ (header.values):
+    - ОФИЦИАЛЬНАЯ УТВЕРЖДЁННАЯ ЦИТАТА НЕДЕЛИ ИЗ ФАЙЛА «Файлы/Цитаты.csv» НА ДАТУ {source['date']}:
+      * Казахский: {quote_info['kz']}
+      * Русский: {quote_info['ru']}
     - Поле header.values ОБЯЗАТЕЛЬНО оформи в виде трёх чётких блоков, разделённых двойным переносом строк:
-      **Цитата недели:** «...» (цитата выдающегося мыслителя: Абая Кунанбаева, Аль-Фараби, Ахмета Байтурсынова или великого учёного).
-      **Привитие ценностей:** (в рамках концепции «Адал азамат» и программы «Біртұтас тәрбие» — честность, академическая честность, справедливость, ответственность за цифровые решения, осознанность и этичность).
-      **Связь с темой урока:** (2-3 развёрнутых предложения, подробно и глубоко раскрывающих, как смысл цитаты недели прямо соотносится с изучаемой темой «{source['title']}»).
+      **Цитата недели:** {quote_info['kz']} ({quote_info['ru']})
+      **Привитие ценностей:** (в рамках концепции «Адал азамат» и программы «Біртұтас тәрбие» — честность, справедливость, ответственность за цифровые решения, добросовестный труд).
+      **Связь с темой урока:** (2-3 развёрнутых предложения, подробно и глубоко раскрывающих, как смысл цитаты недели «{quote_info['ru']}» прямо соотносится с изучаемой темой «{source['title']}»).
 12. СВЯЗЫВАНИЕ С ЦИТАТОЙ НЕДЕЛИ И ЦЕННОСТЯМИ В ЭТАПАХ УРОКА (teacher_actions):
-    - В деятельности учителя ОБЯЗАТЕЛЬНО включи по 1-2 предложения, связывающих материал урока с Цитатой недели и ценностями «Адал азамат»:
-      * В 1. Орг. момент: учитель озвучивает цитату недели в приветствии/психологическом настрое и связывает её со стремлением к знаниям и честному труду.
-      * В 3. Объяснение нового материала: учитель подчёркивает моральную ответственность («Адал азамат») и этические принципы при работе с технологиями.
-      * В 4. Практическая работа: учитель напоминает об академической честности и самостоятельности при выполнении заданий.
-      * В 5. Итоги урока: учитель обобщает урок выводом, перекликающимся с мудростью цитаты недели.
+    - В деятельности учителя ОБЯЗАТЕЛЬНО включи по 1-2 предложения, связывающих материал урока с этой утверждённой Цитатой недели:
+      * В 1. Орг. момент: учитель озвучивает утверждённую цитату недели «{quote_info['kz']} ({quote_info['ru']})» в приветствии и связывает её со стремлением к знаниям и честному труду.
+      * В 3. Объяснение нового материала: учитель подчёркивает моральную ответственность («Адал азамат») и принципы честности при работе с технологиями.
+      * В 4. Практическая работа: учитель напоминает об академической честности и самостоятельности при выполнении заданий на платформе www.alasster.site.
+      * В 5. Итоги урока: учитель обобщает урок выводом, перекликающимся со смыслом цитаты недели «{quote_info['ru']}».
 13. РЕСУРСЫ УРОКА (resources):
     - Для каждого этапа в поле resources ОБЯЗАТЕЛЬНО укажи конкретные разделы платформы www.alasster.site, используемые на данном этапе (например: «Платформа www.alasster.site: Раздел 1 «Введение»», «Платформа www.alasster.site: Раздел 3 «...», Раздел 4 «...»»).
 
@@ -477,6 +481,10 @@ class KspService:
 
     def public(self, row: dict) -> dict:
         result = {k: row[k] for k in ('id', 'status', 'message')}
+        if row.get('status') == 'ready' and row.get('path') and not Path(row['path']).is_file():
+            result['status'] = 'error'
+            result['message'] = 'Файл не найден в Google Диске. Нажмите КСП для повтора.'
+            return result
         if row.get('status') == 'ready':
             result['url'] = f"/api/ksp/{row['id']}/document"
             result['view_url'] = f"/api/ksp/{row['id']}/google-docs"
@@ -542,6 +550,11 @@ class KspService:
             self.update(key, 'saving', 'Сборка DOCX…')
             target = output_path(source, self.output_root)
             build_docx(self.template, target, source, plan)
+            import time
+            for _ in range(45):  # wait up to ~90s for Google Drive to register the file
+                if get_google_drive_file_url(target):
+                    break
+                time.sleep(2)
             self.update(key, 'ready', 'КСП сохранён в Google Диске', str(target))
         except Exception as exc:
             message = str(exc) if isinstance(exc, ValueError) else 'Ошибка генерации КСП. Повторите попытку.'
@@ -608,7 +621,13 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
             raise HTTPException(404, 'Документ не найден')
 
         file_path = Path(row['path'])
-        drive_url = get_google_drive_file_url(file_path)
+        import time
+        drive_url = None
+        for _ in range(10):
+            drive_url = get_google_drive_file_url(file_path)
+            if drive_url:
+                break
+            time.sleep(1)
         if drive_url:
             return RedirectResponse(drive_url, status_code=302)
 

@@ -301,66 +301,140 @@ def set_cell_text(cell, text: str, bold: bool = False, italic: bool = False,
 
 
 
-QUOTE_PAIRS = [
-    (
-        "«Ғылымды үйренуден бұрын адамға тәрбие беру керек, тәрбиесіз берілген білім – адамзаттың қас жауы» (Әбу Насыр әл-Фараби)",
-        "Воспитание в рамках Единой программы «Біртұтас тәрбие» и концепции «Адал азамат»: честность, справедливость, ответственность за цифровые решения, осознанность и нетерпимость к искажению информации."
-    ),
-    (
-        "«Адам бол – мал тап, асықпа, арзанға салма ар-ұятты» (Абай Құнанбайұлы)",
-        "Формирование качеств честного гражданина («Адал азамат»): добросовестный труд, академическая честность, уважение к авторскому праву и этичное поведение в информационной среде."
-    ),
-    (
-        "«Елді түзетуді бала оқыту ісін түзетуден бастау керек» (Ахмет Байтұрсынұлы)",
-        "Привитие ценностей гражданской ответственности, критического осмысления информации, стремления к созидательному использованию передовых цифровых технологий во благо общества."
+def get_weekly_quote(date_str: str = '', lesson_num: str | int = 1) -> dict:
+    """Reads official weekly quote from Файлы/Цитаты.csv based on lesson date or week card."""
+    csv_path = ROOT / 'Файлы' / 'Цитаты.csv'
+    if not csv_path.is_file():
+        return {
+            'kz': '«Білекті бірді жығар, білімді мыңды жығар.»',
+            'ru': '«Сильный одолеет одного, знающий - тысячу.»',
+            'card': '2'
+        }
+
+    rows = []
+    try:
+        import csv
+        with open(csv_path, 'r', encoding='utf-8-sig') as f:
+            for r in csv.DictReader(f, delimiter=';'):
+                rows.append(r)
+    except Exception:
+        pass
+
+    if not rows:
+        return {
+            'kz': '«Білекті бірді жығар, білімді мыңды жығар.»',
+            'ru': '«Сильный одолеет одного, знающий - тысячу.»',
+            'card': '2'
+        }
+
+    # 1. Exact match on 'Дата начала'
+    clean_date = (date_str or '').strip()
+    if clean_date:
+        for r in rows:
+            if r.get('Дата начала', '').strip() == clean_date:
+                return {
+                    'kz': r.get('Цитата (казахский)', '').strip(),
+                    'ru': r.get('Цитата (русский)', '').strip(),
+                    'card': r.get('Номер карточки', '').strip()
+                }
+
+        # 2. Match date within the Monday-to-Sunday week
+        try:
+            from datetime import datetime
+            dt = datetime.strptime(clean_date, '%d.%m.%Y')
+            for i, r in enumerate(rows):
+                r_dt = datetime.strptime(r.get('Дата начала', '').strip(), '%d.%m.%Y')
+                next_dt = datetime.strptime(rows[i+1].get('Дата начала', '').strip(), '%d.%m.%Y') if i+1 < len(rows) else None
+                if next_dt:
+                    if r_dt <= dt < next_dt:
+                        return {
+                            'kz': r.get('Цитата (казахский)', '').strip(),
+                            'ru': r.get('Цитата (русский)', '').strip(),
+                            'card': r.get('Номер карточки', '').strip()
+                        }
+                else:
+                    if dt >= r_dt:
+                        return {
+                            'kz': r.get('Цитата (казахский)', '').strip(),
+                            'ru': r.get('Цитата (русский)', '').strip(),
+                            'card': r.get('Номер карточки', '').strip()
+                        }
+        except Exception:
+            pass
+
+    # 3. Match by lesson number in quarter 1 (Lesson 1 -> Card 2, etc.)
+    try:
+        num = int(str(lesson_num).strip())
+        target_card = num + 1
+        for r in rows:
+            if str(r.get('Номер карточки', '')).strip() == str(target_card):
+                return {
+                    'kz': r.get('Цитата (казахский)', '').strip(),
+                    'ru': r.get('Цитата (русский)', '').strip(),
+                    'card': str(target_card)
+                }
+    except Exception:
+        pass
+
+    r = rows[1] if len(rows) > 1 else rows[0]
+    return {
+        'kz': r.get('Цитата (казахский)', '').strip(),
+        'ru': r.get('Цитата (русский)', '').strip(),
+        'card': r.get('Номер карточки', '2')
+    }
+
+
+def format_values_block(raw_values: str, lesson_title: str, date_str: str = '', lesson_num: str = '') -> str:
+    """Format Page 1 values row strictly using official quote from Файлы/Цитаты.csv."""
+    quote_info = get_weekly_quote(date_str, lesson_num)
+    quote_kz = quote_info['kz']
+    quote_ru = quote_info['ru']
+    quote_display = f"{quote_kz} ({quote_ru})"
+
+    base_values = (
+        "Воспитание в рамках Единой программы «Біртұтас тәрбие» и концепции «Адал азамат»: "
+        "честность, справедливость, добросовестный труд, академическая честность, высокая ответственность за цифровые решения."
     )
-]
-
-
-def format_values_block(raw_values: str, lesson_title: str) -> str:
-    """Format Page 1 values row: Quote of the week + Values + Connection to theme."""
-    raw = (raw_values or '').strip()
-    if '**Цитата недели:**' in raw and '**Связь с темой урока:**' in raw:
-        return raw
-
-    quote, base_values = QUOTE_PAIRS[0]
-    lt = lesson_title.lower()
-    if 'этик' in lt or 'социальн' in lt or 'ии' in lt:
-        quote, base_values = QUOTE_PAIRS[0]
-    elif 'программ' in lt or 'python' in lt or 'алгоритм' in lt:
-        quote, base_values = QUOTE_PAIRS[1]
-    else:
-        quote, base_values = QUOTE_PAIRS[2]
 
     connection = (
-        f"Тема урока «{lesson_title}» прямо связана с идеей цитаты недели и принципами концепции «Адал азамат»: "
-        f"учащиеся осознают личную моральную ответственность за достоверность, честность и безопасность цифровых решений, "
-        f"понимая, что любые технологии должны служить справедливости и благу человека."
+        f"Тема урока «{lesson_title}» прямо связана со смыслом цитаты недели {quote_kz} ({quote_ru}): "
+        f"учащиеся осознают личную ответственность за честность, точность и безопасность цифровых решений, "
+        f"развивая практические навыки добросовестного и созидательного труда в цифровой среде."
     )
 
-    return f"**Цитата недели:** {quote}\n\n**Привитие ценностей:** {base_values}\n\n**Связь с темой урока:** {connection}"
+    # Check if raw_values from Gemini already contains the correct quote and linkage
+    raw = (raw_values or '').strip()
+    if (quote_kz in raw or quote_ru in raw) and '**Цитата недели:**' in raw and '**Связь с темой урока:**' in raw:
+        return raw
+
+    return f"**Цитата недели:** {quote_display}\n\n**Привитие ценностей:** {base_values}\n\n**Связь с темой урока:** {connection}"
 
 
-def enrich_teacher_actions(text: str, stage_idx: int, lesson_title: str) -> str:
-    """Ensure teacher actions in stages contain 1-2 sentences tying back to Quote of the week & values."""
+def enrich_teacher_actions(text: str, stage_idx: int, lesson_title: str, date_str: str = '', lesson_num: str = '') -> str:
+    """Ensure teacher actions in stages contain 1-2 sentences tying back to official Quote of the week."""
     if not text:
         return text
 
-    if re.search(r'цитат\w*\s+недел|адал\s+азамат|біртұтас|әл[- ]фараби|абай', text, re.I):
-        return text
+    quote_info = get_weekly_quote(date_str, lesson_num)
+    quote_kz = quote_info['kz']
+    quote_ru = quote_info['ru']
 
     if stage_idx == 0:
-        sentence = "\n\n**Связь с цитатой недели:** Учитель напоминает классу мудрость недели: «Ғылымды үйренуден бұрын адамға тәрбие беру керек, тәрбиесіз берілген білім – адамзаттың қас жауы» (Әл-Фараби), настраивая ребят на честный труд, взаимное уважение и осознанное отношение к изучаемым технологиям."
-        return text + sentence
+        if not re.search(r'цитат\w*\s+недел', text, re.I):
+            sentence = f"\n\n**Связь с цитатой недели:** Учитель напоминает классу мудрость недели: {quote_kz} ({quote_ru}), настраивая учащихся на добросовестный труд, взаимное уважение и осознанное погружение в тему «{lesson_title}»."
+            return text + sentence
     elif stage_idx == 2:
-        sentence = "\n\n**Привитие ценностей («Адал азамат»):** Учитель акцентирует внимание учащихся на том, что применение искусственного интеллекта требует от честного гражданина высочайшей моральной ответственности, объективности и прозрачности перед обществом."
-        return text + sentence
+        if not re.search(r'адал\s+азамат|ответственност', text, re.I):
+            sentence = f"\n\n**Привитие ценностей («Адал азамат»):** Учитель подчеркивает моральную ответственность и добросовестность при освоении принципов темы «{lesson_title}»."
+            return text + sentence
     elif stage_idx == 3:
-        sentence = "\n\n**Академическая честность:** Учитель напоминает о принципе честного гражданина («Адал азамат») при самостоятельном анализе задач, проверке решений и аргументации своей позиции на платформе www.alasster.site."
-        return text + sentence
+        if not re.search(r'академическ\w*\s+честност|адал', text, re.I):
+            sentence = "\n\n**Академическая честность:** Учитель напоминает о принципе честного гражданина («Адал азамат») при самостоятельном выполнении практических заданий на платформе www.alasster.site."
+            return text + sentence
     elif stage_idx == 4:
-        sentence = "\n\n**Нравственный вывод:** Учитель подводит итог урока с отсылкой к цитате недели: любые знания и передовые технологии приносят подлинную пользу только тогда, когда направлены на созидание и благо общества."
-        return text + sentence
+        if not re.search(r'цитат\w*\s+недел|нравственн', text, re.I):
+            sentence = f"\n\n**Нравственный вывод:** Учитель подводит итог урока с отсылкой к цитате недели: {quote_ru}. Настоящий успех и прочные знания достигаются только честным трудом."
+            return text + sentence
 
     return text
 
@@ -458,7 +532,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
         'Тема урока': theme_text,
         'Цели обучения в соответствии с учебной программой': goals_text,
         'Цель урока': header.get('lesson_goals', ''),
-        'Привитие ценностей': format_values_block(header.get('values', ''), source.get('title', '')),
+        'Привитие ценностей': format_values_block(header.get('values', ''), source.get('title', ''), source.get('date', ''), source.get('number', '')),
         'Функциональная грамотность': header.get('functional_literacy', ''),
         'Искусственный интеллект': header.get('ai_tools', 'Chat gpt, google ai studio, claude, copilot, gemini')
     }
@@ -546,7 +620,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
             set_cell_formatted(r.cells[0], s_name, bold=True, font_size=FONT_SIZE)
 
             # 1. Enriched teacher actions with Quote of the week & Values connections
-            teacher_act = enrich_teacher_actions(stage.get('teacher_actions', ''), i, source.get('title', ''))
+            teacher_act = enrich_teacher_actions(stage.get('teacher_actions', ''), i, source.get('title', ''), source.get('date', ''), source.get('number', ''))
             set_cell_formatted(r.cells[1], teacher_act, font_size=FONT_SIZE)
 
             # 2. Student actions text
@@ -592,24 +666,24 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                     r_shot = p_shot.add_run()
                     r_shot.add_picture(shot_file, width=Inches(2.1))
 
-    target_path.parent.mkdir(parents=True, exist_ok=True)
-    temp_target = target_path.with_suffix('.tmp.docx')
-    doc.save(str(temp_target))
+    # Build locally (never write temp/rename files inside Google Drive folder)
+    local_dir = BASE / '.runtime' / 'ksp' / 'out'
+    local_dir.mkdir(parents=True, exist_ok=True)
+    local_file = local_dir / f"{hashlib.md5(str(target_path).encode('utf-8')).hexdigest()[:12]}.docx"
+    doc.save(str(local_file))
 
-    # Strict verification before atomic publish
-    doc_check = docx.Document(str(temp_target))
+    doc_check = docx.Document(str(local_file))
     full_text = ' '.join(c.text for t in doc_check.tables for r in t.rows for c in r.cells)
     if re.search(r'\bООП\b|\bЗПР\b|особым[и]? образовательн', full_text, re.I):
-        if temp_target.exists():
-            temp_target.unlink()
+        local_file.unlink(missing_ok=True)
         raise ValueError('В сформированном документе обнаружены запрещенные упоминания ООП/ЗПР!')
 
-    if target_path.exists():
-        try:
-            target_path.unlink()
-        except Exception:
-            pass
-    temp_target.replace(target_path)
+    # Single copy into Google Drive (Drive for Desktop syncs it to the cloud)
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(str(local_file), str(target_path))
+    if not target_path.is_file() or target_path.stat().st_size != local_file.stat().st_size:
+        raise ValueError('Не удалось сохранить КСП в папку Google Диска')
+    local_file.unlink(missing_ok=True)
 
     # Immediately clean up all temporary screenshots and temp files now that they are embedded in docx
     cleanup_ksp_temp_files(slide_shots)
