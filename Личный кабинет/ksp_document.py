@@ -29,8 +29,31 @@ SCREENSHOTS_DIR = BASE / '.runtime' / 'ksp' / 'screenshots'
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
-    """Capture and cache crisp screenshots of key lesson sections: intro, theory, practice, summary."""
+def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
+    """Extract section titles and metadata for all slides in the lesson."""
+    lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
+    if not lesson_path.is_file():
+        return []
+    try:
+        html = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
+        clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html, flags=re.S | re.I)
+        parts = re.split(r'(<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>)', clean_html)
+        slides_info = []
+        s_idx = 0
+        for i in range(1, len(parts), 2):
+            slide_html = parts[i+1] if i+1 < len(parts) else ''
+            h = re.search(r'<h[1-4]\b[^>]*>(.*?)</h[1-4]>', slide_html, re.S | re.I)
+            h_text = re.sub(r'<[^>]+>', '', h.group(1)).strip() if h else f'Раздел {s_idx + 1}'
+            h_text = re.sub(r'\s+', ' ', h_text).strip()
+            slides_info.append({'index': s_idx, 'title': h_text})
+            s_idx += 1
+        return slides_info
+    except Exception:
+        return []
+
+
+def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
+    """Capture and cache crisp screenshots of all slides in the lesson."""
     browser = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
     if not os.path.exists(browser):
         browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
@@ -42,20 +65,6 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
         return {}
 
     h_hash = hashlib.md5(lesson_relative_path.encode('utf-8')).hexdigest()[:10]
-    stage_keys = ['intro', 'theory', 'practice', 'summary']
-
-    # Check if all cached screenshots already exist on disk
-    all_cached = True
-    cached_results = {}
-    for sk in stage_keys:
-        cf = SCREENSHOTS_DIR / f'slide_{h_hash}_{sk}.png'
-        if cf.is_file() and cf.stat().st_size > 1000:
-            cached_results[sk] = str(cf)
-        else:
-            all_cached = False
-
-    if all_cached:
-        return cached_results
 
     try:
         html = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
@@ -66,34 +75,29 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
         clean_html = re.sub(r'(<head\b[^>]*>)', r'\1' + base_tag, clean_html, flags=re.I)
         clean_html = re.sub(r'(</head>)', '<style>* { animation: none !important; transition: none !important; }</style>\\1', clean_html, flags=re.I)
 
-        slide_matches = list(re.finditer(r'<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>', clean_html, re.I))
-        total_slides = len(slide_matches)
-        if total_slides == 0:
+        parts = re.split(r'(<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>)', clean_html)
+        total_slides = (len(parts) - 1) // 2
+        if total_slides <= 0:
             return {}
 
-        slide_map = {
-            'intro': 0,
-            'theory': min(1 if total_slides > 1 else 0, total_slides - 1),
-            'practice': min(4 if total_slides > 4 else max(1, total_slides // 2), total_slides - 1),
-            'summary': max(0, total_slides - 2 if total_slides > 2 else total_slides - 1)
-        }
-
         results = {}
-        user_data = tempfile.mkdtemp()
+        user_data = None
 
-        for stage_key, target_idx in slide_map.items():
-            cache_file = SCREENSHOTS_DIR / f'slide_{h_hash}_{stage_key}.png'
+        for slide_idx in range(total_slides):
+            cache_file = SCREENSHOTS_DIR / f'slide_{h_hash}_s{slide_idx}.png'
             if cache_file.is_file() and cache_file.stat().st_size > 1000:
-                results[stage_key] = str(cache_file)
+                results[slide_idx] = str(cache_file)
                 continue
 
-            parts = re.split(r'(<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>)', clean_html)
+            if user_data is None:
+                user_data = tempfile.mkdtemp()
+
             new_parts = []
             s_idx = 0
             for part in parts:
                 if re.match(r'<section\b[^>]*class=[\'"][^\'"]*slide', part):
                     p = re.sub(r'\bactive\b', '', part)
-                    if s_idx == target_idx:
+                    if s_idx == slide_idx:
                         p = p.replace('class="', 'class="active ').replace("class='", "class='active ")
                     s_idx += 1
                     new_parts.append(p)
@@ -101,10 +105,9 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
                     new_parts.append(part)
 
             mod_html = ''.join(new_parts)
-            temp_html = os.path.join(tempfile.gettempdir(), f'ksp_slide_{os.getpid()}_{h_hash}_{stage_key}.html')
+            temp_html = os.path.join(tempfile.gettempdir(), f'temp_{h_hash}_{slide_idx}.html')
             with open(temp_html, 'w', encoding='utf-8') as f:
                 f.write(mod_html)
-            out_png = str(cache_file)
 
             cmd = [
                 browser,
@@ -113,12 +116,21 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
                 '--no-sandbox',
                 '--window-size=1200,750',
                 f'--user-data-dir={user_data}',
-                f'--screenshot={out_png}',
+                f'--screenshot={str(cache_file)}',
                 'file:///' + temp_html.replace('\\', '/')
             ]
-            subprocess.run(cmd, capture_output=True, timeout=10)
-            if os.path.isfile(out_png) and os.path.getsize(out_png) > 1000:
-                results[stage_key] = out_png
+            try:
+                subprocess.run(cmd, capture_output=True, timeout=12)
+                if cache_file.is_file() and cache_file.stat().st_size > 1000:
+                    results[slide_idx] = str(cache_file)
+            except Exception:
+                pass
+
+        # Compatibility aliases
+        if 0 in results: results['intro'] = results[0]
+        if 1 in results: results['theory'] = results[1]
+        if min(4, total_slides - 1) in results: results['practice'] = results[min(4, total_slides - 1)]
+        if (total_slides - 1) in results: results['summary'] = results[total_slides - 1]
 
         return results
     except Exception:
@@ -265,6 +277,70 @@ def set_cell_text(cell, text: str, bold: bool = False, italic: bool = False,
     set_cell_formatted(cell, text, bold=bold, italic=italic, font_size=font_size, font_name=font_name)
 
 
+
+QUOTE_PAIRS = [
+    (
+        "«Ғылымды үйренуден бұрын адамға тәрбие беру керек, тәрбиесіз берілген білім – адамзаттың қас жауы» (Әбу Насыр әл-Фараби)",
+        "Воспитание в рамках Единой программы «Біртұтас тәрбие» и концепции «Адал азамат»: честность, справедливость, ответственность за цифровые решения, осознанность и нетерпимость к искажению информации."
+    ),
+    (
+        "«Адам бол – мал тап, асықпа, арзанға салма ар-ұятты» (Абай Құнанбайұлы)",
+        "Формирование качеств честного гражданина («Адал азамат»): добросовестный труд, академическая честность, уважение к авторскому праву и этичное поведение в информационной среде."
+    ),
+    (
+        "«Елді түзетуді бала оқыту ісін түзетуден бастау керек» (Ахмет Байтұрсынұлы)",
+        "Привитие ценностей гражданской ответственности, критического осмысления информации, стремления к созидательному использованию передовых цифровых технологий во благо общества."
+    )
+]
+
+
+def format_values_block(raw_values: str, lesson_title: str) -> str:
+    """Format Page 1 values row: Quote of the week + Values + Connection to theme."""
+    raw = (raw_values or '').strip()
+    if '**Цитата недели:**' in raw and '**Связь с темой урока:**' in raw:
+        return raw
+
+    quote, base_values = QUOTE_PAIRS[0]
+    lt = lesson_title.lower()
+    if 'этик' in lt or 'социальн' in lt or 'ии' in lt:
+        quote, base_values = QUOTE_PAIRS[0]
+    elif 'программ' in lt or 'python' in lt or 'алгоритм' in lt:
+        quote, base_values = QUOTE_PAIRS[1]
+    else:
+        quote, base_values = QUOTE_PAIRS[2]
+
+    connection = (
+        f"Тема урока «{lesson_title}» прямо связана с идеей цитаты недели и принципами концепции «Адал азамат»: "
+        f"учащиеся осознают личную моральную ответственность за достоверность, честность и безопасность цифровых решений, "
+        f"понимая, что любые технологии должны служить справедливости и благу человека."
+    )
+
+    return f"**Цитата недели:** {quote}\n\n**Привитие ценностей:** {base_values}\n\n**Связь с темой урока:** {connection}"
+
+
+def enrich_teacher_actions(text: str, stage_idx: int, lesson_title: str) -> str:
+    """Ensure teacher actions in stages contain 1-2 sentences tying back to Quote of the week & values."""
+    if not text:
+        return text
+
+    if re.search(r'цитат\w*\s+недел|адал\s+азамат|біртұтас|әл[- ]фараби|абай', text, re.I):
+        return text
+
+    if stage_idx == 0:
+        sentence = "\n\n**Связь с цитатой недели:** Учитель напоминает классу мудрость недели: «Ғылымды үйренуден бұрын адамға тәрбие беру керек, тәрбиесіз берілген білім – адамзаттың қас жауы» (Әл-Фараби), настраивая ребят на честный труд, взаимное уважение и осознанное отношение к изучаемым технологиям."
+        return text + sentence
+    elif stage_idx == 2:
+        sentence = "\n\n**Привитие ценностей («Адал азамат»):** Учитель акцентирует внимание учащихся на том, что применение искусственного интеллекта требует от честного гражданина высочайшей моральной ответственности, объективности и прозрачности перед обществом."
+        return text + sentence
+    elif stage_idx == 3:
+        sentence = "\n\n**Академическая честность:** Учитель напоминает о принципе честного гражданина («Адал азамат») при самостоятельном анализе задач, проверке решений и аргументации своей позиции на платформе www.alasster.site."
+        return text + sentence
+    elif stage_idx == 4:
+        sentence = "\n\n**Нравственный вывод:** Учитель подводит итог урока с отсылкой к цитате недели: любые знания и передовые технологии приносят подлинную пользу только тогда, когда направлены на созидание и благо общества."
+        return text + sentence
+
+    return text
+
 def build_docx(template_path: Path | str, target_path: Path | str, source: dict, plan: dict):
     """
     Builds a finished, formatted KSP docx based on the school's template.
@@ -359,7 +435,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
         'Тема урока': theme_text,
         'Цели обучения в соответствии с учебной программой': goals_text,
         'Цель урока': header.get('lesson_goals', ''),
-        'Привитие ценностей': header.get('values', ''),
+        'Привитие ценностей': format_values_block(header.get('values', ''), source.get('title', '')),
         'Функциональная грамотность': header.get('functional_literacy', ''),
         'Искусственный интеллект': header.get('ai_tools', 'Chat gpt, google ai studio, claude, copilot, gemini')
     }
@@ -406,15 +482,36 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                     r.bold = True
 
     # Capture screenshots of lesson sections for interactive stages
+    slides_meta = get_lesson_slides_meta(source.get('key', ''))
+    total_s = len(slides_meta)
     slide_shots = capture_lesson_slides(source.get('key', ''))
 
-    stage_shot_map = {
-        0: slide_shots.get('intro'),     # Stage 1: Орг. момент (Титульный слайд темы на www.alasster.site)
-        1: slide_shots.get('intro') or slide_shots.get('theory'), # Stage 2: Актуализация
-        2: slide_shots.get('theory'),    # Stage 3: Объяснение (Теоретический блок)
-        3: slide_shots.get('practice'),  # Stage 4: Практика (Интерактивная лаборатория)
-        4: slide_shots.get('summary')    # Stage 5: Итоги (Итоговый тест / рефлексия)
-    }
+    if total_s >= 9:
+        stage_slide_indices = {
+            0: [0],          # 1 section: Введение
+            1: [1],          # 1 section: Разминка / Что такое ИИ
+            2: [2, 3],       # 2 sections: Этические вопросы, Сферы применения
+            3: [4, 7],       # 2 sections: Интерактивный кейс, Практическая работа
+            4: [6, 8]        # 2 sections: Мини-проверка, Итоги урока
+        }
+    elif total_s >= 7:
+        stage_slide_indices = {
+            0: [0],
+            1: [1],
+            2: [2, 3],
+            3: [4, min(5, total_s - 2)],
+            4: [total_s - 2, total_s - 1]
+        }
+    elif total_s >= 5:
+        stage_slide_indices = {
+            0: [0],
+            1: [1],
+            2: [2],
+            3: [3],
+            4: [4]
+        }
+    else:
+        stage_slide_indices = {i: [min(i, max(0, total_s - 1))] for i in range(5)}
 
     # Populate Table 1 stages strictly in 12pt with formatted paragraphs and screenshots
     stages = plan.get('stages', [])
@@ -424,21 +521,53 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
             r = t1.rows[row_idx]
             s_name = stage.get('stage_name', f"Этап {i+1}")
             set_cell_formatted(r.cells[0], s_name, bold=True, font_size=FONT_SIZE)
-            set_cell_formatted(r.cells[1], stage.get('teacher_actions', ''), font_size=FONT_SIZE)
+
+            # 1. Enriched teacher actions with Quote of the week & Values connections
+            teacher_act = enrich_teacher_actions(stage.get('teacher_actions', ''), i, source.get('title', ''))
+            set_cell_formatted(r.cells[1], teacher_act, font_size=FONT_SIZE)
+
+            # 2. Student actions text
             set_cell_formatted(r.cells[2], stage.get('student_actions', ''), font_size=FONT_SIZE)
 
-            # Insert screenshot in «Деятельность обучающихся» in a neat, small size (Inches(2.1))
-            shot_file = stage_shot_map.get(i)
-            if shot_file and os.path.isfile(shot_file):
-                p_shot = r.cells[2].add_paragraph()
-                p_shot.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_shot.paragraph_format.space_before = Pt(4)
-                p_shot.paragraph_format.space_after = Pt(4)
-                r_shot = p_shot.add_run()
-                r_shot.add_picture(shot_file, width=Inches(2.1))
+            # 3. Determine resources & attach matching screenshots
+            stage_indices = stage_slide_indices.get(i, [])
+            section_labels = []
+            for s_idx in stage_indices:
+                t = slides_meta[s_idx]['title'] if s_idx < len(slides_meta) else f"Раздел {s_idx+1}"
+                section_labels.append(f"Раздел {s_idx+1} «{t}»")
 
+            # Column 4: Assessment
             set_cell_formatted(r.cells[3], stage.get('assessment', ''), font_size=FONT_SIZE)
-            set_cell_formatted(r.cells[4], stage.get('resources', ''), font_size=FONT_SIZE)
+
+            # Column 5: Resources mentioning the exact sections
+            raw_res = stage.get('resources', '').strip()
+            if not raw_res or 'alasster.site' not in raw_res.lower() or not re.search(r'раздел|слайд', raw_res, re.I):
+                res_text = f"Платформа www.alasster.site ({', '.join(section_labels)})"
+            else:
+                res_text = raw_res
+            set_cell_formatted(r.cells[4], res_text, font_size=FONT_SIZE)
+
+            # Column 3: Insert screenshots matching the sections in Resources!
+            for s_idx in stage_indices:
+                shot_file = slide_shots.get(s_idx)
+                if shot_file and os.path.isfile(shot_file):
+                    s_title = slides_meta[s_idx]['title'] if s_idx < len(slides_meta) else f"Раздел {s_idx+1}"
+
+                    p_cap = r.cells[2].add_paragraph()
+                    p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    p_cap.paragraph_format.space_before = Pt(3)
+                    p_cap.paragraph_format.space_after = Pt(1)
+                    r_cap = p_cap.add_run(f"Скриншот платформы www.alasster.site: Раздел {s_idx+1} «{s_title}»")
+                    r_cap.font.name = FONT_NAME
+                    r_cap.font.size = Pt(9.5)
+                    r_cap.font.italic = True
+
+                    p_shot = r.cells[2].add_paragraph()
+                    p_shot.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    p_shot.paragraph_format.space_before = Pt(1)
+                    p_shot.paragraph_format.space_after = Pt(4)
+                    r_shot = p_shot.add_run()
+                    r_shot.add_picture(shot_file, width=Inches(2.1))
 
     target_path.parent.mkdir(parents=True, exist_ok=True)
     temp_target = target_path.with_suffix('.tmp.docx')

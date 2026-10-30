@@ -59,6 +59,38 @@ def get_gemini_api_key() -> str:
 
     return ''
 
+
+def get_google_drive_file_url(file_path: str | Path) -> str | None:
+    """Resolve direct Google Docs edit URL from local Google Drive for Desktop database."""
+    file_path = Path(file_path)
+    file_name = file_path.name
+    drivefs_dir = Path(os.environ.get('LOCALAPPDATA', '')) / 'Google' / 'DriveFS'
+    if not drivefs_dir.is_dir():
+        return None
+
+    for acc_dir in drivefs_dir.iterdir():
+        if not acc_dir.is_dir():
+            continue
+        p_meta = acc_dir / 'mirror_metadata_sqlite.db'
+        p_mirror = acc_dir / 'mirror_sqlite.db'
+        if p_meta.is_file() and p_mirror.is_file():
+            try:
+                db_meta = sqlite3.connect(f'file:{p_meta}?mode=ro', uri=True)
+                db_mirror = sqlite3.connect(f'file:{p_mirror}?mode=ro', uri=True)
+                rows = db_mirror.execute(
+                    "SELECT stable_id FROM mirror_item WHERE local_filename=? OR cloud_filename=? ORDER BY local_mtime_ms DESC",
+                    (file_name, file_name)
+                ).fetchall()
+                for r in rows:
+                    stable_id = r[0]
+                    item_row = db_meta.execute("SELECT id FROM items WHERE stable_id=?", (stable_id,)).fetchone()
+                    if item_row and item_row[0]:
+                        cloud_id = item_row[0]
+                        return f"https://docs.google.com/document/d/{cloud_id}/edit"
+            except Exception:
+                pass
+    return None
+
 GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite']
 
 GEMINI_PLAN_SCHEMA = {
@@ -305,6 +337,20 @@ def generate(source: dict) -> dict:
 10. ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ (ai_tools):
    - Chat gpt, google ai studio, claude, copilot, gemini — конкретные сценарии применения учителем при подготовке и учениками для проверки.
 
+11. ПРИВИТИЕ ЦЕННОСТЕЙ И ЦИТАТА НЕДЕЛИ (header.values):
+    - Поле header.values ОБЯЗАТЕЛЬНО оформи в виде трёх чётких блоков, разделённых двойным переносом строк:
+      **Цитата недели:** «...» (цитата выдающегося мыслителя: Абая Кунанбаева, Аль-Фараби, Ахмета Байтурсынова или великого учёного).
+      **Привитие ценностей:** (в рамках концепции «Адал азамат» и программы «Біртұтас тәрбие» — честность, академическая честность, справедливость, ответственность за цифровые решения, осознанность и этичность).
+      **Связь с темой урока:** (2-3 развёрнутых предложения, подробно и глубоко раскрывающих, как смысл цитаты недели прямо соотносится с изучаемой темой «{source['title']}»).
+12. СВЯЗЫВАНИЕ С ЦИТАТОЙ НЕДЕЛИ И ЦЕННОСТЯМИ В ЭТАПАХ УРОКА (teacher_actions):
+    - В деятельности учителя ОБЯЗАТЕЛЬНО включи по 1-2 предложения, связывающих материал урока с Цитатой недели и ценностями «Адал азамат»:
+      * В 1. Орг. момент: учитель озвучивает цитату недели в приветствии/психологическом настрое и связывает её со стремлением к знаниям и честному труду.
+      * В 3. Объяснение нового материала: учитель подчёркивает моральную ответственность («Адал азамат») и этические принципы при работе с технологиями.
+      * В 4. Практическая работа: учитель напоминает об академической честности и самостоятельности при выполнении заданий.
+      * В 5. Итоги урока: учитель обобщает урок выводом, перекликающимся с мудростью цитаты недели.
+13. РЕСУРСЫ УРОКА (resources):
+    - Для каждого этапа в поле resources ОБЯЗАТЕЛЬНО укажи конкретные разделы платформы www.alasster.site, используемые на данном этапе (например: «Платформа www.alasster.site: Раздел 1 «Введение»», «Платформа www.alasster.site: Раздел 3 «...», Раздел 4 «...»»).
+
 ДАННЫЕ УРОКА:
 - Школа: {school_name}
 - ФИО учителя: {teacher_name}
@@ -431,11 +477,20 @@ class KspService:
 
     def public(self, row: dict) -> dict:
         result = {k: row[k] for k in ('id', 'status', 'message')}
-        if row['status'] == 'ready':
+        if row.get('status') == 'ready':
             result['url'] = f"/api/ksp/{row['id']}/document"
             result['view_url'] = f"/api/ksp/{row['id']}/view"
-            result['google_docs_url'] = f"/api/ksp/{row['id']}/google-docs"
-            result['drive_url'] = "https://drive.google.com/drive/folders/1skfm8UZo7rAcWLJFpULLgICGyoJsXsJo"
+            
+            # Resolve direct Google Docs edit URL
+            file_path = row.get('path')
+            direct_docs_url = None
+            if file_path:
+                try:
+                    direct_docs_url = get_google_drive_file_url(file_path)
+                except Exception:
+                    pass
+            result['google_docs_url'] = direct_docs_url or f"/api/ksp/{row['id']}/google-docs"
+            result['drive_url'] = "https://drive.google.com/drive/folders/1GWtxb0KmS5kHJmaHMow_yf1I-8aVL5M_"
         return result
 
     def update(self, key: str, status: str, message: str, path: str = ''):
@@ -552,21 +607,13 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
         if not row or not Path(row['path']).is_file():
             raise HTTPException(404, 'Документ не найден')
 
-        pub_url = None
-        pub_file = BASE / '.runtime' / 'public_url.txt'
-        if pub_file.is_file():
-            try:
-                txt = pub_file.read_text(encoding='utf-8').strip()
-                if txt.startswith('http'):
-                    pub_url = txt
-            except Exception:
-                pass
+        file_path = Path(row['path'])
+        drive_url = get_google_drive_file_url(file_path)
+        if drive_url:
+            return RedirectResponse(drive_url, status_code=302)
 
-        if not pub_url and request.base_url.hostname not in ('localhost', '127.0.0.1', '0.0.0.0'):
-            pub_url = str(request.base_url).rstrip('/')
-
-        # Open reliable in-browser document viewer
-        return RedirectResponse(f"/api/ksp/{job_id}/view", status_code=302)
+        # Fallback to the 2026–2027 folder on Google Drive
+        return RedirectResponse("https://drive.google.com/drive/folders/1GWtxb0KmS5kHJmaHMow_yf1I-8aVL5M_", status_code=302)
 
     @app.get('/api/ksp/{job_id}/document')
     def document(job_id: str, request: Request):
