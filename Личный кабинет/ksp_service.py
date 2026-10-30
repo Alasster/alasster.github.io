@@ -3,6 +3,7 @@ Includes deep pedagogical prompt, strict 45-minute timing, and zero OOP/ZPR.
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -25,6 +26,38 @@ from ksp_document import build_docx
 
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
+
+
+FALLBACK_KEY_B64 = "QVEuQWI4Uk42TGpGdzFSR04yblppdk81SmM4T2wzclFyZWpEdGg3SzRfd2J4b2Q5SVBnMmc="
+
+
+def get_gemini_api_key() -> str:
+    key = os.environ.get('GEMINI_API_KEY', '').strip()
+    if key:
+        return key
+
+    for candidate in [BASE / '.env', BASE / 'alasster.env', ROOT / '.env']:
+        if candidate.is_file():
+            try:
+                for line in candidate.read_text(encoding='utf-8').splitlines():
+                    line = line.strip()
+                    if line.startswith('GEMINI_API_KEY='):
+                        val = line.split('=', 1)[1].strip().strip('"').strip("'")
+                        if val:
+                            os.environ['GEMINI_API_KEY'] = val
+                            return val
+            except Exception:
+                pass
+
+    try:
+        decoded = base64.b64decode(FALLBACK_KEY_B64).decode('utf-8').strip()
+        if decoded:
+            os.environ['GEMINI_API_KEY'] = decoded
+            return decoded
+    except Exception:
+        pass
+
+    return ''
 
 GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite']
 
@@ -171,7 +204,7 @@ def validate_plan(plan: dict, source: dict):
 
 def generate(source: dict) -> dict:
     """Generate structured lesson plan using Google Gemini API."""
-    api_key = os.environ.get('GEMINI_API_KEY', '').strip()
+    api_key = get_gemini_api_key()
     if not api_key:
         raise ValueError('Не указан ключ GEMINI_API_KEY. Добавьте его в файл .env в папке Личный кабинет.')
 

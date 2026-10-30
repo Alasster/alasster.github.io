@@ -180,7 +180,7 @@ def load_local_env() -> None:
 
             if key and value:
 
-                os.environ.setdefault(key, value)
+                os.environ[key] = value
 
 
 
