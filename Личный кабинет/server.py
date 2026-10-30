@@ -677,6 +677,79 @@ def _visibility_rows() -> dict[str, bool]:
 
 
 
+
+PUBLIC_CATALOG_PATH = BASE_DIR.parent / "скрипты" / "lesson-catalog.json"
+
+
+def sync_public_lesson_catalog() -> None:
+    try:
+        PUBLIC_CATALOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        mapping = {
+            "11 класс": ("c11", "11 класс • Компьютерные системы и сети"),
+            "10 ЕМН": ("c10emn", "10 класс ЕМН • Машинное обучение"),
+            "10 ОГН": ("c10ogn", "10 класс ОГН • Информационные технологии"),
+            "9 класс": ("c9", "9 класс • Компьютерные сети"),
+            "Python основы": ("cextra", "Дополнительно • Python Практикум"),
+        }
+        catalog = {}
+        for folder_name, (cid, ctitle) in mapping.items():
+            dir_path = BASE_DIR.parent / folder_name
+            if not dir_path.is_dir():
+                continue
+            catalog[cid] = {
+                "id": cid,
+                "name": folder_name,
+                "title": ctitle,
+                "quarters": {},
+                "lessons": []
+            }
+            html_files = sorted(
+                dir_path.rglob("*.html"),
+                key=lambda p: [
+                    int(s) if s.isdigit() else s.lower()
+                    for s in re.split(r'(\d+)', p.as_posix())
+                ]
+            )
+            for f in html_files:
+                rel = f.relative_to(BASE_DIR.parent).as_posix()
+                try:
+                    c = f.read_text(encoding="utf-8", errors="replace")
+                    h1 = re.search(r"<h1\b[^>]*>(.*?)</h1\s*>", c, re.I | re.S)
+                    title = h1.group(1).strip() if h1 else ""
+                    title = re.sub(r"<[^>]+>", " ", title)
+                    title = re.sub(r"\s+", " ", unescape(title)).strip()
+                    if not title:
+                        t_match = re.search(r"<title\b[^>]*>(.*?)</title\s*>", c, re.I | re.S)
+                        title = re.sub(r"\s+", " ", unescape(t_match.group(1))).strip() if t_match else ""
+                    if not title:
+                        title = f.stem
+                except Exception:
+                    title = f.stem
+
+                stem = f.stem
+                num_match = re.search(r"^(\d+(?:\s*-\s*\d+)?)", stem)
+                num = num_match.group(1) if num_match else stem
+                if "сор" in stem.lower() and "сор" not in str(num).lower():
+                    num = f"{num} СОР"
+                elif "соч" in stem.lower() and "соч" not in str(num).lower():
+                    num = f"{num} СОЧ"
+
+                quarter_name = f.parent.name if f.parent != dir_path else "1 четверть"
+                item = {
+                    "num": num,
+                    "title": title,
+                    "path": rel,
+                    "file": rel,
+                    "quarter": quarter_name
+                }
+                catalog[cid]["quarters"].setdefault(quarter_name, []).append(item)
+                catalog[cid]["lessons"].append(item)
+
+        PUBLIC_CATALOG_PATH.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    except Exception as e:
+        LOGGER.warning("Could not sync public lesson catalog: %s", e)
+
+
 def sync_public_lesson_visibility() -> None:
 
     PUBLIC_VISIBILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -684,6 +757,7 @@ def sync_public_lesson_visibility() -> None:
     payload = {"version": 1, "lessons": _visibility_rows()}
 
     PUBLIC_VISIBILITY_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    sync_public_lesson_catalog()
 
 
 
@@ -2322,6 +2396,14 @@ class LessonVisibilityRequest(BaseModel):
 def lesson_visibility_public():
 
     return {"version": 1, "lessons": _visibility_rows()}
+
+@app.get("/api/lesson-catalog")
+def api_lesson_catalog():
+    sync_public_lesson_catalog()
+    if PUBLIC_CATALOG_PATH.is_file():
+        return JSONResponse(content=json.loads(PUBLIC_CATALOG_PATH.read_text(encoding="utf-8")))
+    return JSONResponse(content={})
+
 
 
 

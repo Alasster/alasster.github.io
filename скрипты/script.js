@@ -16,84 +16,190 @@ document.getElementById('modal-backdrop-el').addEventListener('click', event => 
 /* Complete Curriculum Data */
 const LESSONS_DATABASE = {
   c11: {
-    title: "11 класс • Нейронные сети и ИИ",
+    name: "11 класс",
+    title: "11 класс • Компьютерные системы и сети",
+    quarters: {
+      "1 четверть": [
+        { num: "1", title: "Нейронные сети", path: "11 класс/1 четверть/1 урок.html", file: "11 класс/1 четверть/1 урок.html", quarter: "1 четверть" },
+        { num: "2", title: "Задачи нейронных сетей", path: "11 класс/1 четверть/2 урок.html", file: "11 класс/1 четверть/2 урок.html", quarter: "1 четверть" },
+        { num: "3", title: "Классификация задач ИИ", path: "11 класс/1 четверть/3 урок.html", file: "11 класс/1 четверть/3 урок.html", quarter: "1 четверть" },
+        { num: "4", title: "Классификация задач ИИ", path: "11 класс/1 четверть/4 урок.html", file: "11 класс/1 четверть/4 урок.html", quarter: "1 четверть" },
+        { num: "5", title: "Управление жестами", path: "11 класс/1 четверть/5 урок.html", file: "11 класс/1 четверть/5 урок.html", quarter: "1 четверть" },
+        { num: "6", title: "Основы моделирования нейронных сетей", path: "11 класс/1 четверть/6 урок.html", file: "11 класс/1 четверть/6 урок.html", quarter: "1 четверть" },
+        { num: "7", title: "СОР 1: Моделирование нейронных сетей", path: "11 класс/1 четверть/7 урок.html", file: "11 класс/1 четверть/7 урок.html", quarter: "1 четверть" },
+      ],
+    },
     lessons: [
-      { num: 1, title: "Искусственные нейронные сети", path: "11 класс/1 четверть/1 урок.html" },
-      { num: 2, title: "Задачи нейронных сетей", path: "11 класс/1 четверть/2 урок.html" },
-      { num: 3, title: "Классификация задач ИИ", path: "11 класс/1 четверть/3 урок.html" },
-      { num: 4, title: "Классификация задач ИИ — практика", path: "11 класс/1 четверть/4 урок.html" },
-      { num: 5, title: "Управление приложением жестами", path: "11 класс/1 четверть/5 урок.html" },
-      { num: 6, title: "Основы моделирования нейронных сетей", path: "11 класс/1 четверть/6 урок.html" },
-      { num: "7 СОР", title: "Моделирование нейронных сетей", path: "11 класс/1 четверть/7 урок.html" }
+      { num: "1", title: "Нейронные сети", path: "11 класс/1 четверть/1 урок.html", file: "11 класс/1 четверть/1 урок.html", quarter: "1 четверть" },
+      { num: "2", title: "Задачи нейронных сетей", path: "11 класс/1 четверть/2 урок.html", file: "11 класс/1 четверть/2 урок.html", quarter: "1 четверть" },
+      { num: "3", title: "Классификация задач ИИ", path: "11 класс/1 четверть/3 урок.html", file: "11 класс/1 четверть/3 урок.html", quarter: "1 четверть" },
+      { num: "4", title: "Классификация задач ИИ", path: "11 класс/1 четверть/4 урок.html", file: "11 класс/1 четверть/4 урок.html", quarter: "1 четверть" },
+      { num: "5", title: "Управление жестами", path: "11 класс/1 четверть/5 урок.html", file: "11 класс/1 четверть/5 урок.html", quarter: "1 четверть" },
+      { num: "6", title: "Основы моделирования нейронных сетей", path: "11 класс/1 четверть/6 урок.html", file: "11 класс/1 четверть/6 урок.html", quarter: "1 четверть" },
+      { num: "7", title: "СОР 1: Моделирование нейронных сетей", path: "11 класс/1 четверть/7 урок.html", file: "11 класс/1 четверть/7 урок.html", quarter: "1 четверть" },
     ]
   },
   c10emn: {
+    name: "10 ЕМН",
     title: "10 класс ЕМН • Машинное обучение",
+    quarters: {
+      "1 четверть": [
+        { num: "1 -2", title: "История развития искусственного интеллекта", path: "10 ЕМН/1 четверть/1 -2 урок.html", file: "10 ЕМН/1 четверть/1 -2 урок.html", quarter: "1 четверть" },
+        { num: "3", title: "Основные понятия машинного обучения", path: "10 ЕМН/1 четверть/3 урок.html", file: "10 ЕМН/1 четверть/3 урок.html", quarter: "1 четверть" },
+        { num: "4", title: "Практика: Машинное обучение ML", path: "10 ЕМН/1 четверть/4 урок.html", file: "10 ЕМН/1 четверть/4 урок.html", quarter: "1 четверть" },
+        { num: "5", title: "Перцептрон и его назначение", path: "10 ЕМН/1 четверть/5 урок.html", file: "10 ЕМН/1 четверть/5 урок.html", quarter: "1 четверть" },
+        { num: "6", title: "Перцептрон в Excel", path: "10 ЕМН/1 четверть/6 урок.html", file: "10 ЕМН/1 четверть/6 урок.html", quarter: "1 четверть" },
+        { num: "7", title: "Однослойный перцептрон в Excel", path: "10 ЕМН/1 четверть/7 урок.html", file: "10 ЕМН/1 четверть/7 урок.html", quarter: "1 четверть" },
+        { num: "8", title: "Модели машинного обучения", path: "10 ЕМН/1 четверть/8 урок.html", file: "10 ЕМН/1 четверть/8 урок.html", quarter: "1 четверть" },
+        { num: "9", title: "Управление жестами", path: "10 ЕМН/1 четверть/9 урок.html", file: "10 ЕМН/1 четверть/9 урок.html", quarter: "1 четверть" },
+        { num: "10", title: "Алгоритмы МО: Ближайшие соседи (k-NN)", path: "10 ЕМН/1 четверть/10 урок.html", file: "10 ЕМН/1 четверть/10 урок.html", quarter: "1 четверть" },
+        { num: "11", title: "СОР 1. Алгоритмы МО: Группировка похожих (k-means)", path: "10 ЕМН/1 четверть/11 урок.html", file: "10 ЕМН/1 четверть/11 урок.html", quarter: "1 четверть" },
+        { num: "12", title: "Алгоритмы МО: Линейная регрессия: простой числовой прогноз", path: "10 ЕМН/1 четверть/12 урок.html", file: "10 ЕМН/1 четверть/12 урок.html", quarter: "1 четверть" },
+        { num: "13", title: "Суммативная работа за четверть", path: "10 ЕМН/1 четверть/13 урок.html", file: "10 ЕМН/1 четверть/13 урок.html", quarter: "1 четверть" },
+      ],
+    },
     lessons: [
-      { num: "1-2", title: "История развития искусственного интеллекта", path: "10 ЕМН/1 четверть/1 -2 урок.html" },
-      { num: 3, title: "Основные понятия машинного обучения", path: "10 ЕМН/1 четверть/3 урок.html" },
-      { num: 4, title: "Практика: понятия машинного обучения", path: "10 ЕМН/1 четверть/4 урок.html" },
-      { num: 5, title: "Перцептрон и его назначение", path: "10 ЕМН/1 четверть/5 урок.html" },
-      { num: 6, title: "Практика: перцептрон в Excel", path: "10 ЕМН/1 четверть/6 урок.html" },
-      { num: 7, title: "Практика: однослойный перцептрон в Excel", path: "10 ЕМН/1 четверть/7 урок.html" },
-      { num: 8, title: "Модели машинного обучения", path: "10 ЕМН/1 четверть/8 урок.html" },
-      { num: 9, title: "Управление приложением жестами", path: "10 ЕМН/1 четверть/9 урок.html" },
-      { num: 10, title: "Алгоритмы МО: k-NN (Ближайшие соседи)", path: "10 ЕМН/1 четверть/10 урок.html" },
-      { num: "11 СОР", title: "Алгоритмы МО: k-means (Метод k-средних)", path: "10 ЕМН/1 четверть/11 урок.html" },
-      { num: 12, title: "Алгоритмы МО: Линейная регрессия", path: "10 ЕМН/1 четверть/12 урок.html" },
-      { num: "13 СОЧ", title: "Итоговое оценивание за 1 четверть", path: "10 ЕМН/1 четверть/13 урок.html" }
+      { num: "1 -2", title: "История развития искусственного интеллекта", path: "10 ЕМН/1 четверть/1 -2 урок.html", file: "10 ЕМН/1 четверть/1 -2 урок.html", quarter: "1 четверть" },
+      { num: "3", title: "Основные понятия машинного обучения", path: "10 ЕМН/1 четверть/3 урок.html", file: "10 ЕМН/1 четверть/3 урок.html", quarter: "1 четверть" },
+      { num: "4", title: "Практика: Машинное обучение ML", path: "10 ЕМН/1 четверть/4 урок.html", file: "10 ЕМН/1 четверть/4 урок.html", quarter: "1 четверть" },
+      { num: "5", title: "Перцептрон и его назначение", path: "10 ЕМН/1 четверть/5 урок.html", file: "10 ЕМН/1 четверть/5 урок.html", quarter: "1 четверть" },
+      { num: "6", title: "Перцептрон в Excel", path: "10 ЕМН/1 четверть/6 урок.html", file: "10 ЕМН/1 четверть/6 урок.html", quarter: "1 четверть" },
+      { num: "7", title: "Однослойный перцептрон в Excel", path: "10 ЕМН/1 четверть/7 урок.html", file: "10 ЕМН/1 четверть/7 урок.html", quarter: "1 четверть" },
+      { num: "8", title: "Модели машинного обучения", path: "10 ЕМН/1 четверть/8 урок.html", file: "10 ЕМН/1 четверть/8 урок.html", quarter: "1 четверть" },
+      { num: "9", title: "Управление жестами", path: "10 ЕМН/1 четверть/9 урок.html", file: "10 ЕМН/1 четверть/9 урок.html", quarter: "1 четверть" },
+      { num: "10", title: "Алгоритмы МО: Ближайшие соседи (k-NN)", path: "10 ЕМН/1 четверть/10 урок.html", file: "10 ЕМН/1 четверть/10 урок.html", quarter: "1 четверть" },
+      { num: "11", title: "СОР 1. Алгоритмы МО: Группировка похожих (k-means)", path: "10 ЕМН/1 четверть/11 урок.html", file: "10 ЕМН/1 четверть/11 урок.html", quarter: "1 четверть" },
+      { num: "12", title: "Алгоритмы МО: Линейная регрессия: простой числовой прогноз", path: "10 ЕМН/1 четверть/12 урок.html", file: "10 ЕМН/1 четверть/12 урок.html", quarter: "1 четверть" },
+      { num: "13", title: "Суммативная работа за четверть", path: "10 ЕМН/1 четверть/13 урок.html", file: "10 ЕМН/1 четверть/13 урок.html", quarter: "1 четверть" },
     ]
   },
   c10ogn: {
+    name: "10 ОГН",
     title: "10 класс ОГН • Информационные технологии",
+    quarters: {
+      "1 четверть": [
+        { num: "1", title: "История развития искусственного интеллекта", path: "10 ОГН/1 четверть/1 урок.html", file: "10 ОГН/1 четверть/1 урок.html", quarter: "1 четверть" },
+        { num: "2", title: "Основные понятия машинного обучения", path: "10 ОГН/1 четверть/2 урок.html", file: "10 ОГН/1 четверть/2 урок.html", quarter: "1 четверть" },
+        { num: "3", title: "Модели машинного обучения", path: "10 ОГН/1 четверть/3 урок.html", file: "10 ОГН/1 четверть/3 урок.html", quarter: "1 четверть" },
+        { num: "4", title: "Создаю свою презентацию", path: "10 ОГН/1 четверть/4 урок.html", file: "10 ОГН/1 четверть/4 урок.html", quarter: "1 четверть" },
+        { num: "5", title: "Перцептрон и его назначение", path: "10 ОГН/1 четверть/5 урок.html", file: "10 ОГН/1 четверть/5 урок.html", quarter: "1 четверть" },
+        { num: "6", title: "Перцептрон в Excel", path: "10 ОГН/1 четверть/6 урок.html", file: "10 ОГН/1 четверть/6 урок.html", quarter: "1 четверть" },
+        { num: "7", title: "СОР 1: Перцептрон и его назначение", path: "10 ОГН/1 четверть/7 урок.html", file: "10 ОГН/1 четверть/7 урок.html", quarter: "1 четверть" },
+      ],
+    },
     lessons: [
-      { num: 1, title: "История развития искусственного интеллекта", path: "10 ОГН/1 четверть/1 урок.html" },
-      { num: 2, title: "Основные понятия машинного обучения", path: "10 ОГН/1 четверть/2 урок.html" },
-      { num: 3, title: "Модели машинного обучения", path: "10 ОГН/1 четверть/3 урок.html" },
-      { num: 4, title: "Проектная мастерская: презентация о МО", path: "10 ОГН/1 четверть/4 урок.html" },
-      { num: 5, title: "Перцептрон и его назначение", path: "10 ОГН/1 четверть/5 урок.html" },
-      { num: 6, title: "Практика: перцептрон в Excel", path: "10 ОГН/1 четверть/6 урок.html" },
-      { num: "7 СОР", title: "Практика: перцептрон в Excel", path: "10 ОГН/1 четверть/7 урок.html" }
+      { num: "1", title: "История развития искусственного интеллекта", path: "10 ОГН/1 четверть/1 урок.html", file: "10 ОГН/1 четверть/1 урок.html", quarter: "1 четверть" },
+      { num: "2", title: "Основные понятия машинного обучения", path: "10 ОГН/1 четверть/2 урок.html", file: "10 ОГН/1 четверть/2 урок.html", quarter: "1 четверть" },
+      { num: "3", title: "Модели машинного обучения", path: "10 ОГН/1 четверть/3 урок.html", file: "10 ОГН/1 четверть/3 урок.html", quarter: "1 четверть" },
+      { num: "4", title: "Создаю свою презентацию", path: "10 ОГН/1 четверть/4 урок.html", file: "10 ОГН/1 четверть/4 урок.html", quarter: "1 четверть" },
+      { num: "5", title: "Перцептрон и его назначение", path: "10 ОГН/1 четверть/5 урок.html", file: "10 ОГН/1 четверть/5 урок.html", quarter: "1 четверть" },
+      { num: "6", title: "Перцептрон в Excel", path: "10 ОГН/1 четверть/6 урок.html", file: "10 ОГН/1 четверть/6 урок.html", quarter: "1 четверть" },
+      { num: "7", title: "СОР 1: Перцептрон и его назначение", path: "10 ОГН/1 четверть/7 урок.html", file: "10 ОГН/1 четверть/7 урок.html", quarter: "1 четверть" },
     ]
   },
   c9: {
+    name: "9 класс",
     title: "9 класс • Компьютерные сети",
+    quarters: {
+      "1 четверть": [
+        { num: "1", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/1 четверть/1 урок.html", file: "9 класс/1 четверть/1 урок.html", quarter: "1 четверть" },
+        { num: "2", title: "IP-адрес компьютера", path: "9 класс/1 четверть/2 урок.html", file: "9 класс/1 четверть/2 урок.html", quarter: "1 четверть" },
+        { num: "3", title: "IP-адрес компьютера и протоколы", path: "9 класс/1 четверть/3 урок.html", file: "9 класс/1 четверть/3 урок.html", quarter: "1 четверть" },
+        { num: "4", title: "IP-адрес. Маска подсети", path: "9 класс/1 четверть/4 урок.html", file: "9 класс/1 четверть/4 урок.html", quarter: "1 четверть" },
+        { num: "5", title: "Доменная система имён", path: "9 класс/1 четверть/5 урок.html", file: "9 класс/1 четверть/5 урок.html", quarter: "1 четверть" },
+        { num: "6", title: "Пропускная способность сети", path: "9 класс/1 четверть/6 урок.html", file: "9 класс/1 четверть/6 урок.html", quarter: "1 четверть" },
+        { num: "7", title: "СОР 1: Пропускная способность сети", path: "9 класс/1 четверть/7 урок.html", file: "9 класс/1 четверть/7 урок.html", quarter: "1 четверть" },
+      ],
+      "2 четверть": [
+        { num: "1", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/2 четверть/1 урок.html", file: "9 класс/2 четверть/1 урок.html", quarter: "2 четверть" },
+        { num: "2", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/2 четверть/2 урок.html", file: "9 класс/2 четверть/2 урок.html", quarter: "2 четверть" },
+        { num: "3", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/2 четверть/3 урок.html", file: "9 класс/2 четверть/3 урок.html", quarter: "2 четверть" },
+      ],
+    },
     lessons: [
-      { num: 1, title: "Социальные и этические аспекты ИИ", path: "9 класс/1 четверть/1 урок.html" },
-      { num: 2, title: "IP-адрес компьютера", path: "9 класс/1 четверть/2 урок.html" },
-      { num: 3, title: "IP-адрес и сетевые протоколы", path: "9 класс/1 четверть/3 урок.html" },
-      { num: 4, title: "IP-адрес. Маска подсети", path: "9 класс/1 четверть/4 урок.html" },
-      { num: 5, title: "Доменная система имён (DNS)", path: "9 класс/1 четверть/5 урок.html" },
-      { num: 6, title: "Определение пропускной способности сети", path: "9 класс/1 четверть/6 урок.html" },
-      { num: "7 СОР", title: "Определение пропускной способности сети", path: "9 класс/1 четверть/7 урок.html" }
-    ]
-  },
-  c8: {
-    title: "8 класс • Архитектура и безопасность",
-    lessons: [
+      { num: "1", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/1 четверть/1 урок.html", file: "9 класс/1 четверть/1 урок.html", quarter: "1 четверть" },
+      { num: "2", title: "IP-адрес компьютера", path: "9 класс/1 четверть/2 урок.html", file: "9 класс/1 четверть/2 урок.html", quarter: "1 четверть" },
+      { num: "3", title: "IP-адрес компьютера и протоколы", path: "9 класс/1 четверть/3 урок.html", file: "9 класс/1 четверть/3 урок.html", quarter: "1 четверть" },
+      { num: "4", title: "IP-адрес. Маска подсети", path: "9 класс/1 четверть/4 урок.html", file: "9 класс/1 четверть/4 урок.html", quarter: "1 четверть" },
+      { num: "5", title: "Доменная система имён", path: "9 класс/1 четверть/5 урок.html", file: "9 класс/1 четверть/5 урок.html", quarter: "1 четверть" },
+      { num: "6", title: "Пропускная способность сети", path: "9 класс/1 четверть/6 урок.html", file: "9 класс/1 четверть/6 урок.html", quarter: "1 четверть" },
+      { num: "7", title: "СОР 1: Пропускная способность сети", path: "9 класс/1 четверть/7 урок.html", file: "9 класс/1 четверть/7 урок.html", quarter: "1 четверть" },
+      { num: "1", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/2 четверть/1 урок.html", file: "9 класс/2 четверть/1 урок.html", quarter: "2 четверть" },
+      { num: "2", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/2 четверть/2 урок.html", file: "9 класс/2 четверть/2 урок.html", quarter: "2 четверть" },
+      { num: "3", title: "Социальный и этический аспекты применения искусственного интеллекта", path: "9 класс/2 четверть/3 урок.html", file: "9 класс/2 четверть/3 урок.html", quarter: "2 четверть" },
     ]
   },
   cextra: {
+    name: "Python основы",
     title: "Дополнительно • Python Практикум",
+    quarters: {
+      "1 четверть": [
+        { num: "1", title: "Введение в Python", path: "Python основы/1.Основа.html", file: "Python основы/1.Основа.html", quarter: "1 четверть" },
+        { num: "2", title: "Функция print()", path: "Python основы/2.print.html", file: "Python основы/2.print.html", quarter: "1 четверть" },
+        { num: "3", title: "Переменные", path: "Python основы/3.Переменные.html", file: "Python основы/3.Переменные.html", quarter: "1 четверть" },
+        { num: "4", title: "4. Типы данных", path: "Python основы/4.Типы.html", file: "Python основы/4.Типы.html", quarter: "1 четверть" },
+        { num: "5", title: "Ввод данных", path: "Python основы/5.Input.html", file: "Python основы/5.Input.html", quarter: "1 четверть" },
+        { num: "6", title: "6. Математические операции", path: "Python основы/6.Математика.html", file: "Python основы/6.Математика.html", quarter: "1 четверть" },
+        { num: "7", title: "Логические выражения", path: "Python основы/7.Логика.html", file: "Python основы/7.Логика.html", quarter: "1 четверть" },
+        { num: "8", title: "Условные операторы", path: "Python основы/8.Условия.html", file: "Python основы/8.Условия.html", quarter: "1 четверть" },
+        { num: "9", title: "Цикл for", path: "Python основы/9.For.html", file: "Python основы/9.For.html", quarter: "1 четверть" },
+        { num: "10", title: "Цикл while", path: "Python основы/10.While.html", file: "Python основы/10.While.html", quarter: "1 четверть" },
+        { num: "11", title: "Списки (Lists)", path: "Python основы/11.Списки.html", file: "Python основы/11.Списки.html", quarter: "1 четверть" },
+        { num: "12", title: "Работа со списками", path: "Python основы/12.Работа со списками.html", file: "Python основы/12.Работа со списками.html", quarter: "1 четверть" },
+        { num: "13", title: "Работа со строками", path: "Python основы/13.Строки.html", file: "Python основы/13.Строки.html", quarter: "1 четверть" },
+        { num: "14", title: "Создание функций", path: "Python основы/14.Функции.html", file: "Python основы/14.Функции.html", quarter: "1 четверть" },
+        { num: "15", title: "Работа с файлами", path: "Python основы/15.Файлы.html", file: "Python основы/15.Файлы.html", quarter: "1 четверть" },
+      ],
+    },
     lessons: [
-      { num: 1, title: "Python: Введение и Основы", path: "Python основы/1.Основа.html" },
-      { num: 2, title: "Python: Вывод данных (print)", path: "Python основы/2.print.html" },
-      { num: 3, title: "Python: Переменные и память", path: "Python основы/3.Переменные.html" },
-      { num: 4, title: "Python: Типы данных", path: "Python основы/4.Типы.html" },
-      { num: 5, title: "Python: Ввод данных (input)", path: "Python основы/5.Input.html" },
-      { num: 6, title: "Python: Математические операции", path: "Python основы/6.Математика.html" },
-      { num: 7, title: "Python: Логические выражения", path: "Python основы/7.Логика.html" },
-      { num: 8, title: "Python: Условные конструкции", path: "Python основы/8.Условия.html" },
-      { num: 9, title: "Python: Цикл for", path: "Python основы/9.For.html" },
-      { num: 10, title: "Python: Цикл while", path: "Python основы/10.While.html" },
-      { num: 11, title: "Python: Списки (List)", path: "Python основы/11.Списки.html" },
-      { num: 12, title: "Python: Работа со списками", path: "Python основы/12.Работа со списками.html" },
-      { num: 13, title: "Python: Строки (Strings)", path: "Python основы/13.Строки.html" },
-      { num: 14, title: "Python: Функции (def)", path: "Python основы/14.Функции.html" },
-      { num: 15, title: "Python: Работа с файлами", path: "Python основы/15.Файлы.html" }
+      { num: "1", title: "Введение в Python", path: "Python основы/1.Основа.html", file: "Python основы/1.Основа.html", quarter: "1 четверть" },
+      { num: "2", title: "Функция print()", path: "Python основы/2.print.html", file: "Python основы/2.print.html", quarter: "1 четверть" },
+      { num: "3", title: "Переменные", path: "Python основы/3.Переменные.html", file: "Python основы/3.Переменные.html", quarter: "1 четверть" },
+      { num: "4", title: "4. Типы данных", path: "Python основы/4.Типы.html", file: "Python основы/4.Типы.html", quarter: "1 четверть" },
+      { num: "5", title: "Ввод данных", path: "Python основы/5.Input.html", file: "Python основы/5.Input.html", quarter: "1 четверть" },
+      { num: "6", title: "6. Математические операции", path: "Python основы/6.Математика.html", file: "Python основы/6.Математика.html", quarter: "1 четверть" },
+      { num: "7", title: "Логические выражения", path: "Python основы/7.Логика.html", file: "Python основы/7.Логика.html", quarter: "1 четверть" },
+      { num: "8", title: "Условные операторы", path: "Python основы/8.Условия.html", file: "Python основы/8.Условия.html", quarter: "1 четверть" },
+      { num: "9", title: "Цикл for", path: "Python основы/9.For.html", file: "Python основы/9.For.html", quarter: "1 четверть" },
+      { num: "10", title: "Цикл while", path: "Python основы/10.While.html", file: "Python основы/10.While.html", quarter: "1 четверть" },
+      { num: "11", title: "Списки (Lists)", path: "Python основы/11.Списки.html", file: "Python основы/11.Списки.html", quarter: "1 четверть" },
+      { num: "12", title: "Работа со списками", path: "Python основы/12.Работа со списками.html", file: "Python основы/12.Работа со списками.html", quarter: "1 четверть" },
+      { num: "13", title: "Работа со строками", path: "Python основы/13.Строки.html", file: "Python основы/13.Строки.html", quarter: "1 четверть" },
+      { num: "14", title: "Создание функций", path: "Python основы/14.Функции.html", file: "Python основы/14.Функции.html", quarter: "1 четверть" },
+      { num: "15", title: "Работа с файлами", path: "Python основы/15.Файлы.html", file: "Python основы/15.Файлы.html", quarter: "1 четверть" },
     ]
-  }
+  },
 };
+
+function updateLessonCatalog(cat) {
+  if (!cat || typeof cat !== 'object') return;
+  Object.keys(cat).forEach(k => {
+    if (LESSONS_DATABASE[k]) {
+      if (cat[k].title) LESSONS_DATABASE[k].title = cat[k].title;
+      if (cat[k].quarters) LESSONS_DATABASE[k].quarters = cat[k].quarters;
+      if (cat[k].lessons) LESSONS_DATABASE[k].lessons = cat[k].lessons;
+    } else {
+      LESSONS_DATABASE[k] = cat[k];
+    }
+  });
+}
+
+fetch('/скрипты/lesson-catalog.json?t=' + Date.now(), { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(updateLessonCatalog)
+  .catch(() => {});
+
+fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(data => {
+    if (data?.url) {
+      fetch(data.url + '/api/lesson-catalog?t=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(updateLessonCatalog)
+        .catch(() => {});
+    }
+  })
+  .catch(() => {});
 
 let publicVisibility = {};
 const lessonIsPublic = (file) => {
@@ -159,24 +265,10 @@ function showClassModal(id) {
     list.innerHTML = '';
     list.scrollTop = 0;
 
-    const has13Soch = data.lessons.some(l => String(l.num).includes('13') && String(l.num).toUpperCase().includes('СОЧ'));
-    const seenFiles = new Set();
-    const latestLessons = [...data.lessons].sort((a, b) =>
-      (parseInt(String(b.num), 10) || 0) - (parseInt(String(a.num), 10) || 0)
-    ).filter(l => {
-      const numStr = String(l.num).trim();
-      if (has13Soch && (numStr === '13' || (numStr.startsWith('13') && !numStr.toUpperCase().includes('СОЧ')))) {
-        return false;
-      }
-      const norm = (l.path || l.file || '').toLowerCase().replace(/\\/g, '/').split('/').pop();
-      if (seenFiles.has(norm)) return false;
-      seenFiles.add(norm);
-      return lessonIsPublic(l.path || l.file);
-    });
-    latestLessons.forEach(l => {
+    const renderLessonCard = (l) => {
       const row = document.createElement('a');
       row.className = 'lesson-card-item lesson-row-card';
-      row.href = encodeURI(l.path);
+      row.href = encodeURI(l.path || l.file);
       row.innerHTML = `
         <div class="lesson-num-badge lesson-badge-id">${l.num}</div>
         <div class="lesson-title-text lesson-title-label">${l.title}</div>
@@ -185,14 +277,35 @@ function showClassModal(id) {
         </div>
       `;
       list.appendChild(row);
-    });
+    };
+
+    const quarterNames = data.quarters ? Object.keys(data.quarters) : [];
+    const hasMultipleQuarters = quarterNames.length > 1;
+
+    if (hasMultipleQuarters) {
+      quarterNames.forEach(qName => {
+        const qLessons = data.quarters[qName] || [];
+        const visibleLessons = qLessons.filter(l => lessonIsPublic(l.path || l.file));
+        if (visibleLessons.length === 0) return;
+
+        const qDivider = document.createElement('div');
+        qDivider.className = 'modal-quarter-divider';
+        qDivider.innerHTML = `<span>${qName}</span>`;
+        list.appendChild(qDivider);
+
+        visibleLessons.forEach(renderLessonCard);
+      });
+    } else {
+      const lessons = data.lessons || [];
+      const visibleLessons = lessons.filter(l => lessonIsPublic(l.path || l.file));
+      visibleLessons.forEach(renderLessonCard);
+    }
   }
 
   const backdrop = document.getElementById('modal-backdrop-el');
   if (!backdrop) return;
 
   backdrop.dataset.classTheme = id;
-
   backdrop.removeAttribute('inert');
   backdrop.inert = false;
   backdrop.classList.add('active');
