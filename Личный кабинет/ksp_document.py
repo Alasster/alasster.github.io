@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import os
 import re
 import subprocess
@@ -40,7 +41,7 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
     if not lesson_path.is_file():
         return {}
 
-    h_hash = abs(hash(lesson_relative_path)) % 1000000
+    h_hash = hashlib.md5(lesson_relative_path.encode('utf-8')).hexdigest()[:10]
     stage_keys = ['intro', 'theory', 'practice', 'summary']
 
     # Check if all cached screenshots already exist on disk
@@ -486,20 +487,16 @@ def docx_to_html(doc_path: Path | str) -> str:
             html_parts.append('<tr>')
             for cell in row.cells:
                 html_parts.append('<td>')
+                blips = cell._tc.xpath('.//*[local-name()="blip"]')
                 for p in cell.paragraphs:
                     p_text = p.text.strip()
-                    img_tags = []
-                    for blip in cell._tc.xpath('.//*[local-name()="blip"]'):
-                        embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
-                        if embed_id and embed_id in images:
-                            img_tags.append(f'<div class="ksp-img-box"><img src="{images[embed_id]}" alt="Скриншот с alasster.site" style="max-width:260px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.15); margin:6px 0; border: 1px solid #cbd5e1;"></div>')
-
                     if p_text:
-                        p_html = re.sub(r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?[:—–])', r'<strong>\1</strong>', p_text)
+                        p_html = re.sub(r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?\s*[:—–-](?:\*{1,2})?)\s*', r'<strong>\1 </strong>', p_text)
                         html_parts.append(f'<p>{p_html}</p>')
-
-                    for it in img_tags:
-                        html_parts.append(it)
+                for blip in blips:
+                    embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+                    if embed_id and embed_id in images:
+                        html_parts.append(f'<div class="ksp-img-box" style="text-align:center; margin:8px 0;"><img src="{images[embed_id]}" alt="Скриншот с www.alasster.site" style="max-width:280px; width:100%; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15); border: 1px solid #cbd5e1;"></div>')
                 html_parts.append('</td>')
             html_parts.append('</tr>')
         html_parts.append('</table>')

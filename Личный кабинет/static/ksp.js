@@ -80,9 +80,9 @@
     const isReady = job?.status === 'ready';
     const isShiftClick = Boolean(event.shiftKey);
 
-    // If ready and not forcing re-generation: Open in Google Docs!
+    // If ready and not forcing re-generation: Open in browser viewer!
     if (isReady && !isShiftClick) {
-      const targetUrl = job.google_docs_url || `/api/ksp/${encodeURIComponent(job.id)}/google-docs`;
+      const targetUrl = job.view_url || `/api/ksp/${encodeURIComponent(job.id)}/view`;
       window.open(targetUrl, '_blank', 'noopener');
       return;
     }

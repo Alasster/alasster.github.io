@@ -565,14 +565,8 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
         if not pub_url and request.base_url.hostname not in ('localhost', '127.0.0.1', '0.0.0.0'):
             pub_url = str(request.base_url).rstrip('/')
 
-        if pub_url:
-            from urllib.parse import quote
-            file_url = f"{pub_url}/api/ksp/{job_id}/document"
-            viewer_url = f"https://docs.google.com/viewer?url={quote(file_url, safe='')}&embedded=false"
-            return RedirectResponse(viewer_url, status_code=302)
-
-        drive_url = "https://drive.google.com/drive/folders/1skfm8UZo7rAcWLJFpULLgICGyoJsXsJo"
-        return RedirectResponse(drive_url, status_code=302)
+        # Open reliable in-browser document viewer
+        return RedirectResponse(f"/api/ksp/{job_id}/view", status_code=302)
 
     @app.get('/api/ksp/{job_id}/document')
     def document(job_id: str, request: Request):
