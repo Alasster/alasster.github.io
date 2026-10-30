@@ -13,6 +13,8 @@ import hashlib
 import os
 import re
 import subprocess
+import shutil
+import glob
 import tempfile
 from pathlib import Path
 import docx
@@ -27,6 +29,35 @@ FONT_NAME = 'Times New Roman'
 
 SCREENSHOTS_DIR = BASE / '.runtime' / 'ksp' / 'screenshots'
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+def cleanup_ksp_temp_files(slide_shots: dict | None = None):
+    """Automatically cleans up temporary screenshot images, temporary html, and Chrome data."""
+    # 1. Clean up intermediate PNG screenshot files used in this docx build
+    if slide_shots:
+        for shot_file in set(slide_shots.values()):
+            if shot_file and os.path.isfile(shot_file):
+                try:
+                    os.unlink(shot_file)
+                except Exception:
+                    pass
+
+    # 2. Clean any lingering screenshot PNG files in SCREENSHOTS_DIR
+    if SCREENSHOTS_DIR.is_dir():
+        for f in SCREENSHOTS_DIR.glob('*.png'):
+            try:
+                f.unlink()
+            except Exception:
+                pass
+
+    # 3. Clean temporary HTML files in %TEMP%
+    temp_dir = tempfile.gettempdir()
+    for pattern in ('temp_*_*.html', 'ksp_slide_*.html'):
+        for f in glob.glob(os.path.join(temp_dir, pattern)):
+            try:
+                os.unlink(f)
+            except Exception:
+                pass
+
 
 
 def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
@@ -125,6 +156,12 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
                     results[slide_idx] = str(cache_file)
             except Exception:
                 pass
+            finally:
+                if os.path.isfile(temp_html):
+                    try:
+                        os.unlink(temp_html)
+                    except Exception:
+                        pass
 
         # Compatibility aliases
         if 0 in results: results['intro'] = results[0]
@@ -135,6 +172,9 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
         return results
     except Exception:
         return {}
+    finally:
+        if user_data and os.path.isdir(user_data):
+            shutil.rmtree(user_data, ignore_errors=True)
 
 
 def capture_lesson_screenshot(lesson_relative_path: str) -> str | None:
@@ -587,6 +627,10 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
         except Exception:
             pass
     temp_target.replace(target_path)
+
+    # Immediately clean up all temporary screenshots and temp files now that they are embedded in docx
+    cleanup_ksp_temp_files(slide_shots)
+
     return str(target_path)
 
 
