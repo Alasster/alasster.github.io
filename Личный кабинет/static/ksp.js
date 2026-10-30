@@ -9,7 +9,7 @@
   let refreshing = false;
   const starting = new Set();
 
-  function announce(text) {
+  function announce(text, isError = false) {
     let status = document.getElementById('ksp-status');
     if (!status) {
       status = document.createElement('p');
@@ -17,11 +17,24 @@
       status.className = 'panel-message';
       status.setAttribute('role', 'status');
       status.setAttribute('aria-live', 'polite');
-      status.style.marginBottom = '12px';
+      status.style.marginBottom = '14px';
+      status.style.padding = '10px 14px';
+      status.style.borderRadius = '10px';
       status.style.fontWeight = '500';
+      status.style.fontSize = '0.9rem';
+      status.style.transition = 'all 0.3s ease';
       grid.before(status);
     }
     status.textContent = text;
+    if (isError) {
+      status.style.background = 'rgba(239, 68, 68, 0.12)';
+      status.style.color = '#dc2626';
+      status.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+    } else {
+      status.style.background = 'rgba(72, 187, 120, 0.12)';
+      status.style.color = '#15803d';
+      status.style.border = '1px solid rgba(72, 187, 120, 0.3)';
+    }
   }
 
   function paint() {
@@ -40,17 +53,17 @@
       button.setAttribute('aria-busy', String(busy));
 
       if (busy) {
-        button.textContent = job?.message || 'Запуск…';
-        button.title = 'Идёт составление плана урока…';
+        button.textContent = job?.message || 'Генерация…';
+        button.title = 'Методист Gemini составляет подробный КСП (45 мин, 14pt, без ООП)…';
       } else if (ready) {
         button.textContent = 'КСП';
-        button.title = 'Скачать готовый КСП (DOCX)';
+        button.title = 'КСП уже автоматически сохранён в Google Диске! Нажмите, чтобы открыть DOCX';
       } else if (job?.status === 'error') {
         button.textContent = 'КСП';
         button.title = job.message || 'Ошибка генерации. Нажмите для повтора.';
       } else {
         button.textContent = 'КСП';
-        button.title = 'Сгенерировать КСП по этому уроку';
+        button.title = 'Сгенерировать КСП и сохранить на Google Диск';
       }
 
       button.setAttribute('aria-label', button.title);
@@ -72,12 +85,16 @@
 
       Object.entries(jobs).forEach(([key, job]) => {
         if (active.has(previous[key]?.status) && !active.has(job.status)) {
-          announce(job.message || 'Создание КСП завершено');
+          if (job.status === 'ready') {
+            announce('✓ КСП успешно создан и автоматически сохранён в Google Диске (папка КСП / 2026–2027). Нажмите кнопку, чтобы открыть файл.');
+          } else if (job.status === 'error') {
+            announce(job.message || 'Ошибка при составлении КСП', true);
+          }
         }
       });
       paint();
     } catch (_) {
-      // Background poll failure is silent and does not disrupt cabinet
+      // Background poll failure
     } finally {
       refreshing = false;
       clearTimeout(timer);
@@ -96,13 +113,14 @@
     if (!key || starting.has(key) || active.has(jobs[key]?.status)) return;
 
     if (jobs[key]?.status === 'ready' && jobs[key]?.url) {
+      announce('Файл открывается. Он также уже сохранён на вашем Google Диске в папке «КСП / 2026–2027».');
       window.open(jobs[key].url, '_blank', 'noopener');
       return;
     }
 
     starting.add(key);
     paint();
-    announce('Запущен методист Gemini. Генерация КСП идёт в фоне, сайт не зависает.');
+    announce('Запущен методист Gemini. Генерация идёт в фоне, файл автоматически запишется в Google Диск.');
 
     try {
       const response = await fetch('/api/ksp', {
@@ -118,7 +136,7 @@
       jobs[key] = result;
       announce(result.message || 'Создание КСП в процессе…');
     } catch (error) {
-      announce(error.name === 'TimeoutError' ? 'Запрос отправлен, ожидаем результат…' : error.message);
+      announce(error.name === 'TimeoutError' ? 'Запрос отправлен, ожидаем результат…' : error.message, true);
     } finally {
       starting.delete(key);
       paint();

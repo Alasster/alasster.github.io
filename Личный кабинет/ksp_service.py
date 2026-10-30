@@ -1,4 +1,6 @@
-"""Isolated, durable KSP generation service powered by Google Gemini API."""
+"""Isolated, durable KSP generation service powered by Google Gemini API.
+Includes deep pedagogical prompt, strict 45-minute timing, and zero OOP/ZPR.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -24,7 +26,6 @@ from ksp_document import build_docx
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
 
-DEFAULT_GEMINI_KEY = 'AIzaSyDW-0vHR3_5HZbd1BiQj-8p3nJjEe9ZHHs'
 GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite']
 
 GEMINI_PLAN_SCHEMA = {
@@ -87,8 +88,8 @@ def lesson_source(key: str) -> dict:
     if not path.is_relative_to(ROOT.resolve()) or path.suffix != '.html':
         raise ValueError('Недопустимый путь урока')
     parts = path.relative_to(ROOT).parts
-    if len(parts) != 3 or not re.fullmatch(r'(?:9 класс|10 ЕМН|10 ОГН|11 класс)', parts[0]):
-        raise ValueError('КСП доступен только для школьных уроков 9–11 классов')
+    if len(parts) != 3 or parts[0] == 'Python основы':
+        raise ValueError('КСП доступен для школьных уроков (кроме Python основы)')
     if not path.is_file():
         raise ValueError('Файл урока не найден')
 
@@ -115,13 +116,14 @@ def lesson_source(key: str) -> dict:
     if not goals and html_goals:
         goals = html_goals
     if not goals:
-        raise ValueError('В выбранном уроке не найдена точная цель обучения.')
+        # Fallback to general topic goal if not in definition
+        goals = [f"{parts[0]}: освоение темы «{title}»"]
 
     dates = re.findall(r'(?<!\d)(?:\d{2}\.\d{2}\.20\d{2}|20\d{2}-\d{2}-\d{2})(?!\d)', plain(html))
     date_val = slot.get('date') or (dates[0] if dates else '07.09.2026')
     section_val = slot.get('section') or 'Информатика'
     theme_val = slot.get('theme') or title
-    num = re.search(r'\d+', path.stem).group()
+    num = re.search(r'\d+', path.stem).group() if re.search(r'\d+', path.stem) else '1'
 
     return dict(
         key=key,
@@ -169,30 +171,45 @@ def validate_plan(plan: dict, source: dict):
 
 def generate(source: dict) -> dict:
     """Generate structured lesson plan using Google Gemini API."""
-    api_key = os.environ.get('GEMINI_API_KEY') or DEFAULT_GEMINI_KEY
+    api_key = os.environ.get('GEMINI_API_KEY', '').strip()
+    if not api_key:
+        raise ValueError('Не указан ключ GEMINI_API_KEY. Добавьте его в файл .env в папке Личный кабинет.')
+
     teacher_name = os.environ.get('KSP_TEACHER', 'Кадыржанов Ж.К.')
     school_name = 'ГПХ на ПХВ «Школа - гимназия №22»'
 
-    system_instructions = f"""Ты — высококвалифицированный методист по информатике в Республике Казахстан.
-Составь полный, подробный, образцовый краткосрочный план урока (КСП) в формате JSON строго по структуре.
+    system_instructions = f"""Ты — выдающийся методист по информатике в Республике Казахстан.
+Твоя задача — составить максимально подробный, глубокий и высокопрофессиональный краткосрочный план урока (КСП) в формате JSON строго по структуре.
 
 СТРОЖАЙШИЕ ПРАВИЛА:
 1. КАТЕГОРИЧЕСКИ БЕЗ ООП (в классе нет детей с ООП или ЗПР, любые слова ООП, ЗПР, адаптации исключить полностью).
-2. Общее время: ровно 45 минут, ровно 5 этапов:
+2. Общее время урока: ровно 45 минут, ровно 5 этапов:
    - 1. ОРГ. МОМЕНТ (5 мин)
    - 2. АКТУАЛИЗАЦИЯ ЗНАНИЙ (5 мин)
    - 3. ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (10 мин)
    - 4. ПРАКТИЧЕСКАЯ РАБОТА (20 мин)
    - 5. ПОДВЕДЕНИЕ ИТОГОВ УРОКА (5 мин)
 3. Обязательно связать с платформой www.alasster.site ({source['class_name']}, {source['quarter']}, {source['number']} урок).
-4. Деятельность учителя (teacher_actions): расписать максимально подробно и конкретно прямую речь педагога, вопросы к классу с правильными ответами, инструкции, демонстрацию.
-   В практической части обязательно дать минимум 3 конкретных практических задания с условиями, решениями и дескрипторами для учителя.
-5. Деятельность обучающихся (student_actions): детально расписать наблюдаемые действия учеников на уроке.
-6. Оценивание (assessment): словесная похвала, критерии, формативное оценивание (10-балльная шкала с баллами).
-7. Функциональная грамотность (functional_literacy): практический кейс по стандартам ICILS/PISA.
-8. Искусственный интеллект (ai_tools): Chat gpt, google ai studio, claude, copilot, gemini — конкретные примеры их использования учителем при подготовке и учениками.
+4. ТРЕБОВАНИЯ К ДЕЯТЕЛЬНОСТИ УЧИТЕЛЯ (teacher_actions):
+   - Орг. момент (5 мин): Приветствие («Здравствуйте, ребята!»), создание коллаборативной среды, психологический настрой, объявление темы, целей урока и критериев успеха понятным языком.
+   - Актуализация знаний (5 мин): Интерактивная разминка или фронтальный опрос. Обязательно написать прямую речь учителя с конкретными вопросами и ожидаемыми ответами учащихся. Логическая подводка к новой теме.
+   - Объяснение нового материала (10 мин): Глубокое, подробное объяснение ключевых понятий и алгоритмов темы (НЕ общие фразы!). Прямая речь учителя: термины, наглядные примеры из жизни, демонстрация слайдов и демонстрационных материалов с сайта www.alasster.site, промежуточные контрольные вопросы для проверки понимания.
+   - Практическая работа (20 мин): Инструктаж по технике безопасности и работе за ПК. Постановка задачи. ОБЯЗАТЕЛЬНО минимум 3 конкретных практических задания:
+     * Задание 1 (базовый уровень): условие, пошаговая инструкция, правильный ответ, дескриптор.
+     * Задание 2 (применение): условие задачи/кейса, решение, дескриптор.
+     * Задание 3 (высокий уровень / продвинутое): проблемная задача на анализ, решение, дескриптор.
+     Для учителя обязательно расписать ключи ответов и чёткие дескрипторы оценивания.
+   - Подведение итогов (5 мин): Развёрнутая рефлексия («Конструктор урока», анкета или карточки). Разбор типичных ошибок. Выставление и комментирование баллов ФО. Чёткий инструктаж по домашнему заданию.
+5. ТРЕБОВАНИЯ К ДЕЯТЕЛЬНОСТИ ОБУЧАЮЩИХСЯ (student_actions):
+   - Реальные действия школьников: работа на ПК, конспектирование в тетрадях, выполнение заданий на www.alasster.site, ответы на вопросы, взаимопроверка.
+6. ОЦЕНИВАНИЕ (assessment):
+   - Словесная похвала учителя, критериальное и формативное оценивание (10-балльная шкала с баллами за каждое задание).
+7. ФУНКЦИОНАЛЬНАЯ ГРАМОТНОСТЬ (functional_literacy):
+   - Практический кейс по стандартам ICILS/PISA (применение цифровых навыков в реальной жизни).
+8. ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ (ai_tools):
+   - Chat gpt, google ai studio, claude, copilot, gemini — конкретные сценарии применения учителем при подготовке и учениками для проверки.
 
-ИСХОДНЫЕ ДАННЫЕ УРОКА:
+ДАННЫЕ УРОКА:
 - Школа: {school_name}
 - ФИО учителя: {teacher_name}
 - Предмет: Информатика
@@ -225,8 +242,16 @@ def generate(source: dict) -> dict:
                     plan = json.loads(text_content)
                     validate_plan(plan, source)
                     return plan
+                elif resp.status_code == 403:
+                    resp_json = resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {}
+                    err_msg = resp_json.get('error', {}).get('message', '')
+                    if 'leaked' in err_msg.lower():
+                        raise ValueError('Ключ Gemini API заблокирован Google (обнаружен в публичном доступе). Пожалуйста, создайте новый бесплатный ключ на https://aistudio.google.com/app/apikey и добавьте в .env')
+                    last_error = f"Gemini 403: {err_msg or resp.text[:200]}"
                 else:
                     last_error = f"Gemini {model} вернул статус {resp.status_code}: {resp.text[:250]}"
+        except ValueError:
+            raise
         except Exception as exc:
             last_error = f"Gemini {model} ошибка подключения: {str(exc)}"
 
@@ -238,14 +263,13 @@ class KspService:
         self.state = Path(state_dir or BASE / '.runtime' / 'ksp')
         self.state.mkdir(parents=True, exist_ok=True)
         self.db_path = self.state / 'jobs.sqlite3'
-        
-        # Local Google Drive folder or default parent
+
         configured_output = os.environ.get('KSP_OUTPUT_ROOT')
         if configured_output:
             self.output_root = Path(configured_output)
         else:
             self.output_root = Path(ROOT.parent / 'КСП')
-            
+
         self.template = Path(os.environ.get('KSP_TEMPLATE_PATH', BASE / 'ksp_template.docx'))
         self.generator = generator or generate
         self.pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix='ksp')
@@ -295,7 +319,7 @@ class KspService:
                                 ident = row['id'] if row else uuid.uuid4().hex
                                 db.execute(
                                     'INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
-                                    (key, ident, 'ready', 'КСП готов', str(target), src['source_hash'])
+                                    (key, ident, 'ready', 'КСП готов в Google Диске', str(target), src['source_hash'])
                                 )
                     except Exception:
                         continue
@@ -324,7 +348,7 @@ class KspService:
     def start(self, key: str) -> dict:
         source = lesson_source(key)
         target = output_path(source, self.output_root)
-        
+
         with self.lock:
             with self.db() as db:
                 row = db.execute('SELECT * FROM jobs WHERE key=?', (source['key'],)).fetchone()
@@ -334,9 +358,9 @@ class KspService:
                     ident = row['id'] if row else uuid.uuid4().hex
                     db.execute(
                         'INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
-                        (source['key'], ident, 'ready', 'КСП готов', str(target), source['source_hash'])
+                        (source['key'], ident, 'ready', 'КСП готов в Google Диске', str(target), source['source_hash'])
                     )
-                    return dict(id=ident, status='ready', message='КСП готов', url=f"/api/ksp/{ident}/document")
+                    return dict(id=ident, status='ready', message='КСП готов в Google Диске', url=f"/api/ksp/{ident}/document")
 
                 if not self.template.is_file():
                     raise ValueError('Не найден образец КСП (ksp_template.docx).')
@@ -344,11 +368,11 @@ class KspService:
                 ident = uuid.uuid4().hex
                 db.execute(
                     'INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
-                    (source['key'], ident, 'queued', 'В очереди', '', source['source_hash'])
+                    (source['key'], ident, 'queued', 'В очереди…', '', source['source_hash'])
                 )
 
             self.pool.submit(self.run, source)
-        return dict(id=ident, status='queued', message='В очереди')
+        return dict(id=ident, status='queued', message='В очереди…')
 
     def run(self, source: dict):
         key = source['key']
@@ -360,7 +384,7 @@ class KspService:
             self.update(key, 'saving', 'Сборка DOCX…')
             target = output_path(source, self.output_root)
             build_docx(self.template, target, source, plan)
-            self.update(key, 'ready', 'КСП готов', str(target))
+            self.update(key, 'ready', 'КСП сохранён в Google Диске', str(target))
         except Exception as exc:
             message = str(exc) if isinstance(exc, ValueError) else 'Ошибка генерации КСП. Повторите попытку.'
             self.update(key, 'error', message)
@@ -383,7 +407,17 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
 
     def authorize(request: Request):
         access = require_superadmin(request)
-        return access if isinstance(access, JSONResponse) else None
+        if isinstance(access, JSONResponse):
+            # Check teacher or admin
+            try:
+                from server import get_user_from_request
+                user = get_user_from_request(request)
+                if user and user.get("role") in {"teacher", "admin", "superadmin"}:
+                    return None
+            except Exception:
+                pass
+            return access
+        return None
 
     @app.get('/api/ksp')
     def statuses(request: Request):
