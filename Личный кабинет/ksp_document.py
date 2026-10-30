@@ -29,6 +29,7 @@ def set_cell_text(cell, text: str, bold: bool = False, italic: bool = False,
     lines = str(text or '').split('\n')
     for i, line in enumerate(lines):
         p = cell.paragraphs[0] if i == 0 else cell.add_paragraph()
+        p.text = ''
         p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.space_after = Pt(2)
         p.paragraph_format.line_spacing = 1.15
