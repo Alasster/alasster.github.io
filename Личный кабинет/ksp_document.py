@@ -173,12 +173,12 @@ SEMANTIC_MARKERS = [
 ]
 
 MARKER_SPLIT_REGEX = re.compile(
-    r'(?:(?<=[.!?])|(?<=[.!?]["\'»”]))\s+(?=(?:\*\*)?(?:' + '|'.join(SEMANTIC_MARKERS) + r')(?:\*\*)?[:—–\s])',
+    r'(?:(?<=[.!?])|(?<=[.!?]["\'»”]))\s+(?=(?:\*\*)?(?:' + '|'.join(SEMANTIC_MARKERS) + r')(?:\*\*)?\s*[:—–-])',
     re.I
 )
 
 LABEL_MATCH_REGEX = re.compile(
-    r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?[:—–](?:\*{1,2})?)\s*(.*)$',
+    r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?\s*[:—–-](?:\*{1,2})?)\s*(.*)$',
     re.S
 )
 
@@ -228,7 +228,7 @@ def set_cell_formatted(cell, text: str, bold: bool = False, italic: bool = False
             p._p.remove(r._r)
         p.alignment = align
         p.paragraph_format.space_before = Pt(2)
-        p.paragraph_format.space_after = Pt(5)  # Distinct blank space between paragraphs!
+        p.paragraph_format.space_after = Pt(7)  # Distinct blank space between paragraphs!
         p.paragraph_format.line_spacing = 1.15
 
         para_clean = para_text.strip()
@@ -408,10 +408,11 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     slide_shots = capture_lesson_slides(source.get('key', ''))
 
     stage_shot_map = {
-        1: slide_shots.get('intro'),     # Stage 2: Актуализация (Введение/Тема)
-        2: slide_shots.get('theory'),    # Stage 3: Объяснение (Теория)
-        3: slide_shots.get('practice'),  # Stage 4: Практика (Практикум)
-        4: slide_shots.get('summary')    # Stage 5: Итоги (Тест/Рефлексия)
+        0: slide_shots.get('intro'),     # Stage 1: Орг. момент (Титульный слайд темы на www.alasster.site)
+        1: slide_shots.get('intro') or slide_shots.get('theory'), # Stage 2: Актуализация
+        2: slide_shots.get('theory'),    # Stage 3: Объяснение (Теоретический блок)
+        3: slide_shots.get('practice'),  # Stage 4: Практика (Интерактивная лаборатория)
+        4: slide_shots.get('summary')    # Stage 5: Итоги (Итоговый тест / рефлексия)
     }
 
     # Populate Table 1 stages strictly in 12pt with formatted paragraphs and screenshots

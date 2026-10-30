@@ -1,126 +1,137 @@
-/* KSP Action Buttons & States with Premium Animations */
+/* Neumorphic KSP Action Buttons: Yellow (Busy), Green (Ready), Red (Error) */
 
 .lesson-ksp-button {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  padding: 5px 12px !important;
-  border-radius: 9px !important;
+  flex: 0 0 auto;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 52px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 12px !important;
+  font-family: var(--font, inherit) !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: var(--surface, #e7ebf3);
+  color: var(--text-dark, #263248);
+  box-shadow: 3px 3px 6px rgba(163, 174, 195, 0.42), -3px -3px 6px rgba(255, 255, 255, 0.75);
+  transition: all 0.22s ease !important;
+  user-select: none;
 }
 
-/* Ready State: Vibrant Green Neumorphic */
+.lesson-ksp-button:hover {
+  box-shadow: inset 2px 2px 5px rgba(163, 174, 195, 0.38), inset -2px -2px 5px rgba(255, 255, 255, 0.85);
+  transform: none;
+}
+
+.lesson-ksp-button:active {
+  transform: translateY(1px);
+}
+
+:root[data-theme="dark"] .lesson-ksp-button {
+  background: var(--surface, #202633);
+  color: var(--text, #e7ebf5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 3px 3px 6px rgba(11, 15, 25, 0.46), -3px -3px 6px rgba(190, 205, 235, 0.1);
+}
+
+:root[data-theme="dark"] .lesson-ksp-button:hover {
+  box-shadow: inset 2px 2px 5px rgba(11, 15, 25, 0.55), inset -2px -2px 5px rgba(190, 205, 235, 0.08);
+}
+
+/* 1. Yellow Neumorphic: Ожидание / Генерация (ksp-busy) */
+.lesson-ksp-button.ksp-busy {
+  cursor: progress !important;
+  pointer-events: none;
+  color: #854d0e !important;
+  background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%) !important;
+  border: 1px solid #fde047 !important;
+  box-shadow: inset 3px 3px 6px rgba(180, 83, 9, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.9) !important;
+  animation: ksp-neu-yellow-pulse 2s infinite ease-in-out !important;
+}
+
+:root[data-theme="dark"] .lesson-ksp-button.ksp-busy {
+  color: #fef08a !important;
+  background: linear-gradient(135deg, #422006 0%, #713f12 100%) !important;
+  border: 1px solid #a16207 !important;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.65), inset -3px -3px 6px rgba(253, 224, 71, 0.08) !important;
+  animation: ksp-neu-yellow-pulse-dark 2s infinite ease-in-out !important;
+}
+
+@keyframes ksp-neu-yellow-pulse {
+  0%, 100% {
+    box-shadow: inset 3px 3px 6px rgba(180, 83, 9, 0.22), inset -3px -3px 6px rgba(255, 255, 255, 0.9), 0 0 0 rgba(234, 179, 8, 0);
+  }
+  50% {
+    box-shadow: inset 3px 3px 6px rgba(180, 83, 9, 0.32), inset -3px -3px 6px rgba(255, 255, 255, 0.95), 0 0 10px rgba(234, 179, 8, 0.4);
+  }
+}
+
+@keyframes ksp-neu-yellow-pulse-dark {
+  0%, 100% {
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.6), inset -3px -3px 6px rgba(253, 224, 71, 0.08);
+  }
+  50% {
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.7), inset -3px -3px 6px rgba(253, 224, 71, 0.14), 0 0 10px rgba(234, 179, 8, 0.3);
+  }
+}
+
+/* 2. Green Neumorphic: Готово (ksp-ready) */
 .lesson-ksp-button.ksp-ready {
-  color: #0d6838 !important;
-  background: linear-gradient(135deg, #e4f9eb 0%, #cbf2d6 100%) !important;
-  border: 1px solid #48bb78 !important;
-  box-shadow: 0 2px 6px rgba(72, 187, 120, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  color: #065f46 !important;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  border: 1px solid #6ee7b7 !important;
+  box-shadow: 3px 3px 7px rgba(16, 185, 129, 0.28), -3px -3px 7px rgba(255, 255, 255, 0.9) !important;
 }
 
 .lesson-ksp-button.ksp-ready:hover {
-  background: linear-gradient(135deg, #d3f5dc 0%, #b8ebc6 100%) !important;
-  box-shadow: 0 4px 10px rgba(72, 187, 120, 0.35) !important;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+  box-shadow: inset 2px 2px 5px rgba(5, 150, 105, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.9) !important;
 }
 
 :root[data-theme="dark"] .lesson-ksp-button.ksp-ready {
   color: #6ee7b7 !important;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.25) 100%) !important;
-  border: 1px solid rgba(16, 185, 129, 0.5) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+  border: 1px solid #059669 !important;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(110, 231, 183, 0.1) !important;
 }
 
 :root[data-theme="dark"] .lesson-ksp-button.ksp-ready:hover {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.35) 100%) !important;
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(110, 231, 183, 0.12) !important;
 }
 
-/* Busy / Generating State: Futuristic Gemini AI Shimmer & Sparkle */
-.lesson-ksp-button.ksp-busy {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 7px !important;
-  cursor: progress !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  color: #312e81 !important;
-  background: linear-gradient(90deg, #e0e7ff 0%, #fae8ff 35%, #cffafe 70%, #e0e7ff 100%) !important;
-  background-size: 300% 100% !important;
-  border: 1px solid #818cf8 !important;
-  box-shadow: 0 0 12px rgba(129, 140, 248, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
-  animation: ksp-gemini-shimmer 2.2s infinite linear, ksp-pulse-glow 2s infinite ease-in-out !important;
-  pointer-events: none;
-  min-width: 140px;
-}
-
-:root[data-theme="dark"] .lesson-ksp-button.ksp-busy {
-  color: #e0e7ff !important;
-  background: linear-gradient(90deg, #1e1b4b 0%, #3b0764 35%, #083344 70%, #1e1b4b 100%) !important;
-  background-size: 300% 100% !important;
-  border: 1px solid #a855f7 !important;
-  box-shadow: 0 0 14px rgba(168, 85, 247, 0.45) !important;
-}
-
-/* Glowing Rotating AI Star / Sparkle Icon */
-.lesson-ksp-button.ksp-busy::before {
-  content: '' !important;
-  display: inline-block !important;
-  width: 13px !important;
-  height: 13px !important;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'%3E%3Cpath d='M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z'/%3E%3C/svg%3E") no-repeat center center / contain !important;
-  animation: ksp-sparkle-spin 1.8s infinite linear, ksp-sparkle-scale 1.2s infinite ease-in-out !important;
-  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.6));
-  flex-shrink: 0;
-}
-
-:root[data-theme="dark"] .lesson-ksp-button.ksp-busy::before {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a855f7'%3E%3Cpath d='M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z'/%3E%3C/svg%3E") no-repeat center center / contain !important;
-  filter: drop-shadow(0 0 6px rgba(192, 132, 252, 0.8));
-}
-
-@keyframes ksp-gemini-shimmer {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 300% 50%; }
-}
-
-@keyframes ksp-pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(129, 140, 248, 0.35);
-    border-color: #818cf8;
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(192, 132, 252, 0.6);
-    border-color: #c084fc;
-  }
-}
-
-@keyframes ksp-sparkle-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes ksp-sparkle-scale {
-  0%, 100% { transform: scale(0.9); }
-  50% { transform: scale(1.25); }
-}
-
-/* Error State */
+/* 3. Red Neumorphic: Ошибка (ksp-error) */
 .lesson-ksp-button.ksp-error {
-  color: #b91c1c !important;
-  background: rgba(239, 68, 68, 0.1) !important;
-  border: 1px solid rgba(239, 68, 68, 0.4) !important;
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15) !important;
+  color: #991b1b !important;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
+  border: 1px solid #fca5a5 !important;
+  box-shadow: 3px 3px 7px rgba(239, 68, 68, 0.24), -3px -3px 7px rgba(255, 255, 255, 0.9) !important;
 }
 
 .lesson-ksp-button.ksp-error:hover {
-  background: rgba(239, 68, 68, 0.18) !important;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+  box-shadow: inset 2px 2px 5px rgba(220, 38, 38, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.9) !important;
+}
+
+:root[data-theme="dark"] .lesson-ksp-button.ksp-error {
+  color: #fca5a5 !important;
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%) !important;
+  border: 1px solid #ef4444 !important;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(252, 165, 165, 0.1) !important;
+}
+
+:root[data-theme="dark"] .lesson-ksp-button.ksp-error:hover {
+  background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(252, 165, 165, 0.12) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lesson-ksp-button.ksp-busy,
-  .lesson-ksp-button.ksp-busy::before {
+  .lesson-ksp-button.ksp-busy {
     animation: none !important;
   }
 }
