@@ -52,18 +52,29 @@
       button.disabled = busy;
       button.setAttribute('aria-busy', String(busy));
 
+      const group = button.closest('.lesson-ksp-group');
+      const viewButton = group?.querySelector('.lesson-ksp-view-button') ||
+                         grid.querySelector(`.lesson-ksp-view-button[data-lesson-path="${CSS.escape(key)}"]`);
+
       if (busy) {
         button.textContent = job?.message || 'Генерация…';
-        button.title = 'Методист Gemini составляет подробный КСП (45 мин, 14pt, без ООП)…';
+        button.title = 'Методист Gemini составляет подробный КСП (45 мин, 12pt, без ООП)…';
+        if (viewButton) viewButton.hidden = true;
       } else if (ready) {
         button.textContent = 'КСП';
-        button.title = 'КСП уже автоматически сохранён в Google Диске! Нажмите, чтобы открыть DOCX';
+        button.title = 'КСП сохранён! Нажмите, чтобы скачать DOCX файл';
+        if (viewButton) {
+          viewButton.hidden = false;
+          viewButton.title = 'Открыть КСП в Google Документах';
+        }
       } else if (job?.status === 'error') {
         button.textContent = 'КСП';
         button.title = job.message || 'Ошибка генерации. Нажмите для повтора.';
+        if (viewButton) viewButton.hidden = true;
       } else {
         button.textContent = 'КСП';
         button.title = 'Сгенерировать КСП и сохранить на Google Диск';
+        if (viewButton) viewButton.hidden = true;
       }
 
       button.setAttribute('aria-label', button.title);
@@ -86,7 +97,7 @@
       Object.entries(jobs).forEach(([key, job]) => {
         if (active.has(previous[key]?.status) && !active.has(job.status)) {
           if (job.status === 'ready') {
-            announce('✓ КСП успешно создан и автоматически сохранён в Google Диске (папка КСП / 2026–2027). Нажмите кнопку, чтобы открыть файл.');
+            announce('✓ КСП успешно создан и автоматически сохранён в Google Диске (папка КСП / 2026–2027). Нажмите кнопку со значком глаза, чтобы открыть в Google Документах, или кнопку КСП для скачивания.');
           } else if (job.status === 'error') {
             announce(job.message || 'Ошибка при составлении КСП', true);
           }
@@ -105,6 +116,31 @@
   }
 
   grid.addEventListener('click', async event => {
+    // 1. Eye Button: Open in Google Docs / Google Drive
+    const viewButton = event.target.closest('.lesson-ksp-view-button');
+    if (viewButton && grid.contains(viewButton)) {
+      event.preventDefault();
+      const key = viewButton.dataset.lessonPath;
+      const job = jobs[key];
+      if (job?.status === 'ready' && job?.url) {
+        const isPublicHttps = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
+        const docsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + job.url)}`;
+        const gDriveFolderUrl = 'https://drive.google.com/drive/folders/1skfm8UZo7rAcWLJFpULLgICGyoJsXsJo';
+
+        if (isPublicHttps) {
+          announce('Открываем созданный КСП в Google Документах…');
+          window.open(docsViewerUrl, '_blank', 'noopener');
+        } else {
+          announce('Открываем папку КСП на Google Диске (файл сохранён и синхронизируется автоматически)…');
+          window.open(gDriveFolderUrl, '_blank', 'noopener');
+        }
+      } else {
+        announce('КСП для этого урока ещё не создан. Нажмите кнопку «КСП», чтобы сгенерировать.', true);
+      }
+      return;
+    }
+
+    // 2. KSP Button: Generate or Download
     const button = event.target.closest('.lesson-ksp-button');
     if (!button || !grid.contains(button)) return;
     event.preventDefault();
@@ -113,7 +149,7 @@
     if (!key || starting.has(key) || active.has(jobs[key]?.status)) return;
 
     if (jobs[key]?.status === 'ready' && jobs[key]?.url) {
-      announce('Файл открывается. Он также уже сохранён на вашем Google Диске в папке «КСП / 2026–2027».');
+      announce('Скачивание файла DOCX. Он также сохранён на вашем Google Диске в папке «КСП / 2026–2027».');
       window.open(jobs[key].url, '_blank', 'noopener');
       return;
     }

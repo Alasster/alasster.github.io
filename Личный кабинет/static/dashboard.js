@@ -2016,24 +2016,32 @@ function renderLessonsCatalog(classes) {
 
         if (item.name !== 'Python основы') {
 
+          const kspGroup = document.createElement('div');
+          kspGroup.className = 'lesson-ksp-group';
+
           const kspButton = document.createElement('button');
-
           kspButton.className = 'button button-ghost lesson-ksp-button';
-
           kspButton.type = 'button';
-
           kspButton.dataset.lessonPath = lesson.file_path || decodeURIComponent(lessonKey);
-
           kspButton.textContent = 'КСП';
-
           kspButton.title = 'Создать КСП по этому уроку';
-
           kspButton.setAttribute('aria-label', `КСП: ${lesson.title}`);
+
+          const viewButton = document.createElement('button');
+          viewButton.className = 'button button-ghost lesson-ksp-view-button';
+          viewButton.type = 'button';
+          viewButton.dataset.lessonPath = lesson.file_path || decodeURIComponent(lessonKey);
+          viewButton.title = 'Открыть КСП в Google Документах';
+          viewButton.setAttribute('aria-label', `Открыть КСП в Google Документах: ${lesson.title}`);
+          viewButton.innerHTML = '<i class="fa-regular fa-eye"></i>';
+          viewButton.hidden = true;
+
           if (window.currentCabinetUser?.role !== 'superadmin' && window.currentCabinetUser?.role !== 'teacher') {
-            kspButton.hidden = true;
+            kspGroup.hidden = true;
           }
 
-          row.append(kspButton);
+          kspGroup.append(kspButton, viewButton);
+          row.append(kspGroup);
 
         }
 

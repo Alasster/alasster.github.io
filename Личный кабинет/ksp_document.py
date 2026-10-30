@@ -1,31 +1,96 @@
 """Robust, template-preserving DOCX builder for Kazakhstan KSP lesson plans using python-docx.
-Strictly 14pt Times New Roman, Table 1 starts on Page 2, preserves neat screenshots.
+- Strict 12pt Times New Roman everywhere.
+- Table 1 starts on Page 2.
+- Captures and embeds real screenshots from the corresponding lesson on www.alasster.site.
+- Strictly zero mentions of OOP / ZPR.
 """
 from __future__ import annotations
 
 import os
 import re
-from copy import deepcopy
+import subprocess
+import tempfile
 from pathlib import Path
 import docx
-from docx.shared import Pt
-from docx.enum.text import WD_BREAK
+from docx.shared import Pt, Inches
+from docx.enum.text import WD_BREAK, WD_ALIGN_PARAGRAPH
 
-FONT_SIZE = Pt(14)
+BASE = Path(__file__).resolve().parent
+ROOT = BASE.parent
+
+FONT_SIZE = Pt(12)
 FONT_NAME = 'Times New Roman'
 
 
-def set_cell_text(cell, text: str, bold: bool = False, italic: bool = False,
-                  font_size: Pt = FONT_SIZE, font_name: str = FONT_NAME,
-                  preserve_drawings: bool = False):
-    """Format cell text cleanly preserving 14pt Times New Roman and optional screenshots."""
-    drawing_paragraphs = []
-    if preserve_drawings:
-        for p in cell.paragraphs:
-            if p._p.xpath('.//w:drawing'):
-                drawing_paragraphs.append(deepcopy(p._p))
+def capture_lesson_screenshot(lesson_relative_path: str) -> str | None:
+    """Take a crisp, headless screenshot of the corresponding lesson HTML file."""
+    browser = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
+    if not os.path.exists(browser):
+        browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+    if not os.path.exists(browser):
+        return None
 
+    lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
+    if not lesson_path.is_file():
+        return None
+
+    try:
+        html = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
+        # Strip external network scripts and external CSS to guarantee instant offline rendering
+        clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html, flags=re.S | re.I)
+        clean_html = re.sub(r'<link\b[^>]*http[^>]*>', '', clean_html, flags=re.I)
+
+        # Inject base href to resolve local stylesheets and images cleanly
+        base_dir = lesson_path.parent.as_posix()
+        base_tag = f'<base href="file:///{base_dir}/">'
+        clean_html = re.sub(r'(<head\b[^>]*>)', r'\1' + base_tag, clean_html, flags=re.I)
+
+        temp_html = os.path.join(tempfile.gettempdir(), f'lesson_snap_{os.getpid()}_{abs(hash(lesson_relative_path)) % 10000}.html')
+        with open(temp_html, 'w', encoding='utf-8') as f:
+            f.write(clean_html)
+
+        out_png = os.path.join(tempfile.gettempdir(), f'lesson_snap_{os.getpid()}_{abs(hash(lesson_relative_path)) % 10000}.png')
+        user_data = tempfile.mkdtemp()
+        file_url = 'file:///' + temp_html.replace('\\', '/')
+
+        cmd = [
+            browser,
+            '--headless=new',
+            '--disable-gpu',
+            '--no-sandbox',
+            '--window-size=1200,750',
+            f'--user-data-dir={user_data}',
+            f'--screenshot={out_png}',
+            file_url
+        ]
+        subprocess.run(cmd, capture_output=True, timeout=8)
+        if os.path.isfile(out_png) and os.path.getsize(out_png) > 1000:
+            return out_png
+    except Exception:
+        pass
+    return None
+
+
+def sanitize_ksp_text(text: str) -> str:
+    """Strictly scrub forbidden classroom terms: interactive whiteboards and laptops."""
+    if not text:
+        return ''
+    # Replace interactive whiteboard mentions
+    text = re.sub(r'\bинтерактивн\w*\s+доск\w*', 'платформу www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bсмарт[- ]доск\w*', 'платформу www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\b(на|к)\s+доск[еу]\b', 'к платформе www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bу\s+доски\b', 'на платформе www.alasster.site', text, flags=re.I)
+    # Replace laptop mentions
+    text = re.sub(r'\bна\s+ноутбук\w*', 'на рабочих местах на платформе www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bноутбук\w*', 'рабочие места', text, flags=re.I)
+    return text
+
+
+def set_cell_text(cell, text: str, bold: bool = False, italic: bool = False,
+                  font_size: Pt = FONT_SIZE, font_name: str = FONT_NAME):
+    """Format cell text cleanly strictly in 12pt Times New Roman."""
     cell.text = ''
+    text = sanitize_ksp_text(text)
     lines = str(text or '').split('\n')
     for i, line in enumerate(lines):
         p = cell.paragraphs[0] if i == 0 else cell.add_paragraph()
@@ -39,17 +104,13 @@ def set_cell_text(cell, text: str, bold: bool = False, italic: bool = False,
         run.font.name = font_name
         run.font.size = font_size
 
-    if preserve_drawings:
-        for dp in drawing_paragraphs:
-            cell._tc.append(dp)
-
 
 def build_docx(template_path: Path | str, target_path: Path | str, source: dict, plan: dict):
     """
     Builds a finished, formatted KSP docx based on the school's template.
-    1. Font size: 14pt Times New Roman everywhere.
+    1. Font size: 12pt Times New Roman everywhere.
     2. Table 1 ("Ход урока") starts strictly on Page 2.
-    3. Screenshots/drawings in lesson stages are preserved and formatted neatly.
+    3. Screenshots of the real corresponding lesson are taken and neatly embedded.
     4. Strictly removes any OOP / ZPR rows or mentions.
     """
     template_path = Path(template_path)
@@ -85,11 +146,9 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
         t1_idx = body.index(t1._tbl)
         between_p_elems = [body[i] for i in range(t0_idx + 1, t1_idx) if body[i].tag.endswith('p')]
 
-        # Remove extra empty paragraphs between tables
         for p_elem in between_p_elems[1:]:
             body.remove(p_elem)
 
-        # In the first paragraph between Table 0 and Table 1, insert page break
         if between_p_elems:
             break_p = [p for p in doc.paragraphs if p._p == between_p_elems[0]][0]
             break_p.text = ''
@@ -99,7 +158,6 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
             r = break_p.add_run()
             r.add_break(WD_BREAK.PAGE)
         else:
-            # If no paragraph existed between tables, insert one before t1
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(0)
@@ -137,11 +195,10 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
         'Искусственный интеллект': header.get('ai_tools', 'Chat gpt, google ai studio, claude, copilot, gemini')
     }
 
-    # Populate Table 0 cells with 14pt font
+    # Populate Table 0 cells strictly in 12pt
     for row in t0.rows:
         if not row.cells:
             continue
-        # Set label in 14pt bold
         for p in row.cells[0].paragraphs:
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(2)
@@ -157,9 +214,8 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                 set_cell_text(row.cells[1], v, bold=False, font_size=FONT_SIZE)
                 break
 
-    # Format Table 1 header rows with 14pt
+    # Format Table 1 header rows strictly in 12pt
     if len(t1.rows) > 0:
-        # Row 0: "Ход урока" banner
         for p in t1.rows[0].cells[0].paragraphs:
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(2)
@@ -170,7 +226,6 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                 r.bold = True
 
     if len(t1.rows) > 1:
-        # Row 1: Columns ["Этапы урока", "Деятельность учителя", ...]
         for cell in t1.rows[1].cells:
             for p in cell.paragraphs:
                 p.paragraph_format.space_before = Pt(0)
@@ -181,7 +236,10 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                     r.font.size = FONT_SIZE
                     r.bold = True
 
-    # Populate Table 1 stages with 14pt font & preserved screenshots
+    # Capture real screenshot of the corresponding lesson
+    lesson_screenshot_path = capture_lesson_screenshot(source.get('key', ''))
+
+    # Populate Table 1 stages strictly in 12pt with lesson screenshot
     stages = plan.get('stages', [])
     for i, stage in enumerate(stages[:5]):
         row_idx = 2 + i
@@ -190,8 +248,17 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
             s_name = stage.get('stage_name', f"Этап {i+1}")
             set_cell_text(r.cells[0], s_name, bold=True, font_size=FONT_SIZE)
             set_cell_text(r.cells[1], stage.get('teacher_actions', ''), font_size=FONT_SIZE)
-            # In cell 2 (Деятельность обучающихся), preserve screenshots!
-            set_cell_text(r.cells[2], stage.get('student_actions', ''), font_size=FONT_SIZE, preserve_drawings=True)
+            set_cell_text(r.cells[2], stage.get('student_actions', ''), font_size=FONT_SIZE)
+
+            # In stage 3 (Объяснение нового материала), insert the crisp lesson screenshot!
+            if i == 2 and lesson_screenshot_path and os.path.isfile(lesson_screenshot_path):
+                p_shot = r.cells[2].add_paragraph()
+                p_shot.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                p_shot.paragraph_format.space_before = Pt(4)
+                p_shot.paragraph_format.space_after = Pt(2)
+                r_shot = p_shot.add_run()
+                r_shot.add_picture(lesson_screenshot_path, width=Inches(3.2))
+
             set_cell_text(r.cells[3], stage.get('assessment', ''), font_size=FONT_SIZE)
             set_cell_text(r.cells[4], stage.get('resources', ''), font_size=FONT_SIZE)
 
