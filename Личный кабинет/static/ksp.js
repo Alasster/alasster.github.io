@@ -116,24 +116,15 @@
   }
 
   grid.addEventListener('click', async event => {
-    // 1. Eye Button: Open in Google Docs / Google Drive
+    // 1. Eye Button: Open directly IN BROWSER TAB (NOT download!)
     const viewButton = event.target.closest('.lesson-ksp-view-button');
     if (viewButton && grid.contains(viewButton)) {
       event.preventDefault();
       const key = viewButton.dataset.lessonPath;
       const job = jobs[key];
-      if (job?.status === 'ready' && job?.url) {
-        const isPublicHttps = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
-        const docsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + job.url)}`;
-        const gDriveFolderUrl = 'https://drive.google.com/drive/folders/1skfm8UZo7rAcWLJFpULLgICGyoJsXsJo';
-
-        if (isPublicHttps) {
-          announce('Открываем созданный КСП в Google Документах…');
-          window.open(docsViewerUrl, '_blank', 'noopener');
-        } else {
-          announce('Открываем папку КСП на Google Диске (файл сохранён и синхронизируется автоматически)…');
-          window.open(gDriveFolderUrl, '_blank', 'noopener');
-        }
+      if (job?.status === 'ready' && job?.id) {
+        announce('Открываем созданный КСП в браузере…');
+        window.open(`/api/ksp/${encodeURIComponent(job.id)}/view`, '_blank', 'noopener');
       } else {
         announce('КСП для этого урока ещё не создан. Нажмите кнопку «КСП», чтобы сгенерировать.', true);
       }
