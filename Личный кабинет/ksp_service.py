@@ -23,6 +23,7 @@ from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, Redirect
 from pydantic import BaseModel
 
 from ksp_document import build_docx, docx_to_html, get_weekly_quote
+import ksp_drive
 
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
@@ -439,6 +440,11 @@ class KspService:
         self.template = Path(os.environ.get('KSP_TEMPLATE_PATH', BASE / 'ksp_template.docx'))
         self.generator = generator or generate
         self.pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix='ksp')
+        self.local = drive_available()                      # PC with Google Drive for Desktop
+        self.cloud = (not self.local) and ksp_drive.configured()  # Render: Google Drive API
+        self.drive = ksp_drive.DriveClient() if self.cloud else None
+        self._index = {}
+        self._index_ts = 0.0
         self.lock = threading.Lock()
 
         with self.db() as db:
@@ -469,7 +475,9 @@ class KspService:
 
     def sync_existing_files(self):
         """Detect existing docx files on disk and register them as ready."""
-        if not drive_available():
+        if self.cloud:
+            return self.sync_cloud()
+        if not self.local:
             return
         try:
             timetable_file = BASE / 'ksp-timetable.json'
@@ -494,6 +502,41 @@ class KspService:
         except Exception:
             pass
 
+    def sync_cloud(self, max_age: float = 30.0):
+        """Cloud mode: the Google Drive folder is the source of truth (Render disk is ephemeral)."""
+        import time
+        if time.time() - self._index_ts < max_age:
+            return
+        try:
+            index = self.drive.index_docs()
+        except Exception:
+            return
+        self._index, self._index_ts = index, time.time()
+        try:
+            timetable_file = BASE / 'ksp-timetable.json'
+            schedule = json.loads(timetable_file.read_text(encoding='utf-8')) if timetable_file.is_file() else {}
+            with self.db() as db:
+                found = set()
+                for key in schedule:
+                    try:
+                        src = lesson_source(key)
+                    except Exception:
+                        continue
+                    title = output_path(src, self.output_root).stem
+                    doc_id = index.get((src['class_name'], src['quarter'], title))
+                    row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
+                    if doc_id:
+                        found.add(key)
+                        if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
+                            continue
+                        ident = row['id'] if row else uuid.uuid4().hex
+                        db.execute('INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
+                                   (key, ident, 'ready', 'КСП готов в Google Диске', f'gdrive:{doc_id}', src['source_hash']))
+                    elif row and row['status'] == 'ready' and str(row['path']).startswith('gdrive:'):
+                        db.execute('DELETE FROM jobs WHERE key=?', (key,))  # doc was deleted from Drive
+        except Exception:
+            pass
+
     def statuses(self):
         self.sync_existing_files()
         with self.db() as db:
@@ -502,7 +545,7 @@ class KspService:
 
     def public(self, row: dict) -> dict:
         result = {k: row[k] for k in ('id', 'status', 'message')}
-        if row.get('status') == 'ready' and row.get('path') and not Path(row['path']).is_file():
+        if row.get('status') == 'ready' and row.get('path') and not str(row['path']).startswith('gdrive:') and not Path(row['path']).is_file():
             result['status'] = 'error'
             result['message'] = 'Файл не найден в Google Диске. Нажмите КСП для повтора.'
             return result
@@ -513,7 +556,9 @@ class KspService:
             # Resolve direct Google Docs edit URL
             file_path = row.get('path')
             direct_docs_url = None
-            if file_path:
+            if file_path and str(file_path).startswith('gdrive:'):
+                direct_docs_url = f"https://docs.google.com/document/d/{str(file_path)[7:]}/edit"
+            elif file_path:
                 try:
                     direct_docs_url = get_google_drive_file_url(file_path)
                 except Exception:
@@ -531,10 +576,10 @@ class KspService:
 
     def start(self, key: str, force: bool = False) -> dict:
         source = lesson_source(key)
-        if not drive_available():
+        if not (self.local or self.cloud):
             raise ValueError(
-                'КСП сохраняется в Google Диск только на ПК, где он установлен. '
-                'Запустите ЗАПУСТИТЬ_СЕРВЕР.bat и откройте кабинет по адресу http://127.0.0.1:8010'
+                'Не настроен Google Диск: добавьте GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET и '
+                'GOOGLE_DRIVE_REFRESH_TOKEN в переменные Render (инструкция: Настроить_Google_Диск.py).'
             )
         target = output_path(source, self.output_root)
 
@@ -574,6 +619,16 @@ class KspService:
             self.update(key, 'validating', 'Проверка структуры…')
             validate_plan(plan, source)
             self.update(key, 'saving', 'Сборка DOCX…')
+            if self.cloud:
+                tmp = self.state / 'out_cloud' / f'{uuid.uuid4().hex}.docx'
+                build_docx(self.template, tmp, source, plan)
+                self.update(key, 'saving', 'Загрузка в Google Диск…')
+                title = output_path(source, self.output_root).stem
+                doc_id = self.drive.upload_docx_as_gdoc(tmp, [source['class_name'], source['quarter']], title)
+                tmp.unlink(missing_ok=True)
+                self._index_ts = 0.0
+                self.update(key, 'ready', 'КСП сохранён в Google Диске', f'gdrive:{doc_id}')
+                return
             target = output_path(source, self.output_root)
             build_docx(self.template, target, source, plan)
             import time
@@ -643,6 +698,8 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
         svc = get_service()
         with svc.db() as db:
             row = db.execute("SELECT path FROM jobs WHERE id=? AND status='ready'", (job_id,)).fetchone()
+        if row and str(row['path']).startswith('gdrive:'):
+            return RedirectResponse(f"https://docs.google.com/document/d/{str(row['path'])[7:]}/edit", status_code=302)
         if not row or not Path(row['path']).is_file():
             raise HTTPException(404, 'Документ не найден')
 
@@ -668,6 +725,8 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
         svc = get_service()
         with svc.db() as db:
             row = db.execute("SELECT path FROM jobs WHERE id=? AND status='ready'", (job_id,)).fetchone()
+        if row and str(row['path']).startswith('gdrive:'):
+            return RedirectResponse(f"https://docs.google.com/document/d/{str(row['path'])[7:]}/export?format=docx", status_code=302)
         if not row or not Path(row['path']).is_file():
             raise HTTPException(404, 'Документ не найден')
         path = Path(row['path']).resolve()

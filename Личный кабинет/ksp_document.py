@@ -27,7 +27,8 @@ ROOT = BASE.parent
 FONT_SIZE = Pt(12)
 FONT_NAME = 'Times New Roman'
 
-SCREENSHOTS_DIR = BASE / '.runtime' / 'ksp' / 'screenshots'
+# Committed to git so the cloud server (no Chrome) can embed the same screenshots.
+SCREENSHOTS_DIR = BASE / 'ksp_screenshots'
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 def cleanup_ksp_temp_files(slide_shots: dict | None = None):
@@ -72,7 +73,7 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
     if not os.path.exists(browser):
         browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
     if not os.path.exists(browser):
-        return {}
+        browser = None  # cloud: only use screenshots already stored in ksp_screenshots/
 
     lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
     if not lesson_path.is_file():
@@ -101,6 +102,9 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
             cache_file = SCREENSHOTS_DIR / f'slide_{h_hash}_s{slide_idx}.png'
             if cache_file.is_file() and cache_file.stat().st_size > 1000:
                 results[slide_idx] = str(cache_file)
+                continue
+
+            if not browser:
                 continue
 
             if user_data is None:

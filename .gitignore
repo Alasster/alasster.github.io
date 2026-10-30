@@ -19,5 +19,4 @@ _backup_site_legacy/
 *.db
 Личный кабинет/backups/
 Личный кабинет/generator/backups/
-
-
+Личный кабинет/client_secret.json
