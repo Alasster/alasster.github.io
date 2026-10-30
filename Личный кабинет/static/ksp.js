@@ -52,29 +52,18 @@
       button.disabled = busy;
       button.setAttribute('aria-busy', String(busy));
 
-      const group = button.closest('.lesson-ksp-group');
-      const viewButton = group?.querySelector('.lesson-ksp-view-button') ||
-                         grid.querySelector(`.lesson-ksp-view-button[data-lesson-path="${CSS.escape(key)}"]`);
-
       if (busy) {
         button.textContent = job?.message || 'Генерация…';
-        button.title = 'Методист Gemini составляет подробный КСП (45 мин, 12pt, без ООП)…';
-        if (viewButton) viewButton.hidden = true;
+        button.title = 'Методист Gemini составляет подробный КСП (45 мин, 12pt, ГОСО РК, Google Диск)…';
       } else if (ready) {
         button.textContent = 'КСП';
-        button.title = 'КСП сохранён! Нажмите, чтобы скачать DOCX файл';
-        if (viewButton) {
-          viewButton.hidden = false;
-          viewButton.title = 'Открыть КСП в Google Документах';
-        }
+        button.title = 'Открыть КСП в Google Документах (Shift + клик для перегенерации)';
       } else if (job?.status === 'error') {
         button.textContent = 'КСП';
         button.title = job.message || 'Ошибка генерации. Нажмите для повтора.';
-        if (viewButton) viewButton.hidden = true;
       } else {
         button.textContent = 'КСП';
-        button.title = 'Сгенерировать КСП и сохранить на Google Диск';
-        if (viewButton) viewButton.hidden = true;
+        button.title = 'Сгенерировать подробный КСП и сохранить на Google Диск';
       }
 
       button.setAttribute('aria-label', button.title);
@@ -97,7 +86,7 @@
       Object.entries(jobs).forEach(([key, job]) => {
         if (active.has(previous[key]?.status) && !active.has(job.status)) {
           if (job.status === 'ready') {
-            announce('✓ КСП успешно создан и автоматически сохранён в Google Диске (папка КСП / 2026–2027). Нажмите кнопку со значком глаза, чтобы открыть в Google Документах, или кнопку КСП для скачивания.');
+            announce('✓ КСП успешно создан и сохранён на Google Диске (папка «КСП / 2026–2027»). Нажмите кнопку «КСП», чтобы открыть в Google Документах.');
           } else if (job.status === 'error') {
             announce(job.message || 'Ошибка при составлении КСП', true);
           }
@@ -116,22 +105,6 @@
   }
 
   grid.addEventListener('click', async event => {
-    // 1. Eye Button: Open directly IN BROWSER TAB (NOT download!)
-    const viewButton = event.target.closest('.lesson-ksp-view-button');
-    if (viewButton && grid.contains(viewButton)) {
-      event.preventDefault();
-      const key = viewButton.dataset.lessonPath;
-      const job = jobs[key];
-      if (job?.status === 'ready' && job?.id) {
-        announce('Открываем созданный КСП в браузере…');
-        window.open(`/api/ksp/${encodeURIComponent(job.id)}/view`, '_blank', 'noopener');
-      } else {
-        announce('КСП для этого урока ещё не создан. Нажмите кнопку «КСП», чтобы сгенерировать.', true);
-      }
-      return;
-    }
-
-    // 2. KSP Button: Generate or Download
     const button = event.target.closest('.lesson-ksp-button');
     if (!button || !grid.contains(button)) return;
     event.preventDefault();
@@ -139,21 +112,32 @@
     const key = button.dataset.lessonPath;
     if (!key || starting.has(key) || active.has(jobs[key]?.status)) return;
 
-    if (jobs[key]?.status === 'ready' && jobs[key]?.url) {
-      announce('Скачивание файла DOCX. Он также сохранён на вашем Google Диске в папке «КСП / 2026–2027».');
-      window.open(jobs[key].url, '_blank', 'noopener');
+    const job = jobs[key];
+    const isReady = job?.status === 'ready';
+    const isShiftClick = Boolean(event.shiftKey);
+
+    // If ready and not forcing re-generation: Open in Google Docs!
+    if (isReady && !isShiftClick) {
+      announce('Открываем созданный КСП в Google Документах (Google Диск: папка «КСП / 2026–2027»). Зажмите Shift при клике, чтобы перегенерировать.');
+      const targetUrl = job.google_docs_url || `/api/ksp/${encodeURIComponent(job.id)}/google-docs`;
+      window.open(targetUrl, '_blank', 'noopener');
       return;
     }
 
+    // Otherwise: trigger generation (or forced re-generation)
     starting.add(key);
     paint();
-    announce('Запущен методист Gemini. Генерация идёт в фоне, файл автоматически запишется в Google Диск.');
+    if (isShiftClick) {
+      announce('Запущена повторная генерация КСП через Gemini (с актуальными скриншотами и подробными объяснениями)…');
+    } else {
+      announce('Запущен методист Gemini. Генерация идёт в фоне, файл автоматически запишется в Google Диск.');
+    }
 
     try {
       const response = await fetch('/api/ksp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lesson_path: key }),
+        body: JSON.stringify({ lesson_path: key, force: isShiftClick }),
         signal: AbortSignal.timeout(20000)
       });
       const result = await response.json();

@@ -2016,9 +2016,6 @@ function renderLessonsCatalog(classes) {
 
         if (item.name !== 'Python основы') {
 
-          const kspGroup = document.createElement('div');
-          kspGroup.className = 'lesson-ksp-group';
-
           const kspButton = document.createElement('button');
           kspButton.className = 'button button-ghost lesson-ksp-button';
           kspButton.type = 'button';
@@ -2027,21 +2024,11 @@ function renderLessonsCatalog(classes) {
           kspButton.title = 'Создать КСП по этому уроку';
           kspButton.setAttribute('aria-label', `КСП: ${lesson.title}`);
 
-          const viewButton = document.createElement('button');
-          viewButton.className = 'button button-ghost lesson-ksp-view-button';
-          viewButton.type = 'button';
-          viewButton.dataset.lessonPath = lesson.file_path || decodeURIComponent(lessonKey);
-          viewButton.title = 'Открыть КСП в Google Документах';
-          viewButton.setAttribute('aria-label', `Открыть КСП в Google Документах: ${lesson.title}`);
-          viewButton.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3.5"/></svg>';
-          viewButton.hidden = true;
-
           if (window.currentCabinetUser?.role !== 'superadmin' && window.currentCabinetUser?.role !== 'teacher') {
-            kspGroup.hidden = true;
+            kspButton.hidden = true;
           }
 
-          kspGroup.append(kspButton, viewButton);
-          row.append(kspGroup);
+          row.append(kspButton);
 
         }
 

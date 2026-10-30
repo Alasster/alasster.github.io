@@ -2,8 +2,8 @@
 - Strict 12pt Times New Roman everywhere.
 - Table 1 starts on Page 2.
 - Normal horizontal text direction everywhere (all w:textDirection stripped).
-- Distinct paragraphs with blank line spacing (space_after = Pt(4)) and bold section titles.
-- Captures and embeds real section screenshots for all interactive lesson stages from www.alasster.site.
+- Distinct paragraphs with blank line spacing (space_after = Pt(5), space_before = Pt(2)) and bold section titles.
+- Captures, caches and embeds real section screenshots for all interactive lesson stages from www.alasster.site.
 - Strictly zero mentions of OOP / ZPR, interactive whiteboards, or laptops.
 """
 from __future__ import annotations
@@ -24,9 +24,12 @@ ROOT = BASE.parent
 FONT_SIZE = Pt(12)
 FONT_NAME = 'Times New Roman'
 
+SCREENSHOTS_DIR = BASE / '.runtime' / 'ksp' / 'screenshots'
+SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
-    """Capture crisp screenshots of key lesson sections: intro, theory, practice, summary."""
+    """Capture and cache crisp screenshots of key lesson sections: intro, theory, practice, summary."""
     browser = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
     if not os.path.exists(browser):
         browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
@@ -37,6 +40,22 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
     if not lesson_path.is_file():
         return {}
 
+    h_hash = abs(hash(lesson_relative_path)) % 1000000
+    stage_keys = ['intro', 'theory', 'practice', 'summary']
+
+    # Check if all cached screenshots already exist on disk
+    all_cached = True
+    cached_results = {}
+    for sk in stage_keys:
+        cf = SCREENSHOTS_DIR / f'slide_{h_hash}_{sk}.png'
+        if cf.is_file() and cf.stat().st_size > 1000:
+            cached_results[sk] = str(cf)
+        else:
+            all_cached = False
+
+    if all_cached:
+        return cached_results
+
     try:
         html = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
         clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html, flags=re.S | re.I)
@@ -46,7 +65,7 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
         clean_html = re.sub(r'(<head\b[^>]*>)', r'\1' + base_tag, clean_html, flags=re.I)
         clean_html = re.sub(r'(</head>)', '<style>* { animation: none !important; transition: none !important; }</style>\\1', clean_html, flags=re.I)
 
-        slide_matches = list(re.finditer(r'<section\b[^>]*class=["\'][^"\']*slide[^"\']*["\'][^>]*>', clean_html, re.I))
+        slide_matches = list(re.finditer(r'<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>', clean_html, re.I))
         total_slides = len(slide_matches)
         if total_slides == 0:
             return {}
@@ -62,11 +81,16 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
         user_data = tempfile.mkdtemp()
 
         for stage_key, target_idx in slide_map.items():
-            parts = re.split(r'(<section\b[^>]*class=["\'][^"\']*slide[^"\']*["\'][^>]*>)', clean_html)
+            cache_file = SCREENSHOTS_DIR / f'slide_{h_hash}_{stage_key}.png'
+            if cache_file.is_file() and cache_file.stat().st_size > 1000:
+                results[stage_key] = str(cache_file)
+                continue
+
+            parts = re.split(r'(<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>)', clean_html)
             new_parts = []
             s_idx = 0
             for part in parts:
-                if re.match(r'<section\b[^>]*class=["\'][^"\']*slide', part):
+                if re.match(r'<section\b[^>]*class=[\'"][^\'"]*slide', part):
                     p = re.sub(r'\bactive\b', '', part)
                     if s_idx == target_idx:
                         p = p.replace('class="', 'class="active ').replace("class='", "class='active ")
@@ -76,11 +100,10 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
                     new_parts.append(part)
 
             mod_html = ''.join(new_parts)
-            h_hash = abs(hash(lesson_relative_path + stage_key)) % 100000
-            temp_html = os.path.join(tempfile.gettempdir(), f'ksp_slide_{os.getpid()}_{h_hash}.html')
+            temp_html = os.path.join(tempfile.gettempdir(), f'ksp_slide_{os.getpid()}_{h_hash}_{stage_key}.html')
             with open(temp_html, 'w', encoding='utf-8') as f:
                 f.write(mod_html)
-            out_png = os.path.join(tempfile.gettempdir(), f'ksp_slide_{os.getpid()}_{h_hash}.png')
+            out_png = str(cache_file)
 
             cmd = [
                 browser,
@@ -92,7 +115,7 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[str, str]:
                 f'--screenshot={out_png}',
                 'file:///' + temp_html.replace('\\', '/')
             ]
-            subprocess.run(cmd, capture_output=True, timeout=8)
+            subprocess.run(cmd, capture_output=True, timeout=10)
             if os.path.isfile(out_png) and os.path.getsize(out_png) > 1000:
                 results[stage_key] = out_png
 
@@ -113,11 +136,51 @@ def sanitize_ksp_text(text: str) -> str:
         return ''
     text = re.sub(r'\bинтерактивн\w*\s+доск\w*', 'платформу www.alasster.site', text, flags=re.I)
     text = re.sub(r'\bсмарт[- ]доск\w*', 'платформу www.alasster.site', text, flags=re.I)
-    text = re.sub(r'\b(на|к)\s+доск[еу]\b', 'к платформе www.alasster.site', text, flags=re.I)
-    text = re.sub(r'\bу\s+доски\b', 'на платформе www.alasster.site', text, flags=re.I)
-    text = re.sub(r'\bна\s+ноутбук\w*', 'на рабочих местах на платформе www.alasster.site', text, flags=re.I)
-    text = re.sub(r'\bноутбук\w*', 'рабочие места', text, flags=re.I)
+    text = re.sub(r'\b(вызов|демонстрация)\s+к\s+доск[ее]\b', 'работа на платформе www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bна\s+доске\b', 'на платформе www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bэлектронн\w*\s+доск\w*', 'материалы платформы www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bноутбук\w*', 'рабочих местах', text, flags=re.I)
+    text = re.sub(r'\bноутбуках\b', 'рабочих местах', text, flags=re.I)
     return text
+
+
+SEMANTIC_MARKERS = [
+    r'Приветствие', r'Психологический настрой', r'Организационный момент',
+    r'Тема урока', r'Тема', r'Цель нашего урока', r'Цель урока', r'Цели урока', r'Цель',
+    r'Критерии успеха', r'Критерии оценивания', r'Критерии',
+    r'Актуализация знаний', r'Актуализация', r'Интерактивная разминка', r'Разминка',
+    r'Фронтальный опрос', r'Опрос',
+    r'Вопрос учителя', r'Вопрос \d+', r'Вопрос',
+    r'Ожидаемый ответ \d+', r'Ожидаемый ответ', r'Ожидаемые ответы',
+    r'Подводка к новой теме', r'Подводка к теме', r'Подводка',
+    r'Объяснение темы', r'Объяснение нового материала', r'Объяснение',
+    r'Теоретический блок', r'Теория', r'Ключевые понятия', r'Ключевые тезисы',
+    r'Терминология и правила', r'Терминология', r'Термины и определения', r'Термины', r'Термин', r'Определение',
+    r'Разбор конкретного примера \d+', r'Разбор конкретного примера', r'Разбор примера \d+', r'Разбор примера',
+    r'Пример \d+', r'Пример', r'Случай \d+',
+    r'Контрольные вопросы', r'Контрольный вопрос', r'Проверка понимания',
+    r'Инструктаж по технике безопасности', r'Инструктаж по ТБ', r'Инструктаж',
+    r'Практическая работа', r'Постановка задачи',
+    r'Задание 1\b[^\n:—–]*', r'Задание 2\b[^\n:—–]*', r'Задание 3\b[^\n:—–]*', r'Задание \d+', r'Задание',
+    r'Условие задачи', r'Условие', r'Пошаговый алгоритм', r'Алгоритм решения', r'Алгоритм',
+    r'Решение и ответ', r'Решение', r'Правильный ответ', r'Ответ для учителя', r'Ответ',
+    r'Дескриптор', r'Дескрипторы',
+    r'Подведение итогов урока', r'Подведение итогов', r'Итоги урока', r'Итоги',
+    r'Обобщение темы', r'Обобщение',
+    r'Рефлексия', r'Самооценивание', r'Взаимооценивание',
+    r'Оценивание', r'Формативное оценивание', r'Выставление баллов ФО', r'Баллы ФО',
+    r'Домашнее задание', r'Инструктаж по ДЗ', r'Инструктаж по домашнему заданию', r'ДЗ'
+]
+
+MARKER_SPLIT_REGEX = re.compile(
+    r'(?:(?<=[.!?])|(?<=[.!?]["\'»”]))\s+(?=(?:\*\*)?(?:' + '|'.join(SEMANTIC_MARKERS) + r')(?:\*\*)?[:—–\s])',
+    re.I
+)
+
+LABEL_MATCH_REGEX = re.compile(
+    r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?[:—–](?:\*{1,2})?)\s*(.*)$',
+    re.S
+)
 
 
 def split_into_logical_paragraphs(raw_text: str) -> list[str]:
@@ -130,17 +193,8 @@ def split_into_logical_paragraphs(raw_text: str) -> list[str]:
     raw_lines = [l.strip() for l in re.split(r'\n+', raw_text) if l.strip()]
 
     paragraphs = []
-    marker_pattern = re.compile(
-        r'(?<=[.!?])\s+(?=(?:Приветствие|Тема урока|Тема|Цель урока|Цели урока|Цель|Критерии успеха|Критерии|'
-        r'Актуализация|Фронтальный опрос|Разминка|Вопрос \d|Вопрос|Ожидаемый ответ|'
-        r'Объяснение темы|Теоретический блок|Ключевые понятия|Терминология|Пример|Контрольные вопросы|Контрольный вопрос|'
-        r'Инструктаж по ТБ|Инструктаж|Задание \d|Задание|Дескриптор|Ответ|Решение|'
-        r'Подведение итогов|Итоги|Обобщение|Рефлексия|Оценивание|Баллы ФО|Домашнее задание|ДЗ)[:—–\s])',
-        re.I
-    )
-
     for line in raw_lines:
-        sub_parts = marker_pattern.split(line)
+        sub_parts = MARKER_SPLIT_REGEX.split(line)
         for part in sub_parts:
             part = part.strip()
             if part:
@@ -153,11 +207,12 @@ def set_cell_formatted(cell, text: str, bold: bool = False, italic: bool = False
                        font_size: Pt = FONT_SIZE, font_name: str = FONT_NAME,
                        align=WD_ALIGN_PARAGRAPH.LEFT):
     """
-    Format cell content with distinct paragraphs, spacing, bold prefixes, and clean alignment.
-    Strictly removes all w:textDirection.
+    Format cell content with distinct paragraphs, empty vertical space separation (space_after = Pt(5)),
+    bold semantic prefixes, and clean alignment.
+    Strictly removes all w:textDirection from cell to prevent rotated text.
     """
     cell.text = ''
-    for td in cell._tc.xpath('.//w:textDirection'):
+    for td in cell._tc.xpath('.//*[local-name()="textDirection"]'):
         td.getparent().remove(td)
 
     paragraphs = split_into_logical_paragraphs(text)
@@ -166,19 +221,22 @@ def set_cell_formatted(cell, text: str, bold: bool = False, italic: bool = False
         p.text = ''
         return
 
-    label_pattern = re.compile(r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s]{1,35}?[:—–]))\s*(.*)$', re.S)
-
     for i, para_text in enumerate(paragraphs):
         p = cell.paragraphs[0] if i == 0 else cell.add_paragraph()
         p.text = ''
+        for r in list(p.runs):
+            p._p.remove(r._r)
         p.alignment = align
-        p.paragraph_format.space_before = Pt(0)
-        p.paragraph_format.space_after = Pt(4)  # Visible blank space between paragraphs!
+        p.paragraph_format.space_before = Pt(2)
+        p.paragraph_format.space_after = Pt(5)  # Distinct blank space between paragraphs!
         p.paragraph_format.line_spacing = 1.15
 
-        m = label_pattern.match(para_text)
+        para_clean = para_text.strip()
+        m = LABEL_MATCH_REGEX.match(para_clean)
         if m:
-            label, rest = m.group(1), m.group(2)
+            label = m.group(1).replace('*', '').strip()
+            rest = m.group(2).replace('*', '').strip()
+
             r_lbl = p.add_run(label)
             r_lbl.bold = True
             r_lbl.italic = italic
@@ -192,7 +250,8 @@ def set_cell_formatted(cell, text: str, bold: bool = False, italic: bool = False
                 r_rest.font.name = font_name
                 r_rest.font.size = font_size
         else:
-            r = p.add_run(para_text)
+            clean_text = para_clean.replace('*', '')
+            r = p.add_run(clean_text)
             r.bold = bold
             r.italic = italic
             r.font.name = font_name
@@ -211,7 +270,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     1. Font size: 12pt Times New Roman everywhere.
     2. Table 1 ("Ход урока") starts strictly on Page 2.
     3. Normal horizontal text direction everywhere (all w:textDirection stripped).
-    4. Paragraphs divided cleanly with space_after = Pt(4) and bold section headers.
+    4. Paragraphs divided cleanly with space_after = Pt(5) and bold section headers.
     5. Section screenshots captured and embedded under student activities.
     6. Strictly removes any OOP / ZPR rows or mentions.
     """
@@ -230,7 +289,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     for table in doc.tables:
         for row in table.rows:
             for cell in row.cells:
-                for td in cell._tc.xpath('.//w:textDirection'):
+                for td in cell._tc.xpath('.//*[local-name()="textDirection"]'):
                     td.getparent().remove(td)
 
     t0 = doc.tables[0]
@@ -372,7 +431,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                 p_shot = r.cells[2].add_paragraph()
                 p_shot.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 p_shot.paragraph_format.space_before = Pt(4)
-                p_shot.paragraph_format.space_after = Pt(2)
+                p_shot.paragraph_format.space_after = Pt(4)
                 r_shot = p_shot.add_run()
                 r_shot.add_picture(shot_file, width=Inches(2.1))
 
@@ -389,72 +448,59 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     if re.search(r'\bООП\b|\bЗПР\b|особым[и]? образовательн', full_text, re.I):
         if temp_target.exists():
             temp_target.unlink()
-        raise ValueError('В сформированном документе обнаружены не удалённые блоки ООП')
+        raise ValueError('В сформированном документе обнаружены запрещенные упоминания ООП/ЗПР!')
 
+    if target_path.exists():
+        try:
+            target_path.unlink()
+        except Exception:
+            pass
     temp_target.replace(target_path)
+    return str(target_path)
 
 
-def docx_to_html(docx_path: Path | str) -> str:
-    """Renders a generated DOCX file directly as clean HTML for in-browser viewing."""
-    docx_path = Path(docx_path)
-    if not docx_path.is_file():
-        return "<p>Документ не найден</p>"
+def docx_to_html(doc_path: Path | str) -> str:
+    """Converts the DOCX tables and paragraphs into high-fidelity HTML preview."""
+    doc_path = Path(doc_path)
+    if not doc_path.is_file():
+        return "<p>Файл не найден</p>"
 
-    doc = docx.Document(str(docx_path))
-    if len(doc.tables) < 2:
-        return "<p>Ошибка: неверная структура документа</p>"
+    doc = docx.Document(str(doc_path))
+    html_parts = []
 
-    t0 = doc.tables[0]
-    t1 = doc.tables[1]
+    # Extract images mapped by relationship ID for embedding
+    images = {}
+    for rel in doc.part.rels.values():
+        if "image" in rel.target_ref:
+            try:
+                img_data = rel.target_part.blob
+                b64 = base64.b64encode(img_data).decode('ascii')
+                images[rel.rId] = f"data:image/png;base64,{b64}"
+            except Exception:
+                pass
 
-    def render_cell(cell):
-        parts = []
-        for p in cell.paragraphs:
-            runs_html = []
-            for r in p.runs:
-                txt = r.text
-                drawings = r._r.xpath('.//w:drawing')
-                if drawings:
-                    for d in drawings:
-                        blips = d.xpath('.//*[local-name()="blip"]')
-                        for b in blips:
-                            embed_id = b.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
-                            if embed_id and embed_id in doc.part.related_parts:
-                                img_part = doc.part.related_parts[embed_id]
-                                b64 = base64.b64encode(img_part.blob).decode('ascii')
-                                mime = img_part.content_type
-                                runs_html.append(f'<div class="ksp-img-box"><img src="data:{mime};base64,{b64}" alt="Скриншот платформы" /></div>')
-                if txt:
-                    escaped = txt.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                    if r.bold:
-                        runs_html.append(f'<strong>{escaped}</strong>')
-                    elif r.italic:
-                        runs_html.append(f'<em>{escaped}</em>')
-                    else:
-                        runs_html.append(escaped)
-            if runs_html:
-                parts.append(f'<p class="ksp-para">{"".join(runs_html)}</p>')
-        return "".join(parts)
+    for table in doc.tables:
+        html_parts.append('<table class="ksp-table">')
+        for row in table.rows:
+            html_parts.append('<tr>')
+            for cell in row.cells:
+                html_parts.append('<td>')
+                for p in cell.paragraphs:
+                    p_text = p.text.strip()
+                    img_tags = []
+                    for blip in cell._tc.xpath('.//*[local-name()="blip"]'):
+                        embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+                        if embed_id and embed_id in images:
+                            img_tags.append(f'<div class="ksp-img-box"><img src="{images[embed_id]}" alt="Скриншот с alasster.site" style="max-width:260px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.15); margin:6px 0; border: 1px solid #cbd5e1;"></div>')
 
-    t0_rows = []
-    for r in t0.rows:
-        if len(r.cells) >= 2:
-            lbl = r.cells[0].text.strip()
-            val = render_cell(r.cells[1])
-            t0_rows.append(f'<tr><td class="ksp-label-cell"><strong>{lbl}</strong></td><td class="ksp-val-cell">{val}</td></tr>')
+                    if p_text:
+                        p_html = re.sub(r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?[:—–])', r'<strong>\1</strong>', p_text)
+                        html_parts.append(f'<p>{p_html}</p>')
 
-    t1_rows = []
-    if len(t1.rows) > 0:
-        t1_rows.append(f'<tr><th colspan="5" class="ksp-banner-th">{t1.rows[0].cells[0].text.strip()}</th></tr>')
-    if len(t1.rows) > 1:
-        th_cols = "".join(f'<th>{c.text.strip()}</th>' for c in t1.rows[1].cells)
-        t1_rows.append(f'<tr class="ksp-stage-header-tr">{th_cols}</tr>')
-    for r in t1.rows[2:]:
-        td_cols = "".join(f'<td>{render_cell(c)}</td>' for c in r.cells)
-        t1_rows.append(f'<tr>{td_cols}</tr>')
+                    for it in img_tags:
+                        html_parts.append(it)
+                html_parts.append('</td>')
+            html_parts.append('</tr>')
+        html_parts.append('</table>')
 
-    return f'''
-    <table class="ksp-meta-table">{"".join(t0_rows)}</table>
-    <div class="ksp-page-break"><span>Страница 2 · Ход урока</span></div>
-    <table class="ksp-stages-table">{"".join(t1_rows)}</table>
-    '''
+    return '\n'.join(html_parts)
