@@ -102,6 +102,14 @@ def get_google_drive_file_url(file_path: str | Path) -> str | None:
                 pass
     return None
 
+def drive_available() -> bool:
+    """True only on a PC with Google Drive for Desktop (where KSP can be saved into Мой диск)."""
+    if os.environ.get('KSP_OUTPUT_ROOT'):
+        return True
+    local = os.environ.get('LOCALAPPDATA', '')
+    return bool(local) and (Path(local) / 'Google' / 'DriveFS').is_dir()
+
+
 GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite']
 
 GEMINI_PLAN_SCHEMA = {
@@ -461,6 +469,8 @@ class KspService:
 
     def sync_existing_files(self):
         """Detect existing docx files on disk and register them as ready."""
+        if not drive_available():
+            return
         try:
             timetable_file = BASE / 'ksp-timetable.json'
             if not timetable_file.is_file():
@@ -521,6 +531,11 @@ class KspService:
 
     def start(self, key: str, force: bool = False) -> dict:
         source = lesson_source(key)
+        if not drive_available():
+            raise ValueError(
+                'КСП сохраняется в Google Диск только на ПК, где он установлен. '
+                'Запустите ЗАПУСТИТЬ_СЕРВЕР.bat и откройте кабинет по адресу http://127.0.0.1:8010'
+            )
         target = output_path(source, self.output_root)
 
         with self.lock:

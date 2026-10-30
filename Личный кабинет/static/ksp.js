@@ -37,7 +37,7 @@
       } else if (ready) {
         button.title = 'Открыть в Google Документах (Shift + клик для повторного создания)';
       } else if (isError) {
-        button.title = 'Ошибка создания КСП. Нажмите для повтора';
+        button.title = (job && job.message) ? job.message : 'Ошибка создания КСП. Нажмите для повтора';
       } else {
         button.title = 'Создать КСП';
       }
@@ -103,8 +103,8 @@
         throw new Error(result.detail || 'Не удалось запустить генерацию КСП');
       }
       jobs[key] = result;
-    } catch (_) {
-      // Button state handles error visualization
+    } catch (err) {
+      jobs[key] = { status: 'error', message: String(err && err.message || err) };
     } finally {
       starting.delete(key);
       paint();
