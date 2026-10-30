@@ -2022,13 +2022,16 @@ function renderLessonsCatalog(classes) {
 
           kspButton.type = 'button';
 
-          kspButton.disabled = true;
+          kspButton.dataset.lessonPath = lesson.file_path || decodeURIComponent(lessonKey);
 
           kspButton.textContent = 'КСП';
 
-          kspButton.title = 'Генератор КСП будет добавлен позже';
+          kspButton.title = 'Создать КСП по этому уроку';
 
-          kspButton.setAttribute('aria-label', `КСП: ${lesson.title} — скоро`);
+          kspButton.setAttribute('aria-label', `КСП: ${lesson.title}`);
+          if (window.currentCabinetUser?.role !== 'superadmin' && window.currentCabinetUser?.role !== 'teacher') {
+            kspButton.hidden = true;
+          }
 
           row.append(kspButton);
 
@@ -2063,6 +2066,8 @@ function renderLessonsCatalog(classes) {
   }
 
   lessonCatalogRetry.hidden = true;
+
+  window.KspButtons?.refresh();
 
 }
 

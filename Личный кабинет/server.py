@@ -3970,6 +3970,11 @@ def generator_compatible_health():
 
 
 
+from ksp_service import install_routes as install_ksp_routes
+
+install_ksp_routes(app, require_superadmin, load_local_env)
+
+
 if __name__ == "__main__":
 
     import uvicorn

@@ -1,0 +1,73 @@
+/* KSP Action Buttons & States */
+
+.lesson-ksp-button {
+  transition: all 0.25s ease !important;
+  font-size: 12px !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+}
+
+.lesson-ksp-button.ksp-ready {
+  color: #0f6f3e !important;
+  background: #d8f5df !important;
+  border: 1px solid #52c41a !important;
+  box-shadow: 0 2px 6px rgba(82, 196, 26, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+.lesson-ksp-button.ksp-ready:hover {
+  background: #c3ebd0 !important;
+  box-shadow: 0 3px 8px rgba(82, 196, 26, 0.3) !important;
+}
+
+:root[data-theme="dark"] .lesson-ksp-button.ksp-ready {
+  color: #69f0ae !important;
+  background: rgba(46, 125, 50, 0.25) !important;
+  border: 1px solid #2e7d32 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+:root[data-theme="dark"] .lesson-ksp-button.ksp-ready:hover {
+  background: rgba(46, 125, 50, 0.4) !important;
+}
+
+.lesson-ksp-button.ksp-busy {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  cursor: progress !important;
+  font-size: 11px !important;
+  color: #3b5998 !important;
+  background: rgba(59, 89, 152, 0.1) !important;
+  border: 1px solid rgba(59, 89, 152, 0.3) !important;
+  pointer-events: none;
+}
+
+.lesson-ksp-button.ksp-busy::before {
+  content: '';
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ksp-spin 0.75s linear infinite;
+  box-sizing: border-box;
+}
+
+@keyframes ksp-spin {
+  to { transform: rotate(360deg); }
+}
+
+.lesson-ksp-button.ksp-error {
+  color: #c62828 !important;
+  background: rgba(198, 40, 40, 0.08) !important;
+  border: 1px solid rgba(198, 40, 40, 0.3) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-ksp-button.ksp-busy::before {
+    animation: none;
+  }
+}
