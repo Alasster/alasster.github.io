@@ -31,25 +31,8 @@ SCREENSHOTS_DIR = BASE / '.runtime' / 'ksp' / 'screenshots'
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 def cleanup_ksp_temp_files(slide_shots: dict | None = None):
-    """Automatically cleans up temporary screenshot images, temporary html, and Chrome data."""
-    # 1. Clean up intermediate PNG screenshot files used in this docx build
-    if slide_shots:
-        for shot_file in set(slide_shots.values()):
-            if shot_file and os.path.isfile(shot_file):
-                try:
-                    os.unlink(shot_file)
-                except Exception:
-                    pass
-
-    # 2. Clean any lingering screenshot PNG files in SCREENSHOTS_DIR
-    if SCREENSHOTS_DIR.is_dir():
-        for f in SCREENSHOTS_DIR.glob('*.png'):
-            try:
-                f.unlink()
-            except Exception:
-                pass
-
-    # 3. Clean temporary HTML files in %TEMP%
+    """Automatically cleans up temporary html files in %TEMP%."""
+    # Clean temporary HTML files in %TEMP%
     temp_dir = tempfile.gettempdir()
     for pattern in ('temp_*_*.html', 'ksp_slide_*.html'):
         for f in glob.glob(os.path.join(temp_dir, pattern)):
