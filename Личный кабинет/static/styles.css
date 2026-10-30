@@ -363,8 +363,14 @@ select.profile-select {
   color: var(--muted);
   user-select: none;
 }
+/* Always show all topics in teacher dashboard, even when quarter is hidden from students */
 .lesson-topic-group.is-quarter-hidden .lesson-topic-list {
-  display: none !important;
+  display: grid !important;
+  opacity: 0.82;
+  transition: opacity 0.2s ease;
+}
+.lesson-topic-group.is-quarter-hidden .lesson-topic-list:hover {
+  opacity: 1;
 }
 .neu-switch,
 .lesson-visibility-toggle {
