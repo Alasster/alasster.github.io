@@ -249,6 +249,7 @@
         control.setAttribute('aria-pressed', String(isOn));
         control.setAttribute('aria-label', `Домашний выключатель: ${isOn ? '1, включён' : '0, выключен'}. Нажмите, чтобы ${isOn ? 'выключить' : 'включить'}`);
         rocker.classList.toggle('is-on', isOn);
+        rocker.setAttribute('transform', isOn ? 'translate(0 -46)' : 'translate(0 0)');
         bulb.classList.toggle('is-on', isOn);
         wires.forEach(wire => wire.classList.toggle('is-on', isOn));
         if (stateBadge) stateBadge.classList.toggle('is-on', isOn);
@@ -845,7 +846,7 @@
           <path class="q2-home-logic-wire" d="M462 210 H 702"/>
           <path class="q2-home-logic-flow" data-wire="Y" d="M462 210 H 702"/>
           <path class="q2-home-logic-wire" d="M760 30 V 108"/>
-          <g class="q2-bulb" data-bulb>
+          <g class="q2-bulb" data-bulb transform="rotate(180 760 158)">
             <circle class="q2-bulb-glow" cx="760" cy="158" r="82" fill="url(#${gradientId})"/>
             <path class="q2-bulb-body" d="M760 108c-28 0-48 21-48 47 0 23 14 35 23 54h50c9-19 23-31 23-54 0-26-20-47-48-47z"/>
             <path class="q2-bulb-filament" d="m741 157 7 15q4 8 8 0t8 0q4 8 8 0l7-15"/>
@@ -882,7 +883,9 @@
       const group = el.querySelector(`[data-sw="${name}"]`);
       if (!group) return;
       group.classList.toggle('is-on', value === 1);
-      group.querySelector('.q2-home-switch-rocker').classList.toggle('is-on', value === 1);
+      const rocker = group.querySelector('.q2-home-switch-rocker');
+      rocker.classList.toggle('is-on', value === 1);
+      rocker.setAttribute('transform', value === 1 ? 'translate(0 -38)' : 'translate(0 0)');
       group.querySelector('.q2-home-switch-value').textContent = String(value);
       group.setAttribute('aria-label', `Выключатель ${name}: ${value === 1 ? '1, включён' : '0, выключен'}. Нажмите, чтобы переключить`);
       group.setAttribute('aria-pressed', String(value === 1));
@@ -926,7 +929,9 @@
         }).join('')}
       </tbody></table>`;
 
-      if (!cfg.task) {
+      if (cfg.hint === false) {
+        feedback.hidden = true;
+      } else if (!cfg.task) {
         feedback.textContent = OP_HINT[gate];
         feedback.className = 'q2-feedback is-hint';
       }

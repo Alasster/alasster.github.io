@@ -242,7 +242,7 @@
         { icon: 'fas fa-check-circle', title: 'Определение', text: definition, footer: formula },
         { icon: 'fas fa-lightbulb', title: 'Аналогия', text: analogy }
       ] },
-      { t: 'widget', kind: 'lamp', config: { gate, a: gate === 'not' ? 0 : 1, b: gate === 'and' || gate === 'eq' ? 1 : 0, gates: [gate] } },
+      { t: 'widget', kind: 'lamp', config: { gate, a: gate === 'not' ? 0 : 1, b: gate === 'and' || gate === 'eq' ? 1 : 0, gates: [gate], hint: false } },
     ]
   }));
 

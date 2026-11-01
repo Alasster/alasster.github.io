@@ -223,8 +223,13 @@ body.q2-lesson {
   place-items: center;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(79, 70, 229, 0.14), rgba(8, 145, 178, 0.12));
+  box-shadow: inset 4px 4px 8px rgba(111, 121, 160, 0.24), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
   color: var(--q2-indigo);
   font-size: 1.05rem;
+}
+
+body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
+  box-shadow: inset 4px 4px 8px rgba(111, 121, 160, 0.24), inset -4px -4px 8px rgba(255, 255, 255, 0.9) !important;
 }
 
 .q2-card-footer {
@@ -1378,7 +1383,6 @@ body.q2-lesson {
   stroke-width: 2;
   transition: fill 0.25s ease, stroke 0.25s ease;
 }
-.q2-switch:hover .q2-sw-track { stroke: rgba(79, 70, 229, 0.5); }
 .q2-sw-track.is-on { fill: rgba(79, 70, 229, 0.16); stroke: rgba(79, 70, 229, 0.55); }
 .q2-sw-knob {
   fill: #fff;
@@ -1405,8 +1409,6 @@ body.q2-lesson {
   stroke-width: 1.5;
   filter: drop-shadow(2px 2px 3px rgba(100, 116, 139, 0.16)) drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.9));
 }
-
-.q2-lamp-lab .q2-switch:hover .q2-sw-plate { stroke: rgba(79, 70, 229, 0.48); }
 
 .q2-lamp-lab .q2-sw-thumb { transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
 .q2-lamp-lab .q2-sw-thumb.is-on { transform: translateY(-36px); }
@@ -2727,8 +2729,7 @@ body.q2-lesson {
   stroke-width: 1.5;
   stroke-linecap: round;
 }
-.q2-home-switch-rocker { transition: transform 0.12s ease-out; }
-.q2-home-switch-rocker.is-on { transform: translateY(-38px); }
+.q2-home-switch-rocker { transition: none; }
 .q2-home-switch-rocker rect {
   fill: #f7f9fc;
   stroke: #aab4bf;
@@ -2805,6 +2806,10 @@ body.q2-lesson {
   fill: rgba(255, 255, 255, 0.88);
 }
 .q2-single-switch { cursor: pointer; }
+.q2-single-switch:hover,
+.q2-lamp-lab .q2-switch:hover {
+  box-shadow: none !important;
+}
 .q2-single-switch, .q2-switch { touch-action: manipulation; }
 .q2-home-plate { fill: #e8edf2; stroke: rgba(255, 255, 255, 0.88); stroke-width: 3; }
 .q2-home-plate-highlight { fill: rgba(255, 255, 255, 0.2); stroke: rgba(255, 255, 255, 0.28); stroke-width: 1.5; pointer-events: none; }
@@ -2820,8 +2825,7 @@ body.q2-lesson {
 .q2-single-switch[aria-pressed="false"] .q2-switch-label-off { fill: #4f46e5; }
 .q2-rocker-track { fill: #c5cdd6; stroke: #fbfdff; stroke-width: 2; filter: drop-shadow(2px 3px 4px rgba(54, 69, 81, 0.2)) drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.9)); }
 .q2-rocker-groove { fill: none; stroke: rgba(82, 96, 108, 0.22); stroke-width: 1.5; stroke-linecap: round; }
-.q2-rocker-thumb { transition: transform 0.2s ease; }
-.q2-rocker-thumb.is-on { transform: translateY(-46px); }
+.q2-rocker-thumb { transition: none; }
 .q2-rocker-thumb rect { fill: #f7f9fc; stroke: #aab4bf; stroke-width: 1.5; filter: drop-shadow(3px 4px 4px rgba(54, 69, 81, 0.3)) drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.95)); }
 .q2-rocker-thumb path { fill: none; stroke: #87939f; stroke-width: 2; stroke-linecap: round; }
 .q2-single-switch:focus-visible { outline: none; }
