@@ -77,8 +77,10 @@
         return `<div class="q2-grid q2-grid-${cols}">${(item.items || []).map(card => `
           <article class="q2-card${card.tone ? ` q2-card-${card.tone}` : ''}">
             ${card.badge ? `<span class="q2-card-badge">${card.badge}</span>` : ''}
-            ${card.icon ? `<div class="q2-card-icon"><i class="${card.icon}"></i></div>` : ''}
-            <h3>${card.title}</h3>
+            <div class="q2-card-heading">
+              ${card.icon ? `<span class="q2-card-icon"><i class="${card.icon}"></i></span>` : ''}
+              <h3>${card.title}</h3>
+            </div>
             <p>${card.text}</p>
             ${card.footer ? `<div class="q2-card-footer">${card.footer}</div>` : ''}
           </article>`).join('')}</div>`;
@@ -258,7 +260,11 @@
         if (state) state.textContent = isOn ? 'СВЕТ ВКЛЮЧЕН' : 'СВЕТ ВЫКЛЮЧЕН';
       };
 
-      control.addEventListener('click', toggle);
+      control.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggle();
+      });
       control.addEventListener('keydown', event => {
         if (event.key === 'Enter' || event.key === ' ' || event.code === 'Space') {
           event.preventDefault();
@@ -798,62 +804,62 @@
     let b = cfg.b == null ? 0 : cfg.b;
     const gates = cfg.gates || ['and', 'or', 'not', 'xor', 'imp', 'eq'];
     const gradientId = `${el.dataset.q2W}-bulb-glow`;
+    const switchMarkup = (name, y, value) => `<g class="q2-switch${value ? ' is-on' : ''}" data-sw="${name}" transform="translate(48 ${y})" role="button" tabindex="0" aria-pressed="${value === 1}" aria-label="Выключатель ${name}: ${value}, ${value ? 'включён' : 'выключен'}. Нажмите, чтобы переключить">
+        <rect class="q2-home-switch-plate" width="154" height="150" rx="20"/>
+        <rect class="q2-home-switch-highlight" x="6" y="6" width="142" height="138" rx="16"/>
+        <circle class="q2-home-switch-screw" cx="16" cy="16" r="3.5"/><circle class="q2-home-switch-screw" cx="138" cy="16" r="3.5"/>
+        <circle class="q2-home-switch-screw" cx="16" cy="134" r="3.5"/><circle class="q2-home-switch-screw" cx="138" cy="134" r="3.5"/>
+        <text class="q2-home-switch-label q2-home-switch-label-on" x="77" y="28">1 · ВКЛ</text>
+        <text class="q2-home-switch-label q2-home-switch-label-off" x="77" y="137">0 · ВЫКЛ</text>
+        <rect class="q2-home-switch-recess" x="48" y="37" width="58" height="78" rx="12"/>
+        <path class="q2-home-switch-groove" d="M55 44h44m-44 64h44"/>
+        <g class="q2-home-switch-rocker${value ? ' is-on' : ''}">
+          <rect x="55" y="73" width="44" height="34" rx="8"/>
+          <text class="q2-home-switch-value" x="77" y="95">${value}</text>
+        </g>
+        <text class="q2-home-switch-name" x="77" y="171">${name}</text>
+      </g>`;
+    const switches = `${switchMarkup('A', 42, a)}${switchMarkup('B', 240, b)}`;
+    const wires = `<g class="q2-home-logic-wire-group" data-wire="A">
+          <path class="q2-home-logic-wire" d="M202 117 L 350 185"/>
+          <path class="q2-home-logic-flow" d="M202 117 L 350 185"/>
+        </g>
+        <g class="q2-home-logic-wire-group" data-wire="B">
+          <path class="q2-home-logic-wire" d="M202 315 L 350 235"/>
+          <path class="q2-home-logic-flow" d="M202 315 L 350 235"/>
+        </g>`;
 
     el.classList.add('q2-lamp-lab');
-    el.innerHTML = `<div class="q2-lab-stage">
-        <svg viewBox="0 0 760 340" role="img" aria-label="Логическая схема с двумя выключателями, элементом и лампой">
+    el.innerHTML = `<div class="q2-lab-stage q2-home-logic-stage">
+        <svg viewBox="0 0 900 440" role="img" aria-label="Домашние выключатели, логический элемент и лампа">
           <defs>
-            <radialGradient id="${gradientId}"><stop offset="0" stop-color="#fde68a" stop-opacity=".95"/><stop offset=".55" stop-color="#fbbf24" stop-opacity=".45"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/></radialGradient>
+            <linearGradient id="${gradientId}-wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6796a1"/><stop offset="1" stop-color="#315d68"/></linearGradient>
+            <radialGradient id="${gradientId}"><stop offset="0" stop-color="#fff9b0" stop-opacity="1"/><stop offset=".48" stop-color="#facc15" stop-opacity=".58"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/></radialGradient>
           </defs>
-          <g class="q2-switch" data-sw="A" transform="translate(34 55)" role="button" tabindex="0" aria-pressed="false" aria-label="Выключатель A: 0. Нажмите, чтобы переключить">
-            <rect class="q2-sw-plate" width="120" height="96" rx="18"/>
-            <rect class="q2-sw-recess" x="25" y="11" width="70" height="74" rx="13"/>
-            <g class="q2-sw-thumb">
-              <rect x="33" y="49" width="54" height="30" rx="8"/>
-              <text class="q2-sw-value" x="60" y="69">0</text>
-            </g>
-            <text class="q2-sw-name" x="60" y="116">A</text>
-          </g>
-          <g class="q2-switch" data-sw="B" transform="translate(34 175)" role="button" tabindex="0" aria-pressed="false" aria-label="Выключатель B: 0. Нажмите, чтобы переключить">
-            <rect class="q2-sw-plate" width="120" height="96" rx="18"/>
-            <rect class="q2-sw-recess" x="25" y="11" width="70" height="74" rx="13"/>
-            <g class="q2-sw-thumb">
-              <rect x="33" y="49" width="54" height="30" rx="8"/>
-              <text class="q2-sw-value" x="60" y="69">0</text>
-            </g>
-            <text class="q2-sw-name" x="60" y="116">B</text>
-          </g>
-          <g class="q2-wire-group" data-wire="A">
-            <line class="q2-wire" x1="154" y1="103" x2="330" y2="150"/>
-            <line class="q2-flow" x1="154" y1="103" x2="330" y2="150"/>
-          </g>
-          <g class="q2-wire-group" data-wire="B">
-            <line class="q2-wire" x1="154" y1="223" x2="330" y2="190"/>
-            <line class="q2-flow" x1="154" y1="223" x2="330" y2="190"/>
-          </g>
-          <rect class="q2-gate-box" x="330" y="112" width="124" height="116" rx="20"/>
-          <text class="q2-gate-symbol" x="392" y="182" data-gate-label>∧</text>
-          <g class="q2-wire-group" data-wire="Y">
-            <line class="q2-wire" x1="454" y1="170" x2="588" y2="170"/>
-            <line class="q2-flow" x1="454" y1="170" x2="588" y2="170"/>
-          </g>
+          <rect class="q2-home-logic-wall" x="10" y="10" width="880" height="420" rx="26" fill="url(#${gradientId}-wall)"/>
+          <path class="q2-home-logic-wall-line" d="M30 405 H 870"/>
+          ${wires}
+          ${switches}
+          <rect class="q2-home-logic-gate" x="350" y="160" width="112" height="100" rx="20"/>
+          <text class="q2-home-logic-gate-symbol" x="406" y="220" data-gate-label>∧</text>
+          <path class="q2-home-logic-wire" d="M462 210 H 702"/>
+          <path class="q2-home-logic-flow" data-wire="Y" d="M462 210 H 702"/>
+          <path class="q2-home-logic-wire" d="M760 30 V 108"/>
           <g class="q2-bulb" data-bulb>
-            <circle class="q2-bulb-glow" cx="628" cy="170" r="62" fill="url(#${gradientId})"/>
-            <circle class="q2-bulb-body" cx="628" cy="170" r="34"/>
-            <path class="q2-bulb-filament" d="M616 180l7-14 6 10 6-10 6 14"/>
-            <rect class="q2-bulb-base" x="614" y="201" width="28" height="14" rx="5"/>
+            <circle class="q2-bulb-glow" cx="760" cy="158" r="82" fill="url(#${gradientId})"/>
+            <path class="q2-bulb-body" d="M760 108c-28 0-48 21-48 47 0 23 14 35 23 54h50c9-19 23-31 23-54 0-26-20-47-48-47z"/>
+            <path class="q2-bulb-filament" d="m741 157 7 15q4 8 8 0t8 0q4 8 8 0l7-15"/>
+            <path class="q2-bulb-base" d="M738 209h44v30h-44z"/>
+            <path class="q2-home-logic-bulb-thread" d="M740 217h40m-40 8h40m-36 8h32"/>
             <g class="q2-bulb-rays">
-              <line x1="628" y1="112" x2="628" y2="98"/><line x1="628" y1="228" x2="628" y2="242"/>
-              <line x1="570" y1="170" x2="556" y2="170"/><line x1="686" y1="170" x2="700" y2="170"/>
-              <line x1="587" y1="129" x2="577" y2="119"/><line x1="669" y1="211" x2="679" y2="221"/>
-              <line x1="669" y1="129" x2="679" y2="119"/><line x1="587" y1="211" x2="577" y2="221"/>
+              <path d="M760 89V75m-52 37-10-10m114 10 10-10m-128 55h-14m156 0h14m-146 36-11 8m120-8 11 8"/>
             </g>
           </g>
-          <text class="q2-svg-note" x="628" y="272">лампа</text>
+          <text class="q2-home-logic-caption" x="760" y="276" data-q2-lamp-status>ЛАМПА ${compute() ? 'ГОРИТ' : 'ВЫКЛЮЧЕНА'}</text>
         </svg>
       </div>
       <div class="q2-lab-side">
-        <div class="q2-gate-tabs">${gates.map(item => `<button type="button" class="q2-tab${item === gate ? ' is-active' : ''}" data-gate="${item}">${OP_NAME[item]}</button>`).join('')}</div>
+        ${gates.length > 1 ? `<div class="q2-gate-tabs">${gates.map(item => `<button type="button" class="q2-tab${item === gate ? ' is-active' : ''}" data-gate="${item}">${OP_NAME[item]}</button>`).join('')}</div>` : ''}
         <div class="q2-formula" data-formula></div>
         <div class="q2-mini-table" data-table></div>
         <div class="q2-feedback" data-feedback aria-live="polite"></div>
@@ -865,6 +871,7 @@
     const feedback = el.querySelector('[data-feedback]');
     const gateLabelNode = el.querySelector('[data-gate-label]');
     const bulb = el.querySelector('[data-bulb]');
+    const lampStatus = el.querySelector('[data-q2-lamp-status]');
     const check = el.querySelector('[data-check]');
 
     function compute() {
@@ -874,8 +881,9 @@
     function switchNode(name, value) {
       const group = el.querySelector(`[data-sw="${name}"]`);
       if (!group) return;
-      group.querySelector('.q2-sw-thumb').classList.toggle('is-on', value === 1);
-      group.querySelector('.q2-sw-value').textContent = String(value);
+      group.classList.toggle('is-on', value === 1);
+      group.querySelector('.q2-home-switch-rocker').classList.toggle('is-on', value === 1);
+      group.querySelector('.q2-home-switch-value').textContent = String(value);
       group.setAttribute('aria-label', `Выключатель ${name}: ${value === 1 ? '1, включён' : '0, выключен'}. Нажмите, чтобы переключить`);
       group.setAttribute('aria-pressed', String(value === 1));
     }
@@ -884,20 +892,25 @@
       const y = compute();
       switchNode('A', a);
       switchNode('B', b);
+      const unary = gate === 'not';
+      const aGroup = el.querySelector('[data-sw="A"]');
+      aGroup.setAttribute('transform', unary ? 'translate(48 135)' : 'translate(48 42)');
       const bGroup = el.querySelector('[data-sw="B"]');
       if (bGroup) {
-        bGroup.classList.toggle('is-disabled', gate === 'not');
-        bGroup.setAttribute('aria-disabled', String(gate === 'not'));
-        bGroup.setAttribute('tabindex', gate === 'not' ? '-1' : '0');
+        bGroup.classList.toggle('is-hidden', unary);
+        bGroup.setAttribute('aria-hidden', String(unary));
       }
+      const aWire = el.querySelector('[data-wire="A"]');
+      const aWirePath = unary ? 'M202 210 H 350' : 'M202 117 L 350 185';
+      aWire.querySelectorAll('path').forEach(path => path.setAttribute('d', aWirePath));
+      const bWire = el.querySelector('[data-wire="B"]');
+      if (bWire) bWire.classList.toggle('is-hidden', unary);
       gateLabelNode.textContent = gateLabel(gate);
-      ['A', 'B', 'Y'].forEach(name => {
-        const group = el.querySelector(`[data-wire="${name}"]`);
-        if (!group) return;
-        const active = name === 'A' ? a === 1 : name === 'B' ? (b === 1 && gate !== 'not') : y === 1;
-        group.classList.toggle('is-on', active);
-      });
+      el.querySelector('[data-wire="A"]')?.classList.toggle('is-on', a === 1);
+      el.querySelector('[data-wire="B"]')?.classList.toggle('is-on', b === 1 && gate !== 'not');
+      el.querySelector('[data-wire="Y"]')?.classList.toggle('is-on', y === 1);
       bulb.classList.toggle('is-on', y === 1);
+      if (lampStatus) lampStatus.textContent = `ЛАМПА ${y ? 'ГОРИТ' : 'ВЫКЛЮЧЕНА'}`;
       formula.innerHTML = gate === 'not'
         ? `<span class="q2-formula-main">Y = ¬A = ¬${a} = <b>${y}</b></span>`
         : `<span class="q2-formula-main">Y = A ${OP_SIGN[gate]} B = ${a} ${OP_SIGN[gate]} ${b} = <b>${y}</b></span>`;
@@ -1053,7 +1066,9 @@
     }
 
     el.querySelectorAll('.q2-switch').forEach(group => {
-      group.addEventListener('click', () => {
+      group.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
         if (group.dataset.sw === 'A') a = a ? 0 : 1;
         else b = b ? 0 : 1;
         render();

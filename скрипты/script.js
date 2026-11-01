@@ -5,6 +5,15 @@ document.head.appendChild(analytics);
 
 let lastModalTrigger = null;
 
+function lessonNumberValue(lesson) {
+  const match = String(lesson.num || '').match(/\d+/);
+  return match ? Number(match[0]) : Number.NEGATIVE_INFINITY;
+}
+
+function newestLessonsFirst(lessons) {
+  return [...lessons].sort((left, right) => lessonNumberValue(right) - lessonNumberValue(left));
+}
+
 document.querySelector('.mobile-burger-btn').addEventListener('click', toggleNavMenu);
 document.querySelectorAll('[data-class-id]').forEach(button => {
   button.addEventListener('click', () => showClassModal(button.dataset.classId));
@@ -295,19 +304,21 @@ function showClassModal(id) {
     if (hasMultipleQuarters) {
       quarterNames.forEach(qName => {
         const qLessons = data.quarters[qName] || [];
-        const visibleLessons = qLessons.filter(l => lessonIsPublic(l.path || l.file));
+        const visibleLessons = newestLessonsFirst(qLessons.filter(l => lessonIsPublic(l.path || l.file)));
         if (visibleLessons.length === 0) return;
 
-        const qDivider = document.createElement('div');
-        qDivider.className = 'modal-quarter-divider';
-        qDivider.innerHTML = `<span>${qName}</span>`;
-        list.appendChild(qDivider);
+        if (qName !== '2 четверть') {
+          const qDivider = document.createElement('div');
+          qDivider.className = 'modal-quarter-divider';
+          qDivider.innerHTML = `<span>${qName}</span>`;
+          list.appendChild(qDivider);
+        }
 
         visibleLessons.forEach(renderLessonCard);
       });
     } else {
       const lessons = data.lessons || [];
-      const visibleLessons = lessons.filter(l => lessonIsPublic(l.path || l.file));
+      const visibleLessons = newestLessonsFirst(lessons.filter(l => lessonIsPublic(l.path || l.file)));
       visibleLessons.forEach(renderLessonCard);
     }
   }

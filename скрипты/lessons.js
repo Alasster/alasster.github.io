@@ -434,6 +434,16 @@
 
 
 
+  function newestLessonsFirst(lessons) {
+    return [...lessons].sort((left, right) => {
+      const leftMatch = String(left.num || '').match(/\d+/);
+      const rightMatch = String(right.num || '').match(/\d+/);
+      const leftNumber = leftMatch ? Number(leftMatch[0]) : Number.NEGATIVE_INFINITY;
+      const rightNumber = rightMatch ? Number(rightMatch[0]) : Number.NEGATIVE_INFINITY;
+      return rightNumber - leftNumber;
+    });
+  }
+
   function renderModalLessons(classId) {
     const listEl = document.getElementById('modal-lessons-list');
     if (!listEl) return;
@@ -448,10 +458,12 @@
     if (hasMultipleQuarters) {
       quarterNames.forEach(qName => {
         const qLessons = data.quarters[qName] || [];
-        const visibleLessons = qLessons.filter(lesson => lessonIsPublic(lesson.file || lesson.path));
+        const visibleLessons = newestLessonsFirst(qLessons.filter(lesson => lessonIsPublic(lesson.file || lesson.path)));
         if (visibleLessons.length === 0) return;
 
-        html += `<div class="modal-quarter-divider"><span>${qName}</span></div>`;
+        if (qName !== '2 четверть') {
+          html += `<div class="modal-quarter-divider"><span>${qName}</span></div>`;
+        }
         visibleLessons.forEach(lesson => {
           const filePath = lesson.file || lesson.path;
           const isCurrent = currentPath.endsWith(filePath);
@@ -466,7 +478,7 @@
       });
     } else {
       const lessons = data.lessons || [];
-      const visibleLessons = lessons.filter(lesson => lessonIsPublic(lesson.file || lesson.path));
+      const visibleLessons = newestLessonsFirst(lessons.filter(lesson => lessonIsPublic(lesson.file || lesson.path)));
       visibleLessons.forEach(lesson => {
         const filePath = lesson.file || lesson.path;
         const isCurrent = currentPath.endsWith(filePath);

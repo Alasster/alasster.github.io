@@ -236,13 +236,12 @@
       'Импликация — логическое следование',
       'Эквивалентность — логическое равенство'
     ][index]}: <span class="accent-text">${formula}</span>`,
-    lead: 'Изучите правило операции и проверьте его на интерактивной схеме.',
+    lead: 'Переключайте выключатели и наблюдайте за состоянием лампы.',
     blocks: [
       { t: 'cards', cols: 2, items: [
-        { badge: 'Определение', icon: 'fas fa-check-circle', title: 'Правило операции', text: definition, footer: formula },
-        { badge: 'Аналогия', icon: 'fas fa-lightbulb', title: 'Лампа и выключатели', text: analogy }
+        { icon: 'fas fa-check-circle', title: 'Определение', text: definition, footer: formula },
+        { icon: 'fas fa-lightbulb', title: 'Аналогия', text: analogy }
       ] },
-      { t: 'callout', tone: 'good', icon: 'fas fa-toggle-on', title: 'Интерактивная схема', text: 'Меняйте значения A и B: лампа и таблица истинности пересчитываются.' },
       { t: 'widget', kind: 'lamp', config: { gate, a: gate === 'not' ? 0 : 1, b: gate === 'and' || gate === 'eq' ? 1 : 0, gates: [gate] } },
     ]
   }));

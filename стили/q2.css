@@ -186,6 +186,15 @@ body.q2-lesson {
   margin: 0;
 }
 
+.q2-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+}
+
+.q2-card-heading h3 { min-width: 0; }
+
 .q2-card p {
   font-size: 0.9rem;
   line-height: 1.6;
@@ -206,8 +215,10 @@ body.q2-lesson {
 }
 
 .q2-card-icon {
+  flex: 0 0 42px;
   width: 42px;
   height: 42px;
+  margin: 0;
   display: grid;
   place-items: center;
   border-radius: 14px;
@@ -314,15 +325,23 @@ body.q2-lesson {
 }
 
 .lesson-9-q2-1 .q2-slide:nth-of-type(2) .q2-grid {
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  margin-bottom: 22px;
 }
 
 .lesson-9-q2-1 .q2-slide:nth-of-type(2) .q2-card {
-  min-height: 150px;
+  min-height: 160px;
+}
+
+.lesson-9-q2-1 .q2-slide:nth-of-type(2) .q2-steps-logic {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
 }
 
 .lesson-9-q2-1 .q2-slide:nth-of-type(2) .q2-steps-logic .q2-step {
-  min-height: 124px;
+  min-height: 132px;
   padding: 14px;
   box-shadow: 7px 7px 14px rgba(151, 164, 190, 0.28), -6px -6px 13px rgba(255, 255, 255, 0.92);
 }
@@ -1371,6 +1390,8 @@ body.q2-lesson {
 .q2-sw-knob.is-on { fill: var(--q2-indigo); stroke: rgba(55, 48, 163, 0.7); }
 .q2-sw-knob.is-on + .q2-sw-value { fill: #fff; }
 
+.q2-lamp-lab g.q2-switch.is-hidden,
+.q2-lamp-lab g.q2-home-logic-wire-group.is-hidden { display: none !important; }
 .q2-lamp-lab .q2-sw-plate {
   fill: #f4f6fb;
   stroke: rgba(255, 255, 255, 0.96);
@@ -2635,6 +2656,128 @@ body.q2-lesson {
   fill: var(--muted);
 }
 
+.q2-home-logic-stage {
+  padding: 8px;
+  border-radius: 22px;
+  background: #dce5eb;
+  box-shadow: inset 5px 5px 12px rgba(107, 124, 140, 0.18), inset -5px -5px 12px rgba(255, 255, 255, 0.9);
+}
+
+.q2-home-logic-wall { stroke: rgba(255, 255, 255, 0.72); stroke-width: 2; }
+.q2-home-logic-wall-line { fill: none; stroke: rgba(255, 255, 255, 0.08); stroke-width: 1.5; }
+.q2-home-logic-wire {
+  fill: none;
+  stroke: rgba(235, 248, 249, 0.7);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.q2-home-logic-flow {
+  fill: none;
+  stroke: #fbbf24;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 7 12;
+  opacity: 0;
+  pointer-events: none;
+}
+.q2-home-logic-wire-group.is-on .q2-home-logic-flow,
+.q2-home-logic-flow.is-on { opacity: 1; animation: q2-scene-flow 1s linear infinite; }
+.q2-home-logic-gate {
+  fill: #f6f8fb;
+  stroke: rgba(255, 255, 255, 0.96);
+  stroke-width: 2;
+  filter: drop-shadow(5px 7px 8px rgba(19, 51, 58, 0.3));
+}
+.q2-home-logic-gate-symbol {
+  text-anchor: middle;
+  font: 800 48px var(--font-main);
+  fill: #4f46e5;
+}
+.q2-home-switch-plate {
+  fill: #e8edf2;
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 2;
+  filter: drop-shadow(5px 7px 7px rgba(17, 47, 54, 0.35));
+}
+.q2-home-switch-highlight {
+  fill: rgba(255, 255, 255, 0.2);
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+.q2-home-switch-screw { fill: #b7c0c8; stroke: #f8fafc; stroke-width: 1; }
+.q2-home-switch-label {
+  text-anchor: middle;
+  font: 800 9px var(--font-main);
+  letter-spacing: 0.04em;
+  fill: #66717e;
+}
+.q2-switch.is-on .q2-home-switch-label-on { fill: #047857; }
+.q2-switch:not(.is-on) .q2-home-switch-label-off { fill: #4f46e5; }
+.q2-home-switch-recess {
+  fill: #cbd4dc;
+  stroke: rgba(111, 126, 138, 0.42);
+  stroke-width: 1.5;
+  filter: drop-shadow(2px 3px 4px rgba(54, 69, 81, 0.2)) drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.8));
+}
+.q2-home-switch-groove {
+  fill: none;
+  stroke: rgba(82, 96, 108, 0.28);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.q2-home-switch-rocker { transition: transform 0.12s ease-out; }
+.q2-home-switch-rocker.is-on { transform: translateY(-38px); }
+.q2-home-switch-rocker rect {
+  fill: #f7f9fc;
+  stroke: #aab4bf;
+  stroke-width: 1.5;
+  filter: drop-shadow(3px 4px 4px rgba(54, 69, 81, 0.3)) drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.95));
+}
+.q2-home-switch-value {
+  text-anchor: middle;
+  font: 700 14px var(--font-mono);
+  fill: #596777;
+  pointer-events: none;
+}
+.q2-home-switch-rocker.is-on .q2-home-switch-value { fill: #047857; }
+.q2-home-switch-name {
+  text-anchor: middle;
+  font: 800 12px var(--font-main);
+  letter-spacing: 0.08em;
+  fill: rgba(255, 255, 255, 0.92);
+}
+.q2-switch:focus-visible { outline: none; }
+.q2-switch:focus-visible .q2-home-switch-plate { stroke: #fbbf24; stroke-width: 4; }
+.q2-home-logic-bulb-thread { fill: none; stroke: rgba(255, 255, 255, 0.52); stroke-width: 1.5; }
+.q2-home-logic-stage .q2-bulb-body {
+  filter: drop-shadow(3px 6px 6px rgba(18, 50, 56, 0.42));
+  transition: fill 0.12s ease-out, stroke 0.12s ease-out, filter 0.12s ease-out;
+}
+.q2-home-logic-stage .q2-bulb.is-on .q2-bulb-body {
+  fill: #ffda36;
+  stroke: #fff3a6;
+  filter: drop-shadow(0 0 12px rgba(255, 225, 76, 0.72));
+}
+.q2-home-logic-stage .q2-bulb-rays {
+  fill: none;
+  stroke: #ffe34d;
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.12s ease-out;
+}
+.q2-home-logic-stage .q2-bulb.is-on .q2-bulb-rays { opacity: 1; }
+.q2-home-logic-caption {
+  text-anchor: middle;
+  font: 800 11px var(--font-main);
+  letter-spacing: 0.06em;
+  fill: rgba(255, 255, 255, 0.9);
+}
+.q2-home-logic-stage .q2-bulb-filament { stroke: #59636d; stroke-width: 3; }
+.q2-home-logic-stage .q2-bulb.is-on .q2-bulb-filament { stroke: #a44711; }
+
 .q2-home-wire {
   fill: none;
   stroke: rgba(235, 248, 249, 0.62);
@@ -2662,6 +2805,7 @@ body.q2-lesson {
   fill: rgba(255, 255, 255, 0.88);
 }
 .q2-single-switch { cursor: pointer; }
+.q2-single-switch, .q2-switch { touch-action: manipulation; }
 .q2-home-plate { fill: #e8edf2; stroke: rgba(255, 255, 255, 0.88); stroke-width: 3; }
 .q2-home-plate-highlight { fill: rgba(255, 255, 255, 0.2); stroke: rgba(255, 255, 255, 0.28); stroke-width: 1.5; pointer-events: none; }
 .q2-home-screw { fill: #b7c0c8; stroke: #f8fafc; stroke-width: 1; }
