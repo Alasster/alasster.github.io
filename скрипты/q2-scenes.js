@@ -207,13 +207,17 @@
     return `<svg viewBox="0 0 440 370" role="img" aria-label="Окно Python IDLE последовательно показывает вложенные шаги рекурсии">
       <style>
         @keyframes q2-rec-window-appear {
-          0%, 4% { opacity: 0; }
-          12%, 78% { opacity: 1; }
-          88%, 100% { opacity: 0; }
+          from { opacity: 0; transform: scale(0.82); }
+          to { opacity: 1; transform: scale(1); }
         }
-        .q2-rec-window-frame { opacity: 0; animation: q2-rec-window-appear 7s ease-in-out infinite; }
+        .q2-rec-window-frame {
+          opacity: 0;
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: q2-rec-window-appear 0.65s ease-out both;
+        }
         @media (prefers-reduced-motion: reduce) {
-          .q2-rec-window-frame { animation: none; opacity: 1; }
+          .q2-rec-window-frame { animation: none; opacity: 1; transform: none; }
         }
       </style>
       <rect x="12" y="12" width="416" height="346" rx="20" fill="#dce8f1" stroke="#b8cbd8" stroke-width="2"/>

@@ -23764,11 +23764,11 @@ body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel
 html body.lesson-page:is(
   [class*="lesson-9-"], [class*="lesson-10emn"], [class*="lesson-10ogn"], [class*="lesson-11-"],
   [data-lesson-id^="9-"], [data-lesson-id^="10emn"], [data-lesson-id^="10ogn"], [data-lesson-id^="11-"]
-) :is(.slide, .q2-slide) *:hover {
+) :is(.slide, .q2-slide) :not(svg):not(svg *):not(.slide-next):not(#slideNext):hover {
   transform: none !important;
 }
 
-html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.slide, .q2-slide) *:hover {
+html body.lesson-page :is(.slide, .q2-slide) :not(svg):not(svg *):hover {
   transition: none !important;
 }
 
@@ -24268,7 +24268,7 @@ body.lesson-page .rubric-row p,
    ========================================================================== */
 
 /* 1. Suppress hover transforms without overriding SVG switch/lamp transforms */
-body.lesson-page *:hover:not(.q2-switch):not(.q2-single-switch):not(.q2-home-switch-rocker):not(.q2-rocker-thumb):not(.q2-bulb) {
+body.lesson-page :not(svg):not(svg *):not(.slide-next):not(#slideNext):hover {
   transform: none !important;
   -webkit-transform: none !important;
 }
@@ -24319,7 +24319,7 @@ body.lesson-page :is(
 }
 
 /* Prevent icons or text inside hovered elements from shifting */
-body.lesson-page *:hover > :is(i, svg, img, .icon, span, b, p) {
+body.lesson-page :not(svg):not(svg *):hover > :is(i, img, .icon, span, b, p) {
   transform: none !important;
 }
 
@@ -27042,9 +27042,8 @@ html body.lesson-page .slide :is(
   .flow-step, .step, .work-step, .pipeline-step, .trainstep,
   .callout, .info-box, .box, .fact, .insight, .rule, .rule-card,
   .scenario, .task, .era, .workbench, .workpanel, .case-content, .summary-box, .topic
-):hover :is(i, svg, .icon, img, .sphere-img, span, p, h2, h3, h4, small, strong) {
+):hover :is(i, .icon, img, .sphere-img, span, p, h2, h3, h4, small, strong) {
   transform: none !important;
-  box-shadow: none !important;
 }
 
 html body.lesson-page .slide :is(
@@ -27325,7 +27324,7 @@ html body.lesson-page:is(
 html body.lesson-page:is(
   [class*="lesson-9-"], [class*="lesson-10emn"], [class*="lesson-10ogn"], [class*="lesson-11-"],
   [data-lesson-id^="9-"], [data-lesson-id^="10emn"], [data-lesson-id^="10ogn"], [data-lesson-id^="11-"]
-) :is(.slide, .q2-slide) *:hover {
+) :is(.slide, .q2-slide) :not(svg):not(svg *):not(.slide-next):not(#slideNext):hover {
   transform: none !important;
 }
 

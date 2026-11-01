@@ -3397,14 +3397,14 @@ body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-wide {
   line-height: 1.5;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-copy:hover {
+html body.lesson-page :is(.slide, .q2-slide) .q2-copy:hover {
   background: rgba(255, 255, 255, 0.85) !important;
   color: var(--muted) !important;
   border-color: rgba(148, 163, 184, 0.3) !important;
   box-shadow: none !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-btn:hover:not(:disabled) {
+html body.lesson-page :is(.slide, .q2-slide) .q2-btn:hover:not(:disabled) {
   background: rgba(79, 70, 229, 0.1) !important;
   border-color: rgba(79, 70, 229, 0.24) !important;
   color: var(--q2-indigo) !important;
@@ -3412,57 +3412,57 @@ html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-btn:ho
   transform: none !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-btn-ghost:hover:not(:disabled) {
+html body.lesson-page :is(.slide, .q2-slide) .q2-btn-ghost:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.8) !important;
   border-color: rgba(148, 163, 184, 0.34) !important;
   color: var(--text) !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) :is(.q2-tab, .q2-option, .q2-match-item, .q2-order-item, .q2-cell, .q2-matrix-cell, .q2-path-card):hover {
+html body.lesson-page :is(.slide, .q2-slide) :is(.q2-tab, .q2-option, .q2-match-item, .q2-order-item, .q2-cell, .q2-matrix-cell, .q2-path-card):hover {
   transition: none !important;
   transform: none !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-tab:hover {
+html body.lesson-page :is(.slide, .q2-slide) .q2-tab:hover {
   background: rgba(255, 255, 255, 0.8) !important;
   border-color: rgba(148, 163, 184, 0.3) !important;
   color: var(--text) !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-option:hover:not(:disabled),
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-match-item:hover:not(.is-solved),
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-path-card:hover:not(:disabled) {
+html body.lesson-page :is(.slide, .q2-slide) .q2-option:hover:not(:disabled),
+html body.lesson-page :is(.slide, .q2-slide) .q2-match-item:hover:not(.is-solved),
+html body.lesson-page :is(.slide, .q2-slide) .q2-path-card:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.86) !important;
   border-color: rgba(148, 163, 184, 0.3) !important;
   color: var(--text) !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-order-item:hover,
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-cell:hover,
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-matrix-cell:hover {
+html body.lesson-page :is(.slide, .q2-slide) .q2-order-item:hover,
+html body.lesson-page :is(.slide, .q2-slide) .q2-cell:hover,
+html body.lesson-page :is(.slide, .q2-slide) .q2-matrix-cell:hover {
   background: rgba(255, 255, 255, 0.9) !important;
   border-color: rgba(148, 163, 184, 0.35) !important;
   color: var(--text) !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-card:hover {
+html body.lesson-page :is(.slide, .q2-slide) .q2-card:hover {
   transition: none !important;
   transform: none !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] .brand-logo-group:hover .brand-icon-box,
-html body.lesson-page[data-lesson-id^="10emn"] .classes-menu-btn:hover,
-html body.lesson-page[data-lesson-id^="10emn"] .neu-auth-btn:hover,
-html body.lesson-page[data-lesson-id^="10emn"] .start-btn:hover,
-html body.lesson-page[data-lesson-id^="10emn"] .nav-btn:hover,
-html body.lesson-page[data-lesson-id^="10emn"] .btn-action:hover,
-html body.lesson-page[data-lesson-id^="10emn"] .quiz-btn:hover,
-html body.lesson-page[data-lesson-id^="10emn"] .option-btn:hover {
+html body.lesson-page .brand-logo-group:hover .brand-icon-box,
+html body.lesson-page .classes-menu-btn:hover,
+html body.lesson-page .neu-auth-btn:hover,
+html body.lesson-page .start-btn:hover,
+html body.lesson-page .nav-btn:hover,
+html body.lesson-page .btn-action:hover,
+html body.lesson-page .quiz-btn:hover,
+html body.lesson-page .option-btn:hover {
   transform: none !important;
   transition: none !important;
 }
 
-html body.lesson-page[data-lesson-id^="10emn"] :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav):hover::before {
+html body.lesson-page :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav):hover::before {
   transform: none !important;
   background: #94a3b8 !important;
 }
@@ -3532,4 +3532,14 @@ body.lesson-page[data-lesson-id^="10emn"] .q2-code.is-compact pre {
 
 .q2-copy {
   display: none !important;
+}
+
+/* Защита SVG-схем от реакции на наведение мыши */
+[data-q2-auto-sort],
+[data-q2-auto-sort] *,
+.q2-svg-wrap svg,
+.q2-svg-wrap svg *,
+.q2-hero-visual svg:not(:has([data-q2-single-switch])):not(:has(.q2-switch)),
+.q2-hero-visual svg:not(:has([data-q2-single-switch])):not(:has(.q2-switch)) * {
+  pointer-events: none !important;
 }
