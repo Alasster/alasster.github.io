@@ -22,7 +22,7 @@
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
   function hl(line) {
-    const tokens = /("[^"]*"|'[^']*'|#[^\n]*|\b(?:def|return|if|elif|else|for|while|in|not|and|or|True|False|None|print|input|int|str|float|len|range|append|sorted|list|sum|abs)\b|\b\d+(?:\.\d+)?\b)/g;
+    const tokens = /("[^"]*"|'[^']*'|#[^\n]*|\b(?:def|return|if|elif|else|for|while|in|not|and|or|True|False|None|print|input|int|str|float|len|range|append|sorted|sort|split|map|reverse|end|list|sum|abs)\b|\b\d+(?:\.\d+)?\b)/g;
     return esc(line).replace(tokens, match => {
       if (match[0] === '#') return `<span class="q2-tok-c">${match}</span>`;
       if (match[0] === '"' || match[0] === "'") return `<span class="q2-tok-s">${match}</span>`;
@@ -42,7 +42,7 @@
       </div>
       <pre><code>${lines.map((line, index) =>
         `<span class="q2-code-line" data-line="${index}"><span class="q2-ln">${index + 1}</span>${hl(line) || ' '}</span>`
-      ).join('\n')}</code></pre>
+      ).join('')}</code></pre>
       ${block.caption ? `<p class="q2-caption">${block.caption}</p>` : ''}
     </div>`;
   }
@@ -82,6 +82,7 @@
               <h3>${card.title}</h3>
             </div>
             <p>${card.text}</p>
+            ${card.code ? codeBlock({ code: Array.isArray(card.code) ? card.code.join('\n') : card.code, title: card.codeTitle || 'Python', compact: true }) : ''}
             ${card.footer ? `<div class="q2-card-footer">${card.footer}</div>` : ''}
           </article>`).join('')}</div>`;
       }
@@ -95,9 +96,14 @@
       case 'steps':
         return `<div class="q2-steps${item.cls ? ` ${item.cls}` : ''}">${(item.items || []).map((step, index) => `
           <div class="q2-step">
-            <span class="q2-step-num">${index + 1}</span>
+            ${step.icon ? `<span class="q2-step-icon"><i class="${step.icon}"></i></span>` : `<span class="q2-step-num">${step.badge || (index + 1)}</span>`}
             <div><h4>${step.title}</h4><p>${step.text}</p></div>
           </div>`).join('')}</div>`;
+      case 'split':
+        return `<div class="q2-split${item.cls ? ` ${item.cls}` : ''}">
+          <div class="q2-split-col q2-split-left">${blocks(item.left)}</div>
+          <div class="q2-split-col q2-split-right">${blocks(item.right)}</div>
+        </div>`;
       case 'table':
         return `<div class="q2-table-wrap"><table class="q2-table">
           ${item.caption ? `<caption>${item.caption}</caption>` : ''}
@@ -119,7 +125,7 @@
           <div class="q2-ref-body">${item.html || ''}</div>
         </details>`;
       case 'svg':
-        return `<div class="q2-svg-wrap">${item.svg}${item.caption ? `<p class="q2-caption">${item.caption}</p>` : ''}</div>`;
+        return `<div class="q2-svg-wrap${item.compact ? ' q2-svg-compact' : ''}${item.cls ? ` ${item.cls}` : ''}">${item.svg}${item.caption ? `<p class="q2-caption">${item.caption}</p>` : ''}</div>`;
       case 'rubric':
         return `<div class="q2-panel q2-rubric-panel"><h3><i class="fas fa-list-check"></i> ${item.title || 'Критерии успеха'}</h3>
           <div class="rubric">${(item.items || []).map(row => `<div class="rubric-row"><strong>${row.mark || '✓'}</strong><span>${row.text}</span></div>`).join('')}</div></div>`;
@@ -275,6 +281,104 @@
     });
   }
 
+  function initAutoSort(root) {
+    root.querySelectorAll('[data-q2-auto-sort]').forEach(svg => {
+      if (svg.dataset.autoSortBound === '1') return;
+      svg.dataset.autoSortBound = '1';
+      const nodes = Array.from(svg.querySelectorAll('.q2-autosort-item'));
+      const statusNode = svg.querySelector('[data-sort-status]');
+      if (!nodes.length) return;
+
+      const baseX = 58;
+      const stepX = 56;
+      const items = nodes.map((node, index) => ({
+        node,
+        val: Number(node.dataset.val),
+        slot: index
+      }));
+
+      const presets = [
+        [7, 3, 9, 1, 5, 8],
+        [9, 5, 1, 8, 3, 7],
+        [5, 9, 3, 8, 1, 7],
+        [8, 1, 7, 3, 9, 5]
+      ];
+      let presetIdx = 0;
+
+      const applyPositions = (compareSlots = [], sortedFromSlot = items.length, allSorted = false) => {
+        items.forEach(item => {
+          const x = baseX + item.slot * stepX;
+          const isCmp = compareSlots.includes(item.slot);
+          const liftY = isCmp ? -8 : 0;
+          item.node.setAttribute('transform', `translate(${x} ${liftY})`);
+          item.node.style.transform = `translate(${x}px, ${liftY}px)`;
+          item.node.classList.toggle('is-compare', isCmp);
+          item.node.classList.toggle('is-sorted', allSorted || item.slot >= sortedFromSlot);
+        });
+      };
+
+      const buildSteps = () => {
+        const sim = items.slice().sort((a, b) => a.slot - b.slot).map(it => it.val);
+        const n = sim.length;
+        const steps = [];
+        for (let pass = 0; pass < n - 1; pass++) {
+          let swapped = false;
+          for (let j = 0; j < n - 1 - pass; j++) {
+            if (sim[j] > sim[j + 1]) {
+              steps.push({ type: 'swap', a: j, b: j + 1, sortedFrom: n - pass, aVal: sim[j], bVal: sim[j + 1] });
+              const t = sim[j];
+              sim[j] = sim[j + 1];
+              sim[j + 1] = t;
+              swapped = true;
+            }
+          }
+          if (!swapped) break;
+        }
+        return steps;
+      };
+
+      let timer = null;
+      const wait = ms => new Promise(resolve => { timer = setTimeout(resolve, ms); });
+
+      const runLoop = async () => {
+        while (document.body.contains(svg)) {
+          const steps = buildSteps();
+          for (const st of steps) {
+            if (!document.body.contains(svg)) return;
+            if (statusNode) statusNode.textContent = `сравниваем ${st.aVal} и ${st.bVal} → меняем местами`;
+            applyPositions([st.a, st.b], st.sortedFrom, false);
+            await wait(240);
+            const leftItem = items.find(it => it.slot === st.a);
+            const rightItem = items.find(it => it.slot === st.b);
+            if (leftItem && rightItem) {
+              leftItem.slot = st.b;
+              rightItem.slot = st.a;
+            }
+            applyPositions([st.a, st.b], st.sortedFrom, false);
+            await wait(520);
+          }
+
+          if (statusNode) statusNode.textContent = 'готово: 1, 3, 5, 7, 8, 9 — по возрастанию!';
+          applyPositions([], 0, true);
+          await wait(1150);
+
+          presetIdx = (presetIdx + 1) % presets.length;
+          const nextOrder = presets[presetIdx];
+          if (statusNode) statusNode.textContent = 'перемешиваем элементы и сортируем заново…';
+          items.forEach(it => {
+            const newSlot = nextOrder.indexOf(it.val);
+            if (newSlot !== -1) it.slot = newSlot;
+          });
+          applyPositions([], items.length, false);
+          await wait(780);
+        }
+      };
+
+      applyPositions([], items.length, false);
+      runLoop();
+    });
+  }
+
   function boot() {
     const id = document.body.dataset.lessonId;
     const lesson = Q2.lessons[id];
@@ -291,6 +395,7 @@
     if (badgeNum) badgeNum.textContent = `Урок ${lesson.num}`;
     root.innerHTML = (lesson.slides || []).map(renderSlide).join('');
     initSingleLamp(root);
+    initAutoSort(root);
     initWidgets(root);
     document.dispatchEvent(new CustomEvent('q2:ready', { detail: { id } }));
   }

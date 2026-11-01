@@ -4,8 +4,27 @@
 
   // Reviewed against the actual content of all 34 lessons / 249 slides.
   const stages = {
+    "10emn-q2-1": [
+      { "icon": "home", "title": "Рекурсия" },
+      { "icon": "binary", "title": "Вспоминаем Python: def" },
+      { "icon": "refresh", "title": "Функция вызывает саму себя" },
+      { "icon": "code", "title": "Примеры рекурсивного кода" },
+      { "icon": "edit", "title": "Открываем Python IDLE" },
+      { "icon": "computer", "title": "Практика: пишем рекурсивный код" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10ogn-q2-1": [
+      { "icon": "home", "title": "Алгоритмы сортировки" },
+      { "icon": "layers", "title": "Что значит «отсортировать»" },
+      { "icon": "binary", "title": "Списки и сортировка в Python" },
+      { "icon": "computer", "title": "Как запускать код в Python IDLE" },
+      { "icon": "edit", "title": "Практическая работа в Python" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги урока и дескриптор" }
+    ],
     "9-q2-1": [
-      { "icon": "bulb", "title": "Логика и логические операции" },
+      { "icon": "bulb", "title": "Логические операции" },
       { "icon": "binary", "title": "Как компьютер работает с логикой" },
       { "icon": "star", "title": "Логическое умножение · конъюнкция · И" },
       { "icon": "plus", "title": "Логическая сумма · дизъюнкция · ИЛИ" },
@@ -1014,6 +1033,36 @@
         "icon": "flag",
         "title": "Критерии оценивания: 10 баллов"
       }
+    ],
+    "10ogn-q2-1": [
+      {
+        "icon": "home",
+        "title": "Алгоритмы сортировки"
+      },
+      {
+        "icon": "layers",
+        "title": "Что значит «отсортировать»"
+      },
+      {
+        "icon": "list",
+        "title": "Списки и сортировка в Python"
+      },
+      {
+        "icon": "binary",
+        "title": "Как запускать код в Python IDLE"
+      },
+      {
+        "icon": "computer",
+        "title": "Практическая работа в Python"
+      },
+      {
+        "icon": "check",
+        "title": "Мини-проверка"
+      },
+      {
+        "icon": "flag",
+        "title": "Итоги урока и дескриптор"
+      }
     ]
   };
 
@@ -1103,7 +1152,42 @@
     "lock-open": "unlock",
     "star": "star",
     "arrow-right-from-bracket": "sign-out-alt",
-    "spinner": "loading"
+    "spinner": "loading",
+    "arrow-down-1-9": "arrow-comparison",
+    "arrow-up-9-1": "arrow-comparison",
+    "arrow-down-a-z": "arrow-comparison",
+    "arrow-up-z-a": "arrow-comparison",
+    "arrows-up-down": "arrow-comparison",
+    "arrows-left-right": "arrow-comparison",
+    "sort": "arrow-comparison",
+    "sort-up": "arrow-comparison",
+    "sort-down": "arrow-comparison",
+    "magnifying-glass": "search",
+    "search": "search",
+    "list-check": "list-check",
+    "list": "list",
+    "list-ul": "list",
+    "repeat": "refresh",
+    "rotate": "refresh",
+    "arrows-rotate": "refresh",
+    "code": "binary",
+    "file-code": "edit",
+    "file": "edit",
+    "file-lines": "book-alt",
+    "terminal": "computer",
+    "keyboard": "computer",
+    "folder": "folder",
+    "folder-open": "folder",
+    "floppy-disk": "download",
+    "save": "download",
+    "circle-info": "interrogation",
+    "info-circle": "interrogation",
+    "wand-magic": "magic-wand",
+    "sparkles": "magic-wand",
+    "bolt-lightning": "bolt",
+    "gears": "settings-sliders",
+    "gear": "settings-sliders",
+    "cog": "settings-sliders"
   };
   const emoji = {
     "💻": "computer",

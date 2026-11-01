@@ -40,155 +40,296 @@
     <text class="q2-scene-caption" x="270" y="215" text-anchor="middle">нет базы → бесконечная рекурсия; нет шага → задача не уменьшается</text>
   </svg>`;
 
+  const REC_SCREEN_SVG = `<svg viewBox="0 0 560 390" role="img" aria-label="Светлая анимированная трассировка countdown в окне Python IDLE">
+    <style>
+      @keyframes q2-rec-reveal {
+        0%, 5% { opacity: 0; }
+        11%, 88% { opacity: 1; }
+        96%, 100% { opacity: 0; }
+      }
+      @keyframes q2-rec-highlight {
+        0%, 9%, 100% { fill: rgba(99, 102, 241, 0.04); }
+        10%, 18% { fill: rgba(99, 102, 241, 0.36); }
+      }
+      .q2-rec-demo-step { opacity: 0; animation: q2-rec-reveal 9s linear infinite; }
+      .q2-rec-demo-line { animation: q2-rec-highlight 9s linear infinite; }
+    </style>
+    <rect x="8" y="8" width="544" height="374" rx="20" fill="#edf3f7" stroke="#c8d6e0" stroke-width="2"/>
+    <path d="M28 8h504a20 20 0 0 1 20 20v30H8V28A20 20 0 0 1 28 8z" fill="#f9fbfd"/>
+    <circle cx="32" cy="29" r="6" fill="#f87171"/><circle cx="52" cy="29" r="6" fill="#fbbf24"/><circle cx="72" cy="29" r="6" fill="#34d399"/>
+    <text x="112" y="34" fill="#42586b" font-family="sans-serif" font-size="15" font-weight="700">Python IDLE · recursion.py</text>
+    <rect x="18" y="52" width="326" height="310" rx="10" fill="#fff" stroke="#d7e1e9"/>
+    <text x="34" y="76" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="700">Код программы</text>
+    <g font-family="monospace" font-size="14">
+      <rect class="q2-rec-demo-line" x="26" y="88" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:.2s"/>
+      <text x="34" y="108" fill="#6d28d9">def countdown(n):</text>
+      <rect class="q2-rec-demo-line" x="26" y="120" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:1.1s"/>
+      <text x="34" y="140" fill="#334155">    if n == 0:</text>
+      <rect class="q2-rec-demo-line" x="26" y="152" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:2s"/>
+      <text x="34" y="172" fill="#334155">        print("Старт!")</text>
+      <rect class="q2-rec-demo-line" x="26" y="184" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:2.9s"/>
+      <text x="34" y="204" fill="#334155">        return</text>
+      <rect class="q2-rec-demo-line" x="26" y="216" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:3.8s"/>
+      <text x="34" y="236" fill="#334155">    print(n)</text>
+      <rect class="q2-rec-demo-line" x="26" y="248" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:4.7s"/>
+      <text x="34" y="268" fill="#334155">    countdown(n - 1)</text>
+      <rect class="q2-rec-demo-line" x="26" y="280" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:5.6s"/>
+      <text x="34" y="300" fill="#047857">countdown(3)</text>
+    </g>
+    <rect x="356" y="52" width="186" height="310" rx="10" fill="#e7eef4" stroke="#d2dee7"/>
+    <text x="372" y="76" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="700">Python Shell</text>
+    <g font-family="monospace" font-size="18" font-weight="700" fill="#16734a">
+      <text x="372" y="108" fill="#536679" font-size="12" font-weight="400">&gt;&gt;&gt; countdown(3)</text>
+      <g class="q2-rec-demo-step" style="animation-delay:.7s"><text x="378" y="150">3</text></g>
+      <g class="q2-rec-demo-step" style="animation-delay:1.6s"><text x="378" y="184">2</text></g>
+      <g class="q2-rec-demo-step" style="animation-delay:2.5s"><text x="378" y="218">1</text></g>
+      <g class="q2-rec-demo-step" style="animation-delay:3.4s"><text x="378" y="252">Старт!</text></g>
+    </g>
+    <text x="372" y="334" fill="#486174" font-family="sans-serif" font-size="12" font-weight="700">Вызовов больше нет</text>
+    <text x="18" y="377" fill="#64748b" font-family="sans-serif" font-size="12">Подсветка следует по строкам, вывод появляется автоматически</text>
+  </svg>`;
+
+  const IDLE_GUIDE_HTML = `<div class="q2-idle-guide">
+    <article class="q2-idle-step">
+      <h3><span>1</span> Открой Python IDLE</h3>
+      <svg viewBox="0 0 360 150" role="img" aria-label="Открой меню Пуск, затем папку Python и IDLE">
+        <rect x="8" y="8" width="344" height="134" rx="14" fill="#f3f6fa" stroke="#d4dee8"/>
+        <rect x="20" y="20" width="108" height="108" rx="10" fill="#e5edf5"/>
+        <rect x="31" y="31" width="86" height="22" rx="6" fill="#fff" stroke="#d2dce6"/>
+        <text x="74" y="46" text-anchor="middle" fill="#334155" font-size="12" font-family="sans-serif">Пуск</text>
+        <path d="M75 54v10" stroke="#7c8da0" stroke-width="2"/>
+        <rect x="31" y="65" width="86" height="22" rx="6" fill="#fff" stroke="#d2dce6"/>
+        <text x="74" y="80" text-anchor="middle" fill="#334155" font-size="11" font-family="sans-serif">Python 3.x</text>
+        <path d="M75 88v9" stroke="#7c8da0" stroke-width="2"/>
+        <rect x="31" y="98" width="86" height="22" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="74" y="113" text-anchor="middle" fill="#1e40af" font-size="10" font-family="sans-serif">IDLE</text>
+        <path d="M142 75h25" stroke="#71839a" stroke-width="2"/>
+        <path d="m162 69 8 6-8 6" fill="none" stroke="#71839a" stroke-width="2"/>
+        <rect x="180" y="38" width="150" height="74" rx="12" fill="#fff" stroke="#cbd5e1"/>
+        <circle cx="196" cy="53" r="4" fill="#f87171"/><circle cx="209" cy="53" r="4" fill="#fbbf24"/><circle cx="222" cy="53" r="4" fill="#34d399"/>
+        <text x="255" y="81" text-anchor="middle" fill="#334155" font-size="14" font-weight="700" font-family="sans-serif">Python IDLE</text>
+        <text x="255" y="99" text-anchor="middle" fill="#64748b" font-size="11" font-family="sans-serif">откроется Shell</text>
+      </svg>
+      <p>Пуск → Python 3.x → IDLE (Python 3.x)</p>
+    </article>
+    <article class="q2-idle-step">
+      <h3><span>2</span> Создай файл</h3>
+      <svg viewBox="0 0 360 150" role="img" aria-label="В меню File выбери New File">
+        <rect x="8" y="8" width="344" height="134" rx="14" fill="#f3f6fa" stroke="#d4dee8"/>
+        <rect x="22" y="22" width="316" height="106" rx="10" fill="#fff" stroke="#cbd5e1"/>
+        <rect x="22" y="22" width="316" height="24" rx="10" fill="#edf2f7"/>
+        <text x="36" y="38" fill="#334155" font-size="12" font-family="sans-serif">File</text>
+        <text x="66" y="38" fill="#64748b" font-size="11" font-family="sans-serif">Edit  Format  Run</text>
+        <rect x="28" y="48" width="134" height="64" rx="7" fill="#fff" stroke="#cbd5e1"/>
+        <text x="40" y="66" fill="#64748b" font-size="11" font-family="sans-serif">Open...</text>
+        <rect x="34" y="72" width="122" height="25" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="44" y="89" fill="#1e40af" font-size="11" font-weight="700" font-family="sans-serif">New File</text>
+        <path d="M186 80h37" stroke="#71839a" stroke-width="2"/>
+        <path d="m218 74 8 6-8 6" fill="none" stroke="#71839a" stroke-width="2"/>
+        <rect x="237" y="58" width="82" height="46" rx="8" fill="#e8f4ec" stroke="#a8cfb3"/>
+        <text x="278" y="77" text-anchor="middle" fill="#315c3f" font-size="11" font-weight="700" font-family="sans-serif">Editor</text>
+        <text x="278" y="93" text-anchor="middle" fill="#527083" font-size="10" font-family="sans-serif">новый файл</text>
+      </svg>
+      <p>В окне Shell нажми File → New File.</p>
+    </article>
+    <article class="q2-idle-step">
+      <h3><span>3</span> Сохрани программу</h3>
+      <svg viewBox="0 0 360 150" role="img" aria-label="Сохрани файл под именем recursion.py">
+        <rect x="8" y="8" width="344" height="134" rx="14" fill="#f3f6fa" stroke="#d4dee8"/>
+        <rect x="38" y="20" width="284" height="110" rx="12" fill="#fff" stroke="#cbd5e1"/>
+        <text x="58" y="44" fill="#334155" font-size="13" font-weight="700" font-family="sans-serif">Сохранить как</text>
+        <text x="58" y="68" fill="#64748b" font-size="10" font-family="sans-serif">Имя файла</text>
+        <rect x="56" y="75" width="248" height="27" rx="6" fill="#f8fafc" stroke="#94a3b8"/>
+        <text x="68" y="93" fill="#334155" font-size="12" font-family="monospace">recursion.py</text>
+        <rect x="222" y="108" width="82" height="18" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="263" y="121" text-anchor="middle" fill="#1e40af" font-size="10" font-weight="700" font-family="sans-serif">Сохранить</text>
+      </svg>
+      <p>File → Save As… Укажи имя файла с окончанием <code>.py</code>.</p>
+    </article>
+    <article class="q2-idle-step">
+      <h3><span>4</span> Запусти код</h3>
+      <svg viewBox="0 0 360 150" role="img" aria-label="В меню Run выбери Run Module или нажми F5">
+        <rect x="8" y="8" width="344" height="134" rx="14" fill="#f3f6fa" stroke="#d4dee8"/>
+        <rect x="20" y="20" width="188" height="108" rx="10" fill="#fff" stroke="#cbd5e1"/>
+        <rect x="20" y="20" width="188" height="24" rx="10" fill="#edf2f7"/>
+        <text x="34" y="36" fill="#64748b" font-size="11" font-family="sans-serif">File  Edit  Format</text>
+        <text x="160" y="36" fill="#334155" font-size="11" font-weight="700" font-family="sans-serif">Run</text>
+        <rect x="112" y="47" width="87" height="34" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="155" y="62" text-anchor="middle" fill="#1e40af" font-size="9" font-weight="700" font-family="sans-serif">Run Module</text>
+        <text x="155" y="75" text-anchor="middle" fill="#1e40af" font-size="9" font-family="sans-serif">F5</text>
+        <path d="M213 64h18" stroke="#71839a" stroke-width="2"/>
+        <path d="m227 58 8 6-8 6" fill="none" stroke="#71839a" stroke-width="2"/>
+        <rect x="240" y="30" width="102" height="82" rx="10" fill="#e7eef4" stroke="#cbd5e1"/>
+        <text x="291" y="48" text-anchor="middle" fill="#64748b" font-size="10" font-family="sans-serif">Python Shell</text>
+        <text x="253" y="70" fill="#16734a" font-size="10" font-family="monospace">&gt;&gt;&gt; 3</text>
+        <text x="253" y="86" fill="#16734a" font-size="10" font-family="monospace">&gt;&gt;&gt; 2</text>
+        <text x="253" y="102" fill="#16734a" font-size="10" font-family="monospace">&gt;&gt;&gt; 1</text>
+      </svg>
+      <p>Run → Run Module или нажми F5. Результат появится в Shell.</p>
+    </article>
+  </div>`;
+
   /* ==========================================================================
      УРОК 1. Что такое рекурсия
      ========================================================================== */
   Q2.add('10emn-q2-1', {
     num: 1,
     cls: '10 ЕМН',
-    title: 'Что такое рекурсия',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Задача, которая <span class="accent-text">содержит саму себя</span>',
-        lead: 'Матрёшка внутри матрёшки, зеркало напротив зеркала, папка с папками. Рекурсия — это способ решать задачу через такую же задачу, но меньшего размера.',
-        goal: 'Объяснять понятие рекурсии и приводить примеры рекурсивных процессов.',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 1',
+        title: '<span class="accent-text">Рекурсия</span>',
+        lead: 'Как функция может вызвать саму себя — и почему программа при этом не зацикливается?',
+        goal: 'Вспомнить функции Python и научиться находить в рекурсии шаг и условие остановки.',
         goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-layer-group', text: 'Задача меньшего размера' },
+          { icon: 'fas fa-code', text: 'Вспоминаем def' },
           { icon: 'fas fa-rotate-left', text: 'Вызов самой себя' },
-          { icon: 'fas fa-code', text: 'Python-функция' }
+          { icon: 'fas fa-stop', text: 'Условие остановки' }
         ],
-        visual: 'recursion',
-        visualCaption: 'Каждый уровень — уменьшенная копия предыдущего',
-        cta: 'Начать погружение'
+        visual: 'recursionIntro',
+        visualCaption: 'Новое окно появляется на каждом рекурсивном вызове',
+        cta: 'Начать урок'
       },
       {
         k: 'concept',
-        eyebrow: '02 · ПОНЯТИЕ',
-        title: 'Определение через себя',
-        lead: 'Рекурсивная функция — это функция, которая в своём теле вызывает саму себя. Главное условие: каждая следующий вызов должен работать с более простой задачей.',
+        eyebrow: '02 · ВСПОМИНАЕМ PYTHON',
+        title: 'Что означает <code>def</code>?',
+        lead: 'Функцию сначала описывают, а затем вызывают по имени.',
         blocks: [
           {
-            t: 'definition',
-            icon: 'fas fa-rotate-left',
-            title: 'Рекурсия',
-            text: 'Рекурсия — приём, при котором функция вызывает саму себя, но с меньшим или более простым набором данных. Процесс продолжается до выполнения условия остановки.'
+            t: 'code',
+            title: 'обычная функция.py',
+            code: 'def greet(name):\n    print("Привет,", name)\n\ngreet("Алия")'
           },
           {
-            t: 'code',
-            title: 'countdown.py',
-            code: 'def countdown(n):\n    if n == 0:            # база: остановка\n        print("Старт!")\n        return\n    print(n)\n    countdown(n - 1)      # шаг: та же задача, но меньше\n\ncountdown(3)'
+            t: 'cards',
+            cols: 2,
+            items: [
+              { title: 'Объявление', text: '<code>def</code> начинает описание функции. <code>greet</code> — её имя, <code>name</code> — параметр.', tone: 'violet' },
+              { title: 'Вызов', text: '<code>greet("Алия")</code> запускает тело функции; значение «Алия» попадает в параметр <code>name</code>.', tone: 'cyan' }
+            ]
           },
           {
             t: 'callout',
             icon: 'fas fa-lightbulb',
-            title: 'Аналогия',
-            text: 'Вы стоите между двумя зеркалами и видите коридор из отражений. Каждое отражение — уменьшенная копия предыдущего. Рекурсия в программе устроена так же.'
-          },
-          {
-            t: 'cards',
-            cols: 3,
-            items: [
-              { badge: '1', title: 'Уменьшение', text: 'Каждый вызов получает задачу меньше: n − 1, остаток строки, половину массива.', tone: 'violet' },
-              { badge: '2', title: 'Остановка', text: 'Рано или поздно задача становится настолько простой, что ответ известен сразу.', tone: 'cyan' },
-              { badge: '3', title: 'Возврат', text: 'Результаты возвращаются назад по цепочке вызовов и собираются в итог.', tone: 'amber' }
-            ]
-          }
-        ]
-      },
-      {
-        k: 'lab',
-        eyebrow: '03 · ИНТЕРАКТИВ',
-        title: 'Первый рекурсивный вызов',
-        lead: 'Постройте трассировку countdown(3) и пройдите шаги. Обратите внимание: вызовы «складываются» в стек, а потом по одному возвращаются.',
-        widget: {
-          kind: 'recursion',
-          config: { fn: 'countdown', n: 3 }
-        },
-        after: [
-          {
-            t: 'callout',
-            tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Что вы увидели',
-            text: 'Сначала появляются вызовы countdown(3), countdown(2), countdown(1), countdown(0). Затем база печатает «Старт!», и вызовы начинают возвращаться.'
+            title: 'Проверь себя',
+            text: 'Что появится на экране после вызова? А что изменится, если передать имя «Марат»?'
           }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '04 · ГДЕ ВСТРЕЧАЕТСЯ',
-        title: 'Рекурсия вокруг нас',
-        lead: 'Рекурсивные структуры встречаются и в природе, и в компьютере.',
+        eyebrow: '03 · РЕКУРСИЯ',
+        title: 'Функция вызывает саму себя',
+        lead: 'Рекурсивная функция решает часть задачи, затем вызывает себя для оставшейся, более простой части.',
         blocks: [
           {
             t: 'cards',
             cols: 2,
             items: [
-              { badge: 'Папки', title: 'Файловая система', text: 'Папка содержит папки, те — ещё папки. Обход дерева каталогов — рекурсивная задача.', tone: 'violet' },
-              { badge: 'Фрактал', title: 'Геометрия', text: 'Каждая часть фрактала похожа на целое: снежинка Коха, треугольник Серпинского.', tone: 'cyan' },
-              { badge: 'Граф', title: 'Алгоритмы', text: 'Обход в глубину (DFS) естественно записывается рекурсией.', tone: 'amber' },
-              { badge: 'Поиск', title: 'Быстрые алгоритмы', text: 'Быстрая сортировка и бинарный поиск делят задачу пополам — это тоже рекурсия.', tone: 'green' }
+              { title: 'База', text: 'Условие, при котором функция больше не вызывает себя. В примере: <code>n == 0</code>.', tone: 'green' },
+              { title: 'Рекурсивный шаг', text: 'Вызов той же функции с меньшей задачей: <code>countdown(n - 1)</code>.', tone: 'violet' }
             ]
           },
+          { t: 'svg', cls: 'q2-recursion-wide', svg: REC_SCREEN_SVG, caption: 'Ход выполнения countdown(3)' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '04 · ПРИМЕРЫ КОДА',
+        title: 'Подсказки к четырём задачам',
+        lead: 'Вспомни образец на прошлом слайде: сначала база, затем действие и шаг к более простой задаче. Эти подсказки направляют, но не дают готовые программы.',
+        blocks: [
           {
-            t: 'compare',
-            left: {
-              title: 'Рекурсия даёт',
-              items: ['Короткую и понятную запись', 'Естественное решение для деревьев и графов', 'Прямое соответствие математическому определению']
-            },
-            right: {
-              title: 'Рекурсия требует',
-              items: ['Обязательной базы', 'Уменьшения задачи на каждом шаге', 'Внимания к глубине вызовов']
-            },
-            vs: 'и'
+            t: 'cards',
+            cols: 2,
+            items: [
+              { badge: 'Задача 1 · повтор приветствия', title: 'Печатай до остановки', text: 'Поставь базу при <code>n == 0</code>. На каждом шаге выведи приветствие, затем передай функции <code>n - 1</code>. Проверь отдельно <code>n = 0</code> и <code>n = 3</code>.', tone: 'violet' },
+              { badge: 'Задача 2 · сумма чисел', title: 'Собирай сумму при возврате', text: 'Для нуля сумма равна <code>0</code>. На шаге прибавь текущее <code>n</code> к результату для меньшего аргумента. Для <code>n = 4</code> проверь ответ <code>10</code>.', tone: 'cyan' },
+              { badge: 'Задача 3 · степень числа', title: 'Уменьшай показатель', text: 'При показателе <code>0</code> результат равен <code>1</code>. На каждом шаге умножай основание на результат для показателя на единицу меньше.', tone: 'amber' },
+              { badge: 'Задача 4 · количество цифр', title: 'Убирай последнюю цифру', text: 'Остановись, когда осталось однозначное число. Для шага раздели число нацело на <code>10</code> и прибавь одну цифру к результату.', tone: 'green' }
+            ]
           }
         ]
       },
       {
-        k: 'practice',
-        eyebrow: '05 · ПРАКТИКА',
-        title: 'Узнаём рекурсию',
-        lead: 'Отвечайте коротко: да, нет или название.',
-        tasks: [
-          { title: 'Определение', q: 'Как называется функция, которая вызывает саму себя?', answer: ['рекурсивная', 'рекурсивная функция', 'recursive'], explain: 'Это рекурсивная функция.', hint: 'Слово связано с «рекурсией».' },
-          { title: 'Условие', q: 'Что обязательно должно быть в рекурсивной функции?', answer: ['база', 'условие остановки', 'базовый случай', 'выход'], explain: 'Без условия остановки рекурсия будет бесконечной.', hint: 'Иначе вызовы никогда не прекратятся.' },
-          { title: 'Пример', q: 'Является ли обход папок с вложенными папками рекурсивной задачей?', answer: ['да', 'yes'], explain: 'Каждая вложенная папка обрабатывается так же, как исходная.', hint: 'Структура повторяет себя.' },
-          { title: 'Шаг', q: 'Что должно происходить с задачей при каждом новом вызове?', answer: ['уменьшаться', 'уменьшение', 'становиться меньше', 'упрощаться'], explain: 'Иначе рекурсия не завершится.', hint: 'Вспомните n − 1.' },
-          { title: 'Результат', q: 'Сколько строк выведет countdown(3) до слова «Старт!»?', answer: '3', type: 'number', explain: 'Будут напечатаны 3, 2, 1.', hint: 'Посчитайте числа от 3 до 1.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Определение рекурсии сформулировано своими словами.' },
-          { mark: '1 балл', text: 'Названы база и уменьшение задачи.' },
-          { mark: '1 балл', text: 'Приведён собственный пример рекурсивного процесса.' }
+        k: 'concept',
+        eyebrow: '05 · PYTHON IDLE',
+        title: 'Открой IDLE и запусти программу',
+        lead: 'Следуй схеме: открыть редактор, создать файл, сохранить его и запустить.',
+        blocks: [
+          { t: 'html', html: IDLE_GUIDE_HTML }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКА · ПИШЕМ КОД',
+        title: 'Четыре задачи — от простой к сложнее',
+        lead: 'Создай отдельный файл в IDLE. Для каждой задачи напиши свою функцию; готовых решений на слайдах нет. В каждой функции должны быть база и шаг, который упрощает задачу.',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 2,
+            items: [
+              { badge: '1 · 2 балла', title: 'Повтор приветствия', text: 'Напиши <code>greet_n(n)</code>: вывести «Привет!» ровно <code>n</code> раз. Проверь вызов с <code>n = 3</code>.', tone: 'violet' },
+              { badge: '2 · 2 балла', title: 'Сумма чисел', text: 'Напиши <code>sum_to(n)</code> для целого <code>n ≥ 0</code>: вернуть сумму чисел от 1 до <code>n</code>. Например, для 4 ответ должен быть 10.', tone: 'cyan' },
+              { badge: '3 · 3 балла', title: 'Степень числа', text: 'Напиши <code>power(a, n)</code>, чтобы получить <code>a</code> в степени <code>n</code>. Учти: любое ненулевое число в степени 0 равно 1.', tone: 'amber' },
+              { badge: '4 · 3 балла', title: 'Количество цифр', text: 'Напиши <code>count_digits(n)</code> для положительного целого числа. Например, для 531 ответ — 3. На шаге убирай последнюю цифру.', tone: 'green' }
+            ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-list-check',
+            title: 'Перед запуском проверь',
+            text: 'Есть ли условие остановки? Меняется ли аргумент так, чтобы приблизиться к нему? После написания проверь функции на примерах из карточек.'
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '06 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА',
+        title: 'Проверим, что запомнили',
+        lead: 'Выбери один ответ в каждом вопросе.',
         questions: [
-          { q: 'Что такое рекурсия?', options: ['Вызов функцией самой себя', 'Повторение цикла', 'Ошибка программы', 'Копирование файла'], answer: 0, explain: 'Функция вызывает себя с более простой задачей.' },
-          { q: 'Зачем нужна база рекурсии?', options: ['Чтобы остановить вызовы', 'Чтобы ускорить программу', 'Чтобы сохранить файл', 'Чтобы вывести результат'], answer: 0, explain: 'База — условие остановки.' },
-          { q: 'Что произойдёт без условия остановки?', options: ['Бесконечная рекурсия', 'Программа ускорится', 'Ничего', 'Появится цикл for'], answer: 0, explain: 'Вызовы не прекратятся, пока не кончится память стека.' },
-          { q: 'Какая задача естественно решается рекурсией?', options: ['Обход дерева папок', 'Сложение двух чисел', 'Вывод строки', 'Сортировка пузырьком'], answer: 0, explain: 'Дерево имеет рекурсивную структуру.' },
-          { q: 'Что означает «задача меньшего размера»?', options: ['Меньше данных на каждом шаге', 'Меньше файлов', 'Меньше строк кода', 'Меньше памяти'], answer: 0, explain: 'Например, n − 1 или остаток строки.' }
+          { q: 'Для чего в Python используют слово def?', options: ['Чтобы объявить функцию', 'Чтобы вызвать цикл', 'Чтобы вывести текст', 'Чтобы остановить программу'], answer: 0, explain: 'После def записывают имя функции и её параметры.' },
+          { q: 'Что делает вызов greet("Алия")?', options: ['Запускает тело функции с аргументом «Алия»', 'Создаёт новый файл', 'Объявляет параметр', 'Останавливает программу'], answer: 0, explain: 'Вызов запускает уже объявленную функцию.' },
+          { q: 'Что такое рекурсия?', options: ['Функция вызывает саму себя', 'Функция всегда запускает цикл', 'Программа вызывает другую программу', 'Переменная хранит список'], answer: 0, explain: 'Рекурсивная функция содержит вызов самой себя.' },
+          { q: 'Зачем нужна база рекурсии?', options: ['Чтобы остановить вызовы', 'Чтобы увеличить аргумент', 'Чтобы объявить функцию', 'Чтобы повторить вывод'], answer: 0, explain: 'Без базы вызовы не завершатся.' },
+          { q: 'Что выведет countdown(3), если сначала печатать n, а потом вызывать countdown(n - 1)?', options: ['3, 2, 1, затем «Старт!»', '1, 2, 3', 'Только «Старт!»', '3 бесконечно'], answer: 0, explain: 'Каждый вызов печатает текущее число до следующего вызова.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Рекурсия — вызов функцией самой себя.',
-          'Каждый вызов должен уменьшать задачу.',
-          'База останавливает рекурсию.',
-          'Результаты возвращаются по цепочке вызовов.',
-          'Рекурсия естественна для деревьев, графов и деления задачи.'
+          '<code>def</code> объявляет функцию, вызов запускает её тело.',
+          'Рекурсивная функция вызывает саму себя.',
+          'База останавливает вызовы, шаг упрощает задачу.'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задача 1: есть остановка при n = 0.' },
+          { mark: '1 балл', text: 'Задача 1: приветствие выводится ровно n раз.' },
+          { mark: '1 балл', text: 'Задача 2: база возвращает 0 при n = 0.' },
+          { mark: '1 балл', text: 'Задача 2: рекурсивный шаг прибавляет n и уменьшает аргумент.' },
+          { mark: '1 балл', text: 'Задача 3: база для показателя 0 возвращает 1.' },
+          { mark: '1 балл', text: 'Задача 3: шаг умножает на a и уменьшает показатель.' },
+          { mark: '1 балл', text: 'Задача 3: проверка power(2, 3) даёт 8.' },
+          { mark: '1 балл', text: 'Задача 4: база верно обрабатывает однозначное число.' },
+          { mark: '1 балл', text: 'Задача 4: шаг отбрасывает последнюю цифру через n // 10.' },
+          { mark: '1 балл', text: 'Задача 4: проверка count_digits(531) даёт 3.' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'Рекурсия — это ...',
-          'Без базы рекурсия ...',
-          'Пример рекурсии из жизни — ...'
+          'Что делает ключевое слово def?',
+          'Как рекурсивная функция приближается к остановке?',
+          'Какую из четырёх задач ты решил(а) и что было самым сложным?'
         ]
       }
     ]
@@ -200,12 +341,12 @@
   Q2.add('10emn-q2-2', {
     num: 2,
     cls: '10 ЕМН',
-    title: 'База и рекурсивный шаг',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Два элемента, <span class="accent-text">без которых не работает</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: 'Любая корректная рекурсия состоит из базы и шага. База отвечает «когда остановиться», шаг — «как приблизиться к остановке».',
         goal: 'Выделять базу и рекурсивный шаг в рекурсивной функции.',
         goalCode: '10.2.1.1',
@@ -367,12 +508,12 @@
   Q2.add('10emn-q2-3', {
     num: 3,
     cls: '10 ЕМН',
-    title: 'Стек вызовов',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Кто помнит, <span class="accent-text">куда возвращаться</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: 'Пока функция не завершилась, Python хранит её вызов в стеке. Стек растёт вниз при вызовах и разбирается вверх при возвратах.',
         goal: 'Объяснять, как работает стек вызовов и почему возникает RecursionError.',
         goalCode: '10.2.1.2',
@@ -529,12 +670,12 @@
   Q2.add('10emn-q2-4', {
     num: 4,
     cls: '10 ЕМН',
-    title: 'Факториал',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Классика: <span class="accent-text">n!</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: 'Факториал — первая рекурсивная функция, которую пишут почти все. Он короткий, но содержит всё: базу, шаг, стек и возврат значений.',
         goal: 'Записывать факториал рекурсивно и объяснять каждый шаг вычисления.',
         goalCode: '10.2.1.3',
@@ -714,12 +855,12 @@
   Q2.add('10emn-q2-5', {
     num: 5,
     cls: '10 ЕМН',
-    title: 'Сумма цифр числа',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Разобрать число <span class="accent-text">по цифрам</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: 'Число 4721 — это 1 плюс сумма цифр числа 472. Один остаток от деления и один целочисленный раздел — и задача стала меньше.',
         goal: 'Применять рекурсию к разбору числа на цифры.',
         goalCode: '10.2.1.4',
@@ -902,12 +1043,12 @@
   Q2.add('10emn-q2-6', {
     num: 6,
     cls: '10 ЕМН',
-    title: 'Переворот строки',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Строка, которая <span class="accent-text">читается назад</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: '«дом» → «мод». Чтобы перевернуть строку рекурсивно, отрежем первый символ и перевернём остаток, а потом приклеим символ в конец.',
         goal: 'Писать рекурсивную функцию разворота строки и объяснять порядок склейки.',
         goalCode: '10.2.1.5',
@@ -1073,12 +1214,12 @@
   Q2.add('10emn-q2-7', {
     num: 7,
     cls: '10 ЕМН',
-    title: 'Рекурсия и цикл',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Два способа <span class="accent-text">повторить</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: 'Любую линейную рекурсию можно записать циклом, и наоборот. Вопрос не «что лучше», а «что понятнее в конкретной задаче».',
         goal: 'Сравнивать рекурсивное и циклическое решения, переводить одно в другое.',
         goalCode: '10.2.1.6',
@@ -1262,12 +1403,12 @@
   Q2.add('10emn-q2-8', {
     num: 8,
     cls: '10 ЕМН',
-    title: 'Рекурсия: подготовка к СОР',
+    title: 'Рекурсия',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Собираем всё <span class="accent-text">в одну картину</span>',
+        title: '<span class="accent-text">Рекурсия</span>',
         lead: 'Семь уроков рекурсии сводятся к четырём умениям: найти базу, записать шаг, объяснить стек и выбрать между рекурсией и циклом.',
         goal: 'Систематизировать тему рекурсии и подготовиться к суммативному оцениванию.',
         goalCode: '10.2.1.7',
@@ -1399,12 +1540,12 @@
   Q2.add('10emn-q2-9', {
     num: 9,
     cls: '10 ЕМН',
-    title: 'Сортировка: постановка задачи',
+    title: 'Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Формально: <span class="accent-text">упорядочить по ключу</span>',
+        title: 'Алгоритмы <span class="accent-text">сортировки</span>',
         lead: 'Сортировка — приведение последовательности к порядку, заданному отношением «не больше». Формально это перестановка элементов, после которой a[i] ≤ a[i+1] для всех i.',
         goal: 'Формулировать задачу сортировки и оценивать её сложность.',
         goalCode: '10.2.2.1',
@@ -1574,12 +1715,12 @@
   Q2.add('10emn-q2-10', {
     num: 10,
     cls: '10 ЕМН',
-    title: 'Сортировка пузырьком',
+    title: 'Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Инвариант: <span class="accent-text">хвост уже отсортирован</span>',
+        title: 'Алгоритмы <span class="accent-text">сортировки</span>',
         lead: 'После k-го прохода последние k элементов стоят на своих местах. Это инвариант пузырька — свойство, которое сохраняется на каждом шаге.',
         goal: 'Реализовывать пузырьковую сортировку и оценивать число операций.',
         goalCode: '10.2.2.1',
@@ -1740,12 +1881,12 @@
   Q2.add('10emn-q2-11', {
     num: 11,
     cls: '10 ЕМН',
-    title: 'Сортировка выбором',
+    title: 'Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Минимум — на своё место, <span class="accent-text">один обмен</span>',
+        title: 'Алгоритмы <span class="accent-text">сортировки</span>',
         lead: 'Выбор не переставляет элементы десятки раз. Он находит минимум и меняет его с текущим — всего один обмен за проход.',
         goal: 'Реализовывать сортировку выбором и оценивать число обменов.',
         goalCode: '10.2.2.1',
@@ -1909,12 +2050,12 @@
   Q2.add('10emn-q2-12', {
     num: 12,
     cls: '10 ЕМН',
-    title: 'Сортировка вставками',
+    title: 'Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Адаптивный алгоритм: <span class="accent-text">быстро на готовом</span>',
+        title: 'Алгоритмы <span class="accent-text">сортировки</span>',
         lead: 'Вставки — единственная из трёх простых сортировок, которая на почти отсортированном массиве работает почти за O(n). Это свойство называется адаптивностью.',
         goal: 'Реализовывать сортировку вставками и объяснять её адаптивность.',
         goalCode: '10.2.2.1',
@@ -2077,12 +2218,12 @@
   Q2.add('10emn-q2-13', {
     num: 13,
     cls: '10 ЕМН',
-    title: 'Сравнение и оценка алгоритмов',
+    title: 'СОР №2. Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Один массив — <span class="accent-text">три характеристики</span>',
+        title: 'СОР №2. <span class="accent-text">Алгоритмы сортировки</span>',
         lead: 'Алгоритмы сравнивают по времени, памяти и устойчивости. Для учебных задач важны первые две, для реальных отчётов — ещё и сохранение порядка равных.',
         goal: 'Сравнивать алгоритмы сортировки по сложности, памяти и устойчивости.',
         goalCode: '10.2.2.2',
@@ -2251,12 +2392,12 @@
   Q2.add('10emn-q2-14', {
     num: 14,
     cls: '10 ЕМН',
-    title: 'Быстрая сортировка',
+    title: 'Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Разделяй и <span class="accent-text">властвуй</span>',
+        title: 'Алгоритмы <span class="accent-text">сортировки</span>',
         lead: 'Быстрая сортировка выбирает опорный элемент, делит массив на меньшие и большие и рекурсивно сортирует части. В среднем это O(n log n).',
         goal: 'Объяснять идею быстрой сортировки и её сложность.',
         goalCode: '10.2.2.2',
@@ -2418,12 +2559,12 @@
   Q2.add('10emn-q2-15', {
     num: 15,
     cls: '10 ЕМН',
-    title: 'sorted(), key и сортировка записей',
+    title: 'СОЧ',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Сортировать не числа, <span class="accent-text">а записи</span>',
+        title: '<span class="accent-text">СОЧ</span>',
         lead: 'В реальных задачах сортируют не отдельные числа, а строки таблиц: учеников по баллам, товары по цене. Для этого в Python есть параметр key.',
         goal: 'Сортировать сложные структуры данных по ключу.',
         goalCode: '10.2.2.2',
@@ -2602,12 +2743,12 @@
   Q2.add('10emn-q2-16', {
     num: 16,
     cls: '10 ЕМН',
-    title: 'Проект и итоги четверти',
+    title: 'Алгоритмы сортировки',
     slides: [
       {
         k: 'hero',
         eyebrow: '01 · ВВЕДЕНИЕ',
-        title: 'Рекурсия и сортировка <span class="accent-text">в одной работе</span>',
+        title: 'Алгоритмы <span class="accent-text">сортировки</span>',
         lead: 'Итоговый проект соединяет обе темы: нужно обработать данные рекурсивно и упорядочить их, объяснив выбор алгоритма.',
         goal: 'Применять рекурсию и сортировки в практическом проекте.',
         goalCode: '10.2.2.2',

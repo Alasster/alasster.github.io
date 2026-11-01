@@ -23760,6 +23760,27 @@ body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel
   transform: none !important;
 }
 
+/* Strictly disable hover movement/transforms inside all 9-11 class slides */
+html body.lesson-page:is(
+  [class*="lesson-9-"], [class*="lesson-10emn"], [class*="lesson-10ogn"], [class*="lesson-11-"],
+  [data-lesson-id^="9-"], [data-lesson-id^="10emn"], [data-lesson-id^="10ogn"], [data-lesson-id^="11-"]
+) :is(.slide, .q2-slide) *:hover {
+  transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.slide, .q2-slide) *:hover {
+  transition: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-row-card:hover,
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-row-card:hover .lesson-arrow-icon,
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .class-tab-pill:hover,
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .btn-close-modal:hover,
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .btn-close-modal:hover i {
+  transform: none !important;
+  transition: none !important;
+}
+
 body.lesson-page[data-lesson-id][class] .slide :is(.card, .card-featured, .panel, .panel-section, .glass, .glass-card, .paper, .box, .definition, .concept-definition, .ml-definition, .quiz, .quiz-box, .quizbox, .recallquiz, .workbench, .workpanel, .case-content, .summary-box, .fact, .rule, .era, .flowstep, .pipe, .step, .work-step, .pipeline-step, .trainstep, .rubric-row, .piecewise, .protocol-demo, .octetinfo, [class$="-card"], [class*="-card "], [class$="-panel"], [class*="-panel "], [class$="-box"], [class*="-box "]):not(:where(.brand-icon-box, .icon-box, .part-icon, .code-box, .inset-box, .formula-box, .bp-formula-box, .lesson-goal-card, .goal, .goalitem, .goal-box, [class*="goal-card"])):not(:where(.correct, .wrong, .incorrect, .right, .selected, .is-selected, [aria-pressed="true"], [data-state="correct"], [data-state="wrong"])):hover {
   background: var(--surface) !important;
 }
@@ -25790,7 +25811,7 @@ body.lesson-page :is(.rubric .row, .rubric .rubric-card, .rubric-row) {
 }
 
 body.lesson-page :is(.rubric .row:hover, .rubric .rubric-card:hover, .rubric-row:hover) {
-  transform: translateY(-2px) !important;
+  transform: none !important;
 }
 
 /* Score Pill (.rs) */
@@ -26102,7 +26123,7 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.action,
 
 body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.action, .advance, .start-btn, button.action):hover {
   background: #cf7350 !important;
-  transform: translateY(-2px) !important;
+  transform: none !important;
   box-shadow: 0 6px 18px rgba(237, 144, 108, 0.50) !important;
 }
 
@@ -27297,5 +27318,13 @@ html body.lesson-page:is(
   .q2-compare-col, .q2-rubric-panel, .q2-summary-points, .q2-ticket, .q2-check-item
 ):hover {
   box-shadow: var(--lesson-card-shadow) !important;
+  transform: none !important;
+}
+
+/* Strictly disable hover movement/transforms inside all 9-11 class slides */
+html body.lesson-page:is(
+  [class*="lesson-9-"], [class*="lesson-10emn"], [class*="lesson-10ogn"], [class*="lesson-11-"],
+  [data-lesson-id^="9-"], [data-lesson-id^="10emn"], [data-lesson-id^="10ogn"], [data-lesson-id^="11-"]
+) :is(.slide, .q2-slide) *:hover {
   transform: none !important;
 }

@@ -177,8 +177,7 @@ body.q2-lesson {
 }
 
 .q2-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 44px -18px rgba(79, 70, 229, 0.26);
+  transform: none;
 }
 
 .q2-card h3 {
@@ -735,11 +734,11 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   background: rgba(79, 70, 229, 0.17);
   border-color: rgba(79, 70, 229, 0.4);
   color: #3730a3;
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .q2-btn:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: none;
 }
 
 .q2-btn:disabled {
@@ -970,7 +969,7 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 .q2-option:hover:not(:disabled) {
   border-color: rgba(79, 70, 229, 0.4);
   background: #fff;
-  transform: translateX(2px);
+  transform: none;
 }
 
 .q2-option:disabled { cursor: default; }
@@ -2406,7 +2405,7 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 .q2-path-card:hover:not(:disabled) {
   border-color: rgba(79, 70, 229, 0.4);
   background: #fff;
-  transform: translateY(-2px);
+  transform: none;
 }
 
 .q2-path-route {
@@ -3034,11 +3033,229 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 .q2-scene-weight rect { fill: rgba(255, 255, 255, 0.96); stroke: rgba(148, 163, 184, 0.4); stroke-width: 1; }
 .q2-scene-weight text { text-anchor: middle; font-family: var(--font-mono); font-size: 12px; font-weight: 700; fill: #475569; }
 
+.q2-Scene-progress { fill: rgba(148, 163, 184, 0.22); }
 .q2-scene-progress { fill: rgba(148, 163, 184, 0.22); }
 .q2-scene-progress-fill { fill: url(#q2s-glow); animation: q2-scene-progress 2.4s ease-in-out infinite; }
 @keyframes q2-scene-progress {
   0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
+}
+
+/* Анимированная плавная сортировка блоков (data-q2-auto-sort) */
+.q2-autosort-item {
+  transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.q2-autosort-rect {
+  fill: url(#q2s-bar-def);
+  stroke: rgba(79, 70, 229, 0.55);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 6px 10px rgba(79, 70, 229, 0.2));
+  transition: fill 0.28s ease, stroke 0.28s ease, filter 0.28s ease;
+}
+
+.q2-autosort-badge {
+  fill: rgba(241, 245, 249, 0.95);
+  stroke: rgba(148, 163, 184, 0.45);
+  stroke-width: 1.2;
+  transition: fill 0.28s ease, stroke 0.28s ease;
+}
+
+.q2-autosort-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  fill: #334155;
+  transition: fill 0.28s ease;
+}
+
+.q2-autosort-item.is-compare .q2-autosort-rect {
+  fill: url(#q2s-bar-cmp);
+  stroke: rgba(217, 119, 6, 0.85);
+  filter: drop-shadow(0 8px 14px rgba(217, 119, 6, 0.32));
+}
+
+.q2-autosort-item.is-compare .q2-autosort-badge {
+  fill: #fef3c7;
+  stroke: rgba(217, 119, 6, 0.65);
+}
+
+.q2-autosort-item.is-compare .q2-autosort-val {
+  fill: #92400e;
+}
+
+.q2-autosort-item.is-sorted .q2-autosort-rect {
+  fill: url(#q2s-bar-ok);
+  stroke: rgba(5, 150, 105, 0.8);
+  filter: drop-shadow(0 6px 12px rgba(5, 150, 105, 0.26));
+}
+
+.q2-autosort-item.is-sorted .q2-autosort-badge {
+  fill: #d1fae5;
+  stroke: rgba(5, 150, 105, 0.6);
+}
+
+.q2-autosort-item.is-sorted .q2-autosort-val {
+  fill: #065f46;
+}
+
+/* 2-колоночная раскладка (.q2-split) и компактные схемы */
+.q2-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.q2-split-equal {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.q2-split-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.q2-svg-compact {
+  padding: 14px 16px;
+}
+
+.q2-svg-compact svg {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* Исключение слипания карточек и блоков на всех слайдах Q2 */
+.q2-slide .container > :is(
+  .q2-grid,
+  .q2-definition,
+  .q2-callout,
+  .q2-panel,
+  .q2-steps,
+  .q2-code,
+  .q2-svg-wrap,
+  .q2-table-wrap,
+  .q2-compare,
+  .q2-split,
+  .q2-widget,
+  .q2-ref,
+  .q2-quote,
+  .q2-summary-grid
+) {
+  margin-bottom: 20px;
+}
+
+.q2-slide .container > :last-child,
+.q2-split-col > :last-child {
+  margin-bottom: 0;
+}
+
+/* Вдавленные (recessed / inset) иконки во всех элементах Q2 */
+.q2-step-icon,
+.q2-definition h3 i,
+.q2-callout h3 i,
+.q2-panel h3 i,
+.q2-ref summary i,
+.q2-list li > i,
+.q2-summary-points .clean-list li > i,
+.q2-ticket ul li > i {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+  border-radius: 11px !important;
+  background: linear-gradient(145deg, rgba(226, 232, 240, 0.72), rgba(248, 250, 252, 0.92)) !important;
+  box-shadow: inset 3px 3px 6px rgba(111, 121, 160, 0.28), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  color: var(--q2-indigo) !important;
+}
+
+.q2-step-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 13px !important;
+  font-size: 1rem !important;
+}
+
+.q2-definition h3,
+.q2-callout h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.q2-definition h3 i,
+.q2-callout h3 i,
+.q2-panel h3 i,
+.q2-ref summary i {
+  width: 34px !important;
+  height: 34px !important;
+  font-size: 0.92rem !important;
+}
+
+.q2-list li > i,
+.q2-summary-points .clean-list li > i,
+.q2-ticket ul li > i {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9px !important;
+  font-size: 0.8rem !important;
+}
+
+body.q2-lesson .chips .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.q2-lesson .chips .chip i {
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  font-size: 1rem !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(
+  .q2-card-icon,
+  .q2-step-icon,
+  .q2-definition h3 i,
+  .q2-callout h3 i,
+  .q2-panel h3 i,
+  .q2-ref summary i,
+  .q2-list li > i,
+  .q2-summary-points .clean-list li > i,
+  .q2-ticket ul li > i
+) {
+  background: #E2F5EC !important;
+  color: #059669 !important;
+  box-shadow: inset 3px 3px 6px rgba(140, 188, 165, 0.55), inset -3px -3px 6px rgba(255, 255, 255, 0.96) !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .chips .chip i {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  color: #059669 !important;
+}
+
+.q2-card .q2-code {
+  margin-top: 6px;
+}
+
+.q2-card .q2-code pre {
+  padding: 10px 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.q2-rubric-panel .rubric {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 12px !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -3052,6 +3269,7 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 
 @media (max-width: 900px) {
   .q2-hero,
+  .q2-split,
   .q2-lamp-lab,
   .q2-chain-lab,
   .q2-truth-body,
@@ -3103,4 +3321,132 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   .q2-scene-glow {
     animation: none !important;
   }
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-code pre {
+  font-size: 1rem !important;
+  line-height: 1.35 !important;
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-code.is-compact pre {
+  font-size: 0.96rem !important;
+  line-height: 1.35 !important;
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion .q2-svg-wrap {
+  background: linear-gradient(145deg, #f8fbfd, #eaf1f6);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  box-shadow: inset 3px 3px 8px rgba(148, 163, 184, 0.15), inset -3px -3px 8px rgba(255, 255, 255, 0.92);
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion-examples {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion-examples .q2-code pre {
+  font-size: 0.88rem !important;
+}
+
+body.lesson-page[data-lesson-id^="10emn"] .q2-rec-window-frame {
+  opacity: 0;
+  animation: q2-rec-window-appear 7s ease-in-out infinite;
+}
+
+@keyframes q2-rec-window-appear {
+  0%, 4% { opacity: 0; }
+  12%, 78% { opacity: 1; }
+  88%, 100% { opacity: 0; }
+}
+
+@media (max-width: 900px) {
+  body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion,
+  body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion-examples {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.lesson-page[data-lesson-id^="10emn"] .q2-rec-window-frame,
+  body.lesson-page[data-lesson-id^="10emn"] .q2-rec-demo-step,
+  body.lesson-page[data-lesson-id^="10emn"] .q2-rec-demo-line {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-copy:hover {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: var(--muted) !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+  box-shadow: none !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-btn:hover:not(:disabled) {
+  background: rgba(79, 70, 229, 0.1) !important;
+  border-color: rgba(79, 70, 229, 0.24) !important;
+  color: var(--q2-indigo) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(148, 163, 184, 0.34) !important;
+  color: var(--text) !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) :is(.q2-tab, .q2-option, .q2-match-item, .q2-order-item, .q2-cell, .q2-matrix-cell, .q2-path-card):hover {
+  transition: none !important;
+  transform: none !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-tab:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+  color: var(--text) !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-option:hover:not(:disabled),
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-match-item:hover:not(.is-solved),
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-path-card:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+  color: var(--text) !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-order-item:hover,
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-cell:hover,
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-matrix-cell:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.35) !important;
+  color: var(--text) !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-card:hover {
+  transition: none !important;
+  transform: none !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] .brand-logo-group:hover .brand-icon-box,
+html body.lesson-page[data-lesson-id^="10emn"] .classes-menu-btn:hover,
+html body.lesson-page[data-lesson-id^="10emn"] .neu-auth-btn:hover,
+html body.lesson-page[data-lesson-id^="10emn"] .start-btn:hover,
+html body.lesson-page[data-lesson-id^="10emn"] .nav-btn:hover,
+html body.lesson-page[data-lesson-id^="10emn"] .btn-action:hover,
+html body.lesson-page[data-lesson-id^="10emn"] .quiz-btn:hover,
+html body.lesson-page[data-lesson-id^="10emn"] .option-btn:hover {
+  transform: none !important;
+  transition: none !important;
+}
+
+html body.lesson-page[data-lesson-id^="10emn"] :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav):hover::before {
+  transform: none !important;
+  background: #94a3b8 !important;
 }

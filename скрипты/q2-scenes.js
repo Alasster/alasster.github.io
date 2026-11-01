@@ -192,7 +192,7 @@
     return `<svg viewBox="0 0 420 370" role="img" aria-label="Стек рекурсивных вызовов">
       ${boxes.map(i => `<g class="q2-scene-stack${i === 3 ? ' is-base' : ''}" style="animation-delay:${i * 0.35}s">
         <rect x="${96 + i * 8}" y="${58 + i * 64}" width="${228 - i * 16}" height="50" rx="14"/>
-        ${label(210, 89 + i * 64, i === 3 ? 'S(0) → 0' : `S(${3 - i}) → ждёт`, 'q2-scene-stack-label')}
+        ${label(210, 89 + i * 64, i === 3 ? 'countdown(0) → стоп' : `countdown(${3 - i}) → ждёт`, 'q2-scene-stack-label')}
       </g>`).join('')}
       ${label(30, 84, 'вызов', 'q2-scene-side')}
       ${label(30, 276, 'возврат', 'q2-scene-side')}
@@ -202,22 +202,80 @@
     </svg>`;
   };
 
-  S.sort = function () {
-    const heights = [58, 96, 74, 128, 44, 112, 84];
-    return `<svg viewBox="0 0 440 340" role="img" aria-label="Столбцы сортируемого списка">
-      <rect class="q2-scene-panel" x="34" y="38" width="372" height="250" rx="24"/>
-      ${heights.map((h, i) => {
-        const x = 62 + i * 46;
-        const y = 254 - h;
-        const active = i === 3 || i === 4;
-        return `<g class="q2-scene-bar${active ? ' is-active' : ''}" style="animation-delay:${i * 0.12}s">
-          <rect x="${x}" y="${y}" width="30" height="${h}" rx="9"/>
-          ${label(x + 15, 276, String(h), 'q2-scene-bar-label')}
+  S.recursionIntro = function () {
+    const levels = [0, 1, 2, 3, 4];
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Окно Python IDLE последовательно показывает вложенные шаги рекурсии">
+      <style>
+        @keyframes q2-rec-window-appear {
+          0%, 4% { opacity: 0; }
+          12%, 78% { opacity: 1; }
+          88%, 100% { opacity: 0; }
+        }
+        .q2-rec-window-frame { opacity: 0; animation: q2-rec-window-appear 7s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .q2-rec-window-frame { animation: none; opacity: 1; }
+        }
+      </style>
+      <rect x="12" y="12" width="416" height="346" rx="20" fill="#dce8f1" stroke="#b8cbd8" stroke-width="2"/>
+      <path d="M32 12h376a20 20 0 0 1 20 20v24H12V32a20 20 0 0 1 20-20z" fill="#f4f8fb"/>
+      <circle cx="34" cy="34" r="6" fill="#f87171"/><circle cx="54" cy="34" r="6" fill="#fbbf24"/><circle cx="74" cy="34" r="6" fill="#34d399"/>
+      <rect x="104" y="23" width="196" height="22" rx="8" fill="#e5edf3"/>
+      <text x="202" y="39" text-anchor="middle" fill="#486174" font-family="sans-serif" font-size="13" font-weight="700">Python IDLE · recursion.py</text>
+      <rect x="26" y="66" width="388" height="274" rx="10" fill="#e9e9b5"/>
+      ${levels.map((level) => {
+        const x = 38 + level * 34;
+        const y = 78 + level * 28;
+        const width = 364 - level * 68;
+        const height = 250 - level * 56;
+        const fontSize = 23 - level * 3;
+        const delay = (level * 0.65).toFixed(2);
+        return `<g class="q2-rec-window-frame" style="animation-delay:${delay}s">
+          <rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${level % 2 ? '#a9c97a' : '#c9d28a'}" fill-opacity="0.84" stroke="#386545" stroke-width="2" stroke-dasharray="7 7"/>
+          <text x="220" y="${y + height - 12}" text-anchor="middle" fill="#31533b" font-family="sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing="-0.5">РЕКУРСИЯ</text>
         </g>`;
       }).join('')}
-      <path class="q2-scene-swap" d="M206 214 Q 230 190 252 214" fill="none" marker-end="url(#q2s-arrow2)"/>
-      <defs><marker id="q2s-arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#536dfe"/></marker></defs>
-      ${label(220, 316, 'сравнить · поменять · сдвинуть', 'q2-scene-caption')}
+      <text x="220" y="353" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">новый вызов открывает следующую вложенную задачу</text>
+    </svg>`;
+  };
+
+  S.sort = function () {
+    const items = [
+      { id: 0, val: 7, h: 122 },
+      { id: 1, val: 3, h: 66 },
+      { id: 2, val: 9, h: 152 },
+      { id: 3, val: 1, h: 38 },
+      { id: 4, val: 5, h: 94 },
+      { id: 5, val: 8, h: 138 }
+    ];
+    return `<svg viewBox="0 0 440 340" role="img" aria-label="Анимированная сортировка блоков по возрастанию" data-q2-auto-sort>
+      <defs>
+        <linearGradient id="q2s-bar-def" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#818cf8"/>
+          <stop offset="1" stop-color="#4f46e5"/>
+        </linearGradient>
+        <linearGradient id="q2s-bar-cmp" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fbbf24"/>
+          <stop offset="1" stop-color="#d97706"/>
+        </linearGradient>
+        <linearGradient id="q2s-bar-ok" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#34d399"/>
+          <stop offset="1" stop-color="#059669"/>
+        </linearGradient>
+      </defs>
+      <rect class="q2-scene-panel" x="28" y="30" width="384" height="252" rx="24"/>
+      <line x1="52" y1="234" x2="388" y2="234" stroke="rgba(148,163,184,0.35)" stroke-width="2" stroke-linecap="round"/>
+      <g class="q2-autosort-bars">
+        ${items.map((item, slot) => {
+          const x = 58 + slot * 56;
+          const y = 232 - item.h;
+          return `<g class="q2-autosort-item" data-item-id="${item.id}" data-val="${item.val}" data-h="${item.h}" transform="translate(${x} 0)">
+            <rect class="q2-autosort-rect" x="0" y="${y}" width="42" height="${item.h}" rx="12"/>
+            <rect class="q2-autosort-badge" x="5" y="242" width="32" height="26" rx="8"/>
+            <text class="q2-autosort-val" x="21" y="260" text-anchor="middle">${item.val}</text>
+          </g>`;
+        }).join('')}
+      </g>
+      <text class="q2-scene-caption" data-sort-status x="220" y="314" text-anchor="middle">блоки плавно меняются местами до полного порядка</text>
     </svg>`;
   };
 
