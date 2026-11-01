@@ -852,26 +852,6 @@
 
 
 
-    if (container.clientHeight > 0 && container.scrollHeight > container.clientHeight) {
-
-      const top = activeDot.offsetTop;
-
-      const bottom = top + activeDot.offsetHeight;
-
-      if (bottom > container.scrollTop + container.clientHeight - 7) {
-
-        container.scrollTop = bottom - container.clientHeight + 7;
-
-      } else if (top < container.scrollTop + 7) {
-
-        container.scrollTop = Math.max(0, top - 7);
-
-      }
-
-    }
-
-
-
     let indicator = container.querySelector('.dot-indicator');
 
     if (!indicator) {

@@ -23677,7 +23677,7 @@ body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) {
   box-shadow: var(--control-raised) !important;
 }
 
-/* Keep the rail on the right across tablet/desktop breakpoints and short windows. */
+/* Keep the rail on the right across tablet/desktop breakpoints and short windows without scrolling. */
 @media (min-width: 641px) {
   body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) {
     position: fixed !important;
@@ -23685,7 +23685,7 @@ body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) {
     flex-direction: column !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
     left: auto !important;
     right: var(--lesson-rail-right, 40px) !important;
     bottom: auto !important;
@@ -23696,10 +23696,11 @@ body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) {
     max-height: max(48px, calc(100dvh - var(--lesson-rail-top, 100px) - 20px)) !important;
     max-width: 48px !important;
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
+    overflow: hidden !important;
+    overscroll-behavior: none;
+  }
+  body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav):hover {
+    transform: translateY(-50%) !important;
   }
 }
 
@@ -23707,11 +23708,11 @@ body.lesson-page[data-lesson-id] :is(#dots, #dotsNav, .dots, .dots-nav) :is(butt
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  flex: 0 0 40px !important;
+  flex: 0 1 40px !important;
   width: 40px !important;
-  height: 40px !important;
+  height: min(40px, calc((100dvh - var(--lesson-rail-top, 100px) - 52px) / 11)) !important;
   min-width: 40px !important;
-  min-height: 40px !important;
+  min-height: 24px !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 18px !important;
@@ -24267,8 +24268,8 @@ body.lesson-page .rubric-row p,
    2. ONLY INTERACTIVE ELEMENTS (buttons, links, options) REACT ON HOVER WITH ВДАВЛИВАНИЕ.
    ========================================================================== */
 
-/* 1. Suppress hover transforms without overriding SVG switch/lamp transforms */
-body.lesson-page :not(svg):not(svg *):not(.slide-next):not(#slideNext):hover {
+/* 1. Suppress hover transforms inside slides without overriding SVG or fixed rail transforms */
+body.lesson-page :is(.slide, .q2-slide) :not(svg):not(svg *):not(.slide-next):not(#slideNext):hover {
   transform: none !important;
   -webkit-transform: none !important;
 }
