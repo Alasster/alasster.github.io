@@ -24246,8 +24246,8 @@ body.lesson-page .rubric-row p,
    2. ONLY INTERACTIVE ELEMENTS (buttons, links, options) REACT ON HOVER WITH ВДАВЛИВАНИЕ.
    ========================================================================== */
 
-/* 1. Suppress hover transforms without overriding SVG switch positions */
-body.lesson-page *:hover:not(.q2-switch):not(.q2-single-switch):not(.q2-home-switch-rocker):not(.q2-rocker-thumb) {
+/* 1. Suppress hover transforms without overriding SVG switch/lamp transforms */
+body.lesson-page *:hover:not(.q2-switch):not(.q2-single-switch):not(.q2-home-switch-rocker):not(.q2-rocker-thumb):not(.q2-bulb) {
   transform: none !important;
   -webkit-transform: none !important;
 }

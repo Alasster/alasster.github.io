@@ -2750,7 +2750,6 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   fill: rgba(255, 255, 255, 0.92);
 }
 .q2-switch:focus-visible { outline: none; }
-.q2-switch:focus-visible .q2-home-switch-plate { stroke: #fbbf24; stroke-width: 4; }
 .q2-home-logic-bulb-thread { fill: none; stroke: rgba(255, 255, 255, 0.52); stroke-width: 1.5; }
 .q2-home-logic-stage .q2-bulb-body {
   filter: drop-shadow(3px 6px 6px rgba(18, 50, 56, 0.42));
