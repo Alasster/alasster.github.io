@@ -80,11 +80,24 @@
     const isReady = job?.status === 'ready';
     const isShiftClick = Boolean(event.shiftKey);
 
-    // If ready and not forcing re-generation: Open directly in Google Docs!
+    // If ready and not forcing re-generation: verify it still exists in Google Drive before opening!
     if (isReady && !isShiftClick) {
-      const targetUrl = job.google_docs_url || `/api/ksp/${encodeURIComponent(job.id)}/google-docs`;
-      window.open(targetUrl, '_blank', 'noopener');
-      return;
+      try {
+        const checkResp = await fetch('/api/ksp', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+        if (checkResp.ok) {
+          const checkData = await checkResp.json();
+          jobs = checkData.lessons || {};
+          paint();
+        }
+      } catch (_) {}
+
+      const freshJob = jobs[key];
+      if (freshJob?.status === 'ready') {
+        const targetUrl = freshJob.google_docs_url || `/api/ksp/${encodeURIComponent(freshJob.id)}/google-docs`;
+        window.open(targetUrl, '_blank', 'noopener');
+        return;
+      }
+      // If file was deleted from Drive, fall through to create it right away!
     }
 
     // Otherwise: trigger generation (or forced re-generation)

@@ -103,6 +103,7 @@ def get_google_drive_file_url(file_path: str | Path) -> str | None:
                 pass
     return None
 
+
 def drive_available() -> bool:
     """True only on a PC with Google Drive for Desktop (where KSP can be saved into Мой диск)."""
     if os.environ.get('KSP_OUTPUT_ROOT'):
@@ -445,6 +446,7 @@ class KspService:
         self.drive = ksp_drive.DriveClient() if self.cloud else None
         self._index = {}
         self._index_ts = 0.0
+        self._last_upload_ts = 0.0
         self.lock = threading.Lock()
 
         with self.db() as db:
@@ -473,36 +475,61 @@ class KspService:
         finally:
             db.close()
 
+    def _ensure_local_pool(self, min_slots: int = 120):
+        """Maintain a hidden pool of user-owned placeholder files in КСП/.pool so Render can claim them."""
+        if not self.local:
+            return
+        try:
+            pool_dir = self.output_root / '.pool'
+            pool_dir.mkdir(parents=True, exist_ok=True)
+            existing = list(pool_dir.glob('slot_*.docx'))
+            if len(existing) < min_slots:
+                for i in range(1, min_slots + 40):
+                    slot = pool_dir / f'slot_{i:03d}.docx'
+                    if not slot.exists():
+                        slot.write_bytes(b'PK\x03\x04placeholder')
+        except Exception:
+            pass
+
+    def _all_lesson_keys(self) -> set[str]:
+        timetable_file = BASE / 'ksp-timetable.json'
+        schedule = json.loads(timetable_file.read_text(encoding='utf-8')) if timetable_file.is_file() else {}
+        all_keys = set(schedule.keys())
+        for p in ROOT.glob('*/*/* урок.html'):
+            if p.parts[0] != 'Python основы':
+                all_keys.add(str(p.relative_to(ROOT)).replace('\\', '/'))
+        return all_keys
+
     def sync_existing_files(self):
-        """Detect existing docx files on disk and register them as ready."""
+        """Detect existing docx files on disk and register them as ready (or remove if deleted)."""
         if self.cloud:
             return self.sync_cloud()
         if not self.local:
             return
+        self._ensure_local_pool()
         try:
-            timetable_file = BASE / 'ksp-timetable.json'
-            if not timetable_file.is_file():
-                return
-            schedule = json.loads(timetable_file.read_text(encoding='utf-8'))
+            all_keys = self._all_lesson_keys()
             with self.db() as db:
-                for key in schedule:
+                for key in all_keys:
                     try:
                         src = lesson_source(key)
                         target = output_path(src, self.output_root)
+                        row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                         if target.is_file():
-                            row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                             if not row or row['status'] != 'ready':
                                 ident = row['id'] if row else uuid.uuid4().hex
                                 db.execute(
                                     'INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
                                     (key, ident, 'ready', 'КСП готов в Google Диске', str(target), src['source_hash'])
                                 )
+                        elif row and row['status'] == 'ready':
+                            db.execute('DELETE FROM jobs WHERE key=?', (key,))
                     except Exception:
                         continue
         except Exception:
             pass
 
-    def sync_cloud(self, max_age: float = 30.0):
+    def sync_cloud(self, max_age: float = 5.0):
         """Cloud mode: the Google Drive folder is the source of truth (Render disk is ephemeral)."""
         import time
         if time.time() - self._index_ts < max_age:
@@ -513,11 +540,9 @@ class KspService:
             return
         self._index, self._index_ts = index, time.time()
         try:
-            timetable_file = BASE / 'ksp-timetable.json'
-            schedule = json.loads(timetable_file.read_text(encoding='utf-8')) if timetable_file.is_file() else {}
+            all_keys = self._all_lesson_keys()
             with self.db() as db:
-                found = set()
-                for key in schedule:
+                for key in all_keys:
                     try:
                         src = lesson_source(key)
                     except Exception:
@@ -526,14 +551,15 @@ class KspService:
                     doc_id = index.get((src['class_name'], src['quarter'], title))
                     row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                     if doc_id:
-                        found.add(key)
                         if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
                             continue
                         ident = row['id'] if row else uuid.uuid4().hex
                         db.execute('INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
                                    (key, ident, 'ready', 'КСП готов в Google Диске', f'gdrive:{doc_id}', src['source_hash']))
                     elif row and row['status'] == 'ready' and str(row['path']).startswith('gdrive:'):
-                        db.execute('DELETE FROM jobs WHERE key=?', (key,))  # doc was deleted from Drive
+                        # Only remove if it wasn't just created within the last 10 seconds
+                        if time.time() - self._last_upload_ts > 10.0:
+                            db.execute('DELETE FROM jobs WHERE key=?', (key,))  # doc was deleted from Drive
         except Exception:
             pass
 
@@ -541,18 +567,21 @@ class KspService:
         self.sync_existing_files()
         with self.db() as db:
             rows = db.execute('SELECT * FROM jobs').fetchall()
-        return {r['key']: self.public(dict(r)) for r in rows}
+        out = {}
+        for r in rows:
+            pub = self.public(dict(r))
+            if pub is not None:
+                out[r['key']] = pub
+        return out
 
-    def public(self, row: dict) -> dict:
+    def public(self, row: dict) -> dict | None:
         result = {k: row[k] for k in ('id', 'status', 'message')}
         if row.get('status') == 'ready' and row.get('path') and not str(row['path']).startswith('gdrive:') and not Path(row['path']).is_file():
-            result['status'] = 'error'
-            result['message'] = 'Файл не найден в Google Диске. Нажмите КСП для повтора.'
-            return result
+            return None
         if row.get('status') == 'ready':
             result['url'] = f"/api/ksp/{row['id']}/document"
             result['view_url'] = f"/api/ksp/{row['id']}/google-docs"
-            
+
             # Resolve direct Google Docs edit URL
             file_path = row.get('path')
             direct_docs_url = None
@@ -577,18 +606,26 @@ class KspService:
     def start(self, key: str, force: bool = False) -> dict:
         source = lesson_source(key)
         if not (self.local or self.cloud):
-            raise ValueError(
-                'Не настроен Google Диск: добавьте GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET и '
-                'GOOGLE_DRIVE_REFRESH_TOKEN в переменные Render (инструкция: Настроить_Google_Диск.py).'
-            )
+            raise ValueError('Не удалось подключиться к Google Диску.')
         target = output_path(source, self.output_root)
+
+        if self.cloud and not force:
+            self.sync_cloud(max_age=0.0)
 
         with self.lock:
             with self.db() as db:
                 row = db.execute('SELECT * FROM jobs WHERE key=?', (source['key'],)).fetchone()
                 if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
-                    return self.public(dict(row))
-                if target.is_file() and not force:
+                    return self.public(dict(row)) or dict(id=row['id'], status=row['status'], message=row['message'])
+
+                if self.cloud and row and row['status'] == 'ready' and str(row['path']).startswith('gdrive:') and not force:
+                    doc_id = str(row['path'])[7:]
+                    if self.drive.file_exists(doc_id):
+                        return self.public(dict(row))
+                    else:
+                        db.execute('DELETE FROM jobs WHERE key=?', (source['key'],))
+
+                if self.local and target.is_file() and not force:
                     ident = row['id'] if row else uuid.uuid4().hex
                     db.execute(
                         'INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
@@ -626,6 +663,8 @@ class KspService:
                 title = output_path(source, self.output_root).stem
                 doc_id = self.drive.upload_docx_as_gdoc(tmp, [source['class_name'], source['quarter']], title)
                 tmp.unlink(missing_ok=True)
+                import time
+                self._last_upload_ts = time.time()
                 self._index_ts = 0.0
                 self.update(key, 'ready', 'КСП сохранён в Google Диске', f'gdrive:{doc_id}')
                 return
