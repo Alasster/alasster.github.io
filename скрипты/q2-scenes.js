@@ -206,16 +206,41 @@
     const levels = [0, 1, 2, 3, 4];
     return `<svg viewBox="0 0 440 370" role="img" aria-label="Окно Python IDLE последовательно показывает вложенные шаги рекурсии">
       <style>
-        @keyframes q2-rec-window-appear {
-          from { opacity: 0; transform: scale(0.82); }
-          to { opacity: 1; transform: scale(1); }
+        @keyframes q2-rec-win-0 {
+          0%, 4% { opacity: 0; transform: scale(0.84) translateY(8px); }
+          11%, 84% { opacity: 1; transform: scale(1) translateY(0); }
+          92%, 100% { opacity: 0; transform: scale(0.92) translateY(-4px); }
+        }
+        @keyframes q2-rec-win-1 {
+          0%, 14% { opacity: 0; transform: scale(0.84) translateY(8px); }
+          21%, 78% { opacity: 1; transform: scale(1) translateY(0); }
+          86%, 100% { opacity: 0; transform: scale(0.92) translateY(-4px); }
+        }
+        @keyframes q2-rec-win-2 {
+          0%, 24% { opacity: 0; transform: scale(0.84) translateY(8px); }
+          31%, 72% { opacity: 1; transform: scale(1) translateY(0); }
+          80%, 100% { opacity: 0; transform: scale(0.92) translateY(-4px); }
+        }
+        @keyframes q2-rec-win-3 {
+          0%, 34% { opacity: 0; transform: scale(0.84) translateY(8px); }
+          41%, 66% { opacity: 1; transform: scale(1) translateY(0); }
+          74%, 100% { opacity: 0; transform: scale(0.92) translateY(-4px); }
+        }
+        @keyframes q2-rec-win-4 {
+          0%, 44% { opacity: 0; transform: scale(0.84) translateY(8px); }
+          51%, 60% { opacity: 1; transform: scale(1) translateY(0); }
+          68%, 100% { opacity: 0; transform: scale(0.92) translateY(-4px); }
         }
         .q2-rec-window-frame {
           opacity: 0;
           transform-box: fill-box;
           transform-origin: center;
-          animation: q2-rec-window-appear 0.65s ease-out both;
         }
+        .q2-rec-w0 { animation: q2-rec-win-0 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+        .q2-rec-w1 { animation: q2-rec-win-1 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+        .q2-rec-w2 { animation: q2-rec-win-2 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+        .q2-rec-w3 { animation: q2-rec-win-3 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+        .q2-rec-w4 { animation: q2-rec-win-4 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
         @media (prefers-reduced-motion: reduce) {
           .q2-rec-window-frame { animation: none; opacity: 1; transform: none; }
         }
@@ -225,20 +250,26 @@
       <circle cx="34" cy="34" r="6" fill="#f87171"/><circle cx="54" cy="34" r="6" fill="#fbbf24"/><circle cx="74" cy="34" r="6" fill="#34d399"/>
       <rect x="104" y="23" width="196" height="22" rx="8" fill="#e5edf3"/>
       <text x="202" y="39" text-anchor="middle" fill="#486174" font-family="sans-serif" font-size="13" font-weight="700">Python IDLE · recursion.py</text>
-      <rect x="26" y="66" width="388" height="274" rx="10" fill="#e9e9b5"/>
+      <rect x="26" y="66" width="388" height="274" rx="14" fill="#eef6ff" stroke="#cbd5e1" stroke-width="1.5"/>
       ${levels.map((level) => {
-        const x = 38 + level * 34;
-        const y = 78 + level * 28;
-        const width = 364 - level * 68;
-        const height = 250 - level * 56;
-        const fontSize = 23 - level * 3;
-        const delay = (level * 0.65).toFixed(2);
-        return `<g class="q2-rec-window-frame" style="animation-delay:${delay}s">
-          <rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${level % 2 ? '#a9c97a' : '#c9d28a'}" fill-opacity="0.84" stroke="#386545" stroke-width="2" stroke-dasharray="7 7"/>
-          <text x="220" y="${y + height - 12}" text-anchor="middle" fill="#31533b" font-family="sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing="-0.5">РЕКУРСИЯ</text>
+        const x = 38 + level * 32;
+        const y = 76 + level * 25;
+        const width = 364 - level * 64;
+        const height = 252 - level * 50;
+        const fontSize = 18 - level * 2;
+        const fills = ['#dbeafe', '#c7d2fe', '#bae6fd', '#a7f3d0', '#fef08a'];
+        const strokes = ['#3b82f6', '#6366f1', '#0284c7', '#059669', '#d97706'];
+        const textColors = ['#1e40af', '#3730a3', '#0369a1', '#065f46', '#92400e'];
+        const titles = ['countdown(3)', 'countdown(2)', 'countdown(1)', 'countdown(0) → стоп', 'возврат ↑'];
+        return `<g class="q2-rec-window-frame q2-rec-w${level}">
+          <rect x="${x}" y="${y}" width="${width}" height="${height}" rx="12" fill="${fills[level]}" fill-opacity="0.92" stroke="${strokes[level]}" stroke-width="2"/>
+          <rect x="${x}" y="${y}" width="${width}" height="22" rx="10" fill="rgba(255,255,255,0.68)"/>
+          <circle cx="${x + 12}" cy="${y + 11}" r="3.5" fill="${strokes[level]}"/>
+          <text x="${x + 24}" y="${y + 15}" fill="${textColors[level]}" font-family="monospace" font-size="11" font-weight="700">${titles[level]}</text>
+          <text x="220" y="${y + height - 11}" text-anchor="middle" fill="${textColors[level]}" font-family="sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing="0.02em">${level === 4 ? 'БАЗА ДОСТИГНУТА' : 'РЕКУРСИЯ'}</text>
         </g>`;
       }).join('')}
-      <text x="220" y="353" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">новый вызов открывает следующую вложенную задачу</text>
+      <text x="220" y="353" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">вызовы углубляются до базы, затем плавно возвращаются</text>
     </svg>`;
   };
 

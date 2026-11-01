@@ -42,20 +42,74 @@
 
   const REC_SCREEN_SVG = `<svg viewBox="0 0 560 390" role="img" aria-label="Светлая анимированная трассировка countdown в окне Python IDLE">
     <style>
-      @keyframes q2-rec-reveal {
-        0%, 5% { opacity: 0; }
-        11%, 88% { opacity: 1; }
-        96%, 100% { opacity: 0; }
+      @keyframes q2-rec-line-call {
+        0%, 6% { fill: rgba(99, 102, 241, 0.34); }
+        8%, 100% { fill: rgba(99, 102, 241, 0.04); }
       }
-      @keyframes q2-rec-highlight {
-        0%, 9%, 100% { fill: rgba(99, 102, 241, 0.04); }
-        10%, 18% { fill: rgba(99, 102, 241, 0.36); }
+      @keyframes q2-rec-line-def {
+        0%, 7% { fill: rgba(99, 102, 241, 0.04); }
+        8%, 13%, 27%, 32%, 46%, 51%, 65%, 70% { fill: rgba(99, 102, 241, 0.34); }
+        15%, 25%, 34%, 44%, 53%, 63%, 72%, 100% { fill: rgba(99, 102, 241, 0.04); }
       }
-      .q2-rec-demo-step { opacity: 0; animation: q2-rec-reveal 9s linear infinite; }
-      .q2-rec-demo-line { animation: q2-rec-highlight 9s linear infinite; }
+      @keyframes q2-rec-line-if {
+        0%, 13% { fill: rgba(99, 102, 241, 0.04); }
+        14%, 19%, 33%, 38%, 52%, 57%, 71%, 76% { fill: rgba(99, 102, 241, 0.34); }
+        21%, 31%, 40%, 50%, 59%, 69%, 78%, 100% { fill: rgba(99, 102, 241, 0.04); }
+      }
+      @keyframes q2-rec-line-print {
+        0%, 19% { fill: rgba(99, 102, 241, 0.04); }
+        20%, 24%, 39%, 43%, 58%, 62% { fill: rgba(99, 102, 241, 0.34); }
+        26%, 37%, 45%, 56%, 64%, 100% { fill: rgba(99, 102, 241, 0.04); }
+      }
+      @keyframes q2-rec-line-step {
+        0%, 23% { fill: rgba(99, 102, 241, 0.04); }
+        24%, 28%, 43%, 47%, 62%, 66% { fill: rgba(99, 102, 241, 0.34); }
+        30%, 41%, 49%, 60%, 68%, 100% { fill: rgba(99, 102, 241, 0.04); }
+      }
+      @keyframes q2-rec-line-base-p {
+        0%, 75% { fill: rgba(16, 185, 129, 0.05); }
+        76%, 83% { fill: rgba(16, 185, 129, 0.36); }
+        85%, 100% { fill: rgba(16, 185, 129, 0.05); }
+      }
+      @keyframes q2-rec-line-base-r {
+        0%, 82% { fill: rgba(16, 185, 129, 0.05); }
+        83%, 91% { fill: rgba(16, 185, 129, 0.36); }
+        93%, 100% { fill: rgba(16, 185, 129, 0.05); }
+      }
+      @keyframes q2-rec-out-1 {
+        0%, 20% { opacity: 0; transform: translateX(-6px); }
+        24%, 92% { opacity: 1; transform: translateX(0); }
+        97%, 100% { opacity: 0; transform: translateX(0); }
+      }
+      @keyframes q2-rec-out-2 {
+        0%, 39% { opacity: 0; transform: translateX(-6px); }
+        43%, 92% { opacity: 1; transform: translateX(0); }
+        97%, 100% { opacity: 0; transform: translateX(0); }
+      }
+      @keyframes q2-rec-out-3 {
+        0%, 58% { opacity: 0; transform: translateX(-6px); }
+        62%, 92% { opacity: 1; transform: translateX(0); }
+        97%, 100% { opacity: 0; transform: translateX(0); }
+      }
+      @keyframes q2-rec-out-4 {
+        0%, 77% { opacity: 0; transform: translateX(-6px); }
+        81%, 92% { opacity: 1; transform: translateX(0); }
+        97%, 100% { opacity: 0; transform: translateX(0); }
+      }
+      .q2-rec-l-call { animation: q2-rec-line-call 10s linear infinite; }
+      .q2-rec-l-def { animation: q2-rec-line-def 10s linear infinite; }
+      .q2-rec-l-if { animation: q2-rec-line-if 10s linear infinite; }
+      .q2-rec-l-print { animation: q2-rec-line-print 10s linear infinite; }
+      .q2-rec-l-step { animation: q2-rec-line-step 10s linear infinite; }
+      .q2-rec-l-bp { animation: q2-rec-line-base-p 10s linear infinite; }
+      .q2-rec-l-br { animation: q2-rec-line-base-r 10s linear infinite; }
+      .q2-rec-o1 { opacity: 0; animation: q2-rec-out-1 10s ease-out infinite; }
+      .q2-rec-o2 { opacity: 0; animation: q2-rec-out-2 10s ease-out infinite; }
+      .q2-rec-o3 { opacity: 0; animation: q2-rec-out-3 10s ease-out infinite; }
+      .q2-rec-o4 { opacity: 0; animation: q2-rec-out-4 10s ease-out infinite; }
       @media (prefers-reduced-motion: reduce) {
-        .q2-rec-demo-step { animation: none; opacity: 1; }
-        .q2-rec-demo-line { animation: none; }
+        .q2-rec-o1, .q2-rec-o2, .q2-rec-o3, .q2-rec-o4 { animation: none; opacity: 1; transform: none; }
+        .q2-rec-l-call, .q2-rec-l-def, .q2-rec-l-if, .q2-rec-l-print, .q2-rec-l-step, .q2-rec-l-bp, .q2-rec-l-br { animation: none; }
       }
     </style>
     <rect x="8" y="8" width="544" height="374" rx="20" fill="#edf3f7" stroke="#c8d6e0" stroke-width="2"/>
@@ -64,33 +118,33 @@
     <text x="112" y="34" fill="#42586b" font-family="sans-serif" font-size="15" font-weight="700">Python IDLE · recursion.py</text>
     <rect x="18" y="52" width="326" height="310" rx="10" fill="#fff" stroke="#d7e1e9"/>
     <text x="34" y="76" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="700">Код программы</text>
-    <g font-family="monospace" font-size="14">
-      <rect class="q2-rec-demo-line" x="26" y="88" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:.2s"/>
+    <g font-family="monospace" font-size="14" font-weight="600">
+      <rect class="q2-rec-l-def" x="26" y="88" width="310" height="29" rx="5" fill="#f4f1ff"/>
       <text x="34" y="108" fill="#6d28d9">def countdown(n):</text>
-      <rect class="q2-rec-demo-line" x="26" y="120" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:1.1s"/>
-      <text x="34" y="140" fill="#334155">    if n == 0:</text>
-      <rect class="q2-rec-demo-line" x="26" y="152" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:2s"/>
-      <text x="34" y="172" fill="#334155">        print("Старт!")</text>
-      <rect class="q2-rec-demo-line" x="26" y="184" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:2.9s"/>
-      <text x="34" y="204" fill="#334155">        return</text>
-      <rect class="q2-rec-demo-line" x="26" y="216" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:3.8s"/>
+      <rect class="q2-rec-l-if" x="26" y="120" width="310" height="29" rx="5" fill="#f4f1ff"/>
+      <text x="34" y="140" fill="#334155">    if n == 0:      # база</text>
+      <rect class="q2-rec-l-bp" x="26" y="152" width="310" height="29" rx="5" fill="#ecfdf5"/>
+      <text x="34" y="172" fill="#047857">        print("Старт!")</text>
+      <rect class="q2-rec-l-br" x="26" y="184" width="310" height="29" rx="5" fill="#ecfdf5"/>
+      <text x="34" y="204" fill="#047857">        return</text>
+      <rect class="q2-rec-l-print" x="26" y="216" width="310" height="29" rx="5" fill="#f4f1ff"/>
       <text x="34" y="236" fill="#334155">    print(n)</text>
-      <rect class="q2-rec-demo-line" x="26" y="248" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:4.7s"/>
-      <text x="34" y="268" fill="#334155">    countdown(n - 1)</text>
-      <rect class="q2-rec-demo-line" x="26" y="280" width="310" height="29" rx="5" fill="#f4f1ff" style="animation-delay:5.6s"/>
-      <text x="34" y="300" fill="#047857">countdown(3)</text>
+      <rect class="q2-rec-l-step" x="26" y="248" width="310" height="29" rx="5" fill="#f4f1ff"/>
+      <text x="34" y="268" fill="#4f46e5">    countdown(n - 1) # шаг</text>
+      <rect class="q2-rec-l-call" x="26" y="280" width="310" height="29" rx="5" fill="#f4f1ff"/>
+      <text x="34" y="300" fill="#0f766e">countdown(3)</text>
     </g>
     <rect x="356" y="52" width="186" height="310" rx="10" fill="#e7eef4" stroke="#d2dee7"/>
     <text x="372" y="76" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="700">Python Shell</text>
-    <g font-family="monospace" font-size="18" font-weight="700" fill="#16734a">
-      <text x="372" y="108" fill="#536679" font-size="12" font-weight="400">&gt;&gt;&gt; countdown(3)</text>
-      <g class="q2-rec-demo-step" style="animation-delay:.7s"><text x="378" y="150">3</text></g>
-      <g class="q2-rec-demo-step" style="animation-delay:1.6s"><text x="378" y="184">2</text></g>
-      <g class="q2-rec-demo-step" style="animation-delay:2.5s"><text x="378" y="218">1</text></g>
-      <g class="q2-rec-demo-step" style="animation-delay:3.4s"><text x="378" y="252">Старт!</text></g>
+    <g font-family="monospace" font-size="17" font-weight="700" fill="#16734a">
+      <text x="372" y="108" fill="#536679" font-size="12" font-weight="600">&gt;&gt;&gt; countdown(3)</text>
+      <g class="q2-rec-o1"><text x="378" y="148">3  (n = 3)</text></g>
+      <g class="q2-rec-o2"><text x="378" y="182">2  (n = 2)</text></g>
+      <g class="q2-rec-o3"><text x="378" y="216">1  (n = 1)</text></g>
+      <g class="q2-rec-o4"><text x="378" y="252" fill="#047857">Старт! (n = 0)</text></g>
     </g>
-    <text x="372" y="334" fill="#486174" font-family="sans-serif" font-size="12" font-weight="700">Вызовов больше нет</text>
-    <text x="18" y="377" fill="#64748b" font-family="sans-serif" font-size="12">Подсветка следует по строкам, вывод появляется автоматически</text>
+    <text x="372" y="334" fill="#486174" font-family="sans-serif" font-size="12" font-weight="700">База n == 0 остановила вызовы</text>
+    <text x="18" y="377" fill="#64748b" font-family="sans-serif" font-size="12">Каждый шаг уменьшает n на 1, пока не сработает условие n == 0</text>
   </svg>`;
 
   const IDLE_GUIDE_HTML = `<div class="q2-idle-guide">
@@ -212,8 +266,8 @@
             t: 'cards',
             cols: 2,
             items: [
-              { title: 'Объявление', text: '<code>def</code> начинает описание функции. <code>greet</code> — её имя, <code>name</code> — параметр.', tone: 'violet' },
-              { title: 'Вызов', text: '<code>greet("Алия")</code> запускает тело функции; значение «Алия» попадает в параметр <code>name</code>.', tone: 'cyan' }
+              { icon: 'fas fa-code', title: 'Объявление', text: '<code>def</code> начинает описание функции. <code>greet</code> — её имя, <code>name</code> — параметр.', tone: 'violet' },
+              { icon: 'fas fa-play', title: 'Вызов', text: '<code>greet("Алия")</code> запускает тело функции; значение «Алия» попадает в параметр <code>name</code>.', tone: 'cyan' }
             ]
           },
           {
@@ -231,30 +285,76 @@
         lead: 'Рекурсивная функция решает часть задачи, затем вызывает себя для оставшейся, более простой части.',
         blocks: [
           {
-            t: 'cards',
-            cols: 2,
-            items: [
-              { title: 'База', text: 'Условие, при котором функция больше не вызывает себя. В примере: <code>n == 0</code>.', tone: 'green' },
-              { title: 'Рекурсивный шаг', text: 'Вызов той же функции с меньшей задачей: <code>countdown(n - 1)</code>.', tone: 'violet' }
+            t: 'split',
+            cls: 'q2-rec-slide-split',
+            left: [
+              {
+                t: 'cards',
+                cols: 1,
+                items: [
+                  { icon: 'fas fa-stop', title: 'База', text: 'Условие, при котором функция больше не вызывает себя. В примере: <code>if n == 0:</code>.', tone: 'green' },
+                  { icon: 'fas fa-rotate-left', title: 'Рекурсивный шаг', text: 'Вызов той же функции с меньшей задачей: <code>countdown(n - 1)</code>.', tone: 'violet' }
+                ]
+              },
+              {
+                t: 'callout',
+                icon: 'fas fa-circle-info',
+                title: 'Главное правило',
+                text: 'Без базы вызовы никогда не остановятся, а без уменьшения аргумента функция не приблизится к базе.'
+              }
+            ],
+            right: [
+              { t: 'svg', cls: 'q2-recursion-compact', svg: REC_SCREEN_SVG, caption: 'Ход выполнения countdown(3)' }
             ]
-          },
-          { t: 'svg', cls: 'q2-recursion-wide', svg: REC_SCREEN_SVG, caption: 'Ход выполнения countdown(3)' }
+          }
         ]
       },
       {
         k: 'concept',
         eyebrow: '04 · ПРИМЕРЫ КОДА',
-        title: 'Подсказки к четырём задачам',
-        lead: 'Вспомни образец на прошлом слайде: сначала база, затем действие и шаг к более простой задаче. Эти подсказки направляют, но не дают готовые программы.',
+        title: 'Примеры рекурсивных функций',
+        lead: 'В каждой рекурсивной функции сначала проверяется база (условие остановки), а затем выполняется рекурсивный шаг к более простой задаче.',
         blocks: [
           {
             t: 'cards',
             cols: 2,
             items: [
-              { badge: 'Задача 1 · повтор приветствия', title: 'Печатай до остановки', text: 'Поставь базу при <code>n == 0</code>. На каждом шаге выведи приветствие, затем передай функции <code>n - 1</code>. Проверь отдельно <code>n = 0</code> и <code>n = 3</code>.', tone: 'violet' },
-              { badge: 'Задача 2 · сумма чисел', title: 'Собирай сумму при возврате', text: 'Для нуля сумма равна <code>0</code>. На шаге прибавь текущее <code>n</code> к результату для меньшего аргумента. Для <code>n = 4</code> проверь ответ <code>10</code>.', tone: 'cyan' },
-              { badge: 'Задача 3 · степень числа', title: 'Уменьшай показатель', text: 'При показателе <code>0</code> результат равен <code>1</code>. На каждом шаге умножай основание на результат для показателя на единицу меньше.', tone: 'amber' },
-              { badge: 'Задача 4 · количество цифр', title: 'Убирай последнюю цифру', text: 'Остановись, когда осталось однозначное число. Для шага раздели число нацело на <code>10</code> и прибавь одну цифру к результату.', tone: 'green' }
+              {
+                badge: 'Пример 1 · повтор действия',
+                icon: 'fas fa-comments',
+                title: 'Печать до остановки',
+                text: 'База при <code>n == 0</code> останавливает вызовы, а шаг уменьшает счётчик на <code>1</code>:',
+                codeTitle: 'greet_n.py',
+                code: 'def show(n):\n    if n == 0:\n        return\n    print("Шаг", n)\n    show(n - 1)',
+                tone: 'violet'
+              },
+              {
+                badge: 'Пример 2 · накопление суммы',
+                icon: 'fas fa-plus',
+                title: 'Сумма при возврате',
+                text: 'Для <code>0</code> сумма равна <code>0</code>. На шаге прибавляем текущее <code>n</code> к результату для <code>n - 1</code>:',
+                codeTitle: 'sum_to.py',
+                code: 'def total(n):\n    if n == 0:\n        return 0\n    return n + total(n - 1)',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Пример 3 · умножение на шаге',
+                icon: 'fas fa-superscript',
+                title: 'Уменьшение показателя',
+                text: 'При показателе <code>0</code> возвращаем <code>1</code>, иначе умножаем число на степень с показателем <code>k - 1</code>:',
+                codeTitle: 'power_demo.py',
+                code: 'def deg2(k):\n    if k == 0:\n        return 1\n    return 2 * deg2(k - 1)',
+                tone: 'amber'
+              },
+              {
+                badge: 'Пример 4 · разбор числа',
+                icon: 'fas fa-calculator',
+                title: 'Отбрасывание последней цифры',
+                text: 'Однозначное число <code>n &lt; 10</code> — база. Иначе делим число нацело <code>n // 10</code>:',
+                codeTitle: 'digits_demo.py',
+                code: 'def sum_d(n):\n    if n < 10:\n        return n\n    return n % 10 + sum_d(n // 10)',
+                tone: 'green'
+              }
             ]
           }
         ]
@@ -278,10 +378,10 @@
             t: 'cards',
             cols: 2,
             items: [
-              { badge: '1 · 2 балла', title: 'Повтор приветствия', text: 'Напиши <code>greet_n(n)</code>: вывести «Привет!» ровно <code>n</code> раз. Проверь вызов с <code>n = 3</code>.', tone: 'violet' },
-              { badge: '2 · 2 балла', title: 'Сумма чисел', text: 'Напиши <code>sum_to(n)</code> для целого <code>n ≥ 0</code>: вернуть сумму чисел от 1 до <code>n</code>. Например, для 4 ответ должен быть 10.', tone: 'cyan' },
-              { badge: '3 · 3 балла', title: 'Степень числа', text: 'Напиши <code>power(a, n)</code>, чтобы получить <code>a</code> в степени <code>n</code>. Учти: любое ненулевое число в степени 0 равно 1.', tone: 'amber' },
-              { badge: '4 · 3 балла', title: 'Количество цифр', text: 'Напиши <code>count_digits(n)</code> для положительного целого числа. Например, для 531 ответ — 3. На шаге убирай последнюю цифру.', tone: 'green' }
+              { badge: '1 · 2 балла', icon: 'fas fa-comments', title: 'Повтор приветствия', text: 'Напиши <code>greet_n(n)</code>: вывести «Привет!» ровно <code>n</code> раз. Проверь вызов с <code>n = 3</code>.', tone: 'violet' },
+              { badge: '2 · 2 балла', icon: 'fas fa-plus', title: 'Сумма чисел', text: 'Напиши <code>sum_to(n)</code> для целого <code>n ≥ 0</code>: вернуть сумму чисел от 1 до <code>n</code>. Например, для 4 ответ должен быть 10.', tone: 'cyan' },
+              { badge: '3 · 3 балла', icon: 'fas fa-superscript', title: 'Степень числа', text: 'Напиши <code>power(a, n)</code>, чтобы получить <code>a</code> в степени <code>n</code>. Учти: любое ненулевое число в степени 0 равно 1.', tone: 'amber' },
+              { badge: '4 · 3 балла', icon: 'fas fa-calculator', title: 'Количество цифр', text: 'Напиши <code>count_digits(n)</code> для положительного целого числа. Например, для 531 ответ — 3. На шаге убирай последнюю цифру.', tone: 'green' }
             ]
           },
           {
