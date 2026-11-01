@@ -2,8 +2,21 @@
 (function () {
   'use strict';
 
-  // Reviewed against the actual content of all 33 lessons / 238 slides.
+  // Reviewed against the actual content of all 34 lessons / 249 slides.
   const stages = {
+    "9-q2-1": [
+      { "icon": "bulb", "title": "Логика и логические операции" },
+      { "icon": "binary", "title": "Как компьютер работает с логикой" },
+      { "icon": "star", "title": "Логическое умножение · конъюнкция · И" },
+      { "icon": "plus", "title": "Логическая сумма · дизъюнкция · ИЛИ" },
+      { "icon": "refresh", "title": "Логическое отрицание · инверсия · НЕ" },
+      { "icon": "arrow-comparison", "title": "Исключающее ИЛИ · XOR" },
+      { "icon": "arrow-right", "title": "Логическое следование · импликация" },
+      { "icon": "link", "title": "Логическое равенство · эквивалентность" },
+      { "icon": "computer", "title": "Практическая работа · 10 баллов" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги урока" }
+    ],
     "9-1": [
 {
         "icon": "home",
@@ -1013,6 +1026,12 @@
     "arrow-right": "arrow-right",
     "arrow-left": "arrow-left",
     "lightbulb": "bulb",
+    "table-cells": "list",
+    "toggle-on": "settings-sliders",
+    "quote-left": "comments",
+    "arrow-pointer": "computer",
+    "check-double": "check",
+    "ticket": "credit-card",
     "database": "database",
     "microchip": "microchip",
     "check-circle": "check",
@@ -1186,4 +1205,3 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
-

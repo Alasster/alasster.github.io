@@ -1,0 +1,1675 @@
+﻿/* ==========================================================================
+   9 КЛАСС · 2 ЧЕТВЕРТЬ — ЛОГИЧЕСКИЕ ОСНОВЫ
+   Данные уроков. Логика объясняется через лампочки и выключатели.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  /* --- повторяющиеся SVG-схемы --- */
+  const SERIES_SVG = `<svg viewBox="0 0 460 250" role="img" aria-label="Последовательное соединение: два выключателя в одной цепи">
+    <defs>
+      <radialGradient id="q9-glow-a"><stop offset="0" stop-color="#fde68a" stop-opacity=".9"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/></radialGradient>
+    </defs>
+    <path class="q2-scene-wire" d="M40 90 H 110" fill="none"/>
+    <g transform="translate(110 66)">
+      <rect class="q2-sw-track" width="86" height="44" rx="22"/>
+      <circle class="q2-sw-knob is-on" cx="66" cy="22" r="15"/>
+      <text class="q2-sw-value" x="66" y="27">1</text>
+      <text class="q2-sw-name" x="43" y="66">A</text>
+    </g>
+    <path class="q2-scene-wire" d="M196 90 H 250" fill="none"/>
+    <g transform="translate(250 66)">
+      <rect class="q2-sw-track" width="86" height="44" rx="22"/>
+      <circle class="q2-sw-knob" cx="20" cy="22" r="15"/>
+      <text class="q2-sw-value" x="20" y="27">0</text>
+      <text class="q2-sw-name" x="43" y="66">B</text>
+    </g>
+    <path class="q2-scene-wire" d="M336 90 H 400 V 150" fill="none"/>
+    <path class="q2-scene-wire" d="M40 90 V 150 H 330" fill="none"/>
+    <circle cx="365" cy="188" r="40" fill="url(#q9-glow-a)" opacity="0"/>
+    <circle cx="365" cy="188" r="26" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2.5"/>
+    <path d="M357 196l5-11 4 8 4-8 5 11" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="365" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#748097">лампа не горит</text>
+    <text x="230" y="36" text-anchor="middle" font-size="12" font-weight="800" fill="#536dfe" letter-spacing="0.06em">ПОСЛЕДОВАТЕЛЬНО · И</text>
+    <text x="230" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">ток должен пройти через оба выключателя</text>
+  </svg>`;
+
+  const PARALLEL_SVG = `<svg viewBox="0 0 460 250" role="img" aria-label="Параллельное соединение: две ветви с выключателями">
+    <defs>
+      <radialGradient id="q9-glow-b"><stop offset="0" stop-color="#fde68a" stop-opacity=".95"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/></radialGradient>
+    </defs>
+    <path class="q2-scene-wire" d="M40 125 H 96" fill="none"/>
+    <path class="q2-scene-wire" d="M96 125 V 74 H 150" fill="none"/>
+    <path class="q2-scene-wire" d="M96 125 V 176 H 150" fill="none"/>
+    <g transform="translate(150 52)">
+      <rect class="q2-sw-track is-on" width="80" height="40" rx="20"/>
+      <circle class="q2-sw-knob is-on" cx="60" cy="20" r="14"/>
+      <text class="q2-sw-value" x="60" y="25">1</text>
+      <text class="q2-sw-name" x="40" y="60">A</text>
+    </g>
+    <g transform="translate(150 156)">
+      <rect class="q2-sw-track" width="80" height="40" rx="20"/>
+      <circle class="q2-sw-knob" cx="20" cy="20" r="14"/>
+      <text class="q2-sw-value" x="20" y="25">0</text>
+      <text class="q2-sw-name" x="40" y="60">B</text>
+    </g>
+    <path class="q2-scene-wire" d="M230 72 H 288 V 125" fill="none"/>
+    <path class="q2-scene-wire" d="M230 176 H 288 V 125" fill="none"/>
+    <path class="q2-scene-wire" d="M288 125 H 340" fill="none"/>
+    <circle cx="370" cy="125" r="46" fill="url(#q9-glow-b)"/>
+    <circle cx="370" cy="125" r="26" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>
+    <path d="M362 133l5-11 4 8 4-8 5 11" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="370" y="182" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">лампа горит</text>
+    <text x="230" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#536dfe" letter-spacing="0.06em">ПАРАЛЛЕЛЬНО · ИЛИ</text>
+    <text x="230" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">достаточно одной замкнутой ветви</text>
+  </svg>`;
+
+  const XOR_SVG = `<svg viewBox="0 0 460 240" role="img" aria-label="Проходной выключатель: лампа горит при разных положениях">
+    <path class="q2-scene-wire" d="M40 120 H 120" fill="none"/>
+    <g transform="translate(120 96)">
+      <rect class="q2-sw-track is-on" width="84" height="44" rx="22"/>
+      <circle class="q2-sw-knob is-on" cx="64" cy="22" r="15"/>
+      <text class="q2-sw-value" x="64" y="27">1</text>
+      <text class="q2-sw-name" x="42" y="66">A · 1 этаж</text>
+    </g>
+    <path class="q2-scene-wire" d="M204 120 H 262" fill="none"/>
+    <g transform="translate(262 96)">
+      <rect class="q2-sw-track is-on" width="84" height="44" rx="22"/>
+      <circle class="q2-sw-knob is-on" cx="64" cy="22" r="15"/>
+      <text class="q2-sw-value" x="64" y="27">1</text>
+      <text class="q2-sw-name" x="42" y="66">B · 2 этаж</text>
+    </g>
+    <path class="q2-scene-wire" d="M346 120 H 388" fill="none"/>
+    <circle cx="408" cy="120" r="24" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2.5"/>
+    <text x="230" y="40" text-anchor="middle" font-size="12" font-weight="800" fill="#536dfe" letter-spacing="0.06em">ПРОХОДНОЙ ВЫКЛЮЧАТЕЛЬ · XOR</text>
+    <text x="230" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">A = 1, B = 1 → одинаковые положения → лампа не горит</text>
+    <text x="230" y="220" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">A = 1, B = 0 → разные положения → лампа горит</text>
+  </svg>`;
+
+  const SEQUENCE_SVG = `<svg viewBox="0 0 460 210" role="img" aria-label="Порядок вычисления логического выражения">
+    <rect x="24" y="66" width="96" height="70" rx="16" fill="rgba(83,109,254,.1)" stroke="rgba(83,109,254,.35)" stroke-width="2"/>
+    <text x="72" y="98" text-anchor="middle" font-size="13" font-weight="800" fill="#3e55d8">1. Скобки</text>
+    <text x="72" y="118" text-anchor="middle" font-size="11" fill="#748097">и НЕ</text>
+    <path d="M120 101 H 152" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" marker-end="url(#q9-ar)"/>
+    <rect x="152" y="66" width="96" height="70" rx="16" fill="rgba(217,119,6,.1)" stroke="rgba(217,119,6,.35)" stroke-width="2"/>
+    <text x="200" y="98" text-anchor="middle" font-size="13" font-weight="800" fill="#b45309">2. И</text>
+    <text x="200" y="118" text-anchor="middle" font-size="11" fill="#748097">∧</text>
+    <path d="M248 101 H 280" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" marker-end="url(#q9-ar)"/>
+    <rect x="280" y="66" width="96" height="70" rx="16" fill="rgba(5,150,105,.1)" stroke="rgba(5,150,105,.35)" stroke-width="2"/>
+    <text x="328" y="98" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">3. ИЛИ</text>
+    <text x="328" y="118" text-anchor="middle" font-size="11" fill="#748097">∨</text>
+    <path d="M376 101 H 408" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" marker-end="url(#q9-ar)"/>
+    <text x="426" y="106" text-anchor="middle" font-size="14" font-weight="800" fill="#263248">Y</text>
+    <defs><marker id="q9-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#94a3b8"/></marker></defs>
+    <text x="230" y="176" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">сначала то, что в скобках; отрицание сильнее И и ИЛИ</text>
+  </svg>`;
+
+  const TT2_SVG = `<svg viewBox="0 0 420 280" role="img" aria-label="Таблица истинности для двух переменных: четыре строки">
+    <rect x="40" y="36" width="340" height="204" rx="18" fill="rgba(255,255,255,.8)" stroke="rgba(255,255,255,.95)" stroke-width="1.5"/>
+    <text x="210" y="66" text-anchor="middle" font-size="12" font-weight="800" fill="#748097" letter-spacing="0.08em">A   B   Y</text>
+    <line x1="70" y1="80" x2="350" y2="80" stroke="rgba(148,163,184,.4)" stroke-width="1.5"/>
+    ${[[0, 0], [0, 1], [1, 0], [1, 1]].map((row, i) => `<g>
+      <rect x="70" y="${90 + i * 34}" width="280" height="26" rx="8" fill="${row[0] === 1 && row[1] === 1 ? 'rgba(5,150,105,.1)' : 'rgba(148,163,184,.07)'}"/>
+      <text x="120" y="${108 + i * 34}" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">${row[0]}</text>
+      <text x="210" y="${108 + i * 34}" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">${row[1]}</text>
+      <text x="300" y="${108 + i * 34}" text-anchor="middle" font-size="14" font-weight="800" fill="#3e55d8">?</text>
+    </g>`).join('')}
+    <text x="210" y="264" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">две переменные → 2² = 4 набора значений</text>
+  </svg>`;
+
+  const TT3_SVG = `<svg viewBox="0 0 460 300" role="img" aria-label="Восемь наборов значений для трёх переменных">
+    <rect x="28" y="30" width="404" height="238" rx="18" fill="rgba(255,255,255,.8)" stroke="rgba(255,255,255,.95)" stroke-width="1.5"/>
+    <text x="230" y="56" text-anchor="middle" font-size="12" font-weight="800" fill="#748097" letter-spacing="0.08em">A  B  C   ·   A  B  C</text>
+    ${[[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1]].map((row, i) => {
+      const col = i < 4 ? 0 : 1;
+      const line = i % 4;
+      const x = 56 + col * 196;
+      const y = 76 + line * 42;
+      return `<g><rect x="${x}" y="${y}" width="168" height="32" rx="9" fill="${row[0] === 1 ? 'rgba(83,109,254,.08)' : 'rgba(148,163,184,.07)'}"/>
+        <text x="${x + 84}" y="${y + 21}" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">${row.join('  ')}</text></g>`;
+    }).join('')}
+    <text x="230" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">три переменные → 2³ = 8 наборов; A меняется половиной блока</text>
+  </svg>`;
+
+  const GATES_SVG = `<svg viewBox="0 0 470 250" role="img" aria-label="Три базовых логических элемента">
+    <g transform="translate(24 40)">
+      <rect x="0" y="0" width="130" height="110" rx="18" fill="rgba(255,255,255,.86)" stroke="rgba(148,163,184,.3)" stroke-width="1.5"/>
+      <text x="65" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#3e55d8" letter-spacing="0.06em">И</text>
+      <path d="M34 48 H 54 A 22 22 0 0 1 54 92 H 34 Z" fill="rgba(83,109,254,.14)" stroke="rgba(83,109,254,.55)" stroke-width="2.5"/>
+      <text x="65" y="104" text-anchor="middle" font-size="11" fill="#748097">1 только при 1 и 1</text>
+    </g>
+    <g transform="translate(170 40)">
+      <rect x="0" y="0" width="130" height="110" rx="18" fill="rgba(255,255,255,.86)" stroke="rgba(148,163,184,.3)" stroke-width="1.5"/>
+      <text x="65" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#3e55d8" letter-spacing="0.06em">ИЛИ</text>
+      <path d="M36 48 Q 84 70 36 92 Q 58 70 36 48 Z" fill="rgba(83,109,254,.14)" stroke="rgba(83,109,254,.55)" stroke-width="2.5"/>
+      <text x="65" y="104" text-anchor="middle" font-size="11" fill="#748097">1 при любом 1</text>
+    </g>
+    <g transform="translate(316 40)">
+      <rect x="0" y="0" width="130" height="110" rx="18" fill="rgba(255,255,255,.86)" stroke="rgba(148,163,184,.3)" stroke-width="1.5"/>
+      <text x="65" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#3e55d8" letter-spacing="0.06em">НЕ</text>
+      <path d="M44 48 L 82 70 L 44 92 Z" fill="rgba(83,109,254,.14)" stroke="rgba(83,109,254,.55)" stroke-width="2.5"/>
+      <circle cx="91" cy="70" r="6" fill="rgba(255,255,255,.96)" stroke="rgba(83,109,254,.55)" stroke-width="2.5"/>
+      <text x="65" y="104" text-anchor="middle" font-size="11" fill="#748097">переворачивает 0 и 1</text>
+    </g>
+    <text x="235" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">Вход — сигнал 0 или 1. Выход — результат операции.</text>
+    <text x="235" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">1 = «есть сигнал», 0 = «сигнала нет»</text>
+  </svg>`;
+
+  const XOR_GATE_SVG = `<svg viewBox="0 0 470 230" role="img" aria-label="Схема XOR и цепочка из двух элементов">
+    <g transform="translate(30 40)">
+      <text x="70" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#3e55d8">XOR</text>
+      <path d="M40 44 Q 96 74 40 104 Q 68 74 40 44 Z" fill="rgba(83,109,254,.14)" stroke="rgba(83,109,254,.55)" stroke-width="2.5"/>
+      <path d="M30 44 Q 86 74 30 104" fill="none" stroke="rgba(83,109,254,.55)" stroke-width="2.5"/>
+      <text x="70" y="132" text-anchor="middle" font-size="11" fill="#748097">1 при разных входах</text>
+    </g>
+    <g transform="translate(220 26)">
+      <text x="120" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#3e55d8">ЦЕПОЧКА: A И B → НЕ</text>
+      <line x1="10" y1="52" x2="54" y2="52" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="10" y1="88" x2="54" y2="88" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M54 34 H 70 A 22 22 0 0 1 70 106 H 54 Z" fill="rgba(83,109,254,.12)" stroke="rgba(83,109,254,.5)" stroke-width="2.5"/>
+      <line x1="92" y1="70" x2="118" y2="70" stroke="#94a3b8" stroke-width="2.5"/>
+      <text x="105" y="58" text-anchor="middle" font-size="10" fill="#748097">S1</text>
+      <path d="M118 48 L 152 70 L 118 92 Z" fill="rgba(83,109,254,.12)" stroke="rgba(83,109,254,.5)" stroke-width="2.5"/>
+      <circle cx="160" cy="70" r="6" fill="rgba(255,255,255,.96)" stroke="rgba(83,109,254,.5)" stroke-width="2.5"/>
+      <line x1="166" y1="70" x2="200" y2="70" stroke="#94a3b8" stroke-width="2.5"/>
+      <text x="210" y="74" text-anchor="middle" font-size="12" font-weight="800" fill="#263248">Y</text>
+      <text x="120" y="140" text-anchor="middle" font-size="11" fill="#748097">сначала И, затем НЕ для всего результата</text>
+    </g>
+  </svg>`;
+
+  const BUILD_SVG = `<svg viewBox="0 0 480 250" role="img" aria-label="Как из выражения получается схема">
+    <rect x="20" y="30" width="180" height="60" rx="14" fill="rgba(83,109,254,.09)" stroke="rgba(83,109,254,.28)" stroke-width="1.5"/>
+    <text x="110" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#3e55d8">A ∧ ¬B</text>
+    <text x="110" y="76" text-anchor="middle" font-size="11" fill="#748097">выражение</text>
+    <path d="M200 60 H 250" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#q9-ar2)"/>
+    <defs><marker id="q9-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#94a3b8"/></marker></defs>
+    <rect x="250" y="30" width="200" height="60" rx="14" fill="rgba(217,119,6,.08)" stroke="rgba(217,119,6,.3)" stroke-width="1.5"/>
+    <text x="350" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#b45309">1. ¬B</text>
+    <text x="350" y="76" text-anchor="middle" font-size="11" fill="#748097">сначала отрицание</text>
+    <rect x="250" y="110" width="200" height="60" rx="14" fill="rgba(5,150,105,.08)" stroke="rgba(5,150,105,.3)" stroke-width="1.5"/>
+    <text x="350" y="136" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">2. A ∧ (результат)</text>
+    <text x="350" y="156" text-anchor="middle" font-size="11" fill="#748097">затем И с A</text>
+    <path d="M350 90 V 108" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#q9-ar2)"/>
+    <rect x="20" y="110" width="180" height="60" rx="14" fill="rgba(148,163,184,.09)" stroke="rgba(148,163,184,.3)" stroke-width="1.5"/>
+    <text x="110" y="136" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">скобки = порядок сборки</text>
+    <text x="110" y="156" text-anchor="middle" font-size="11" fill="#748097">действие в скобках первым</text>
+    <text x="240" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">схема повторяет порядок действий, а не внешний вид записи</text>
+  </svg>`;
+
+  const READ_SVG = `<svg viewBox="0 0 480 250" role="img" aria-label="Как читать схему и записывать выражение">
+    <line x1="24" y1="70" x2="80" y2="70" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="24" y1="112" x2="80" y2="112" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="14" y="74" font-size="12" font-weight="700" fill="#748097">A</text>
+    <text x="14" y="116" font-size="12" font-weight="700" fill="#748097">B</text>
+    <path d="M80 54 Q 128 91 80 128 Q 104 91 80 54 Z" fill="rgba(83,109,254,.12)" stroke="rgba(83,109,254,.5)" stroke-width="2.5"/>
+    <line x1="126" y1="91" x2="168" y2="91" stroke="#94a3b8" stroke-width="2.5"/>
+    <text x="147" y="80" text-anchor="middle" font-size="10" fill="#748097">S1</text>
+    <path d="M168 69 L 202 91 L 168 113 Z" fill="rgba(83,109,254,.12)" stroke="rgba(83,109,254,.5)" stroke-width="2.5"/>
+    <circle cx="210" cy="91" r="6" fill="rgba(255,255,255,.96)" stroke="rgba(83,109,254,.5)" stroke-width="2.5"/>
+    <line x1="216" y1="91" x2="252" y2="91" stroke="#94a3b8" stroke-width="2.5"/>
+    <text x="268" y="95" font-size="12" font-weight="800" fill="#263248">Y</text>
+    <rect x="300" y="52" width="160" height="80" rx="14" fill="rgba(255,255,255,.85)" stroke="rgba(148,163,184,.3)" stroke-width="1.5"/>
+    <text x="380" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="#3e55d8">S1 = A ∨ B</text>
+    <text x="380" y="104" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Y = ¬S1</text>
+    <text x="380" y="122" text-anchor="middle" font-size="11" fill="#748097">= ¬(A ∨ B)</text>
+    <text x="240" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">Читаем от входов к выходу и подписываем каждый промежуточный сигнал.</text>
+    <text x="240" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">скобки появляются там, где сигнал идёт в следующий элемент целиком</text>
+  </svg>`;
+
+  /* ==========================================================================
+     УРОК 1. Шесть логических операций
+     ========================================================================== */
+  const operationSlides = [
+    ['Конъюнкция', 'A ∧ B', 'and', 'Конъюнкция (И) истинна, только если истинны оба высказывания.', 'Два выключателя соединены последовательно: лампа горит, только когда замкнуты оба.'],
+    ['Дизъюнкция', 'A ∨ B', 'or', 'Дизъюнкция (ИЛИ) истинна, если истинно хотя бы одно высказывание.', 'Две параллельные ветви: достаточно замкнуть любой выключатель; при двух замкнутых лампа тоже горит.'],
+    ['Инверсия', '¬A', 'not', 'Инверсия (НЕ) меняет значение на противоположное: 1 → 0, 0 → 1.', 'Представьте управление лампой с обратным правилом: при выключенном входе лампа горит, при включённом — гаснет.'],
+    ['Исключающее ИЛИ', 'A ⊕ B', 'xor', 'XOR истинно, когда значения различаются; при одинаковых значениях результат равен 0.', 'Два проходных выключателя управляют лампой в коридоре: она горит, когда положения выключателей разные.'],
+    ['Импликация', 'A → B', 'imp', 'Импликация читается «если A, то B». Она ложна только при A = 1 и B = 0.', 'Правило «если датчик сработал, должна загореться лампа» нарушено только тогда, когда сигнал есть, а лампа не горит.'],
+    ['Эквивалентность', 'A ↔ B', 'eq', 'Эквивалентность истинна, когда значения обоих высказываний совпадают.', 'Лампа горит, если два выключателя в одинаковом состоянии: оба включены или оба выключены.']
+  ].map(([name, formula, gate, definition, analogy], index) => ({
+    k: 'concept', eyebrow: `${String(index + 3).padStart(2, '0')} · ${name.toUpperCase()}`,
+    title: `${[
+      'Конъюнкция — логическое умножение',
+      'Дизъюнкция — логическая сумма',
+      'Инверсия — логическое отрицание',
+      'XOR — исключающее ИЛИ',
+      'Импликация — логическое следование',
+      'Эквивалентность — логическое равенство'
+    ][index]}: <span class="accent-text">${formula}</span>`,
+    lead: 'Изучите правило операции и проверьте его на интерактивной схеме.',
+    blocks: [
+      { t: 'cards', cols: 2, items: [
+        { badge: 'Определение', icon: 'fas fa-check-circle', title: 'Правило операции', text: definition, footer: formula },
+        { badge: 'Аналогия', icon: 'fas fa-lightbulb', title: 'Лампа и выключатели', text: analogy }
+      ] },
+      { t: 'callout', tone: 'good', icon: 'fas fa-toggle-on', title: 'Интерактивная схема', text: 'Меняйте значения A и B: лампа и таблица истинности пересчитываются.' },
+      { t: 'widget', kind: 'lamp', config: { gate, a: gate === 'not' ? 0 : 1, b: gate === 'and' || gate === 'eq' ? 1 : 0, gates: [gate] } },
+    ]
+  }));
+
+  Q2.add('9-q2-1', {
+    num: 1, cls: '9 класс', title: 'Логика и логические операции',
+    slides: [
+      {
+        k: 'hero', eyebrow: '01 · ВВЕДЕНИЕ', title: 'Логика и логические операции',
+        lead: 'Компьютер обрабатывает сигналы 0 и 1. Логические операции помогают ему проверять условия и получать результат.',
+        goal: 'Определять истинность логических выражений с помощью операций И, ИЛИ, НЕ, XOR, импликации и эквивалентности.', goalCode: '9.2.1.1',
+        chips: [{ icon: 'fas fa-quote-left', text: 'Высказывание' }, { icon: 'fas fa-check-circle', text: 'Истина / ложь · 1 / 0' }, { icon: 'fas fa-sliders', text: 'Логическая операция' }],
+        visual: 'singleLamp', visualCaption: 'Обычный выключатель включает и выключает лампочку', cta: 'Начать урок'
+      },
+      {
+        k: 'concept', eyebrow: '02 · ЛОГИЧЕСКАЯ ОСНОВА', title: 'Как компьютер работает с логикой',
+        lead: 'Компьютер обрабатывает высказывания по логическим правилам.',
+        blocks: [
+          { t: 'cards', cols: 2, items: [
+            { icon: 'fas fa-brain', title: 'Компьютерная логика', text: 'Правила, по которым компьютер обрабатывает истинные и ложные высказывания с помощью значений 1 и 0.' },
+            { icon: 'fas fa-quote-left', title: 'Высказывание A, B, C…', text: 'Утверждение, которое бывает истинным (1) или ложным (0). В задачах каждое высказывание обозначают заглавной буквой. Вопросы и команды высказываниями не являются.' }
+          ] },
+          { t: 'steps', cls: 'q2-steps-logic', items: [{ title: 'Обозначьте', text: 'Высказывания записываем буквами A, B, C… и присваиваем им 1 или 0.' }, { title: 'Возьмите минимум два', text: 'Для решения задач с И, ИЛИ и другими бинарными операциями нужны как минимум A и B.' }, { title: 'Примените правило', text: 'Операция вычисляет результат, а таблица истинности показывает все варианты.' }] },
+          { t: 'widget', kind: 'statements', config: { compact: true, items: [
+            { text: '«5 больше 2»', isStatement: true, note: 'Утверждение; оно истинно.' },
+            { text: '«7 — чётное число»', isStatement: true, note: 'Утверждение; оно ложно.' },
+            { text: '«Открой файл»', isStatement: false, note: 'Команда не истинна и не ложна.' },
+            { text: '«Который час?»', isStatement: false, note: 'Вопрос не является высказыванием.' }
+          ] } }
+        ]
+      },
+      ...operationSlides,
+      {
+        k: 'practice', eyebrow: '09 · ПРАКТИЧЕСКАЯ РАБОТА', title: 'Составьте конспект по логическим операциям',
+        lead: 'Работайте в тетради. Конспект оценивается в 7 баллов, четыре задания — ещё в 3.',
+        before: [{ t: 'callout', tone: 'good', icon: 'fas fa-pen', title: 'Конспект · 7 баллов', text: 'Запишите определения шести операций, изобразите схемы с выключателями и лампой, составьте таблицы истинности. Затем выполните 4 задания: при A = 1 и B = 0 найдите A ∧ B, A ∨ B, A ⊕ B и A → B. За задания можно получить ещё 3 балла.' }],
+        tasks: [
+          { title: 'И', q: 'A = 1, B = 0. Чему равно A ∧ B?', answer: '0', type: 'number', explain: 'Для И нужны две единицы.', hint: 'Один выключатель разомкнут.' },
+          { title: 'ИЛИ', q: 'A = 1, B = 0. Чему равно A ∨ B?', answer: '1', type: 'number', explain: 'Для ИЛИ достаточно одной единицы.', hint: 'Хотя бы один вход равен 1.' },
+          { title: 'XOR', q: 'A = 1, B = 0. Чему равно A ⊕ B?', answer: '1', type: 'number', explain: 'Значения различаются — XOR даёт 1.', hint: 'XOR истинен при разных входах.' },
+          { title: 'Импликация', q: 'A = 1, B = 0. Чему равно A → B?', answer: '0', type: 'number', explain: 'Это единственный ложный случай импликации.', hint: 'Правило не выполнено: из 1 получилось 0.' }
+        ],
+        criteriaTitle: 'Дескриптор · 10 баллов', criteria: [
+          { mark: '2 балла', text: 'Записаны определения всех шести операций.' },
+          { mark: '2 балла', text: 'Нарисованы схемы с выключателями и лампой для И, ИЛИ и XOR.' },
+          { mark: '3 балла', text: 'Составлены таблицы истинности для всех шести операций.' },
+          { mark: '0,5 балла', text: 'Верно решено задание на конъюнкцию (И).' },
+          { mark: '0,5 балла', text: 'Верно решено задание на дизъюнкцию (ИЛИ).' },
+          { mark: '1 балл', text: 'Верно решено задание на XOR.' },
+          { mark: '1 балл', text: 'Верно решено задание на импликацию.' }
+        ]
+      },
+      {
+        k: 'quiz', eyebrow: '10 · МИНИ-ПРОВЕРКА', title: 'Проверьте, как вы поняли операции',
+        lead: 'Выберите один ответ. После каждого ответа прочитайте пояснение.',
+        questions: [
+          { q: 'Что такое высказывание?', options: ['Любое предложение', 'Утверждение, которое истинно или ложно', 'Вопрос', 'Команда'], answer: 1, explain: 'Высказыванию можно присвоить значение 1 или 0.' },
+          { q: 'A = 1, B = 0. Чему равно A ∧ B?', options: ['0', '1', 'Не определено', 'Зависит от порядка'], answer: 0, explain: 'И истинно только при двух единицах.' },
+          { q: 'A = 0. Чему равно ¬A?', options: ['0', '1', 'A', 'Не определено'], answer: 1, explain: 'НЕ меняет 0 на 1.' },
+          { q: 'Когда A ⊕ B равно 1?', options: ['Когда A и B равны', 'Когда A и B различаются', 'Только при A = 1', 'Только при B = 1'], answer: 1, explain: 'XOR даёт 1, если входы разные.' },
+          { q: 'Когда A → B ложно?', options: ['A = 0, B = 0', 'A = 0, B = 1', 'A = 1, B = 0', 'A = 1, B = 1'], answer: 2, explain: 'Импликация ложна только при A = 1 и B = 0.' },
+          { q: 'Когда A ↔ B истинно?', options: ['Только при A = 1', 'Только при B = 1', 'Когда значения совпадают', 'Когда значения различаются'], answer: 2, explain: 'Эквивалентность истинна при 00 и 11.' }
+        ]
+      },
+      {
+        k: 'summary', eyebrow: '11 · ИТОГИ УРОКА', title: 'Шесть операций — шесть правил',
+        points: [
+          'Компьютерная логика обрабатывает высказывания со значениями 0 и 1.',
+          'И истинно при двух единицах; ИЛИ — если есть хотя бы одна единица.',
+          'НЕ меняет значение; XOR истинен при разных входах.',
+          'Импликация ложна только для 1 → 0; эквивалентность истинна при совпадении.'
+        ],
+        ticket: ['Объясните, чем ИЛИ отличается от XOR.', 'Приведите пример высказывания и укажите его значение.', 'Назовите единственный ложный набор для импликации.'],
+        criteriaTitle: 'Дескриптор усвоения темы · 10 баллов', criteria: [
+          { mark: '2 балла', text: 'Записаны определения всех шести операций.' },
+          { mark: '2 балла', text: 'Нарисованы схемы с выключателями и лампой для И, ИЛИ и XOR.' },
+          { mark: '3 балла', text: 'Составлены таблицы истинности для всех шести операций.' },
+          { mark: '0,5 балла', text: 'Верно решено задание на конъюнкцию (И).' },
+          { mark: '0,5 балла', text: 'Верно решено задание на дизъюнкцию (ИЛИ).' },
+          { mark: '1 балл', text: 'Верно решено задание на XOR.' },
+          { mark: '1 балл', text: 'Верно решено задание на импликацию.' }
+        ]
+      }
+    ]
+  });
+  /* ==========================================================================
+     УРОК 2. Таблица истинности с двумя переменными
+     ========================================================================== */
+  Q2.add('9-q2-2', {
+    num: 2,
+    cls: '9 класс',
+    title: 'Таблица истинности с двумя переменными',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'Таблица истинности: <span class="accent-text">все варианты на одном листе</span>',
+        lead: 'Одно выражение может вести себя по-разному при разных входах. Чтобы ничего не забыть, логики перебирают все наборы значений и записывают результат в таблицу.',
+        goal: 'Строить таблицы истинности для заданного логического выражения.',
+        goalCode: '9.2.1.2',
+        chips: [
+          { icon: 'fas fa-table-cells', text: 'Четыре набора' },
+          { icon: 'fas fa-list-ol', text: 'Порядок строк' },
+          { icon: 'fas fa-calculator', text: 'Промежуточные столбцы' }
+        ],
+        visual: 'truth',
+        visualCaption: 'Четыре строки — четыре возможных состояния двух выключателей',
+        cta: 'Построить первую таблицу'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'Какое предложение является высказыванием?', options: ['Сколько тебе лет?', '7 — нечётное число', 'Закрой окно', 'Какая красивая погода'], answer: 1, explain: 'Только утверждение можно проверить: 7 действительно нечётное.' },
+          { q: 'A = 1, B = 1. Чему равно A ∧ B?', options: ['0', '1', 'Зависит от порядка', 'Не определено'], answer: 1, explain: 'Последовательная цепь замкнута с двух сторон — ток идёт.' },
+          { q: 'A = 0, B = 0. Чему равно A ∨ B?', options: ['1', '0', 'Зависит от A', 'Не определено'], answer: 1, explain: 'Обе ветви разомкнуты, лампа не горит.' },
+          { q: 'A = 1, B = 1. Чему равно A ⊕ B?', options: ['1', '0', 'Равно A', 'Равно B'], answer: 1, explain: 'XOR даёт 0 при одинаковых значениях — это его главное отличие от ИЛИ.' },
+          { q: 'A = 0, B = 1. Чему равно A → B?', options: ['0', '1', 'Не определено', 'Равно A'], answer: 1, explain: 'Импликация ложна только при A = 1, B = 0. Здесь условие не выполнено, правило не нарушено.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · ЧЕТЫРЕ НАБОРА',
+        title: 'Два выключателя дают ровно четыре состояния',
+        lead: 'Каждый вход принимает два значения. Два входа — это 2 × 2 = 4 комбинации. Ни больше, ни меньше.',
+        blocks: [
+          { t: 'svg', svg: TT2_SVG },
+          {
+            t: 'steps',
+            items: [
+              { title: 'Столбцы входов', text: 'Слева выписываем все переменные: A и B. Каждая занимает свой столбец.' },
+              { title: 'Порядок строк', text: 'Перебираем наборы как двоичные числа: 00, 01, 10, 11. Так ни один набор не потеряется и не повторится.' },
+              { title: 'Промежуточные столбцы', text: 'Если в выражении есть отрицание или скобки, добавляем столбец для промежуточного результата.' },
+              { title: 'Итоговый столбец', text: 'Последний столбец — значение всего выражения. Он заполняется после промежуточных.' }
+            ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-lightbulb',
+            title: 'Почему порядок именно такой',
+            text: 'Наборы 00, 01, 10, 11 — это числа 0, 1, 2, 3 в двоичной записи. Такой порядок удобно проверять: младший разряд (B) меняется в каждой строке, старший (A) — через строку.'
+          },
+          {
+            t: 'table',
+            caption: 'Проверьте себя: заполните последний столбец для A ∧ B',
+            head: ['A', 'B', 'A ∧ B'],
+            rows: [['0', '0', '?'], ['0', '1', '?'], ['1', '0', '?'], ['1', '1', '?']]
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · ЛАБОРАТОРИЯ',
+        title: 'Заполните таблицу сами',
+        lead: 'Выберите выражение, нажимайте на «?», чтобы поставить 0 или 1, затем проверьте. Кнопка «Показать ответ» поможет, если зашли в тупик.',
+        widget: {
+          kind: 'truth',
+          config: {
+            vars: 2,
+            exprs: [
+              { label: 'A ∧ ¬B', expr: 'A & !B', mid: { label: '¬B', expr: '!B' } },
+              { label: 'A ∨ B', expr: 'A | B' },
+              { label: 'A ⊕ B', expr: 'A ^ B' },
+              { label: '¬A ∨ B', expr: '!A | B', mid: { label: '¬A', expr: '!A' } }
+            ]
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'good',
+            icon: 'fas fa-circle-check',
+            title: 'Заметили закономерность?',
+            text: 'Столбец A ∧ ¬B — это «A без B»: единица только там, где A включён, а B выключен. Такие таблицы помогают увидеть смысл выражения, а не просто посчитать нули и единицы.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · ПОРЯДОК ДЕЙСТВИЙ',
+        title: 'Скобки решают, что считать первым',
+        lead: 'Таблица заполняется не слева направо, а по правилам приоритета. Ошибка в порядке действий ломает весь столбец.',
+        blocks: [
+          { t: 'svg', svg: SEQUENCE_SVG },
+          {
+            t: 'compare',
+            left: {
+              title: '¬A ∧ B',
+              items: ['Сначала отрицаем только A', 'Затем результат соединяем с B через И', 'Истинно, когда A = 0, а B = 1']
+            },
+            right: {
+              title: '¬(A ∧ B)',
+              items: ['Сначала считаем A ∧ B', 'Затем отрицаем весь результат', 'Истинно во всех наборах, кроме A = 1, B = 1']
+            },
+            vs: '≠'
+          },
+          {
+            t: 'table',
+            caption: 'Одно и то же A и B, но разные выражения — разные столбцы',
+            head: ['A', 'B', '¬A ∧ B', '¬(A ∧ B)'],
+            rows: [
+              ['0', '0', '0', '<b>1</b>'],
+              ['0', '1', '<b>1</b>', '<b>1</b>'],
+              ['1', '0', '0', '<b>1</b>'],
+              ['1', '1', '0', '0']
+            ],
+            highlight: 0
+          },
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Правило приоритета',
+            text: 'Сначала выполняются действия в скобках, затем отрицание, затем И, и только потом ИЛИ. Импликация и эквивалентность считаются последними, если нет скобок.'
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'Тренируемся на коротких выражениях',
+        lead: 'Считайте по таблице, а не «на глаз». Если сомневаетесь — выпишите четыре строки на бумаге.',
+        tasks: [
+          { title: 'Число строк', q: 'Сколько строк в таблице истинности для двух переменных (без строки заголовка)?', answer: '4', type: 'number', explain: '2² = 4 набора: 00, 01, 10, 11.', hint: 'Каждая переменная удваивает число наборов.' },
+          { title: 'A ∧ ¬B', q: 'A = 1, B = 1. Чему равно A ∧ ¬B?', answer: '0', type: 'number', explain: '¬B = 0, поэтому A ∧ 0 = 0.', hint: 'Сначала посчитайте ¬B, только потом И.' },
+          { title: 'A ∨ B', q: 'A = 0, B = 0. Чему равно A ∨ B?', answer: '0', type: 'number', explain: 'Обе ветви разомкнуты — лампа не горит.', hint: 'ИЛИ даёт 0 только в одном случае.' },
+          { title: 'Порядок наборов', q: 'Какой набор идёт сразу после 01?', answer: ['10', '1 0'], explain: 'Порядок как у двоичных чисел: 00, 01, 10, 11.', hint: 'Считайте наборы числами 0, 1, 2, 3.' },
+          { title: '¬A ∨ B', q: 'A = 1, B = 0. Чему равно ¬A ∨ B?', answer: '0', type: 'number', explain: '¬A = 0, B = 0, значит 0 ∨ 0 = 0.', hint: 'Подставьте значения в промежуточный столбец ¬A.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Все четыре набора выписаны без пропусков и повторов.' },
+          { mark: '1 балл', text: 'Промежуточный столбец заполнен раньше итогового.' },
+          { mark: '1 балл', text: 'Порядок действий объяснён словами: скобки → НЕ → И → ИЛИ.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'Сколько строк в таблице истинности для двух переменных?', options: ['2', '3', '4', '8'], answer: 2, explain: 'Каждая переменная даёт два значения, поэтому 2² = 4 набора.' },
+          { q: 'В каком порядке удобно перебирать наборы A и B?', options: ['00, 11, 01, 10', '00, 01, 10, 11', '11, 10, 01, 00', 'Только 00 и 11'], answer: 1, explain: 'Последовательный порядок помогает не потерять наборы.' },
+          { q: 'Что вычисляют первым в выражении A ∧ ¬B?', options: ['A ∧ B', '¬B', 'A ∨ B', 'Ничего, порядок не важен'], answer: 1, explain: 'Отрицание выполняется раньше конъюнкции.' },
+          { q: 'A = 1, B = 1. Чему равно A ∧ ¬B?', options: ['1', '0', 'Не определено', 'Равно B'], answer: 1, explain: '¬B = 0, поэтому A ∧ 0 = 0.' },
+          { q: 'Чем таблица A ∨ B отличается от A ⊕ B?', options: ['Только в строке 11', 'Только в строке 00', 'Они полностью совпадают', 'В строках 01 и 10'], answer: 0, explain: 'При A = 1, B = 1 ИЛИ даёт 1, а XOR — 0.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'Таблица истинности перебирает все возможные наборы входов.',
+          'Для двух переменных наборов ровно четыре: 00, 01, 10, 11.',
+          'Промежуточные столбцы считаются раньше итогового.',
+          'Скобки и отрицание меняют порядок вычисления и результат.',
+          'Таблица показывает смысл выражения: где оно истинно, а где ложно.'
+        ],
+        ticket: [
+          'Таблица истинности нужна, чтобы ...',
+          'Я заполняю строки в порядке ..., потому что ...',
+          'Если забыть про скобки, то ...'
+        ]
+      }
+    ]
+  });
+
+  /* ==========================================================================
+     УРОК 3. Таблица истинности с тремя переменными
+     ========================================================================== */
+  Q2.add('9-q2-3', {
+    num: 3,
+    cls: '9 класс',
+    title: 'Таблица истинности с тремя переменными',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'Три выключателя: <span class="accent-text">восемь состояний</span>',
+        lead: 'Добавили ещё один выключатель — и число вариантов удвоилось. Теперь таблица длиннее, а ошибку заметить труднее. Значит, нужен строгий порядок заполнения.',
+        goal: 'Строить таблицы истинности для заданного логического выражения.',
+        goalCode: '9.2.1.2',
+        chips: [
+          { icon: 'fas fa-table-cells-large', text: 'Восемь наборов' },
+          { icon: 'fas fa-layer-group', text: 'Блоки по четыре' },
+          { icon: 'fas fa-scale-balanced', text: 'Закон де Моргана' }
+        ],
+        visual: 'truth',
+        visualCaption: 'Три переменные дают 2³ = 8 строк',
+        cta: 'Разложить по блокам'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'Сколько строк в таблице для двух переменных?', options: ['2', '4', '6', '8'], answer: 1, explain: '2² = 4 набора.' },
+          { q: 'Какой набор идёт сразу после 01?', options: ['00', '10', '11', '01'], answer: 1, explain: 'Порядок как у двоичных чисел: 00, 01, 10, 11.' },
+          { q: 'A = 1, B = 1. Чему равно A ∧ ¬B?', options: ['0', '1', 'Равно B', 'Не определено'], answer: 0, explain: '¬B = 0, значит A ∧ 0 = 0.' },
+          { q: 'Что вычисляют первым в выражении ¬A ∨ B?', options: ['A ∨ B', '¬A', 'B → A', 'Ничего'], answer: 1, explain: 'Отрицание имеет более высокий приоритет, чем ИЛИ.' },
+          { q: 'A = 1, B = 0. Чему равно ¬A ∨ B?', options: ['1', '0', 'Равно A', 'Не определено'], answer: 1, explain: '¬A = 0 и B = 0, поэтому 0 ∨ 0 = 0.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · ВОСЕМЬ НАБОРОВ',
+        title: 'Повторяющиеся блоки: главный приём',
+        lead: 'Восемь строк не нужно придумывать заново. Достаточно один раз записать четыре набора для B и C и повторить их дважды.',
+        blocks: [
+          { t: 'svg', svg: TT3_SVG },
+          {
+            t: 'steps',
+            items: [
+              { title: 'Столбец A', text: 'Первые четыре строки — A = 0, последние четыре — A = 1. Ровно половина и половина.' },
+              { title: 'Столбец B', text: 'Внутри каждой половины: две строки 0, две строки 1. Блоки по два.' },
+              { title: 'Столбец C', text: 'Меняется в каждой строке: 0, 1, 0, 1, 0, 1, 0, 1.' },
+              { title: 'Проверка', text: 'Если наборы не повторяются и их ровно восемь — таблица входов заполнена верно.' }
+            ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-lightbulb',
+            title: 'Правило удвоения',
+            text: 'Каждая новая переменная удваивает число строк: 1 переменная — 2 строки, 2 — 4, 3 — 8, 4 — 16. Формула простая: 2ⁿ, где n — число переменных.'
+          },
+          {
+            t: 'table',
+            caption: 'Готовая заготовка входов для трёх переменных',
+            head: ['№', 'A', 'B', 'C'],
+            rows: [
+              ['1', '0', '0', '0'],
+              ['2', '0', '0', '1'],
+              ['3', '0', '1', '0'],
+              ['4', '0', '1', '1'],
+              ['5', '1', '0', '0'],
+              ['6', '1', '0', '1'],
+              ['7', '1', '1', '0'],
+              ['8', '1', '1', '1']
+            ]
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · ЛАБОРАТОРИЯ',
+        title: 'Восемь строк — и ни одной ошибки',
+        lead: 'Выберите выражение и заполните промежуточный столбец и результат. Сначала посчитайте на бумаге, потом проверьте себя кнопкой.',
+        widget: {
+          kind: 'truth',
+          config: {
+            vars: 3,
+            exprs: [
+              { label: '(A ∧ B) ∨ C', expr: '(A & B) | C', mid: { label: 'A ∧ B', expr: 'A & B' } },
+              { label: 'A ∧ (B ∨ C)', expr: 'A & (B | C)', mid: { label: 'B ∨ C', expr: 'B | C' } },
+              { label: '¬(A ∨ B)', expr: '!(A | B)', mid: { label: 'A ∨ B', expr: 'A | B' } }
+            ]
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'good',
+            icon: 'fas fa-circle-check',
+            title: 'Сравните два первых выражения',
+            text: '(A ∧ B) ∨ C и A ∧ (B ∨ C) — не одно и то же. Найдите строку, где их значения различаются, и объясните почему. Это лучший способ понять роль скобок.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · СРАВНЕНИЕ ВЫРАЖЕНИЙ',
+        title: 'Два выражения, которые выглядят по-разному, но совпадают',
+        lead: 'Иногда разные записи дают одинаковый столбец. Это не совпадение, а логический закон — и его можно доказать таблицей.',
+        blocks: [
+          {
+            t: 'table',
+            caption: 'Закон де Моргана: ¬(A ∨ B) = ¬A ∧ ¬B',
+            head: ['A', 'B', '¬(A ∨ B)', '¬A ∧ ¬B', 'Совпадает?'],
+            rows: [
+              ['0', '0', '1', '1', 'да'],
+              ['0', '1', '0', '0', 'да'],
+              ['1', '0', '0', '0', 'да'],
+              ['1', '1', '0', '0', 'да']
+            ]
+          },
+          {
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Формула 1',
+                title: '¬(A ∨ B) = ¬A ∧ ¬B',
+                text: '«Неверно, что включён хотя бы один» означает «оба выключены». Отрицание ИЛИ превращается в И отрицаний.',
+                footer: 'Отрицание ИЛИ → И отрицаний',
+                tone: 'violet'
+              },
+              {
+                badge: 'Формула 2',
+                title: '¬(A ∧ B) = ¬A ∨ ¬B',
+                text: '«Неверно, что включены оба» означает «хотя бы один выключен». Отрицание И превращается в ИЛИ отрицаний.',
+                footer: 'Отрицание И → ИЛИ отрицаний',
+                tone: 'cyan'
+              }
+            ]
+          },
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Как не перепутать',
+            text: 'При раскрытии скобок со знаком отрицания операция меняется на противоположную: И становится ИЛИ, ИЛИ становится И. Само отрицание при этом переходит на каждую переменную.'
+          },
+          {
+            t: 'table',
+            caption: 'А здесь выражения различаются — найдите строку',
+            head: ['A', 'B', 'C', '(A ∧ B) ∨ C', 'A ∧ (B ∨ C)'],
+            rows: [
+              ['0', '0', '1', '<b>1</b>', '0'],
+              ['0', '1', '0', '0', '0'],
+              ['1', '0', '1', '<b>1</b>', '<b>1</b>'],
+              ['1', '1', '0', '<b>1</b>', '<b>1</b>']
+            ],
+            highlight: 0
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'Три переменные на бумаге',
+        lead: 'Сначала выпишите восемь наборов, затем считайте. Не пытайтесь угадать ответ по названию выражения.',
+        tasks: [
+          { title: 'Число наборов', q: 'Сколько строк в таблице истинности для трёх переменных?', answer: '8', type: 'number', explain: '2³ = 8 наборов.', hint: 'Каждая переменная удваивает число строк.' },
+          { title: 'Скобки и ИЛИ', q: 'A = 1, B = 1, C = 0. Чему равно (A ∧ B) ∨ C?', answer: '1', type: 'number', explain: 'A ∧ B = 1, затем 1 ∨ 0 = 1.', hint: 'Сначала действие в скобках.' },
+          { title: 'Скобки и И', q: 'A = 0, B = 1, C = 1. Чему равно A ∧ (B ∨ C)?', answer: '0', type: 'number', explain: 'B ∨ C = 1, но A = 0, поэтому 0 ∧ 1 = 0.', hint: 'И требует единицу с обеих сторон.' },
+          { title: 'Отрицание суммы', q: 'A = 1, B = 1, C = 0. Чему равно ¬(A ∨ B)?', answer: '0', type: 'number', explain: 'A ∨ B = 1, отрицание даёт 0.', hint: 'Сначала посчитайте, что внутри скобок.' },
+          { title: 'Закон де Моргана', q: 'Запишите ¬(A ∨ B) по закону де Моргана.', answer: ['¬A ∧ ¬B', '!A & !B', 'не A и не B'], explain: 'Отрицание ИЛИ равно И отрицаний.', hint: 'Операция меняется на противоположную, отрицание переходит на каждую переменную.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Восемь наборов входов выписаны без пропусков.' },
+          { mark: '2 балла', text: 'Промежуточные столбцы заполнены верно и раньше итогового.' },
+          { mark: '1 балл', text: 'Различие двух похожих выражений объяснено конкретной строкой таблицы.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'Сколько наборов у трёх переменных?', options: ['3', '6', '8', '9'], answer: 2, explain: '2³ = 8 наборов.' },
+          { q: 'Как удобно заполнять столбец A для восьми строк?', options: ['Четыре нуля, затем четыре единицы', 'Случайно', 'Только единицы', 'Чередовать 0 и 1 в каждой строке'], answer: 0, explain: 'Сначала идут четыре строки с A = 0, затем четыре с A = 1.' },
+          { q: 'Что задают скобки в выражении (A ∨ B) ∧ C?', options: ['Сначала ИЛИ, затем И', 'Сначала И, затем ИЛИ', 'Ничего не задают', 'Заменяют НЕ'], answer: 0, explain: 'Действие в скобках выполняется первым.' },
+          { q: 'A = 1, B = 1, C = 0. Чему равно (A ∧ B) ∨ C?', options: ['0', '1', 'Не определено', 'Равно C'], answer: 1, explain: 'A ∧ B = 1, затем 1 ∨ 0 = 1.' },
+          { q: 'Какое равенство выражает закон де Моргана?', options: ['¬(A ∨ B) = ¬A ∧ ¬B', '¬(A ∨ B) = ¬A ∨ ¬B', 'A ∧ B = A ∨ B', '¬A = A'], answer: 0, explain: 'Отрицание ИЛИ равно И отрицаний.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'Три переменные дают 2³ = 8 наборов.',
+          'Столбцы заполняются блоками: A — по четыре, B — по два, C — через строку.',
+          'Промежуточные столбцы защищают от ошибок в длинных выражениях.',
+          'Разные записи могут давать одинаковый столбец — это логический закон.',
+          'Закон де Моргана: ¬(A ∨ B) = ¬A ∧ ¬B и ¬(A ∧ B) = ¬A ∨ ¬B.'
+        ],
+        ticket: [
+          'Восемь строк удобно заполнять так: ...',
+          'Скобки в выражении нужны, чтобы ...',
+          'Закон де Моргана я объясню на примере ...'
+        ]
+      }
+    ]
+  });
+
+  /* ==========================================================================
+     УРОК 4. Логические элементы И, ИЛИ, НЕ
+     ========================================================================== */
+  Q2.add('9-q2-4', {
+    num: 4,
+    cls: '9 класс',
+    title: 'Логические элементы И, ИЛИ, НЕ',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'Логические элементы: <span class="accent-text">кирпичи процессора</span>',
+        lead: 'Внутри компьютера нет «умных» деталей. Есть миллиарды простых схем, каждая из которых умеет только одно: превращать входные сигналы в выходной по правилу И, ИЛИ или НЕ.',
+        goal: 'Объяснять принципы работы логических элементов компьютера (И, ИЛИ, НЕ, XOR).',
+        goalCode: '9.3.2.1',
+        chips: [
+          { icon: 'fas fa-microchip', text: 'Вход и выход' },
+          { icon: 'fas fa-bolt', text: 'Сигналы 0 и 1' },
+          { icon: 'fas fa-diagram-project', text: 'Условные обозначения' }
+        ],
+        visual: 'gate',
+        visualCaption: 'Четыре элемента, из которых собираются любые вычисления',
+        cta: 'Подать сигнал на вход'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'Сколько строк в таблице для трёх переменных?', options: ['3', '6', '8', '12'], answer: 2, explain: '2³ = 8 наборов.' },
+          { q: 'Как заполняется столбец A для восьми строк?', options: ['Через строку', 'Четыре нуля, четыре единицы', 'Только нули', 'Случайно'], answer: 1, explain: 'Половина строк с A = 0, половина с A = 1.' },
+          { q: 'A = 0, B = 1, C = 1. Чему равно A ∧ (B ∨ C)?', options: ['1', '0', 'Равно C', 'Не определено'], answer: 1, explain: 'Внутри скобок 1, но A = 0, поэтому результат 0.' },
+          { q: 'Какое равенство верно?', options: ['¬(A ∨ B) = ¬A ∧ ¬B', '¬(A ∨ B) = ¬A ∨ ¬B', '¬(A ∧ B) = ¬A ∧ ¬B', '¬A = A'], answer: 0, explain: 'Это закон де Моргана: отрицание ИЛИ равно И отрицаний.' },
+          { q: 'Сколько наборов дадут четыре переменные?', options: ['8', '12', '16', '32'], answer: 2, explain: '2⁴ = 16 наборов.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · СИГНАЛ',
+        title: 'Один провод, два состояния',
+        lead: 'Логический элемент — это маленькая схема с входами и одним выходом. На каждом проводе в любой момент либо есть напряжение, либо нет.',
+        blocks: [
+          { t: 'svg', svg: GATES_SVG },
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              { badge: '1', title: 'Есть сигнал', text: 'Напряжение подано, выключатель замкнут, утверждение истинно. В схемах это единица.', tone: 'green' },
+              { badge: '0', title: 'Нет сигнала', text: 'Цепь разомкнута, напряжения нет, утверждение ложно. В схемах это ноль.', tone: 'violet' },
+              { badge: 'Выход', title: 'Результат операции', text: 'Элемент читает входы и выдаёт 0 или 1 по своему правилу. Этот выход может стать входом следующего элемента.', tone: 'cyan' }
+            ]
+          },
+          {
+            t: 'table',
+            caption: 'Три элемента и их поведение на всех наборах',
+            head: ['A', 'B', 'И (A ∧ B)', 'ИЛИ (A ∨ B)', 'НЕ (¬A)'],
+            rows: [
+              ['0', '0', '0', '0', '1'],
+              ['0', '1', '0', '1', '1'],
+              ['1', '0', '0', '1', '0'],
+              ['1', '1', '1', '1', '0']
+            ],
+            highlight: 3
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-microchip',
+            title: 'Почему это важно',
+            text: 'Процессор складывает числа, сравнивает адреса и проверяет условия именно такими элементами. Из И, ИЛИ и НЕ собирается сумматор — схема, которая умеет складывать двоичные числа.'
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · ЛАБОРАТОРИЯ',
+        title: 'Пульт из трёх элементов',
+        lead: 'Переключайте A и B и наблюдайте за лампой. Затем выполните задание внизу: включите лампу нужным элементом.',
+        widget: {
+          kind: 'lamp',
+          config: {
+            gate: 'or',
+            a: 0,
+            b: 0,
+            gates: ['and', 'or', 'not'],
+            task: {
+              gate: 'and',
+              a: 1,
+              b: 1,
+              text: 'Верно: выбран элемент И, оба выключателя включены — лампа горит. При одном выключенном она погаснет.'
+            }
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'good',
+            icon: 'fas fa-list-check',
+            title: 'Три проверки',
+            text: '1) Элемент И: лампа горит только при двух единицах. 2) Элемент ИЛИ: гаснет только при двух нулях. 3) Элемент НЕ: при переключении A лампа меняет состояние на противоположное.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · ОБОЗНАЧЕНИЯ',
+        title: 'Как элементы рисуют на схемах',
+        lead: 'Форма фигуры подсказывает правило. Запомнив три фигуры, вы сможете читать любую логическую схему.',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              { badge: 'D-образная', title: 'Конъюнктор (И)', text: 'Плоский вход слева, закруглённый выход справа. Внутри пишут ∧ или &, на схемах ГОСТ — 1.', footer: 'Выход 1 только при двух 1', tone: 'violet' },
+              { badge: 'Щитовидная', title: 'Дизъюнктор (ИЛИ)', text: 'Входная сторона вогнутая, выход заострённый. Внутри пишут ∨ или 1.', footer: 'Выход 1 при любой 1', tone: 'cyan' },
+              { badge: 'Треугольник', title: 'Инвертор (НЕ)', text: 'Треугольник с кружком на выходе. Кружок означает отрицание.', footer: 'Выход противоположен входу', tone: 'amber' }
+            ]
+          },
+          {
+            t: 'compare',
+            left: {
+              title: 'Что делает элемент',
+              items: ['Читает сигналы на входах', 'Применяет своё правило', 'Выдаёт один результат на выход']
+            },
+            right: {
+              title: 'Чего элемент не делает',
+              items: ['Не хранит предыдущие значения', 'Не «понимает» смысл сигнала', 'Не работает без подачи питания']
+            },
+            vs: 'и'
+          },
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Вход и выход нельзя путать',
+            text: 'Если перепутать стороны, схема перестанет быть схемой: сигнал идёт строго слева направо. Направление показывает, где входы, а где результат.'
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'Подберите элемент под ситуацию',
+        lead: 'Сначала соедините ситуацию с элементом, затем решите короткие задачи.',
+        before: [
+          {
+            t: 'widget',
+            kind: 'match',
+            config: {
+              prompt: 'Нажмите на ситуацию слева, затем на подходящий элемент справа.',
+              pairs: [
+                { left: 'Лампа горит, только если включены оба выключателя', right: 'И' },
+                { left: 'Лампа горит, если включён хотя бы один выключатель', right: 'ИЛИ' },
+                { left: 'Лампа горит, когда выключатель разомкнут', right: 'НЕ' },
+                { left: 'Сигнал «стоп» запрещает запуск механизма', right: 'НЕ' }
+              ]
+            }
+          }
+        ],
+        tasks: [
+          { title: 'Выход элемента', q: 'На входе элемента И сигналы 1 и 0. Что на выходе?', answer: '0', type: 'number', explain: 'И выдаёт 1 только при двух единицах.', hint: 'Последовательная цепь разорвана одним выключателем.' },
+          { title: 'Выход элемента', q: 'На входе элемента ИЛИ сигналы 0 и 0. Что на выходе?', answer: '0', type: 'number', explain: 'ИЛИ даёт 0 только при двух нулях.', hint: 'Обе ветви разомкнуты.' },
+          { title: 'Инвертор', q: 'На входе элемента НЕ сигнал 0. Что на выходе?', answer: '1', type: 'number', explain: 'Инвертор переворачивает сигнал.', hint: 'НЕ меняет значение на противоположное.' },
+          { title: 'Выбор элемента', q: 'Нужно, чтобы сигнал тревоги включался при срабатывании датчика двери И датчика движения. Какой элемент использовать?', answer: ['и', 'and', 'конъюнктор', '∧'], explain: 'Нужны оба сигнала одновременно — это И.', hint: 'Если хотя бы одного сигнала нет, тревоги быть не должно.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Все четыре ситуации сопоставлены с элементами без ошибок.' },
+          { mark: '1 балл', text: 'Значения на выходах найдены по таблице, а не наугад.' },
+          { mark: '1 балл', text: 'Для тревоги объяснено, почему нужен именно элемент И.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'Что означает сигнал 1 на входе логического элемента?', options: ['Есть сигнал / истина', 'Нет сигнала / ложь', 'Ошибку', 'Только число 1'], answer: 0, explain: '1 обозначает наличие сигнала или истину, 0 — отсутствие или ложь.' },
+          { q: 'Какой элемент даёт 1 только при двух единицах на входе?', options: ['ИЛИ', 'И', 'НЕ', 'XOR'], answer: 1, explain: 'Конъюнктор (И) выдаёт 1 только при A = 1 и B = 1.' },
+          { q: 'Какой элемент инвертирует сигнал?', options: ['И', 'ИЛИ', 'НЕ', 'XOR'], answer: 2, explain: 'Инвертор (НЕ) превращает 0 в 1, а 1 в 0.' },
+          { q: 'Лампа должна гореть, если включён любой из двух выключателей. Какой элемент нужен?', options: ['И', 'ИЛИ', 'НЕ', 'Никакой'], answer: 1, explain: 'Достаточно одного сигнала — это дизъюнктор (ИЛИ).' },
+          { q: 'Что происходит с выходом элемента НЕ при входе 0?', options: ['Выход 0', 'Выход 1', 'Выход не меняется', 'Схема выключается'], answer: 1, explain: 'НЕ инвертирует: ¬0 = 1.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'Логический элемент читает входы и выдаёт один выход: 0 или 1.',
+          'И даёт 1 только при двух единицах, ИЛИ — при хотя бы одной.',
+          'НЕ переворачивает сигнал.',
+          'Форма фигуры на схеме подсказывает операцию.',
+          'Из простых элементов собираются сумматоры и вся логика процессора.'
+        ],
+        ticket: [
+          'Элемент И удобен, когда нужно ...',
+          'Элемент ИЛИ удобен, когда нужно ...',
+          'Без элемента НЕ нельзя было бы ...'
+        ]
+      }
+    ]
+  });
+
+  /* ==========================================================================
+     УРОК 5. XOR и соединение элементов
+     ========================================================================== */
+  Q2.add('9-q2-5', {
+    num: 5,
+    cls: '9 класс',
+    title: 'XOR и соединение элементов',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'XOR: «или одно, <span class="accent-text">или другое</span>, но не оба»',
+        lead: 'Обычное ИЛИ слишком щедрое: оно включает лампу и тогда, когда сигналы пришли сразу по двум проводам. Иногда нужно строгое правило — ровно один сигнал.',
+        goal: 'Объяснять принципы работы логических элементов компьютера, включая XOR и соединение элементов.',
+        goalCode: '9.3.2.1',
+        chips: [
+          { icon: 'fas fa-code-branch', text: 'Исключающее ИЛИ' },
+          { icon: 'fas fa-link', text: 'Цепочки элементов' },
+          { icon: 'fas fa-arrow-right-arrow-left', text: 'Промежуточный сигнал' }
+        ],
+        visual: 'gate',
+        visualCaption: 'Проходной выключатель — живой пример XOR',
+        cta: 'Собрать цепочку'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'Какой элемент даёт 1 только при двух единицах на входе?', options: ['И', 'ИЛИ', 'НЕ', 'XOR'], answer: 0, explain: 'Это конъюнктор (И).' },
+          { q: 'Какой элемент переворачивает сигнал?', options: ['И', 'ИЛИ', 'НЕ', 'XOR'], answer: 2, explain: 'Инвертор (НЕ): ¬0 = 1, ¬1 = 0.' },
+          { q: 'Лампа горит, если включён хотя бы один выключатель. Какой элемент использован?', options: ['И', 'ИЛИ', 'НЕ', 'Никакой'], answer: 1, explain: 'Достаточно одного сигнала — это ИЛИ.' },
+          { q: 'На входе НЕ сигнал 0. Что на выходе?', options: ['0', '1', 'Не меняется', 'Ошибка'], answer: 1, explain: 'Инвертор превращает 0 в 1.' },
+          { q: 'Что означает 1 на проводе схемы?', options: ['Есть сигнал', 'Нет сигнала', 'Провод сломан', 'Сигнал неизвестен'], answer: 0, explain: '1 — наличие напряжения, то есть истина.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · ИСКЛЮЧАЮЩЕЕ ИЛИ',
+        title: 'Одна лампа, два выключателя, проходная схема',
+        lead: 'Представьте лестницу: светом управляют два проходных выключателя. Щёлкнули любым — свет изменился. Включили оба — свет погас. Это и есть XOR.',
+        blocks: [
+          { t: 'svg', svg: XOR_GATE_SVG },
+          {
+            t: 'table',
+            caption: 'Сравните ИЛИ и XOR на одних и тех же наборах',
+            head: ['A', 'B', 'A ∨ B (ИЛИ)', 'A ⊕ B (XOR)'],
+            rows: [
+              ['0', '0', '0', '0'],
+              ['0', '1', '1', '1'],
+              ['1', '0', '1', '1'],
+              ['1', '1', '1', '0']
+            ],
+            highlight: 3
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-lightbulb',
+            title: 'Формула словами',
+            text: 'A ⊕ B = «A или B, но не оба сразу». Через уже знакомые операции это записывают так: (A ∨ B) ∧ ¬(A ∧ B).'
+          },
+          {
+            t: 'cards',
+            cols: 2,
+            items: [
+              { badge: 'ИЛИ', title: 'Мягкое правило', text: 'Пропускает всё, где есть хотя бы один сигнал. Два сигнала — тоже норма.', tone: 'cyan' },
+              { badge: 'XOR', title: 'Строгое правило', text: 'Пропускает только нечётное число сигналов. Два сигнала гасят друг друга.', tone: 'violet' }
+            ]
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · ЛАБОРАТОРИЯ',
+        title: 'Поймайте разницу между ИЛИ и XOR',
+        lead: 'Переключайте элементы и наборы A/B. Обратите внимание на строку 1 и 1: у ИЛИ лампа горит, у XOR — нет.',
+        widget: {
+          kind: 'lamp',
+          config: {
+            gate: 'xor',
+            a: 1,
+            b: 1,
+            gates: ['or', 'xor', 'and'],
+            task: {
+              gate: 'xor',
+              a: 1,
+              b: 0,
+              text: 'Верно: выбран XOR, включён ровно один выключатель — лампа горит. Попробуйте включить второй: лампа погаснет.'
+            }
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Главная ловушка',
+            text: 'В быту «или» часто означает «одно из двух». В логике ИЛИ разрешает оба сигнала, а строгое «одно из двух» — это XOR. На СОР формулировку читают буквально.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · ЦЕПОЧКИ',
+        title: 'Выход одного элемента — вход другого',
+        lead: 'Сложные схемы собираются из простых. Сигнал проходит по цепочке, и на каждом шаге появляется промежуточный результат.',
+        blocks: [
+          {
+            t: 'widget',
+            kind: 'chain',
+            config: { g1: 'and', g2: 'not', a: 1, b: 1 }
+          },
+          {
+            t: 'steps',
+            items: [
+              { title: 'Шаг 1. Читаем входы', text: 'A = 1, B = 1. Оба провода под напряжением.' },
+              { title: 'Шаг 2. Первый элемент', text: 'S1 = A ∧ B = 1 ∧ 1 = 1. Промежуточный сигнал равен единице.' },
+              { title: 'Шаг 3. Второй элемент', text: 'Y = ¬S1 = ¬1 = 0. Инвертор гасит лампу.' },
+              { title: 'Шаг 4. Записываем выражение', text: 'Y = ¬(A ∧ B). Такая схема — «не оба сразу», элемент И-НЕ.' }
+            ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-diagram-project',
+            title: 'Правило чтения цепочки',
+            text: 'Двигайтесь слева направо и подписывайте каждый провод: A, B, затем S1, S2 … и только в конце Y. Так ошибка видна сразу, а не в последней строке таблицы.'
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'Считаем цепочки вручную',
+        lead: 'Решите задачи без схемы: подставляйте числа шаг за шагом и записывайте промежуточные сигналы.',
+        tasks: [
+          { title: 'Промежуточный сигнал', q: 'A = 1, B = 0. Чему равно S1 = A ∧ B?', answer: '0', type: 'number', explain: '1 ∧ 0 = 0.', hint: 'Для И нужны две единицы.' },
+          { title: 'Второй шаг', q: 'S1 = 0. Чему равно Y = ¬S1?', answer: '1', type: 'number', explain: '¬0 = 1.', hint: 'Инвертор меняет значение.' },
+          { title: 'XOR', q: 'A = 1, B = 1. Чему равно A ⊕ B?', answer: '0', type: 'number', explain: 'Два сигнала гасят друг друга.', hint: 'XOR пропускает только один сигнал.' },
+          { title: 'Выбор элемента', q: 'Нужно, чтобы лампа горела, когда включён ровно один из двух выключателей. Какой элемент подходит?', answer: ['xor', 'исключающее или', '⊕'], explain: 'Строгое «одно из двух» — это XOR.', hint: 'ИЛИ здесь не подойдёт: оно разрешает и два сигнала.' },
+          { title: 'Выражение', q: 'Запишите выражение схемы: A и B подаются на И, результат инвертируется.', answer: ['¬(a∧b)', '¬(a&b)', 'не(a и b)', '¬(a и b)', 'not(a and b)'], explain: 'Сначала И, затем НЕ: Y = ¬(A ∧ B).', hint: 'Инвертор стоит после конъюнктора.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Промежуточный сигнал найден до вычисления выхода.' },
+          { mark: '1 балл', text: 'XOR не путается с ИЛИ на наборе 1 и 1.' },
+          { mark: '1 балл', text: 'Выражение записано со скобками и знаком отрицания.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'Чем XOR отличается от ИЛИ?', options: ['XOR даёт 0 при двух единицах', 'XOR даёт 0 при двух нулях', 'XOR не имеет таблицы', 'Они одинаковы'], answer: 0, explain: 'XOR запрещает одновременные сигналы: 1 ⊕ 1 = 0.' },
+          { q: 'A = 0, B = 1. Чему равно A ⊕ B?', options: ['0', '1', 'Не определено', 'Зависит от схемы'], answer: 1, explain: 'Ровно один сигнал — XOR даёт 1.' },
+          { q: 'Что такое промежуточный сигнал?', options: ['Выход одного элемента, который идёт на вход следующего', 'Питание схемы', 'Ошибка в цепи', 'Значение лампы'], answer: 0, explain: 'В цепочке сигнал между элементами называют промежуточным.' },
+          { q: 'Y = ¬(A ∧ B). Чему равен Y при A = 1, B = 1?', options: ['1', '0', '2', 'Не определено'], answer: 1, explain: 'A ∧ B = 1, отрицание даёт 0.' },
+          { q: 'Бытовой проходной выключатель на лестнице реализует...', options: ['И', 'ИЛИ', 'XOR', 'НЕ'], answer: 2, explain: 'Щелчок любым выключателем меняет состояние — это XOR.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'XOR даёт 1, когда сигнал пришёл ровно по одному проводу.',
+          'Формула XOR: (A ∨ B) ∧ ¬(A ∧ B).',
+          'Сложная схема — это цепочка простых элементов.',
+          'Промежуточный сигнал подписывают, чтобы не запутаться.',
+          'Выражение читают слева направо, учитывая скобки.'
+        ],
+        ticket: [
+          'XOR отличается от ИЛИ тем, что ...',
+          'Промежуточный сигнал нужен, чтобы ...',
+          'Читая цепочку, я сначала ..., а потом ...'
+        ]
+      }
+    ]
+  });
+
+  /* ==========================================================================
+     УРОК 6. Из выражения в логическую схему
+     ========================================================================== */
+  Q2.add('9-q2-6', {
+    num: 6,
+    cls: '9 класс',
+    title: 'Из выражения в логическую схему',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'Формула превращается в <span class="accent-text">схему</span>',
+        lead: 'Инженер получает задание словами или формулой, а собирает схему из элементов. Между записью и чертежом есть всего четыре шага — и они всегда одинаковые.',
+        goal: 'Строить логические схемы по логическим выражениям.',
+        goalCode: '9.3.2.2',
+        chips: [
+          { icon: 'fas fa-shoe-prints', text: 'Алгоритм из 4 шагов' },
+          { icon: 'fas fa-code', text: 'Выражение → чертёж' },
+          { icon: 'fas fa-clipboard-check', text: 'Подготовка к СОР №2' }
+        ],
+        visual: 'circuit',
+        visualCaption: 'Одна формула — одна схема, без лишних деталей',
+        cta: 'Собрать первую схему'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'Чем XOR отличается от ИЛИ?', options: ['Даёт 0 при двух единицах', 'Даёт 0 при двух нулях', 'Не имеет таблицы', 'Ничем'], answer: 0, explain: '1 ⊕ 1 = 0, тогда как 1 ∨ 1 = 1.' },
+          { q: 'A = 1, B = 0. Чему равно A ⊕ B?', options: ['0', '1', '2', 'Не определено'], answer: 1, explain: 'Ровно один сигнал — результат 1.' },
+          { q: 'Что такое промежуточный сигнал?', options: ['Выход элемента, идущий на вход следующего', 'Питание схемы', 'Значение лампы', 'Ошибка'], answer: 0, explain: 'Это сигнал между двумя элементами цепочки.' },
+          { q: 'Y = ¬(A ∧ B), A = 1, B = 1. Чему равен Y?', options: ['1', '0', '2', 'Не определено'], answer: 1, explain: 'A ∧ B = 1, инверсия даёт 0.' },
+          { q: 'Проходной выключатель на лестнице — это...', options: ['И', 'ИЛИ', 'XOR', 'НЕ'], answer: 2, explain: 'Любой щелчок меняет состояние — XOR.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · АЛГОРИТМ',
+        title: 'Четыре шага построения',
+        lead: 'Не начинайте рисовать сразу. Сначала разберите формулу на действия — так же, как разбираете пример по математике.',
+        blocks: [
+          { t: 'svg', svg: BUILD_SVG },
+          {
+            t: 'steps',
+            items: [
+              { title: 'Шаг 1. Найдите главное действие', text: 'Это операция, которая выполняется последней. Она окажется ближе всего к выходу Y.' },
+              { title: 'Шаг 2. Разберите скобки', text: 'Выражение в скобках вычисляется раньше — значит, его элемент стоит левее, у входов.' },
+              { title: 'Шаг 3. Подпишите провода', text: 'Входы A и B слева. Выход первого элемента — S1. Выход второго — Y.' },
+              { title: 'Шаг 4. Соедините и проверьте', text: 'Проведите линии без пересечений и проверьте схему на одном наборе: например, A = 1, B = 0.' }
+            ]
+          },
+          {
+            t: 'table',
+            caption: 'Порядок действий в выражении',
+            head: ['Что в выражении', 'Что рисуем', 'Где на схеме'],
+            rows: [
+              ['Действие в скобках', 'Первый элемент', 'Левее, у входов'],
+              ['Отрицание над скобкой', 'Инвертор (НЕ)', 'Правее скобок'],
+              ['Главное действие', 'Последний элемент', 'У выхода Y'],
+              ['Одна буква', 'Просто провод', 'Вход слева']
+            ]
+          },
+          {
+            t: 'callout',
+            tone: 'good',
+            icon: 'fas fa-check',
+            title: 'Проверка на одном наборе',
+            text: 'Подставьте A = 1, B = 0 и пройдите схему глазами. Если получилось не то, что даёт формула, — ошибка в порядке элементов, а не в рисовании.'
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · КОНСТРУКТОР',
+        title: 'Соберите схему по формуле',
+        lead: 'В каждой задаче уже нарисованы провода. Ваше дело — выбрать правильные элементы. Начните с первой формулы, затем перейдите ко второй.',
+        widget: {
+          kind: 'circuit',
+          config: {
+            mode: 'build',
+            tasks: [
+              {
+                label: 'A ∧ B ∨ C',
+                inputs: ['A', 'B', 'C'],
+                slots: [
+                  { op: 'and', src: ['A', 'B'] },
+                  { op: 'or', src: ['S1', 'C'] }
+                ],
+                hint: 'Сначала И для A и B, затем ИЛИ с C.'
+              },
+              {
+                label: '¬(A ∨ B)',
+                inputs: ['A', 'B'],
+                slots: [
+                  { op: 'or', src: ['A', 'B'] },
+                  { op: 'not', src: ['S1'] }
+                ],
+                hint: 'Скобки выполняются первыми, отрицание — последним.'
+              },
+              {
+                label: '(A ∨ B) ∧ ¬C',
+                inputs: ['A', 'B', 'C'],
+                slots: [
+                  { op: 'or', src: ['A', 'B'] },
+                  { op: 'and', src: ['S1', 'C'] }
+                ],
+                hint: 'Внимание: в формуле есть отрицание C — сравните с тем, что даёт конструктор, и обсудите с учителем, как дорисовать инвертор.'
+              }
+            ]
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Про третью задачу',
+            text: 'В конструкторе два элемента, поэтому отрицание над отдельной буквой показывают отдельным инвертором перед входом. На бумаге это маленький треугольник с кружком слева от основного элемента.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · ПРИМЕР',
+        title: 'Разбираем формулу по шагам',
+        lead: 'Формула: Y = (A ∨ B) ∧ ¬C. Три операции, три элемента — но один из них стоит отдельно.',
+        blocks: [
+          {
+            t: 'html',
+            html: '<div class="q2-worked"><div class="q2-worked-line"><span class="q2-worked-num">1</span><div><b>Главное действие</b> — И между скобкой и ¬C. Значит, конъюнктор будет последним, у выхода Y.</div></div><div class="q2-worked-line"><span class="q2-worked-num">2</span><div><b>Скобка (A ∨ B)</b> — дизъюнктор у входов, его выход подписываем S1.</div></div><div class="q2-worked-line"><span class="q2-worked-num">3</span><div><b>¬C</b> — отдельный инвертор на входе C, его выход S2.</div></div><div class="q2-worked-line"><span class="q2-worked-num">4</span><div><b>Соединяем</b>: S1 и S2 идут на входы конъюнктора. Выход — Y.</div></div></div>'
+          },
+          {
+            t: 'table',
+            caption: 'Проверка схемы на наборе A = 1, B = 0, C = 1',
+            head: ['Шаг', 'Вычисление', 'Значение'],
+            rows: [
+              ['S1 = A ∨ B', '1 ∨ 0', '1'],
+              ['S2 = ¬C', '¬1', '0'],
+              ['Y = S1 ∧ S2', '1 ∧ 0', '0'],
+              ['По формуле', '(1 ∨ 0) ∧ ¬1', '0']
+            ],
+            highlight: 2
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-ruler',
+            title: 'Правило оформления',
+            text: 'На СОР схему рисуют слева направо, подписывают входы и выход, а промежуточные сигналы обозначают S1, S2. За это дают отдельный балл.'
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'От формулы к чертежу',
+        lead: 'Отвечайте коротко: порядок элементов и промежуточные сигналы важнее красивых линий.',
+        tasks: [
+          { title: 'Главное действие', q: 'Какая операция выполняется последней в выражении A ∧ B ∨ C?', answer: ['или', 'or', '∨', 'дизъюнкция'], explain: 'И выполняется раньше ИЛИ, значит последнее действие — ИЛИ.', hint: 'Вспомните приоритет: НЕ, затем И, затем ИЛИ.' },
+          { title: 'Сколько элементов', q: 'Сколько логических элементов нужно для схемы Y = ¬(A ∨ B)?', answer: '2', type: 'number', explain: 'Один дизъюнктор и один инвертор.', hint: 'Скобка — это один элемент, отрицание — второй.' },
+          { title: 'Первый элемент', q: 'Какой элемент стоит первым (ближе к входам) в схеме для Y = ¬(A ∧ B)?', answer: ['и', 'and', 'конъюнктор', '∧'], explain: 'Сначала выполняется И, потом отрицание.', hint: 'Действие в скобках всегда раньше.' },
+          { title: 'Промежуточный сигнал', q: 'A = 0, B = 1. Чему равен S1 в схеме для Y = ¬(A ∨ B)?', answer: '1', type: 'number', explain: 'S1 = 0 ∨ 1 = 1.', hint: 'Сначала вычислите скобку.' },
+          { title: 'Проверка', q: 'A = 0, B = 1. Чему равен Y в схеме для Y = ¬(A ∨ B)?', answer: '0', type: 'number', explain: 'S1 = 1, инверсия даёт 0.', hint: 'Инвертор меняет значение S1.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Главное действие определено верно с учётом приоритета.' },
+          { mark: '1 балл', text: 'Количество элементов совпадает с числом операций.' },
+          { mark: '1 балл', text: 'Промежуточные сигналы вычислены до выхода.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'Что рисуют ближе всего к выходу Y?', options: ['Действие в скобках', 'Главное (последнее) действие', 'Первый вход', 'Питание'], answer: 1, explain: 'Последнее действие формулы — последний элемент схемы.' },
+          { q: 'Сколько элементов нужно для A ∧ B ∨ C?', options: ['1', '2', '3', '4'], answer: 1, explain: 'Одно И и одно ИЛИ — два элемента.' },
+          { q: 'С чего начинают построение схемы?', options: ['С рисования лампы', 'С определения главного действия', 'С выбора проводов', 'С таблицы истинности на 8 строк'], answer: 1, explain: 'Сначала находят операцию, выполняемую последней.' },
+          { q: 'Как обозначают выход первого элемента в цепочке?', options: ['Y', 'A', 'S1', 'B'], answer: 2, explain: 'Промежуточные сигналы подписывают S1, S2 и далее.' },
+          { q: 'Y = ¬(A ∨ B), A = 1, B = 0. Чему равен Y?', options: ['1', '0', '2', 'Не определено'], answer: 1, explain: 'A ∨ B = 1, инверсия даёт 0.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'Построение схемы начинается с поиска последнего действия.',
+          'Скобки выполняются раньше — их элементы стоят левее.',
+          'Каждая операция — один элемент, каждая связь — провод.',
+          'Промежуточные сигналы подписывают S1, S2 …',
+          'Схему проверяют на одном конкретном наборе значений.'
+        ],
+        ticket: [
+          'Главное действие я нахожу так: ...',
+          'Если в формуле есть скобки, то на схеме ...',
+          'Проверить схему можно, если ...'
+        ]
+      }
+    ]
+  });
+
+  /* ==========================================================================
+     УРОК 7. Из схемы в выражение
+     ========================================================================== */
+  Q2.add('9-q2-7', {
+    num: 7,
+    cls: '9 класс',
+    title: 'Из схемы в выражение',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'Прочитать чертёж и <span class="accent-text">записать формулу</span>',
+        lead: 'Обратная задача встречается чаще: перед вами схема, и нужно понять, что она вычисляет. Здесь помогает движение от выхода назад, к входам.',
+        goal: 'Записывать логические выражения по логическим схемам.',
+        goalCode: '9.3.2.2',
+        chips: [
+          { icon: 'fas fa-arrow-left', text: 'Чтение от выхода' },
+          { icon: 'fas fa-layer-group', text: 'Скобки по сигналам' },
+          { icon: 'fas fa-clipboard-check', text: 'Подготовка к СОР №2' }
+        ],
+        visual: 'circuit',
+        visualCaption: 'Провод — это связь, элемент — это операция',
+        cta: 'Прочитать схему'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'Что рисуют ближе всего к выходу Y?', options: ['Скобку', 'Последнее действие', 'Первый вход', 'Питание'], answer: 1, explain: 'Последнее действие формулы — последний элемент схемы.' },
+          { q: 'Сколько элементов нужно для A ∧ B ∨ C?', options: ['1', '2', '3', '4'], answer: 1, explain: 'Одно И и одно ИЛИ.' },
+          { q: 'С чего начинают построение схемы?', options: ['С лампы', 'С главного действия', 'С проводов', 'С таблицы на 8 строк'], answer: 1, explain: 'Сначала определяют последнюю операцию.' },
+          { q: 'Как подписывают промежуточный сигнал?', options: ['Y', 'A', 'S1', 'Z'], answer: 2, explain: 'Промежуточные сигналы обозначают S1, S2 …' },
+          { q: 'Y = ¬(A ∨ B), A = 1, B = 0. Чему равен Y?', options: ['1', '0', '2', 'Не определено'], answer: 1, explain: 'A ∨ B = 1, инверсия даёт 0.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · ЧТЕНИЕ',
+        title: 'Идите от выхода назад',
+        lead: 'Держите в голове один вопрос: «что стоит прямо перед выходом?». Ответ на него — последняя операция выражения.',
+        blocks: [
+          { t: 'svg', svg: READ_SVG },
+          {
+            t: 'steps',
+            items: [
+              { title: 'Шаг 1. Найдите выход Y', text: 'Элемент, соединённый с Y напрямую, даёт главную операцию.' },
+              { title: 'Шаг 2. Посмотрите на его входы', text: 'Что приходит на входы: буквы A, B, C или промежуточные сигналы S1, S2?' },
+              { title: 'Шаг 3. Разверните промежуточный сигнал', text: 'Замените S1 на выражение, которое его породило. Это выражение берут в скобки.' },
+              { title: 'Шаг 4. Проверьте на наборе', text: 'Подставьте значения в формулу и пройдите схему. Совпало — запись верна.' }
+            ]
+          },
+          {
+            t: 'table',
+            caption: 'Как элемент превращается в знак',
+            head: ['Элемент на схеме', 'Знак в выражении', 'Скобки'],
+            rows: [
+              ['Конъюнктор (D-форма)', '∧', 'Нужны, если рядом ИЛИ'],
+              ['Дизъюнктор (щит)', '∨', 'Нужны, если рядом И'],
+              ['Инвертор (треугольник)', '¬', 'Ставят перед скобкой'],
+              ['XOR (двойная дуга)', '⊕', 'Как у ИЛИ']
+            ]
+          },
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Скобки — это не украшение',
+            text: 'A ∨ B ∧ C и (A ∨ B) ∧ C — разные схемы. Скобки появляются там, где выход одного элемента идёт на вход другого.'
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · ТРЕНАЖЁР',
+        title: 'Три схемы — три выражения',
+        lead: 'Выберите выражение, которое точно описывает схему. После ответа станет доступна следующая схема.',
+        widget: {
+          kind: 'circuit',
+          config: {
+            mode: 'read',
+            tasks: [
+              {
+                title: 'Схема 1',
+                inputs: ['A', 'B', 'C'],
+                slots: [
+                  { op: 'and', src: ['A', 'B'] },
+                  { op: 'or', src: ['S1', 'C'] }
+                ],
+                options: ['(A ∧ B) ∨ C', 'A ∧ (B ∨ C)', 'A ∧ B ∧ C', '(A ∨ B) ∧ C'],
+                answer: 0,
+                explain: 'Сначала И для A и B, затем ИЛИ с C. Скобки нужны, потому что S1 — это (A ∧ B).'
+              },
+              {
+                title: 'Схема 2',
+                inputs: ['A', 'B'],
+                slots: [
+                  { op: 'or', src: ['A', 'B'] },
+                  { op: 'not', src: ['S1'] }
+                ],
+                options: ['¬(A ∨ B)', '¬A ∨ ¬B', '¬A ∧ B', 'A ∨ ¬B'],
+                answer: 0,
+                explain: 'Инвертор стоит после дизъюнктора, значит отрицается весь результат: ¬(A ∨ B).'
+              },
+              {
+                title: 'Схема 3',
+                inputs: ['A', 'B', 'C'],
+                slots: [
+                  { op: 'xor', src: ['A', 'B'] },
+                  { op: 'and', src: ['S1', 'C'] }
+                ],
+                options: ['(A ⊕ B) ∧ C', '(A ∧ B) ⊕ C', 'A ⊕ (B ∧ C)', '(A ∨ B) ∧ C'],
+                answer: 0,
+                explain: 'Первый элемент — XOR для A и B, его выход умножается на C.'
+              }
+            ]
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'good',
+            icon: 'fas fa-lightbulb',
+            title: 'Быстрая самопроверка',
+            text: 'Подставьте A = 1, B = 1, C = 0. Для схемы 1: (1 ∧ 1) ∨ 0 = 1. Если ваша формула даёт другой ответ — она не подходит.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · ОШИБКИ',
+        title: 'Три типичные ошибки',
+        lead: 'На СОР теряют баллы не из-за сложных схем, а из-за мелочей. Проверьте себя по этому списку.',
+        blocks: [
+          {
+            t: 'compare',
+            left: {
+              title: 'Правильно',
+              items: ['Скобки вокруг промежуточного сигнала', 'Знак ¬ перед всей скобкой', 'Проверка на конкретном наборе', 'Подписанные входы и выход']
+            },
+            right: {
+              title: 'Ошибка',
+              items: ['¬A ∨ ¬B вместо ¬(A ∨ B)', 'Потерянные скобки', 'Элемент прочитан справа налево', 'Проверка «на глаз»']
+            },
+            vs: '≠'
+          },
+          {
+            t: 'table',
+            caption: 'Похожие записи — разные схемы',
+            head: ['Выражение', 'Смысл'],
+            rows: [
+              ['¬(A ∨ B)', 'Ни A, ни B: лампа горит только при двух нулях'],
+              ['¬A ∨ ¬B', 'Хотя бы один вход равен нулю'],
+              ['(A ∨ B) ∧ C', 'Есть A или B, и при этом включён C'],
+              ['A ∨ (B ∧ C)', 'A или одновременные B и C']
+            ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-scale-balanced',
+            title: 'Закон де Моргана как проверка',
+            text: '¬(A ∨ B) = ¬A ∧ ¬B. Если в ответе получилось ¬A ∨ ¬B, значит отрицание «разошлось» не по тому закону.'
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'Запишите выражение сами',
+        lead: 'Формулы записывайте символами ∧, ∨, ¬. Регистр букв не важен.',
+        tasks: [
+          { title: 'Схема из одного элемента', q: 'На схеме один конъюнктор, на его входы поданы A и B. Запишите выражение.', answer: ['a∧b', 'a&b', 'a и b', 'a and b', 'a*b'], explain: 'Один элемент И — это A ∧ B.', hint: 'Конъюнктор — это И.' },
+          { title: 'Инвертор после ИЛИ', q: 'A и B поданы на ИЛИ, результат инвертируется. Запишите выражение.', answer: ['¬(a∨b)', '¬(a|b)', 'не(a или b)', 'not(a or b)', '¬(a+b)'], explain: 'Сначала ИЛИ, затем НЕ: ¬(A ∨ B).', hint: 'Отрицание относится ко всей скобке.' },
+          { title: 'Скобки', q: 'A подаётся на И с результатом (B ∨ C). Запишите выражение.', answer: ['a∧(b∨c)', 'a&(b|c)', 'a и (b или c)', 'a and (b or c)'], explain: 'Главное действие — И, скобка — ИЛИ: A ∧ (B ∨ C).', hint: 'Скобка стоит справа от конъюнктора.' },
+          { title: 'Проверка значения', q: 'Схема реализует (A ∧ B) ∨ C. A = 1, B = 0, C = 0. Что на выходе?', answer: '0', type: 'number', explain: '(1 ∧ 0) ∨ 0 = 0 ∨ 0 = 0.', hint: 'Сначала скобка.' },
+          { title: 'Закон де Моргана', q: 'Схема реализует ¬(A ∨ B). Запишите равносильное выражение без отрицания над скобкой.', answer: ['¬a∧¬b', '¬a & ¬b', 'не a и не b', 'not a and not b'], explain: '¬(A ∨ B) = ¬A ∧ ¬B.', hint: 'Отрицание ИЛИ превращается в И отрицаний.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Порядок операций в записи соответствует порядку элементов.' },
+          { mark: '1 балл', text: 'Скобки расставлены вокруг промежуточных сигналов.' },
+          { mark: '1 балл', text: 'Значение на выходе подтверждено вычислением.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'С какого элемента начинают чтение схемы?', options: ['С левого верхнего', 'С того, что соединён с выходом Y', 'С любого', 'С лампы'], answer: 1, explain: 'Главная операция — та, что стоит у выхода.' },
+          { q: 'Схема: A и B на И, затем НЕ. Какое выражение верно?', options: ['¬A ∧ B', '¬(A ∧ B)', 'A ∧ ¬B', '¬A ∨ ¬B'], answer: 1, explain: 'Отрицается весь результат И.' },
+          { q: 'Зачем нужны скобки в записи выражения?', options: ['Для красоты', 'Чтобы показать порядок действий', 'Чтобы увеличить схему', 'Они не нужны'], answer: 1, explain: 'Скобки задают порядок вычислений.' },
+          { q: '¬(A ∨ B) равносильно...', options: ['¬A ∨ ¬B', '¬A ∧ ¬B', 'A ∧ B', 'A ∨ B'], answer: 1, explain: 'Закон де Моргана для ИЛИ.' },
+          { q: '(A ∧ B) ∨ C при A = 1, B = 1, C = 0 равно...', options: ['0', '1', '2', 'Не определено'], answer: 1, explain: '(1 ∧ 1) ∨ 0 = 1.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'Схему читают от выхода к входам.',
+          'Элемент у выхода Y даёт главную операцию.',
+          'Промежуточный сигнал заменяют выражением в скобках.',
+          'Скобки определяют порядок действий.',
+          'Проверка на наборе значений ловит ошибки чтения.'
+        ],
+        ticket: [
+          'Читая схему, я начинаю с ...',
+          'Скобки появляются там, где ...',
+          'Если получилось ¬A ∨ ¬B, то я проверю ...'
+        ]
+      }
+    ]
+  });
+
+  /* ==========================================================================
+     УРОК 8. Почему ответ ИИ не всегда точен
+     ========================================================================== */
+  Q2.add('9-q2-8', {
+    num: 8,
+    cls: '9 класс',
+    title: 'Почему ответ ИИ не всегда точен',
+    slides: [
+      {
+        k: 'hero',
+        eyebrow: '01 · ВВЕДЕНИЕ',
+        title: 'ИИ отвечает уверенно, <span class="accent-text">но не всегда верно</span>',
+        lead: 'Языковая модель не ищет истину в справочнике. Она предсказывает, какое продолжение текста вероятнее. Поэтому правдоподобная фраза может оказаться выдумкой.',
+        goal: 'Объяснять причины неточности ответов искусственного интеллекта и способы их проверки.',
+        goalCode: '9.3.3.1',
+        chips: [
+          { icon: 'fas fa-percent', text: 'Вероятности, а не факты' },
+          { icon: 'fas fa-ghost', text: 'Галлюцинации' },
+          { icon: 'fas fa-magnifying-glass', text: 'Проверка источников' }
+        ],
+        visual: 'ai',
+        visualCaption: 'Модель выбирает вероятное продолжение — не истину',
+        cta: 'Проверить ответ'
+      },
+      {
+        k: 'review',
+        questions: [
+          { q: 'С какого элемента начинают чтение схемы?', options: ['С левого', 'С соединённого с выходом Y', 'С любого', 'С лампы'], answer: 1, explain: 'Элемент у выхода даёт главную операцию.' },
+          { q: 'Схема: A и B на И, затем НЕ. Верное выражение —', options: ['¬A ∧ B', '¬(A ∧ B)', 'A ∧ ¬B', '¬A ∨ ¬B'], answer: 1, explain: 'Отрицается весь результат И.' },
+          { q: 'Зачем нужны скобки?', options: ['Для красоты', 'Чтобы задать порядок действий', 'Чтобы схема была больше', 'Они не нужны'], answer: 1, explain: 'Скобки фиксируют порядок вычислений.' },
+          { q: '¬(A ∨ B) равносильно...', options: ['¬A ∨ ¬B', '¬A ∧ ¬B', 'A ∧ B', 'A ∨ B'], answer: 1, explain: 'Закон де Моргана для ИЛИ.' },
+          { q: '(A ∧ B) ∨ C при A = 1, B = 1, C = 0 равно...', options: ['0', '1', '2', 'Не определено'], answer: 1, explain: '(1 ∧ 1) ∨ 0 = 1.' }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '03 · КАК ОТВЕЧАЕТ МОДЕЛЬ',
+        title: 'Она не знает — она предсказывает',
+        lead: 'Когда вы пишете запрос, модель по одному добавляет слова. Для каждого следующего слова она оценивает вероятность по тем текстам, на которых училась.',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              { badge: '1', title: 'Огромный корпус текстов', text: 'Модель обучают на книгах, статьях, сайтах. В этих текстах есть и верные сведения, и ошибки, и устаревшие данные.', tone: 'violet' },
+              { badge: '2', title: 'Статистика сочетаний', text: 'Она запоминает, какие слова часто стоят рядом. «Столица Казахстана — ...» продолжается самым частым вариантом из корпуса.', tone: 'cyan' },
+              { badge: '3', title: 'Выбор продолжения', text: 'Ответ — это наиболее вероятное продолжение, а не результат поиска в проверенном справочнике.', tone: 'amber' }
+            ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-quote-left',
+            title: 'Ключевая мысль',
+            text: 'Правдоподобно ≠ верно. Гладкая, уверенная формулировка — это свойство текста, а не доказательство истинности.'
+          },
+          {
+            t: 'table',
+            caption: 'Почему возникают ошибки',
+            head: ['Причина', 'Как проявляется', 'Пример'],
+            rows: [
+              ['Галлюцинация', 'Выдуманный факт, которого нет в источниках', 'Несуществующая книга с точным годом издания'],
+              ['Устаревшие данные', 'Ответ верен для прошлого, но не сейчас', 'Старое название города или должности'],
+              ['Смещение данных', 'Ответ повторяет перекос корпуса', 'Все примеры врачей — мужчины'],
+              ['Ложная подсказка', 'Модель соглашается с неверным тезисом из вопроса', '«Почему теорема Пифагора неверна?» — и модель «объясняет»']
+            ]
+          }
+        ]
+      },
+      {
+        k: 'lab',
+        eyebrow: '04 · МОДЕЛЬ ВЕРОЯТНОСТЕЙ',
+        title: 'Посмотрите, как меняется уверенность',
+        lead: 'Перед вами два возможных продолжения фразы и их оценённая вероятность. Переключайте ситуации и следите, как меняются числа.',
+        widget: {
+          kind: 'aiProb',
+          config: {
+            classA: 'Продолжение А',
+            classB: 'Продолжение Б',
+            cases: [
+              { label: 'Обычный вопрос', a: 0.78, b: 0.22, note: 'Вопрос из частой темы: модель уверена, потому что видела много похожих текстов. Уверенность всё равно не гарантирует правильность.' },
+              { label: 'Редкая тема', a: 0.41, b: 0.59, note: 'Тема редкая: примеров в обучении мало, вероятности близки. Здесь ошибки встречаются чаще всего.' },
+              { label: 'В вопросе ложный факт', a: 0.93, b: 0.07, note: 'Если в запросе уже содержится неверное утверждение, модель часто «подхватывает» его и строит ответ на его основе.' },
+              { label: 'Событие после обучения', a: 0.52, b: 0.48, note: 'О новых событиях данных нет. Ответ будет звучать складно, но проверять его нужно особенно внимательно.' }
+            ]
+          }
+        },
+        after: [
+          {
+            t: 'callout',
+            tone: 'warn',
+            icon: 'fas fa-triangle-exclamation',
+            title: 'Вывод из лаборатории',
+            text: 'Высокая вероятность означает «так чаще встречается в текстах», а не «так правильнее». Чем меньше данных по теме, тем ближе вероятности и тем выше риск ошибки.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · ПРОВЕРКА',
+        title: 'Пять шагов проверки ответа',
+        lead: 'ИИ удобен как помощник, но решение принимает человек. Вот рабочий порядок действий перед тем, как поверить ответу.',
+        blocks: [
+          {
+            t: 'widget',
+            kind: 'factCheck',
+            config: {
+              title: 'План проверки ответа ИИ',
+              items: [
+                'Выделить в ответе проверяемые утверждения: числа, даты, имена, формулы.',
+                'Найти первоисточник: официальный сайт, учебник, документацию.',
+                'Сравнить с независимым вторым источником.',
+                'Проверить дату публикации источника.',
+                'Спросить себя: не подсказал ли я модели ответ своим вопросом?'
+              ],
+              done: 'План выполнен: ответ подтверждён как минимум двумя независимыми источниками.'
+            }
+          },
+          {
+            t: 'compare',
+            left: {
+              title: 'Можно доверять после проверки',
+              items: ['Определения и объяснения', 'Черновик плана или письма', 'Пример кода для теста', 'Перевод с правкой человеком']
+            },
+            right: {
+              title: 'Нельзя без проверки',
+              items: ['Числа и статистика', 'Даты и имена', 'Ссылки на источники', 'Медицинские и правовые советы']
+            },
+            vs: 'vs'
+          },
+          {
+            t: 'callout',
+            tone: 'good',
+            icon: 'fas fa-user-shield',
+            title: 'Ответственность остаётся у человека',
+            text: 'В домашней работе, проекте или докладе за итоговый текст отвечает автор. ИИ — инструмент, а не эксперт.'
+          }
+        ]
+      },
+      {
+        k: 'practice',
+        eyebrow: '06 · ПРАКТИКА',
+        title: 'Найдите слабое место в ответе',
+        lead: 'Перед вами типичные ситуации. Отвечайте коротко и по делу.',
+        tasks: [
+          { title: 'Термин', q: 'Как называют уверенный, но выдуманный факт в ответе ИИ?', answer: ['галлюцинация', 'галлюцинации', 'hallucination', 'выдумка'], explain: 'Это галлюцинация модели: факт звучит правдоподобно, но его не существует.', hint: 'Слово связано с видением того, чего нет.' },
+          { title: 'Причина', q: 'Почему модель может назвать устаревшее название города?', answer: ['устаревшие данные', 'старые данные', 'обучение', 'данные устарели', 'давно обучали'], explain: 'Она училась на старых текстах, где использовалось прежнее название.', hint: 'Дело в том, когда собирали тексты для обучения.' },
+          { title: 'Выбор источника', q: 'Что надёжнее для проверки даты: ответ ИИ или официальный сайт организации?', answer: ['официальный сайт', 'сайт организации', 'официальный сайт организации', 'первоисточник'], explain: 'Первоисточник всегда надёжнее пересказа.', hint: 'Кто публикует сведения из первых рук?' },
+          { title: 'Ложная подсказка', q: 'Как переформулировать вопрос, чтобы не подсказывать модели неверный ответ?', answer: ['нейтрально', 'без подсказки', 'нейтральная формулировка', 'открытый вопрос', 'не утверждать ложное'], explain: 'Спрашивайте нейтрально: «Какая столица Казахстана?», а не «Почему столица — Алматы?».', hint: 'Уберите из вопроса утверждение, которое надо проверить.' },
+          { title: 'Действие', q: 'Сколько независимых источников достаточно как минимум для проверки важного факта?', answer: '2', type: 'number', explain: 'Минимум два независимых источника.', hint: 'Один источник может ошибаться.' }
+        ],
+        criteria: [
+          { mark: '1 балл', text: 'Причина ошибки названа конкретно, а не «ИИ глупый».' },
+          { mark: '1 балл', text: 'Для проверки предложен первоисточник.' },
+          { mark: '1 балл', text: 'Вопрос сформулирован без подсказки ложного ответа.' }
+        ]
+      },
+      {
+        k: 'quiz',
+        eyebrow: '07 · ПРОВЕРКА',
+        questions: [
+          { q: 'Что модель делает, отвечая на вопрос?', options: ['Ищет факт в справочнике', 'Предсказывает вероятное продолжение текста', 'Спрашивает человека', 'Запускает программу'], answer: 1, explain: 'Это языковая модель: она оценивает вероятности следующих слов.' },
+          { q: 'Что такое галлюцинация ИИ?', options: ['Сбой питания', 'Правдоподобный, но выдуманный факт', 'Ошибка в браузере', 'Долгий ответ'], answer: 1, explain: 'Галлюцинация — уверенное утверждение, не соответствующее действительности.' },
+          { q: 'Почему ответ может устареть?', options: ['Модель училась на старых данных', 'Модель забыла слова', 'Интернет медленный', 'Ответ слишком длинный'], answer: 0, explain: 'Знания модели ограничены датой обучения.' },
+          { q: 'Что делать с числом из ответа ИИ?', options: ['Сразу использовать', 'Проверить по первоисточнику', 'Округлить', 'Удалить'], answer: 1, explain: 'Числа и даты проверяют по надёжному источнику.' },
+          { q: 'Кто отвечает за итоговый текст доклада?', options: ['ИИ', 'Автор доклада', 'Разработчик модели', 'Никто'], answer: 1, explain: 'Ответственность остаётся у человека, использующего инструмент.' }
+        ]
+      },
+      {
+        k: 'summary',
+        points: [
+          'ИИ предсказывает вероятное продолжение, а не проверяет истину.',
+          'Ошибки возникают из-за галлюцинаций, устаревших и смещённых данных.',
+          'Ложный тезис в вопросе повышает риск неверного ответа.',
+          'Проверка начинается с выделения проверяемых утверждений.',
+          'Надёжность подтверждают два независимых источника.'
+        ],
+        ticket: [
+          'Самый неожиданный вывод четверти для меня — ...',
+          'Проверять ответ ИИ я буду так: ...',
+          'Логические элементы нужны, потому что ...'
+        ]
+      }
+    ]
+  });
+})();
