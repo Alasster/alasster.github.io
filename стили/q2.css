@@ -2775,6 +2775,10 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   letter-spacing: 0.06em;
   fill: rgba(255, 255, 255, 0.9);
 }
+.q2-home-logic-stage .q2-home-switch-label { font-size: 24px; }
+.q2-home-logic-stage .q2-home-switch-value { font-size: 26px; }
+.q2-home-logic-stage .q2-home-switch-name { font-size: 22px; }
+.q2-home-logic-stage .q2-home-logic-caption { font-size: 22px; }
 .q2-home-logic-stage .q2-bulb-filament { stroke: #59636d; stroke-width: 3; }
 .q2-home-logic-stage .q2-bulb.is-on .q2-bulb-filament { stroke: #a44711; }
 
