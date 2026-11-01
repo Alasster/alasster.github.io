@@ -38,7 +38,6 @@
       <div class="q2-code-head">
         <span class="q2-code-dots"><i></i><i></i><i></i></span>
         <span class="q2-code-title">${esc(block.title || 'Python')}</span>
-        <button type="button" class="q2-copy" data-copy="${attr(source)}">Копировать</button>
       </div>
       <pre><code>${lines.map((line, index) =>
         `<span class="q2-code-line" data-line="${index}"><span class="q2-ln">${index + 1}</span>${hl(line) || ' '}</span>`
@@ -400,26 +399,17 @@
     document.dispatchEvent(new CustomEvent('q2:ready', { detail: { id } }));
   }
 
-  /* ---------------------- копирование и мелкие действия ------------------- */
-  document.addEventListener('click', event => {
-    const copy = event.target.closest('.q2-copy');
-    if (copy) {
-      const text = copy.dataset.copy || '';
-      const done = () => {
-        copy.textContent = 'Скопировано';
-        setTimeout(() => { copy.textContent = 'Копировать'; }, 1600);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(() => {});
-      } else {
-        const area = document.createElement('textarea');
-        area.value = text;
-        document.body.appendChild(area);
-        area.select();
-        try { document.execCommand('copy'); done(); } catch (e) {}
-        area.remove();
+  /* ---------------------- запрет копирования и мелкие действия ------------------- */
+  ['copy', 'cut', 'selectstart', 'dragstart', 'contextmenu'].forEach(evtName => {
+    document.addEventListener(evtName, event => {
+      const target = event.target instanceof Element ? event.target : (event.target && event.target.parentElement);
+      if (target && target.closest('.q2-code, pre, code')) {
+        event.preventDefault();
       }
-    }
+    }, true);
+  });
+
+  document.addEventListener('click', event => {
     const reveal = event.target.closest('[data-q2-reveal]');
     if (reveal) {
       const target = document.getElementById(reveal.dataset.q2Reveal);

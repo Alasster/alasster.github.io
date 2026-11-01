@@ -1536,6 +1536,18 @@
 
 
 
+
+  // Prevent selecting and copying code across all lessons and slides
+  ['copy', 'cut', 'selectstart', 'dragstart', 'contextmenu'].forEach(evtName => {
+    document.addEventListener(evtName, event => {
+      const target = event.target instanceof Element ? event.target : (event.target && event.target.parentElement);
+      if (target && target.closest('pre, code, .q2-code, .code, .code-box, .codebox, .terminal, .console, .syntax-highlighter')) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }, true);
+  });
+
   function bindUniversalSlideInputs() {
 
     if (document._universalSlideInputsBound) return;

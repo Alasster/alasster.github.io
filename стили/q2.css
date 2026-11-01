@@ -3333,52 +3333,68 @@ body.lesson-page[data-lesson-id^="10emn"] .q2-code.is-compact pre {
   line-height: 1.35 !important;
 }
 
-body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion {
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 16px;
-  align-items: start;
-}
-
-body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion .q2-svg-wrap {
-  background: linear-gradient(145deg, #f8fbfd, #eaf1f6);
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  box-shadow: inset 3px 3px 8px rgba(148, 163, 184, 0.15), inset -3px -3px 8px rgba(255, 255, 255, 0.92);
-}
-
-body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion-examples {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion-examples .q2-code pre {
-  font-size: 0.88rem !important;
-}
-
-body.lesson-page[data-lesson-id^="10emn"] .q2-rec-window-frame {
-  opacity: 0;
-  animation: q2-rec-window-appear 7s ease-in-out infinite;
-}
-
-@keyframes q2-rec-window-appear {
-  0%, 4% { opacity: 0; }
-  12%, 78% { opacity: 1; }
-  88%, 100% { opacity: 0; }
+body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-wide {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  border-radius: 24px;
+  background: var(--lesson-card-surface, #f7f8fc);
+  box-shadow: var(--lesson-card-shadow, var(--q2-shadow-sm));
 }
 
 @media (max-width: 900px) {
-  body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion,
-  body.lesson-page[data-lesson-id^="10emn"] .q2-split-recursion-examples {
+  body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-idle-guide {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  body.lesson-page[data-lesson-id^="10emn"] .q2-rec-window-frame,
-  body.lesson-page[data-lesson-id^="10emn"] .q2-rec-demo-step,
-  body.lesson-page[data-lesson-id^="10emn"] .q2-rec-demo-line {
-    animation: none !important;
-    opacity: 1 !important;
-  }
+.q2-idle-guide {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.q2-idle-step {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  background: var(--lesson-card-surface, #f7f8fc);
+  box-shadow: var(--lesson-card-shadow, var(--q2-shadow-sm));
+}
+
+.q2-idle-step h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.q2-idle-step h3 span {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e7edfa;
+  color: #4f46e5;
+  font-size: 0.9rem;
+  box-shadow: inset 2px 2px 5px rgba(148, 163, 184, 0.28), inset -2px -2px 5px rgba(255, 255, 255, 0.95);
+}
+
+.q2-idle-step svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 12px;
+  border-radius: 14px;
+  box-shadow: inset 2px 2px 6px rgba(148, 163, 184, 0.18), inset -2px -2px 6px rgba(255, 255, 255, 0.92);
+}
+
+.q2-idle-step p {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 html body.lesson-page[data-lesson-id^="10emn"] :is(.slide, .q2-slide) .q2-copy:hover {
@@ -3449,4 +3465,71 @@ html body.lesson-page[data-lesson-id^="10emn"] .option-btn:hover {
 html body.lesson-page[data-lesson-id^="10emn"] :is(.dots, #dots, #dotsNav, .dots-nav) :is(button, .dot, .dotbutton, .dot-nav):hover::before {
   transform: none !important;
   background: #94a3b8 !important;
+}
+
+/* Крупный читаемый шрифт кода без двойного контура и без выделения/копирования */
+.q2-code {
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background: var(--surface-recess, rgba(15, 23, 42, 0.045)) !important;
+  border: 1px solid rgba(148, 163, 184, 0.26) !important;
+  box-shadow: inset 3px 3px 7px rgba(148, 163, 184, 0.2), inset -3px -3px 7px rgba(255, 255, 255, 0.9) !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.q2-code pre,
+.q2-code.is-compact pre,
+.q2-card .q2-code pre,
+body.lesson-page[data-lesson-id^="10ogn"] .q2-code pre,
+body.lesson-page[data-lesson-id^="10ogn"] .q2-code.is-compact pre,
+body.lesson-page[data-lesson-id^="10emn"] .q2-code pre,
+body.lesson-page[data-lesson-id^="10emn"] .q2-code.is-compact pre {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 1.05rem !important;
+  line-height: 1.55 !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.q2-code code {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 1.05rem !important;
+  line-height: 1.55 !important;
+  font-weight: 600 !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.q2-code-line {
+  display: block !important;
+  padding: 2px 12px 2px 0 !important;
+  font-size: 1.05rem !important;
+  line-height: 1.55 !important;
+  font-weight: 600 !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.q2-ln {
+  font-size: 0.92rem !important;
+  width: 32px !important;
+  padding-right: 12px !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.q2-copy {
+  display: none !important;
 }

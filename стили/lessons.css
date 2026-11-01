@@ -27328,3 +27328,49 @@ html body.lesson-page:is(
 ) :is(.slide, .q2-slide) *:hover {
   transform: none !important;
 }
+
+/* Remove double contour inside code blocks & forbid selecting/copying code across all slides and lessons */
+body.lesson-page pre code,
+body.lesson-page .q2-code pre,
+body.lesson-page .q2-code code,
+body.lesson-page .code-box code,
+body.lesson-page .codebox code {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.lesson-page :is(
+  pre,
+  pre *,
+  code,
+  .q2-code,
+  .q2-code *,
+  .code,
+  .code *,
+  .code-box,
+  .code-box *,
+  .codebox,
+  .codebox *,
+  .code-card pre,
+  .code-card code,
+  .terminal,
+  .terminal *,
+  .console,
+  .console *,
+  .syntax-highlighter,
+  .syntax-highlighter *
+) {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+body.lesson-page :is(.q2-copy, .copy-btn, .btn-copy, [data-copy]) {
+  display: none !important;
+}

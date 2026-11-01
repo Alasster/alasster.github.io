@@ -53,6 +53,10 @@
       }
       .q2-rec-demo-step { opacity: 0; animation: q2-rec-reveal 9s linear infinite; }
       .q2-rec-demo-line { animation: q2-rec-highlight 9s linear infinite; }
+      @media (prefers-reduced-motion: reduce) {
+        .q2-rec-demo-step { animation: none; opacity: 1; }
+        .q2-rec-demo-line { animation: none; }
+      }
     </style>
     <rect x="8" y="8" width="544" height="374" rx="20" fill="#edf3f7" stroke="#c8d6e0" stroke-width="2"/>
     <path d="M28 8h504a20 20 0 0 1 20 20v30H8V28A20 20 0 0 1 28 8z" fill="#f9fbfd"/>
