@@ -2828,10 +2828,6 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 .q2-rocker-thumb rect { fill: #f7f9fc; stroke: #aab4bf; stroke-width: 1.5; filter: drop-shadow(3px 4px 4px rgba(54, 69, 81, 0.3)) drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.95)); }
 .q2-rocker-thumb path { fill: none; stroke: #87939f; stroke-width: 2; stroke-linecap: round; }
 .q2-single-switch:focus-visible { outline: none; }
-.q2-single-switch:focus-visible .q2-home-plate {
-  stroke: var(--q2-indigo);
-  stroke-width: 4;
-}
 .q2-bulb-cord { fill: none; stroke: rgba(245, 251, 252, 0.86); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(1px 2px 2px rgba(20, 52, 59, 0.35)); }
 .q2-single-bulb-glow { opacity: 0; transition: opacity 0.25s ease; }
 .q2-single-bulb-body {

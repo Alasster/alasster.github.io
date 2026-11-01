@@ -845,8 +845,8 @@
           <text class="q2-home-logic-gate-symbol" x="406" y="220" data-gate-label>∧</text>
           <path class="q2-home-logic-wire" d="M462 210 H 702"/>
           <path class="q2-home-logic-flow" data-wire="Y" d="M462 210 H 702"/>
-          <path class="q2-home-logic-wire" d="M760 30 V 108"/>
-          <g class="q2-bulb" data-bulb transform="rotate(180 760 158)">
+          <path class="q2-home-logic-wire" d="M760 30 V 168"/>
+          <g class="q2-bulb" data-bulb transform="translate(0 60) rotate(180 760 158)">
             <circle class="q2-bulb-glow" cx="760" cy="158" r="82" fill="url(#${gradientId})"/>
             <path class="q2-bulb-body" d="M760 108c-28 0-48 21-48 47 0 23 14 35 23 54h50c9-19 23-31 23-54 0-26-20-47-48-47z"/>
             <path class="q2-bulb-filament" d="m741 157 7 15q4 8 8 0t8 0q4 8 8 0l7-15"/>
@@ -856,7 +856,7 @@
               <path d="M760 89V75m-52 37-10-10m114 10 10-10m-128 55h-14m156 0h14m-146 36-11 8m120-8 11 8"/>
             </g>
           </g>
-          <text class="q2-home-logic-caption" x="760" y="276" data-q2-lamp-status>ЛАМПА ${compute() ? 'ГОРИТ' : 'ВЫКЛЮЧЕНА'}</text>
+          <text class="q2-home-logic-caption" x="760" y="336" data-q2-lamp-status>ЛАМПА ${compute() ? 'ГОРИТ' : 'ВЫКЛЮЧЕНА'}</text>
         </svg>
       </div>
       <div class="q2-lab-side">
