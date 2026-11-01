@@ -1,0 +1,272 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e7ebf3">
+    <title>11 класс · 2 урок</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%23D97706' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-11-01-v64">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="lesson-page lesson-11-2" data-lesson-id="11-2">
+
+  <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">11 класс</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">2 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">Задачи нейронных сетей</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <div class="progress-bar" id="progress"></div>
+    <canvas id="network-bg"></canvas>
+    
+    <div class="dots-nav" id="dotsNav"></div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- Slide 1: Intro -->
+    <section class="slide active">
+        <div class="container">
+            <span class="eyebrow">01 · ВВЕДЕНИЕ</span>
+            <h1>Задачи <span class="accent-text">нейронных сетей</span></h1>
+            <p style="font-size: 1.2rem; max-width: 700px;">Нейронные сети не просто "умные" — они решают три фундаментальных типа задач. Сегодня мы разберем, как отличить классификацию от регрессии и почему распознавание образов — это магия математики.</p>
+            <div class="lesson-goal-card">
+                <div class="goal-header">
+                    <span class="goal-code-badge"><i class="lesson-flaticon" data-flaticon="target"></i> 11.1.2.2</span>
+                    <span class="goal-title-badge">Цель обучения</span>
+                </div>
+                <p class="goal-description">Сравнивать функции активации (функцию единичного скачка, Sigmoid и ReLU), объясняя особенности их применения в искусственных нейронных сетях.</p>
+            </div>
+            <div style="margin-top: 24px;">
+                <button class="start-btn" onclick="changeSlide(1)">Начать изучение <i class="fas fa-play" style="margin-left: 10px;"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 2: Classification -->
+    <section class="slide">
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <span class="eyebrow">02 · КЛАССИФИКАЦИЯ</span>
+<h2>1. Классификация</h2>
+                    <div class="glass">
+                        <p>Это задача разделения данных на <b>заранее известные категории</b> (классы).</p>
+                        <p style="margin-top: 15px;">Нейросеть получает объект и должна сказать: "Это объект типа А" или "Это объект типа Б".</p>
+                        <ul style="margin-top: 20px; list-style: none;">
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> <b>Бинарная:</b> Да/Нет (Спам или не спам).</li>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> <b>Мультиклассовая:</b> Кот, собака или попугай.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="task-card" style="display: flex; flex-direction: column; justify-content: center;">
+                    <span class="type-tag">CATEGORICAL</span>
+                    <div class="viz-box">
+                        <div class="dots-classification">
+                            <div class="dot red" title="Класс 1 (Красный)"></div>
+                            <div class="dot red" title="Класс 1 (Красный)"></div>
+                            <div class="classification-divider"></div>
+                            <div class="dot blue" title="Класс 2 (Синий)"></div>
+                            <div class="dot blue" title="Класс 2 (Синий)"></div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: var(--muted);">Сеть проводит "границу" между классами в пространстве данных.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Regression -->
+    <section class="slide">
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <span class="eyebrow">03 · РЕГРЕССИЯ</span>
+<h2>2. Регрессия</h2>
+                    <div class="glass">
+                        <p>Это предсказание <b>конкретного числа</b> (непрерывной величины) вместо категории.</p>
+                        <p style="margin-top: 15px;">Вместо "да/нет" сеть выдает число: температуру, цену, возраст или вероятность.</p>
+                        <div style="margin-top: 20px; background: rgba(244, 63, 94, 0.1); padding: 15px; border-radius: 18px; border-left: 4px solid var(--rose);">
+                            <strong>Пример:</strong> Прогноз стоимости квартиры на основе её площади и района. Результат: 45 300 000 ₸.
+                        </div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <span class="type-tag">CONTINUOUS</span>
+                    <div class="viz-box">
+                        <div style="position: absolute; left: 20px; bottom: 20px; width: 80%; height: 80%; border-left: 2px solid #cbd5e1; border-bottom: 2px solid #cbd5e1;"></div>
+                        <div class="regression-line"></div>
+                        <div class="dot red" style="position: absolute; top: 40px; left: 60px; width: 8px; height: 8px;"></div>
+                        <div class="dot red" style="position: absolute; top: 80px; left: 100px; width: 8px; height: 8px;"></div>
+                        <div class="dot red" style="position: absolute; top: 60px; left: 180px; width: 8px; height: 8px;"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: var(--muted);">Цель: найти функцию, которая максимально близко проходит через все точки данных.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Pattern Recognition -->
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">04 · РАСПОЗНАВАНИЕ ОБРАЗОВ</span>
+<h2>3. Распознавание образов</h2>
+            <div class="glass">
+                <p>Самая сложная задача. Это поиск закономерностей в <b>неструктурированных данных</b>: изображениях, звуках или текстах.</p>
+            </div>
+            <div class="grid-2" style="grid-template-columns: repeat(3, 1fr); margin-top: 30px;">
+                <div class="task-card" style="text-align: center;">
+                    <i class="fas fa-face-smile" style="color: var(--accent);"></i>
+                    <h4>Зрение</h4>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-top: 10px;">Поиск лиц на фото, распознавание дорожных знаков.</p>
+                </div>
+                <div class="task-card" style="text-align: center;">
+                    <i class="fas fa-microphone" style="color: var(--violet);"></i>
+                    <h4>Звук</h4>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-top: 10px;">Превращение речи в текст (Siri, Alexa).</p>
+                </div>
+                <div class="task-card" style="text-align: center;">
+                    <i class="fas fa-font" style="color: var(--rose);"></i>
+                    <h4>Текст</h4>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-top: 10px;">Определение смысла предложения или почерка.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Practical Comparison -->
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">05 · СРАВНИМ ЗАДАЧИ?</span>
+<h2>Сравним задачи?</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 18px; overflow: hidden;">
+                <thead>
+                    <tr style="background: var(--rose); color: white; text-align: left;">
+                        <th style="padding: 20px;">Задача</th>
+                        <th style="padding: 20px;">Что на входе?</th>
+                        <th style="padding: 20px;">Что на выходе?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 20px;"><b>Классификация</b></td>
+                        <td style="padding: 20px;">Параметры письма</td>
+                        <td style="padding: 20px;"><span style="color: var(--rose);">Метка:</span> "Спам" / "Не спам"</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 20px;"><b>Регрессия</b></td>
+                        <td style="padding: 20px;">Данные о погоде</td>
+                        <td style="padding: 20px;"><span style="color: var(--violet);">Число:</span> +24.5 °C</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px;"><b>Распознавание</b></td>
+                        <td style="padding: 20px;">Набор пикселей</td>
+                        <td style="padding: 20px;"><span style="color: var(--accent);">Образ:</span> "Цифра 5"</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Slide 6: Interactive Quiz -->
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">06 · ПРОВЕРЬ СЕБЯ</span>
+<h2 style="text-align: center;">Проверь себя</h2>
+            <p style="text-align: center; color: var(--muted); margin-bottom: 30px;">Определи тип задачи для ситуации:</p>
+            <div class="grid-2" id="quiz-container">
+                <div class="task-card" onclick="checkAnswer(this, 'reg')" style="cursor: pointer;">
+                    <p>Прогноз курса доллара на завтра</p>
+                </div>
+                <div class="task-card" onclick="checkAnswer(this, 'class')" style="cursor: pointer;">
+                    <p>Определение болен пациент или здоров</p>
+                </div>
+                <div class="task-card" onclick="checkAnswer(this, 'rec')" style="cursor: pointer;">
+                    <p>Разблокировка телефона по лицу</p>
+                </div>
+                <div class="task-card" onclick="checkAnswer(this, 'class')" style="cursor: pointer;">
+                    <p>Сортировка деталей на конвейере по цвету</p>
+                </div>
+            </div>
+            <div id="quiz-feedback" style="text-align: center; margin-top: 20px; font-weight: 600; height: 24px;"></div>
+        </div>
+    </section>
+
+    <!-- Slide 7: External Resource -->
+    <section class="slide">
+        <div class="container">
+            <div class="glass" style="text-align: center; padding: 50px;">
+                <i class="fas fa-robot" style="font-size: 4rem; color: var(--rose); margin-bottom: 20px;"></i>
+                <span class="eyebrow">07 · ИТОГИ УРОКА</span>
+<h2>Практика: Teachable Machine</h2>
+                <p>Google создал инструмент, где вы можете обучить свою нейросеть классификации прямо в браузере за 2 минуты без кода.</p>
+                <div style="margin-top: 30px;">
+                    <a href="https://teachablemachine.withgoogle.com/train" target="_blank" class="start-btn" style="display: inline-flex; align-items: center; text-decoration: none;">
+                        Попробовать создать модель <i class="fas fa-external-link-alt" style="margin-left: 10px;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-01-v14"></script>
+            <script src="../../скрипты/lessons.js?v=auth-cloud-20261101-v7"></script>
+</body>
+</html>
+

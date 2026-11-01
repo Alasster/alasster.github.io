@@ -1,0 +1,342 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e7ebf3">
+    <title>10 ОГН · 1 урок</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%23059669' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-11-01-v64">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="lesson-page lesson-10ogn-1" data-lesson-id="10ogn-1">
+
+  <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">10 ОГН</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">1 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">История развития искусственного интеллекта</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <canvas id="network-bg"></canvas>
+    <div class="bg-spheres" aria-hidden="true"><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span><span class="bg-sphere"></span></div>
+    <div class="progress-bar" id="progress"></div>
+    <div class="dots" id="dots"></div>
+
+    <section class="slide active">
+        <div class="container hero">
+            <div>
+                <span class="eyebrow">01 · ВВЕДЕНИЕ</span>
+                <h1>История развития <span class="gradient-text">искусственного интеллекта</span></h1>
+                <p class="lead">ИИ развивался не ровной линией, а рывками: идеи опережали компьютеры, компьютеры ждали данных, данные требовали новых моделей. Сегодня разберем, почему каждая эпоха была возможна именно в свое время.</p>
+                
+                <div class="chips">
+                    <span class="chip"><i class="fas fa-brain"></i> идеи</span>
+                    <span class="chip"><i class="fas fa-microchip"></i> вычисления</span>
+                    <span class="chip"><i class="fas fa-database"></i> данные</span>
+                    <span class="chip"><i class="fas fa-chart-line"></i> прорывы и кризисы</span>
+                </div>
+            </div>
+            <div class="lesson-goal-card">
+              <div class="goal-header">
+                <span class="goal-code-badge"><i class="lesson-flaticon" data-flaticon="target"></i> 10.1.2.1</span>
+                <span class="goal-title-badge">Цель обучения</span>
+              </div>
+              <p class="goal-description">Анализировать этапы развития искусственного интеллекта и объяснять, как изменения в технологиях и объемах данных повлияли на его развитие.</p>
+            </div>
+            <div style="margin-top: 24px;">
+              <button class="start-btn" onclick="changeSlide(1)">Начать путешествие <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">02 · ГЛАВНАЯ МЫСЛЬ</span>
+<h2>Главная мысль урока</h2>
+            <p>ИИ не стал сильнее только потому, что ученые придумали “умные формулы”. Каждый прорыв возникал, когда одновременно улучшались три условия.</p>
+            
+            <div class="formula">
+                <div class="formula-card" data-mark="A">
+                    <h3>Алгоритмы</h3>
+                    <p>Методы, по которым система учится, ищет решения, распознает закономерности и генерирует ответы.</p>
+                </div>
+                <div class="formula-card" data-mark="C">
+                    <h3>Вычислительная мощность</h3>
+                    <p>Процессоры, видеокарты, облака и память, которые позволяют обучать модели не годами, а днями или неделями.</p>
+                </div>
+                <div class="formula-card" data-mark="D">
+                    <h3>Данные</h3>
+                    <p>Тексты, изображения, звук, видео, действия пользователей и научные базы, на которых модель видит примеры мира.</p>
+                </div>
+            </div>
+            <div class="panel pad" style="margin-top: 18px;">
+                <p><b>Формула анализа:</b> если в эпоху мало данных, слабые компьютеры или неудачные методы, развитие ИИ замедляется. Если все три элемента усиливаются, возникает новый скачок.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">03 · КАРТА РАЗВИТИЯ</span>
+<h2>Карта развития ИИ: от идеи к массовому инструменту</h2>
+            <p>Посмотри на линию времени как исследователь: в каждом этапе важно не только “что изобрели”, но и “почему именно тогда это стало возможно”.</p>
+            
+            <div class="timeline">
+                <div class="era"><div class="era-year">1940-е</div><h3>Рождение идеи</h3><p>Тьюринг формулирует вопрос: может ли машина мыслить? Компьютеры только появляются, данных почти нет.</p></div>
+                <div class="era"><div class="era-year">1956</div><h3>Название ИИ</h3><p>Дартмутская конференция закрепляет термин “искусственный интеллект”. Оптимизм огромный, техника слабая.</p></div>
+                <div class="era"><div class="era-year">1960-70</div><h3>Правила и символы</h3><p>Программы решают логические задачи и играют в игры, но плохо справляются с реальным миром.</p></div>
+                <div class="era"><div class="era-year">1980-е</div><h3>Экспертные системы</h3><p>ИИ копирует правила специалистов. Полезно в узких областях, но дорого поддерживать и трудно масштабировать.</p></div>
+                <div class="era"><div class="era-year">1990-10</div><h3>Машинное обучение</h3><p>Системы начинают учиться на данных. Интернет, датчики и цифровые архивы резко расширяют материал для обучения.</p></div>
+                <div class="era"><div class="era-year">2012+</div><h3>Глубокое обучение</h3><p>Нейросети, GPU и большие датасеты дают прорывы в зрении, речи, переводе и генерации контента.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">04 · РАЗБЕРИТЕ ЭТАП</span>
+<h2>Разберите этап глубже</h2>
+            <p>Нажимайте на эпохи и смотрите, что тогда менялось в идеях, технологиях и данных.</p>
+           
+            <div class="era-board">
+                <div class="era-menu">
+                    <button class="era-btn active" onclick="renderEra('dream')"><i class="fas fa-lightbulb"></i> 1940-1950-е</button>
+                    <button class="era-btn" onclick="renderEra('rules')"><i class="fas fa-sitemap"></i> 1960-1970-е</button>
+                    <button class="era-btn" onclick="renderEra('expert')"><i class="fas fa-user-gear"></i> 1980-е</button>
+                    <button class="era-btn" onclick="renderEra('learn')"><i class="fas fa-chart-simple"></i> 1990-2000-е</button>
+                    <button class="era-btn" onclick="renderEra('deep')"><i class="fas fa-layer-group"></i> 2012-2020-е</button>
+                    <button class="era-btn" onclick="renderEra('gen')"><i class="fas fa-wand-magic-sparkles"></i> 2020-е</button>
+                </div>
+                <div class="panel era-content" id="eraContent"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container lab">
+            <div>
+                <span class="eyebrow">05 · ПРАКТИКУМ</span>
+<h2>Лаборатория: почему прорыв случается не всегда?</h2>
+                <p>Передвигайте ползунки. Так можно увидеть, что хорошая идея без данных или слабая техника без алгоритмов редко дают сильный ИИ.</p>
+                
+                <div class="controls" style="margin-top: 22px;">
+                    <div class="slider-row">
+                        <div class="slider-label">Алгоритмы <span id="algLabel">65</span></div>
+                        <input id="algRange" type="range" min="0" max="100" value="65">
+                    </div>
+                    <div class="slider-row">
+                        <div class="slider-label">Вычисления <span id="computeLabel">45</span></div>
+                        <input id="computeRange" type="range" min="0" max="100" value="45">
+                    </div>
+                    <div class="slider-row">
+                        <div class="slider-label">Данные <span id="dataLabel">50</span></div>
+                        <input id="dataRange" type="range" min="0" max="100" value="50">
+                    </div>
+                </div>
+            </div>
+            <div class="meter-board">
+                <div class="panel pad">
+                    <div class="big-number" id="powerScore">53</div>
+                    <h3>Индекс возможностей ИИ</h3>
+                    <p id="powerText">Система уже может решать отдельные задачи, но масштабный прорыв ограничен одним из факторов.</p>
+                </div>
+                <div class="meter"><div class="meter-top">Качество моделей <span id="modelScore">0%</span></div><div class="bar"><div class="fill" id="modelFill"></div></div></div>
+                <div class="meter"><div class="meter-top">Скорость обучения <span id="speedScore">0%</span></div><div class="bar"><div class="fill" id="speedFill"></div></div></div>
+                <div class="meter"><div class="meter-top">Понимание реального мира <span id="worldScore">0%</span></div><div class="bar"><div class="fill" id="worldFill"></div></div></div>
+                <div class="insight" id="labInsight"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">06 · ПОЧЕМУ БЫЛИ</span>
+<h2>Почему были “зимы ИИ”?</h2>
+            <p>Зима ИИ — период, когда интерес и финансирование падают, потому что обещания оказались сильнее реальных возможностей.</p>
+           
+            <div class="grid-3" style="margin-top: 26px;">
+                <div class="card"><div class="icon red"><i class="fas fa-triangle-exclamation"></i></div><h3>Ожидали слишком много</h3><p>Исследователи думали, что общий интеллект появится быстро. Но задачи вроде понимания языка и зрения оказались намного сложнее.</p></div>
+                <div class="card"><div class="icon amber"><i class="fas fa-microchip"></i></div><h3>Компьютеры не тянули</h3><p>Слабая память и медленные процессоры ограничивали размер программ и объем экспериментов.</p></div>
+                <div class="card"><div class="icon cyan"><i class="fas fa-database"></i></div><h3>Не хватало данных</h3><p>Без больших наборов примеров машина не могла надежно учиться на реальности, а ручные правила быстро ломались.</p></div>
+            </div>
+            <div class="panel pad" style="margin-top: 18px;">
+                <p><b>Вывод:</b> ИИ замедлялся не из-за “плохой идеи”, а из-за разрыва между мечтой, техникой и доступными данными.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">07 · КАК ДАННЫЕ</span>
+<h2>Как данные изменили ИИ</h2>
+            
+            <div class="grid-2" style="margin-top: 22px;">
+                <div class="panel pad">
+                    <h3>Раньше: правила вручную</h3>
+                    <p>Человек записывает инструкции: “если температура высокая и есть кашель, проверь болезнь”. Такая система понятна, но плохо переносит сложные исключения.</p>
+                </div>
+                <div class="panel pad">
+                    <h3>Теперь: обучение на примерах</h3>
+                    <p>Модель получает тысячи или миллионы случаев и сама находит связи. Чем богаче и чище данные, тем лучше она распознает закономерности.</p>
+                </div>
+            </div>
+            <div class="grid-3" style="margin-top: 18px;">
+                <div class="card"><div class="icon green"><i class="fas fa-image"></i></div><h3>Изображения</h3><p>Большие коллекции размеченных фото помогли нейросетям научиться видеть объекты, лица, дороги и дефекты.</p></div>
+                <div class="card"><div class="icon violet"><i class="fas fa-language"></i></div><h3>Тексты</h3><p>Цифровые книги, сайты и документы позволили языковым моделям изучать стиль, факты, структуру фраз и диалог.</p></div>
+                <div class="card"><div class="icon amber"><i class="fas fa-satellite-dish"></i></div><h3>Сенсоры</h3><p>Телефоны, камеры, спутники и датчики создают поток данных для навигации, медицины, климата и производства.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">08 · КАК ТЕХНОЛОГИИ</span>
+<h2>Как технологии изменили ИИ</h2>
+            <p>Один и тот же алгоритм может быть бесполезным на слабом компьютере и мощным на современной инфраструктуре.</p>
+         
+            <div class="grid-3" style="margin-top: 26px;">
+                <div class="card"><div class="icon dark"><i class="fas fa-memory"></i></div><h3>Память</h3><p>Больше памяти позволяет хранить крупные датасеты и миллиарды параметров модели.</p></div>
+                <div class="card"><div class="icon cyan"><i class="fas fa-gauge-high"></i></div><h3>GPU и TPU</h3><p>Графические и специальные процессоры параллельно считают огромные матрицы, на которых держится глубокое обучение.</p></div>
+                <div class="card"><div class="icon blue"><i class="fas fa-cloud"></i></div><h3>Облака</h3><p>Исследователи и компании могут арендовать тысячи серверов, не строя собственный суперкомпьютер.</p></div>
+            </div>
+            <div class="panel pad" style="margin-top: 18px;">
+                <p><b>Пример анализа:</b> нейросети существовали задолго до 2010-х, но только быстрые процессоры, большие датасеты и новые методы обучения сделали их практически сильными.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">09 · МИНИ КЕЙС</span>
+<h2>Мини-кейс: почему ChatGPT стал возможен?</h2>
+            
+            <div class="grid-2" style="margin-top: 22px;">
+                <div class="panel pad">
+                    <h3>Не одна причина</h3>
+                    <ul class="clean-list">
+                        <li class="check-line"><i class="fas fa-check"></i><span><b>Архитектуры трансформеров</b> лучше работают с контекстом текста.</span></li>
+                        <li class="check-line"><i class="fas fa-check"></i><span><b>Много данных</b> дало модели языковой опыт: объяснения, диалоги, код, статьи.</span></li>
+                        <li class="check-line"><i class="fas fa-check"></i><span><b>Мощные вычисления</b> позволили обучать модели огромного размера.</span></li>
+                        <li class="check-line"><i class="fas fa-check"></i><span><b>Настройка под человека</b> сделала ответы более полезными и разговорными.</span></li>
+                    </ul>
+                </div>
+                <div class="panel pad">
+                    <h3>Задание для пары</h3>
+                    <p>Объясните в 4 предложениях: почему похожий сервис было трудно создать в 1980-е, даже если бы ученые уже мечтали о нем?</p>
+                    <div class="insight" style="margin-top: 18px;">
+                        <p><b>Подсказка:</b> сравните три фактора: где взять тексты, на чем обучать модель и какие алгоритмы тогда были доступны.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">10 · ПРОВЕРЬ АНАЛИЗ</span>
+<h2>Проверь анализ</h2>
+            
+            <div class="panel pad quiz">
+                <div class="quiz-top">
+                    <span class="quiz-counter" id="quizCounter">Вопрос 1 / 6</span>
+                    <span class="quiz-status" id="quizScore">Верных ответов: 0</span>
+                </div>
+                <h3 id="quizQuestion"></h3>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div id="quizFeedback">Выберите ответ.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide">
+        <div class="container">
+            <span class="eyebrow">11 · ИТОГИ УРОКА</span>
+<h2>Итог урока</h2>
+           
+            <div class="grid-2" style="margin-top: 22px;">
+                <div class="panel pad">
+                    <h3>Что нужно уметь объяснять</h3>
+                    <ul class="clean-list">
+                        <li class="check-line"><i class="fas fa-check"></i><span>ИИ развивался этапами: символический ИИ, экспертные системы, машинное обучение, глубокое обучение, генеративные модели.</span></li>
+                        <li class="check-line"><i class="fas fa-check"></i><span>Каждый этап зависел от доступных алгоритмов, вычислительной мощности и объема данных.</span></li>
+                        <li class="check-line"><i class="fas fa-check"></i><span>Увеличение данных не гарантирует качество: важны разметка, чистота, разнообразие и этичное использование.</span></li>
+                    </ul>
+                </div>
+                <div class="panel pad">
+                    <h3>Финальная формула</h3>
+                    <p style="font-size: 1.28rem; color: var(--ink); font-weight: 800;">Прорыв в ИИ происходит, когда сильная идея встречается с мощной техникой и большим количеством качественных данных.</p>
+                    <div class="chips">
+                        <span class="chip"><i class="fas fa-lightbulb"></i> идея</span>
+                        <span class="chip"><i class="fas fa-server"></i> мощность</span>
+                        <span class="chip"><i class="fas fa-database"></i> данные</span>
+                        <span class="chip"><i class="fas fa-user-check"></i> польза человеку</span>
+                    </div>
+                    <button class="start-btn" style="margin-top: 22px;" onclick="goToSlide(0)">Вернуться в начало <i class="fas fa-rotate-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" title="Назад"><i class="fas fa-arrow-left"></i></button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)" title="Вперед"><i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    
+
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-01-v14"></script>
+            <script src="../../скрипты/lessons.js?v=auth-cloud-20261101-v7"></script>
+</body>
+</html>
+

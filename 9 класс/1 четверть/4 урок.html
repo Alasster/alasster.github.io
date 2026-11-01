@@ -1,0 +1,362 @@
+﻿<!doctype html>
+
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#e7ebf3">
+    <title>9 класс · 4 урок</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%237C3AED' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-11-01-v64">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+  <body class="lesson-page lesson-9-4" data-lesson-id="9-4">
+
+  <!-- Airy Pill Navigation Bar (Identical dimensions & design to index.html) -->
+  <div class="nav-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="../../index.html" class="brand-logo-group" title="На главную">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <span class="brand-title-text">ALASSTER.SITE</span>
+        </a>
+
+        <div class="nav-lesson-badge">
+          <span class="nav-badge-class">9 класс</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-num">4 урок</span>
+          <span class="nav-badge-divider">·</span>
+          <span class="nav-badge-topic">IP-адрес. Маска подсети</span>
+        </div>
+
+        <div class="nav-right-actions">
+          <button class="classes-menu-btn" id="open-classes-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Меню классов">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="menu-btn-text">Классы</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Classes Modal Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop-el">
+    <div class="modal-glass-container" role="dialog" aria-modal="true" aria-labelledby="modal-heading-el">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <p class="modal-eyebrow">Учебные материалы</p>
+          <h3 class="modal-heading-text" id="modal-heading-el">Выберите класс и урок</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal-el" type="button" aria-label="Закрыть">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-classes-nav">
+        <button type="button" class="class-tab-pill" data-class-id="c9">9 класс</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10emn">10 ЕМН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c10ogn">10 ОГН</button>
+        <button type="button" class="class-tab-pill" data-class-id="c11">11 класс</button>
+        <a href="../../index.html" class="class-tab-pill tab-home-link"><i class="fa-solid fa-house"></i> Главная</a>
+      </div>
+      <div class="modal-lessons-scroll" id="modal-lessons-list"></div>
+    </div>
+  </div>
+
+  <div class="progress" id="progress">
+    </div>
+    <main>
+
+      <section class="slide active" aria-label="Начинаем">
+        <div class="wrap">
+          <header class="slidehead"><span class="eyebrow">01 · ВВЕДЕНИЕ</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <div class="hero">
+            <div><h1>IP-адрес.<br><span class="accent">Маска подсети</span></h1>
+              <p class="lead">Как по IP-адресу понять, какая часть относится к сети, а какая — к компьютеру?</p>
+<div class="chips">
+  <span class="chip"><i data-flaticon="settings-sliders"></i> маска подсети</span>
+  <span class="chip"><i data-flaticon="network"></i> адрес сети</span>
+  <span class="chip"><i data-flaticon="computer"></i> адрес узла</span>
+  <span class="chip"><i data-flaticon="binary"></i> двоичная маска</span>
+</div>
+            <div class="definition">
+              <strong>9.1.2.2 — определять адрес сети по заданному IP-адресу узла и маске</strong>
+            </div>
+            </div>
+            <div class="paper">
+              <div class="bigicon">🧭</div>
+              <h3>Маска — граница</h3>
+              <div class="address"><span class="network">192.168.1<small>сеть</small></span><span class="host">.37<small>узел</small></span></div>
+              <p>Маска отмечает эту границу: что сохранить, а что обнулить.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Повторение">
+        <div class="wrap">
+          <header class="slidehead">
+            <span class="eyebrow">02 · АДРЕС ПРОТОКОЛЫ</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <h2>IP-адрес и протоколы: что помним?</h2>
+          <p>Пять вопросов по одному. Выбери ответ, прочитай пояснение и переходи к следующему вопросу.</p>
+                    <div class="paper" id="reviewQuiz">
+            <div class="controlsrow review-top"><p class="score" id="reviewCount"></p></div>
+            <h3 id="reviewQuestion" tabindex="-1"></h3>
+            <div class="quiz-options" id="reviewOptions" role="group" aria-labelledby="reviewQuestion"></div>
+            <div class="result" id="reviewFeedback" role="status">Выбери один из четырёх вариантов.</div>
+            <button class="action below" id="reviewNext" hidden>Следующий вопрос</button>
+          </div>
+          <div id="reviewSummary" hidden>
+            <div class="paper review-celebration">
+              <div id="reviewConfetti" class="review-confetti" aria-hidden="true"></div>
+              <div class="bigicon" aria-hidden="true">🎉</div>
+              <h3 id="reviewSummaryTitle" tabindex="-1">Ты молодец!</h3>
+              <div class="review-total" id="reviewTotal">5 из 5</div>
+              <p class="small">баллов за повторение</p>
+              <p id="reviewMessage"></p>
+            </div>
+            <details class="card explanation below" id="reviewDetails">
+              <summary>Мои ответы и правильные решения</summary>
+              <ol id="reviewAnswerList" class="review-answers"></ol>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Маска">
+        <div class="wrap spaced">
+          <header class="slidehead"><span class="eyebrow">03 · ЧТО ПОКАЗЫВАЕТ МАСКА</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <h2>Где сеть, а где компьютер?</h2>
+          <p><strong>IP-адрес</strong> содержит часть сети и часть узла. Узел — например, твой компьютер.</p>
+          <div class="definition"><strong>Маска подсети — 32-битное число, которое показывает, какая часть IP-адреса относится к сети, а какая — к узлу.</strong></div>
+          <div class="paper">
+            <p>Представь: <strong>сеть — улица, узел — дом на ней.</strong> Переключи маску и посмотри, как изменится граница.</p>
+            <div class="tabs">
+              <button class="tab" data-mask="24" aria-pressed="true">255.255.255.0</button>
+              <button class="tab" data-mask="16" aria-pressed="false">255.255.0.0</button>
+            </div>
+            <div class="address" id="splitAddress">
+            </div>
+            <div id="splitResult" class="result">
+            </div>
+          </div>
+          <details class="card explanation">
+            <summary>Зачем компьютеру знать свою сеть?</summary>
+            <p>Чтобы решить: <strong>отправить данные напрямую в своей сети или передать их роутеру для отправки в другую сеть</strong>.</p>
+            <p>У тебя <code>192.168.1.37</code> с маской <code>255.255.255.0</code>. Принтер <code>192.168.1.50</code> — в той же подсети <code>192.168.1.0</code>: обращаемся напрямую. Устройство <code>192.168.2.50</code> — в другой: нужен роутер.</p>
+            <p><strong>Маска помогает узнать, где получатель: «у нас» или «в другой сети».</strong> IP-адрес компьютера при этом не меняется.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Биты">
+        <div class="wrap">
+          <header class="slidehead"><span class="eyebrow">04 · БИТЫ</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <h2>Восемь переключателей — один октет</h2>
+          <p>Мы видим IP-адрес и маску как числа, а компьютер работает с <strong>нулями и единицами — битами</strong>. Каждое число между точками — октет из 8 бит.</p>
+          <p><strong>Зачем это здесь?</strong> Маска действует на каждый бит IP-адреса отдельно. Чтобы понять, как работают 255, 0 и 128 в маске, сначала научимся читать их двоичную запись.</p>
+          <div class="bits-layout">
+            <div class="paper">
+              <div class="score" id="bitTarget">Задание: собери 128</div>
+              <p class="small">Нажимай на биты: 0 — выключен, 1 — включён. Число над кнопкой — её вес. Сложи веса всех включённых битов.</p>
+              <div class="bitrow" id="binaryBits"></div>
+              <div class="formula" id="binaryValue" aria-live="polite"></div>
+              <div class="controlsrow">
+                <button class="action" id="checkBits">Проверить</button>
+                <button class="action secondary" id="zeroBits">Обнулить</button>
+              </div>
+              <div class="result" id="bitFeedback" role="status">Подсказка: 128 — это первый разряд.</div>
+                                  <p class="below"><strong>Связь с маской:</strong> <code>11111111₂ = 255</code> — все 8 битов будут сохранены; <code>00000000₂ = 0</code> — все обнулятся. Дальше применим это правило к IP-адресу.</p>
+
+            </div>
+
+            <aside class="card bit-target-panel" aria-label="Числа для сборки">
+              <h3>Собери числа</h3>
+              <div class="bit-targets">
+                <button class="tab" data-bit-target="128" aria-pressed="true">128</button>
+                <button class="tab" data-bit-target="37" aria-pressed="false">37</button>
+                <button class="tab" data-bit-target="150" aria-pressed="false">150</button>
+                <button class="tab" data-bit-target="192" aria-pressed="false">192</button>
+                <button class="tab" data-bit-target="255" aria-pressed="false">255</button>
+              </div>
+              <p class="small below" id="bitScore" role="status">Собрано: 0 из 5</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Фильтр">
+        <div class="wrap">
+          <header class="slidehead"><span class="eyebrow">05 · МАСКА КАК ФИЛЬТР</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <h2>Из адреса компьютера — адрес его сети</h2>
+          <p>У компьютера адрес <code>192.168.1.37</code>. <strong>Как узнать, к какой подсети он относится?</strong> Наложим маску <code>255.255.255.0</code>: сохраним часть сети и заменим часть узла нулями.</p>
+          <div class="grid2">
+            <div class="paper">
+              <h3>Читаем сверху вниз</h3>
+              <div class="maskrow"><strong>IP</strong>
+                <div class="octets"><span class="keep">192</span><span class="keep">168</span><span class="keep">1</span><span>37</span></div>
+              </div>
+              <div class="maskrow"><strong>Маска</strong>
+                <div class="octets"><span class="keep">255</span><span class="keep">255</span><span class="keep">255</span><span>0</span></div>
+              </div>
+              <p class="small">Под 192, 168 и 1 стоит 255: эти числа сохранятся. Под 37 стоит 0: вместо 37 запишем 0.</p>
+              <button class="action" id="applyMask" style="margin-top:14px">Применить маску</button>
+              <div class="maskrow" id="networkRow" hidden>
+                <strong>Сеть</strong>
+                <div class="octets"><span class="keep">192</span><span class="keep">168</span><span class="keep">1</span><span>0</span></div>
+              </div>
+              <div id="maskResult" class="result" role="status">Назови результат и нажми «Применить маску», чтобы проверить.</div>
+            </div>
+            <div class="card">
+              <h3>Что значит «наложить маску»?</h3>
+              <p>Сравнить каждую пару битов IP и маски. <strong>1 в маске — оставь бит IP; 0 — запиши 0.</strong> Это логическое И (AND): единица получается только у пары 1 и 1.</p>
+              <p><strong>255 = 11111111</strong> — восемь команд «сохранить».<br><strong>0 = 00000000</strong> — восемь команд «обнулить».</p>
+              <p class="small">Например, последний октет 37:</p>
+              <div class="binary-filter" aria-label="Побитовое И: 37 и 0 дают 0">
+                <span>37 (IP)</span><code>00100101</code>
+                <span>0 (маска)</span><code>00000000</code>
+                <strong>Итог: 0</strong><code>00000000</code>
+              </div>
+            </div>
+          </div>
+          <div class="definition"><strong>Что получили?</strong> Общий адрес подсети — <code>192.168.1.0</code>. Так компьютер может сравнить свою подсеть с подсетью получателя. Сам IP-адрес компьютера остаётся <code>192.168.1.37</code>.</div>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Маска по шагам">
+        <div class="wrap">
+          <header class="slidehead"><span class="eyebrow">06 · ПО ШАГАМ</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <h2>Почему получается 128?</h2>
+          <p>Пройдём вычисление: <strong>записать биты → оставить нужные → прочитать число.</strong></p>
+          <div class="paper">
+            <div><strong>IP: <code id="exampleIp">192.168.1.150</code></strong> · Маска: <code>255.255.255.128</code></div>
+            <p class="small">Первые три октета не меняются: под ними в маске стоит 255. Разбираем последний октет.</p>
+            <div class="mask-stages">
+              <button class="mask-stage" data-step="0" aria-pressed="true">1. Число в битах</button>
+              <button class="mask-stage" data-step="1">2. Биты маски</button>
+              <button class="mask-stage" data-step="2">3. Наложение</button>
+              <button class="mask-stage" data-step="3">4. Адрес сети</button>
+            </div>
+            <div class="mask-bit-table" id="bitTable">
+            </div>
+            <div class="mask-explain" id="stepText">
+            </div>
+            <div class="controlsrow" style="margin-top:14px">
+              <button class="action" id="nextStep">Дальше</button>
+              <button class="action secondary" id="resetStep">Сначала</button>
+            </div>
+          </div>
+          <div class="definition"><strong>Главная идея:</strong> число 128 в маске — это <code>10000000</code>: оно оставляет только первый бит последнего октета.</div>
+          <details class="card explanation below">
+            <summary>Зачем нужна маска с 128 и что это даёт?</summary>
+            <p><strong>Чтобы разделить одну большую подсеть на две меньшие.</strong> Например, администратор хочет выделить отдельную подсеть каждому из двух кабинетов.</p>
+            <p>С маской <code>255.255.255.0</code> весь диапазон <code>192.168.1.0–192.168.1.255</code> относится к одной подсети. С маской <code>255.255.255.128</code> он делится пополам:</p>
+            <ul>
+              <li>Последнее число IP от <strong>0 до 127</strong> — подсеть <code>192.168.1.0</code>.</li>
+              <li>Последнее число IP от <strong>128 до 255</strong> — подсеть <code>192.168.1.128</code>.</li>
+            </ul>
+            <p><strong>Почему именно 128?</strong> Его двоичная запись — <code>10000000</code>. Первый бит различает две половины: у чисел 0–127 он равен 0, у чисел 128–255 — 1. Маска сохраняет этот бит, чтобы определить подсеть.</p>
+            <p>Наше число <strong>150 попадает во вторую половину</strong>, поэтому адрес сети — <code>192.168.1.128</code>. Например, <code>192.168.1.200</code> будет в той же подсети, а <code>192.168.1.50</code> — в другой: для связи между подсетями нужен роутер.</p>
+            <p><strong>Важно различать:</strong> 128 в маске — выбранное при настройке правило разделения; 128 в адресе сети — результат применения этого правила к IP. Маску не вычисляют из числа 150.</p>
+            <p class="small">В каждом из этих диапазонов первый адрес обозначает сеть, а последний служит для рассылки всем её устройствам. Устройствам доступны адреса 1–126 и 129–254 соответственно.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Практика">
+        <div class="wrap">
+          <header class="slidehead"><span class="eyebrow">07 · ПРАКТИКА</span>
+            <button class="action advance" data-next>Далее</button>
+          </header>
+          <h2>Найди адрес сети</h2>
+          <p>Выбери вкладку и реши три примера. В каждом запиши полный адрес сети. Ответы сохраняются при переключении вкладок до перезагрузки страницы.</p>
+          <div class="paper"><span class="tag">3 задания · по 3 примера</span>
+            <div class="tabs">
+              <button class="tab" data-task="0" aria-pressed="true">Задание 1</button>
+              <button class="tab" data-task="1" aria-pressed="false">Задание 2</button>
+              <button class="tab" data-task="2" aria-pressed="false">Задание 3</button>
+            </div>
+            <h3 class="below" id="taskTitle"></h3>
+            <p id="taskIntro"></p>
+            <div class="practice-grid" id="taskExamples"></div>
+            <p class="score below" id="taskScore" role="status">Решено: 0 из 9</p>
+          </div>
+        </div>
+      </section>
+
+          <section class="slide" aria-label="Итоги урока">
+        <div class="wrap hero">
+          <div>
+            <header class="slidehead">
+              <span class="eyebrow">08 · ИТОГИ УРОКА</span>
+              <button class="action advance" data-next>К началу</button>
+            </header>
+            <h2>Как оценить результат</h2>
+            <p class="rubric-subtitle"><strong>Всего 10 баллов:</strong> 5 баллов за повторение и 5 баллов за вычисление адресов сети по маске.</p>
+            <div class="rubric">
+              <div class="row rubric-card">
+                <div class="rs">9–10</div>
+                <div><strong>Отлично</strong><span class="sub">Безошибочно определяешь сеть по любой маске, включая побитовое наложение.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">7–8</div>
+                <div><strong>Хорошо</strong><span class="sub">Уверенно работаешь со стандартными масками (255.255.255.0), 1 ошибка в битах.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">5–6</div>
+                <div><strong>Понял основы</strong><span class="sub">Понимаешь деление на сеть и узел, но путаешься в двоичном умножении AND.</span></div>
+              </div>
+              <div class="row rubric-card">
+                <div class="rs">0–4</div>
+                <div><strong>Нужно потренироваться</strong><span class="sub">Вернись к слайдам 4–6 и повтори, как маска накладывается на октеты.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="paper pad summary-panel">
+            <h3><i data-flaticon="graduation-cap"></i> После урока вы умеете</h3>
+            <div class="summary summary-list">
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Объяснять роль маски подсети как границы между сетью и узлом.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Вычислять адрес сети для масок 255.255.255.0 и 255.255.0.0 без калькулятора.</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Применять побитовую операцию AND для нестандартных масок (например, .128).</span></div>
+              <div class="sum summary-item"><span class="check-icon">✓</span><span class="sum-text">Определять, находятся ли два устройства в одной подсети или им нужен роутер.</span></div>
+            </div>
+            <div class="definition conclusion-box">
+              <div class="conclusion-badge"><i data-flaticon="bulb"></i> Главный вывод</div>
+              <p>Маска подсети — это фильтр. Единицы маски показывают, какие биты адреса обозначают сеть, а нули — какие относятся к устройству.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <nav class="dots" id="dots" aria-label="Слайды урока">
+    </nav>
+    
+  
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущий слайд"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующий слайд"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+            <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-01-v14"></script>
+            <script src="../../скрипты/lessons.js?v=auth-cloud-20261101-v7"></script>
+</body>
+</html>
+
+
