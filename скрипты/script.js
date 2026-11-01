@@ -221,11 +221,18 @@ fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store'
   .catch(() => {});
 
 let publicVisibility = {};
+let homeVisibilityRequest = null;
+let refreshHomeLessonList = null;
+
+const normalizeVisibilityKey = key => {
+  const normalized = String(key || '').replace(/\\/g, '/').replace(/^\/+/, '');
+  try { return decodeURIComponent(normalized); } catch (e) { return normalized; }
+};
+
 const lessonIsPublic = (file) => {
   if (!file) return true;
   const normalized = file.replace(/\\/g, '/').replace(/^\/+/, '');
-  let decoded = normalized;
-  try { decoded = decodeURIComponent(normalized); } catch (e) {}
+  const decoded = normalizeVisibilityKey(normalized);
 
   const parts = decoded.split('/');
   if (parts.length >= 2) {
@@ -241,25 +248,40 @@ const lessonIsPublic = (file) => {
 
 const applyHomeVisibility = (payload) => {
   if (!payload?.lessons) return;
-  publicVisibility = Object.assign(publicVisibility, payload.lessons);
+  Object.entries(payload.lessons).forEach(([key, isVisible]) => {
+    publicVisibility[normalizeVisibilityKey(key)] = isVisible;
+  });
+  const backdrop = document.getElementById('modal-backdrop-el');
+  if (backdrop?.classList.contains('active')) refreshHomeLessonList?.();
 };
 
-fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' })
-  .then(response => response.ok ? response.json() : null)
-  .then(applyHomeVisibility)
-  .catch(() => {});
+function refreshHomeVisibility() {
+  if (homeVisibilityRequest) return homeVisibilityRequest;
 
-fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' })
-  .then(r => r.ok ? r.json() : null)
-  .then(data => {
-    if (data?.url) {
-      fetch(data.url + '/api/lesson-visibility-public?t=' + Date.now(), { cache: 'no-store' })
-        .then(r => r.ok ? r.json() : null)
-        .then(applyHomeVisibility)
-        .catch(() => {});
+  homeVisibilityRequest = (async () => {
+    try {
+      const localResponse = await fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' });
+      if (localResponse.ok) applyHomeVisibility(await localResponse.json());
+
+      const configResponse = await fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!configResponse.ok) return;
+      const config = await configResponse.json();
+      if (!config?.url) return;
+
+      const response = await fetch(config.url + '/api/lesson-visibility-public?t=' + Date.now(), { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Visibility request failed: ${response.status}`);
+      applyHomeVisibility(await response.json());
+    } catch (error) {
+      console.warn('Could not refresh public lesson visibility:', error);
+    } finally {
+      homeVisibilityRequest = null;
     }
-  })
-  .catch(() => {});
+  })();
+
+  return homeVisibilityRequest;
+}
+
+refreshHomeVisibility();
 
 function showClassModal(id) {
   const data = LESSONS_DATABASE[id];
@@ -281,46 +303,57 @@ function showClassModal(id) {
 
   const list = document.getElementById('modal-lessons-list');
   if (list) {
-    list.innerHTML = '';
-    list.scrollTop = 0;
+    const renderLessonList = () => {
+      const scrollTop = list.scrollTop;
+      list.innerHTML = '';
 
-    const renderLessonCard = (l) => {
-      const row = document.createElement('a');
-      row.className = 'lesson-card-item lesson-row-card';
-      row.href = encodeURI(l.path || l.file);
-      row.innerHTML = `
-        <div class="lesson-num-badge lesson-badge-id">${l.num}</div>
-        <div class="lesson-title-text lesson-title-label">${l.title}</div>
-        <div class="lesson-arrow-icon btn-launch-lesson" aria-hidden="true">
-          <i class="fa-solid fa-arrow-right"></i>
-        </div>
-      `;
-      list.appendChild(row);
+      const renderLessonCard = (l) => {
+        const row = document.createElement('a');
+        row.className = 'lesson-card-item lesson-row-card';
+        row.href = encodeURI(l.path || l.file);
+        row.innerHTML = `
+          <div class="lesson-num-badge lesson-badge-id">${l.num}</div>
+          <div class="lesson-title-text lesson-title-label">${l.title}</div>
+          <div class="lesson-arrow-icon btn-launch-lesson" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        `;
+        list.appendChild(row);
+      };
+
+      const quarterNames = data.quarters ? Object.keys(data.quarters) : [];
+      const hasMultipleQuarters = quarterNames.length > 1;
+
+      if (hasMultipleQuarters) {
+        quarterNames.forEach(qName => {
+          const qLessons = data.quarters[qName] || [];
+          const visibleLessons = newestLessonsFirst(qLessons.filter(l => lessonIsPublic(l.path || l.file)));
+          if (visibleLessons.length === 0) return;
+
+          if (qName !== '2 четверть') {
+            const qDivider = document.createElement('div');
+            qDivider.className = 'modal-quarter-divider';
+            qDivider.innerHTML = `<span>${qName}</span>`;
+            list.appendChild(qDivider);
+          }
+
+          visibleLessons.forEach(renderLessonCard);
+        });
+      } else {
+        const lessons = data.lessons || [];
+        const visibleLessons = newestLessonsFirst(lessons.filter(l => lessonIsPublic(l.path || l.file)));
+        visibleLessons.forEach(renderLessonCard);
+      }
+
+      list.scrollTop = scrollTop;
     };
 
-    const quarterNames = data.quarters ? Object.keys(data.quarters) : [];
-    const hasMultipleQuarters = quarterNames.length > 1;
-
-    if (hasMultipleQuarters) {
-      quarterNames.forEach(qName => {
-        const qLessons = data.quarters[qName] || [];
-        const visibleLessons = newestLessonsFirst(qLessons.filter(l => lessonIsPublic(l.path || l.file)));
-        if (visibleLessons.length === 0) return;
-
-        if (qName !== '2 четверть') {
-          const qDivider = document.createElement('div');
-          qDivider.className = 'modal-quarter-divider';
-          qDivider.innerHTML = `<span>${qName}</span>`;
-          list.appendChild(qDivider);
-        }
-
-        visibleLessons.forEach(renderLessonCard);
-      });
-    } else {
-      const lessons = data.lessons || [];
-      const visibleLessons = newestLessonsFirst(lessons.filter(l => lessonIsPublic(l.path || l.file)));
-      visibleLessons.forEach(renderLessonCard);
-    }
+    renderLessonList();
+    refreshHomeLessonList = () => {
+      if (backdrop?.classList.contains('active') && backdrop.dataset.classTheme === id) {
+        renderLessonList();
+      }
+    };
   }
 
   const backdrop = document.getElementById('modal-backdrop-el');
@@ -332,6 +365,7 @@ function showClassModal(id) {
   backdrop.classList.add('active');
   backdrop.classList.add('is-open');
   document.body.classList.add('modal-open');
+  refreshHomeVisibility();
 
   requestAnimationFrame(() => {
     document.querySelector('.btn-close-modal')?.focus({ preventScroll: true });

@@ -269,6 +269,14 @@
   let activeTabId = detectCurrentClass();
 
   let publicVisibility = {};
+  let visibilityRefreshRequest = null;
+  let localVisibilityLoaded = false;
+  let remoteVisibilityLoaded = false;
+
+  const normalizeVisibilityKey = key => {
+    const normalized = String(key || '').replace(/\\/g, '/').replace(/^\/+/, '');
+    try { return decodeURIComponent(normalized); } catch (e) { return normalized; }
+  };
 
   const lessonIsPublic = (file) => {
 
@@ -276,9 +284,7 @@
 
     const normalized = file.replace(/\\/g, '/').replace(/^\/+/, '');
 
-    let decoded = normalized;
-
-    try { decoded = decodeURIComponent(normalized); } catch (e) {}
+    const decoded = normalizeVisibilityKey(normalized);
 
 
 
@@ -303,6 +309,62 @@
     return true;
 
   };
+
+  function applyPublicVisibility(payload) {
+    if (!payload?.lessons) return;
+
+    Object.entries(payload.lessons).forEach(([key, isVisible]) => {
+      publicVisibility[normalizeVisibilityKey(key)] = isVisible;
+    });
+
+    updateLessonVisibilityUI();
+  }
+
+  function updateLessonVisibilityUI() {
+    checkCurrentLessonAccess();
+
+    const backdrop = document.getElementById('modal-backdrop-el');
+    if (backdrop?.classList.contains('active')) renderModalLessons(activeTabId);
+  }
+
+  function refreshPublicLessonVisibility() {
+    if (visibilityRefreshRequest) return visibilityRefreshRequest;
+
+    visibilityRefreshRequest = (async () => {
+      try {
+        if (!localVisibilityLoaded) {
+          const localResponse = await fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' });
+          if (localResponse.ok) {
+            const payload = await localResponse.json();
+            if (payload?.lessons) {
+              Object.entries(payload.lessons).forEach(([key, isVisible]) => {
+                publicVisibility[normalizeVisibilityKey(key)] = isVisible;
+              });
+            }
+            localVisibilityLoaded = true;
+          }
+        }
+
+        const configResponse = await fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' });
+        if (configResponse.ok) {
+          const config = await configResponse.json();
+          if (config?.url) {
+            const response = await fetch(config.url + '/api/lesson-visibility-public?t=' + Date.now(), { cache: 'no-store' });
+            if (!response.ok) throw new Error(`Visibility request failed: ${response.status}`);
+            applyPublicVisibility(await response.json());
+            remoteVisibilityLoaded = true;
+          }
+        }
+      } catch (error) {
+        console.warn('Could not refresh public lesson visibility:', error);
+      } finally {
+        if (!remoteVisibilityLoaded) updateLessonVisibilityUI();
+        visibilityRefreshRequest = null;
+      }
+    })();
+
+    return visibilityRefreshRequest;
+  }
 
 
 
@@ -352,6 +414,15 @@
 
   }
 
+  function unblockHiddenLesson() {
+    const main = document.querySelector('main');
+    if (main) main.style.display = '';
+    document.querySelectorAll('.slide, .dots, .progress, .nav-controls, .slide-next, .mobile').forEach(el => {
+      el.style.display = '';
+    });
+    document.getElementById('lesson-hidden-overlay')?.remove();
+  }
+
 
 
   function checkCurrentLessonAccess() {
@@ -363,6 +434,10 @@
     if (!lessonIsPublic(relPath)) {
 
       blockHiddenLesson();
+
+    } else {
+
+      unblockHiddenLesson();
 
     }
 
@@ -507,6 +582,7 @@
     document.body.classList.add('modal-open');
 
     renderModalLessons(activeTabId);
+    refreshPublicLessonVisibility();
 
   }
 
@@ -14479,51 +14555,7 @@ const slides = [...document.querySelectorAll('.slide')];
 
     initClassesModal();
 
-    const applyVisibility = (payload) => {
-
-      if (!payload?.lessons) return;
-
-      publicVisibility = Object.assign(publicVisibility, payload.lessons);
-
-      checkCurrentLessonAccess();
-
-      try { renderClassesList(activeTabId); } catch (_) {}
-
-    };
-
-
-
-    fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' })
-
-      .then(response => response.ok ? response.json() : null)
-
-      .then(applyVisibility)
-
-      .catch(() => {});
-
-
-
-    fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' })
-
-      .then(r => r.ok ? r.json() : null)
-
-      .then(data => {
-
-        if (data?.url) {
-
-          fetch(data.url + '/api/lesson-visibility-public?t=' + Date.now(), { cache: 'no-store' })
-
-            .then(r => r.ok ? r.json() : null)
-
-            .then(applyVisibility)
-
-            .catch(() => {});
-
-        }
-
-      })
-
-      .catch(() => {});
+    refreshPublicLessonVisibility();
 
     initUniversalSlideController();
 
