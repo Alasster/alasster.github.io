@@ -1217,6 +1217,7 @@
     "key": "unlock",
     "percent": "calculator",
     "plus": "plus",
+    "reply": "arrow-comparison",
     "right-left": "arrow-comparison",
     "route": "sitemap",
     "ruler": "settings-sliders",

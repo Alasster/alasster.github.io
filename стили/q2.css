@@ -3603,7 +3603,7 @@ body.lesson-page[data-lesson-id^="10emn"] .q2-code.is-compact pre {
 body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-wide,
 body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact {
   padding: clamp(14px, 2vw, 20px);
-  border: 1px solid rgba(255, 255, 255, 0.96);
+  border: none !important;
   border-radius: 24px;
   background: var(--lesson-card-surface, #f7f8fc);
   box-shadow: var(--lesson-card-shadow, var(--q2-shadow-sm));

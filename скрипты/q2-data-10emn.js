@@ -108,29 +108,29 @@
       .q2-rec-o3 { opacity: 0; animation: q2-rec-out-3 10s ease-out infinite; }
       .q2-rec-o4 { opacity: 0; animation: q2-rec-out-4 10s ease-out infinite; }
     </style>
-    <rect x="8" y="8" width="544" height="374" rx="20" fill="#edf3f7" stroke="#c8d6e0" stroke-width="2"/>
+    <rect x="8" y="8" width="544" height="374" rx="20" fill="#edf3f7"/>
     <path d="M28 8h504a20 20 0 0 1 20 20v30H8V28A20 20 0 0 1 28 8z" fill="#f9fbfd"/>
     <circle cx="32" cy="29" r="6" fill="#f87171"/><circle cx="52" cy="29" r="6" fill="#fbbf24"/><circle cx="72" cy="29" r="6" fill="#34d399"/>
     <text x="112" y="34" fill="#42586b" font-family="sans-serif" font-size="15" font-weight="700">Python IDLE · recursion.py</text>
-    <rect x="18" y="52" width="326" height="310" rx="10" fill="#fff" stroke="#d7e1e9"/>
+    <rect x="18" y="52" width="326" height="310" rx="10" fill="#fff"/>
     <text x="34" y="76" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="700">Код программы</text>
-    <g font-family="monospace" font-size="14" font-weight="600">
-      <rect class="q2-rec-l-def" x="26" y="88" width="310" height="29" rx="5" fill="#f4f1ff"/>
-      <text x="34" y="108" fill="#6d28d9">def countdown(n):</text>
-      <rect class="q2-rec-l-if" x="26" y="120" width="310" height="29" rx="5" fill="#f4f1ff"/>
-      <text x="34" y="140" fill="#334155">    if n == 0:      # база</text>
-      <rect class="q2-rec-l-bp" x="26" y="152" width="310" height="29" rx="5" fill="#ecfdf5"/>
-      <text x="34" y="172" fill="#047857">        print("Старт!")</text>
-      <rect class="q2-rec-l-br" x="26" y="184" width="310" height="29" rx="5" fill="#ecfdf5"/>
-      <text x="34" y="204" fill="#047857">        return</text>
-      <rect class="q2-rec-l-print" x="26" y="216" width="310" height="29" rx="5" fill="#f4f1ff"/>
-      <text x="34" y="236" fill="#334155">    print(n)</text>
-      <rect class="q2-rec-l-step" x="26" y="248" width="310" height="29" rx="5" fill="#f4f1ff"/>
-      <text x="34" y="268" fill="#4f46e5">    countdown(n - 1) # шаг</text>
-      <rect class="q2-rec-l-call" x="26" y="280" width="310" height="29" rx="5" fill="#f4f1ff"/>
-      <text x="34" y="300" fill="#0f766e">countdown(3)</text>
+    <g font-family="'JetBrains Mono', Consolas, monospace" font-size="15" font-weight="600">
+      <rect class="q2-rec-l-def" x="26" y="88" width="310" height="29" rx="6" fill="#f4f1ff"/>
+      <text x="36" y="108" fill="#6d28d9">def countdown(n):</text>
+      <rect class="q2-rec-l-if" x="26" y="120" width="310" height="29" rx="6" fill="#f4f1ff"/>
+      <text x="58" y="140" fill="#334155">if n == 0:  # база</text>
+      <rect class="q2-rec-l-bp" x="26" y="152" width="310" height="29" rx="6" fill="#ecfdf5"/>
+      <text x="80" y="172" fill="#047857">print("Старт!")</text>
+      <rect class="q2-rec-l-br" x="26" y="184" width="310" height="29" rx="6" fill="#ecfdf5"/>
+      <text x="80" y="204" fill="#047857">return</text>
+      <rect class="q2-rec-l-print" x="26" y="216" width="310" height="29" rx="6" fill="#f4f1ff"/>
+      <text x="58" y="236" fill="#334155">print(n)</text>
+      <rect class="q2-rec-l-step" x="26" y="248" width="310" height="29" rx="6" fill="#f4f1ff"/>
+      <text x="58" y="268" fill="#4f46e5">countdown(n - 1)  # шаг</text>
+      <rect class="q2-rec-l-call" x="26" y="280" width="310" height="29" rx="6" fill="#f4f1ff"/>
+      <text x="36" y="300" fill="#0f766e">countdown(3)</text>
     </g>
-    <rect x="356" y="52" width="186" height="310" rx="10" fill="#e7eef4" stroke="#d2dee7"/>
+    <rect x="356" y="52" width="186" height="310" rx="10" fill="#e7eef4"/>
     <text x="372" y="76" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="700">Python Shell</text>
     <g font-family="monospace" font-size="17" font-weight="700" fill="#16734a">
       <text x="372" y="108" fill="#536679" font-size="12" font-weight="600">&gt;&gt;&gt; countdown(3)</text>
@@ -250,35 +250,36 @@
       {
         k: 'concept',
         eyebrow: '02 · ВСПОМИНАЕМ PYTHON',
-        title: 'Что означает <code>def</code>?',
-        lead: 'Функцию сначала описывают, а затем вызывают по имени.',
+        title: 'Что означают <code>def</code> и <code>return</code>?',
+        lead: 'Ключевое слово <code>def</code> (от англ. <i>define</i> — определить) указывает Python, что мы создаём новую функцию. Это нужно, чтобы записать блок команд один раз, а затем многократно вызывать его по имени в любых местах программы с разными аргументами.',
         blocks: [
           {
             t: 'code',
-            title: 'обычная функция.py',
-            code: 'def greet(name):\n    print("Привет,", name)\n\ngreet("Алия")'
+            title: 'функция_с_возвратом.py',
+            code: 'def double(x):\n    result = x * 2\n    return result  # возвращаем вычисленный результат\n\na = double(5)      # в переменную a запишется число 10\nprint("Итог:", a)'
           },
           {
             t: 'cards',
-            cols: 2,
+            cols: 3,
             items: [
-              { icon: 'fas fa-code', title: 'Объявление', text: '<code>def</code> начинает описание функции. <code>greet</code> — её имя, <code>name</code> — параметр.', tone: 'violet' },
-              { icon: 'fas fa-play', title: 'Вызов', text: '<code>greet("Алия")</code> запускает тело функции; значение «Алия» попадает в параметр <code>name</code>.', tone: 'cyan' }
+              { icon: 'fas fa-code', title: 'def · Создание', text: '<code>def</code> создаёт функцию и задаёт её имя. Нужен, чтобы оформить повторяющийся алгоритм в один именованный блок.', tone: 'violet' },
+              { icon: 'fas fa-play', title: 'Вызов функции', text: 'Вызов <code>double(5)</code> передаёт аргумент <code>5</code> в параметр <code>x</code> и запускает вычисления внутри функции.', tone: 'cyan' },
+              { icon: 'fas fa-reply', title: 'return · Возврат', text: '<code>return</code> отдаёт готовое значение обратно в строку вызова и завершает функцию. Если значения нет, <code>return</code> просто прерывает выполнение.', tone: 'amber' }
             ]
           },
           {
             t: 'callout',
             icon: 'fas fa-lightbulb',
-            title: 'Проверь себя',
-            text: 'Что появится на экране после вызова? А что изменится, если передать имя «Марат»?'
+            title: 'Зачем нужны def и return?',
+            text: 'Функции избавляют от дублирования кода, делают программу структурированной, а <code>return</code> позволяет передавать результаты вычислений между частями программы.'
           }
         ]
       },
       {
         k: 'concept',
         eyebrow: '03 · РЕКУРСИЯ',
-        title: 'Функция вызывает саму себя',
-        lead: 'Рекурсивная функция решает часть задачи, затем вызывает себя для оставшейся, более простой части.',
+        title: 'Что такое рекурсия и зачем она нужна?',
+        lead: '<b>Рекурсия</b> — это способ организации алгоритма, при котором функция внутри себя вызывает саму же себя для решения уменьшенной подзадачи. Это нужно, чтобы легко и наглядно решать сложные задачи, которые естественно делятся на подобные шаги (факториал, обход деревьев и файлов, быстрая сортировка).',
         blocks: [
           {
             t: 'split',
@@ -288,15 +289,15 @@
                 t: 'cards',
                 cols: 1,
                 items: [
-                  { icon: 'fas fa-stop', title: 'База', text: 'Условие, при котором функция больше не вызывает себя. В примере: <code>if n == 0:</code>.', tone: 'green' },
-                  { icon: 'fas fa-rotate-left', title: 'Рекурсивный шаг', text: 'Вызов той же функции с меньшей задачей: <code>countdown(n - 1)</code>.', tone: 'violet' }
+                  { icon: 'fas fa-stop', title: 'База рекурсии (Stop)', text: 'Условие выхода: простейший случай (<code>if n == 0:</code>), где функция сразу завершается через <code>return</code> и больше себя не вызывает.', tone: 'green' },
+                  { icon: 'fas fa-rotate-left', title: 'Рекурсивный шаг', text: 'Вызов той же функции с уменьшенным аргументом (<code>countdown(n - 1)</code>). Шаг за шагом задача уменьшается и приближается к базе.', tone: 'violet' }
                 ]
               },
               {
                 t: 'callout',
                 icon: 'fas fa-circle-info',
                 title: 'Главное правило',
-                text: 'Без базы вызовы никогда не остановятся, а без уменьшения аргумента функция не приблизится к базе.'
+                text: 'В любой рекурсии <b>обязаны быть и база, и шаг</b>: без базы произойдёт переполнение стека (<code>RecursionError</code>), а без шага задача никогда не дойдёт до базы.'
               }
             ],
             right: [
