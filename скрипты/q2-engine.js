@@ -192,7 +192,7 @@
     } else if (kind === 'practice') {
       const tasks = slide.tasks ? widget('mini', { tasks: slide.tasks }) : '';
       body = `${head(slide)}${blocks(slide.before)}${tasks}${blocks(slide.after)}
-        ${slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Критерии успеха', items: slide.criteria }) : ''}`;
+        ${slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Дескриптор', items: slide.criteria }) : ''}`;
     } else if (kind === 'review') {
       body = `${head({ eyebrow: slide.eyebrow || '02 · ПОВТОРЕНИЕ', title: slide.title || 'Повторение предыдущей темы', lead: slide.lead || 'Ответьте на 5 вопросов — они помогут вспомнить главное перед новой темой.' })}${widget('quiz', { questions: slide.questions, variant: 'review' })}`;
     } else if (kind === 'quiz') {
