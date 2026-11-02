@@ -4048,3 +4048,67 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-
   background: #FBEFE8 !important;
   box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.55), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
 }
+
+/* ==========================================================================
+   10 ЕМН: ПОЛНОЕ ОТКЛЮЧЕНИЕ РЕАКЦИИ НА НАВЕДЕНИЕ ДЛЯ ЦЕЛЕЙ УРОКА
+   Никаких анимаций, сдвигов, трансформаций или смены теней при hover
+   ========================================================================== */
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]),
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) * {
+  cursor: default !important;
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+/* Полный запрет pointer-events на бейджах и заголовках цели, чтобы не триггерить hover */
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .q2-goal-title, .goal-title-badge, i, .lesson-flaticon) {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+/* Сохранение строго исходного вида при hover на саму плашку цели */
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  background: #DFEEFA !important;
+  background-color: #DFEEFA !important;
+  background-image: none !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 6px rgba(160, 195, 222, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+/* Сохранение строго исходного вида бейджа с кодом цели */
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code):hover {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(160, 195, 222, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  color: #2563EB !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(i, .lesson-flaticon):hover {
+  color: #2563EB !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge):hover {
+  color: #547B9C !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) p:hover {
+  color: #1E3A5F !important;
+  transform: none !important;
+  cursor: default !important;
+}
