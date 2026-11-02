@@ -45,9 +45,24 @@
     });
   }
 
+  function getUserRole() {
+    if (window.currentCabinetUser?.role) return window.currentCabinetUser.role;
+    if (window.currentUserRole) return window.currentUserRole;
+    try {
+      const stored = JSON.parse(localStorage.getItem('alasster_auth_user') || '{}');
+      return stored.role;
+    } catch (_) {
+      return null;
+    }
+  }
+
   async function refresh() {
     if (refreshing) return;
-    const role = window.currentCabinetUser?.role;
+    const role = getUserRole();
+    if (!role) {
+      setTimeout(refresh, 400);
+      return;
+    }
     if (role !== 'superadmin' && role !== 'teacher') return;
 
     refreshing = true;
@@ -129,5 +144,11 @@
     if (!document.hidden) refresh();
   });
 
-  window.KspButtons = { refresh };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(refresh, 200));
+  } else {
+    setTimeout(refresh, 200);
+  }
+
+  window.KspButtons = { refresh, paint };
 })();

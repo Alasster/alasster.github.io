@@ -558,6 +558,8 @@ class KspService:
             index = self.drive.index_docs()
         except Exception:
             return
+        if not index:
+            return
         self._index, self._index_ts = index, time.time()
         try:
             all_keys = self._all_lesson_keys()
@@ -568,7 +570,7 @@ class KspService:
                     except Exception:
                         continue
                     title = output_path(src, self.output_root).stem
-                    doc_id = index.get((src['class_name'], src['quarter'], title))
+                    doc_id = index.get((src['class_name'], src['quarter'], title)) or index.get((src['class_name'], src['quarter'], f'{title}.docx'))
                     row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                     if doc_id:
                         if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
@@ -577,8 +579,8 @@ class KspService:
                         db.execute('INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
                                    (key, ident, 'ready', 'КСП готов в Google Диске', f'gdrive:{doc_id}', src['source_hash']))
                     elif row and row['status'] == 'ready' and str(row['path']).startswith('gdrive:'):
-                        # Only remove if it wasn't just created within the last 10 seconds
-                        if time.time() - self._last_upload_ts > 10.0:
+                        file_id = str(row['path'])[7:]
+                        if file_id not in index.values() and (time.time() - self._last_upload_ts > 15.0):
                             db.execute('DELETE FROM jobs WHERE key=?', (key,))  # doc was deleted from Drive
         except Exception:
             pass
@@ -597,16 +599,8 @@ class KspService:
     def public(self, row: dict) -> dict | None:
         result = {k: row[k] for k in ('id', 'status', 'message')}
         if row.get('status') == 'ready':
-            if self.cloud:
-                # If cloud, only consider ready if file is actually indexed on Google Drive
-                if str(row.get('path', '')).startswith('gdrive:'):
-                    file_id = str(row['path'])[7:]
-                    if file_id not in self._index.values():
-                        return None
-            else:
-                if row.get('path') and not Path(row['path']).is_file():
-                    return None
-        if row.get('status') == 'ready':
+            if self.local and row.get('path') and not str(row['path']).startswith('gdrive:') and not Path(row['path']).is_file():
+                return None
             result['url'] = f"/api/ksp/{row['id']}/document"
             result['view_url'] = f"/api/ksp/{row['id']}/google-docs"
 
@@ -621,7 +615,7 @@ class KspService:
                 except Exception:
                     pass
             result['google_docs_url'] = direct_docs_url or f"/api/ksp/{row['id']}/google-docs"
-            result['drive_url'] = "https://drive.google.com/drive/folders/1GWtxb0KmS5kHJmaHMow_yf1I-8aVL5M_"
+            result['drive_url'] = "https://drive.google.com/drive/folders/18h133lNzCI2QeKfuLQmbZjDvlLSZ4Yq9"
         return result
 
     def update(self, key: str, status: str, message: str, path: str = ''):
@@ -694,7 +688,9 @@ class KspService:
                     doc_id = self.drive.upload_docx_as_gdoc(tmp, [source['class_name'], source['quarter']], title)
                     import time
                     self._last_upload_ts = time.time()
-                    self._index_ts = 0.0
+                    self._index_ts = time.time()
+                    self._index[(source['class_name'], source['quarter'], title)] = doc_id
+                    self._index[(source['class_name'], source['quarter'], f'{title}.docx')] = doc_id
                     self.update(key, 'ready', 'КСП сохранён в Google Диске', f'gdrive:{doc_id}')
                     return
                 finally:

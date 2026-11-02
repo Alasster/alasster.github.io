@@ -242,6 +242,14 @@ function applyUserRole(userRole) {
 }
 
 // Synchronously apply initial role from body attribute or localStorage before first render
+try {
+  const cachedUser = JSON.parse(localStorage.getItem('alasster_auth_user') || 'null');
+  if (cachedUser && cachedUser.role) {
+    window.currentCabinetUser = cachedUser;
+    window.currentUserRole = cachedUser.role;
+  }
+} catch (_) {}
+
 const initialRole = document.body.dataset.userRole || (() => {
   try {
     return JSON.parse(localStorage.getItem('alasster_auth_user') || '{}').role;
@@ -363,6 +371,7 @@ async function loadCurrentUser() {
   const user = await response.json();
 
   window.currentCabinetUser = user;
+  window.KspButtons?.refresh();
 
   try {
 
