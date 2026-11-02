@@ -3636,8 +3636,36 @@ body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact svg {
 }
 
 @media (max-width: 900px) {
+  body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-rec-slide-split,
+  body.lesson-page .q2-rec-slide-split,
+  body.lesson-page .q2-graph-split,
   body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-idle-guide {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact {
+    max-width: 100% !important;
+    margin: 10px 0 0 !important;
+    padding: 12px 14px !important;
+  }
+
+  body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact svg {
+    max-height: none !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 680px) {
+  body.lesson-page .q2-grid-3,
+  body.lesson-page .q2-grid-2,
+  body.lesson-page .q2-grid-4 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact {
+    padding: 8px 8px !important;
   }
 }
 
