@@ -3374,6 +3374,14 @@ body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .q2-slid
   .q2-scene-glow {
     animation: none !important;
   }
+
+  body.lesson-page[data-lesson-id="11-q2-1"] .q2-hero-slide .q2-scene-edge-flow {
+    animation: q2-scene-flow 1.8s linear infinite !important;
+  }
+}
+
+body.lesson-page[data-lesson-id="11-q2-1"] .q2-hero-slide .q2-visual {
+  background: var(--surface) !important;
 }
 
 body.lesson-page[data-lesson-id^="10emn"] .q2-code pre {
