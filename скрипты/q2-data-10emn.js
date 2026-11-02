@@ -393,14 +393,6 @@
                 tone: 'amber'
               }
             ]
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-list-check',
-            title: 'Чек-лист перед запуском (F5)',
-            text: '1. Есть ли базовый случай со словом <code>return</code>?<br>' +
-                  '2. Уменьшается ли аргумент в рекурсивном вызове (например, <code>n - 1</code> или <code>exp - 1</code>)?<br>' +
-                  '3. Проверь тесты в Python Shell: <code>echo(3)</code>, <code>print(factorial(4))</code> → 24, <code>print(power(2, 3))</code> → 8.'
           }
         ]
       },
