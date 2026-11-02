@@ -24291,7 +24291,7 @@ body.lesson-page .slide :is(
 /* 3. ONLY INTERACTIVE ELEMENTS react on hover with indentation / вдавливание */
 body.lesson-page :is(
   button:not(:disabled),
-  a[href],
+  a[href]:not(.brand-logo-group):not([class*="brand"]),
   [role="button"]:not(.q2-switch):not(.q2-single-switch),
   input[type="button"],
   input[type="submit"],
@@ -27412,4 +27412,108 @@ body.lesson-page :is(
 
 body.lesson-page :is(.q2-copy, .copy-btn, .btn-copy, [data-copy]) {
   display: none !important;
+}
+
+/* ==========================================================================
+   NAVBAR BRAND LOGO: ABSOLUTELY NO HIGHLIGHT / RECTANGLE AROUND LINK/TEXT
+   ONLY the .brand-icon-box reacts on hover/focus with tactile inset neumorphism.
+   ========================================================================== */
+html body.lesson-page .brand-logo-group,
+html body.lesson-page .brand-logo-group:hover,
+html body.lesson-page .brand-logo-group:focus,
+html body.lesson-page .brand-logo-group:focus-visible,
+html body.lesson-page .brand-logo-group:focus-within,
+html body.lesson-page .brand-logo-group:active,
+html body.lesson-page a.brand-logo-group,
+html body.lesson-page a.brand-logo-group:is(:hover, :focus, :focus-visible, :active),
+html body.lesson-page .navbar a.brand-logo-group,
+html body.lesson-page .navbar a.brand-logo-group:is(:hover, :focus, :focus-visible, :active),
+html body.lesson-page .navbar .brand-logo-group,
+html body.lesson-page .navbar .brand-logo-group:is(:hover, :focus, :focus-visible, :active) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  transform: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer !important;
+}
+
+html body.lesson-page .brand-logo-group .brand-title-text,
+html body.lesson-page .brand-logo-group:is(:hover, :focus, :focus-visible, :active) .brand-title-text,
+html body.lesson-page .navbar .brand-title-text,
+html body.lesson-page .navbar a.brand-logo-group:is(:hover, :focus, :focus-visible, :active) .brand-title-text {
+  border: 0 !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Resting state for brand icon box: raised pill */
+html body.lesson-page .brand-logo-group .brand-icon-box,
+html body.lesson-page .navbar .brand-icon-box,
+html body.lesson-page .brand-icon-box {
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease !important;
+}
+
+/* Grade 9 resting & hover */
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .brand-logo-group .brand-icon-box {
+  background: #FCFAFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 2px 2px 6px rgba(185, 175, 215, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.95) !important;
+}
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .brand-logo-group:hover .brand-icon-box,
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .brand-icon-box:hover {
+  background: #EEEBF8 !important;
+  box-shadow: inset 2px 2px 5px rgba(185, 175, 215, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 10 EMN resting & hover */
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .brand-logo-group .brand-icon-box {
+  background: #F6FBFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 2px 2px 6px rgba(160, 195, 222, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.95) !important;
+}
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .brand-logo-group:hover .brand-icon-box,
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .brand-icon-box:hover {
+  background: #E3F0FA !important;
+  box-shadow: inset 2px 2px 5px rgba(160, 195, 222, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 10 OGN resting & hover */
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .brand-logo-group .brand-icon-box {
+  background: #F7FFFA !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 2px 2px 6px rgba(165, 205, 185, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.95) !important;
+}
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .brand-logo-group:hover .brand-icon-box,
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .brand-icon-box:hover {
+  background: #E5F2EC !important;
+  box-shadow: inset 2px 2px 5px rgba(165, 205, 185, 0.60), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Grade 11 resting & hover */
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-logo-group .brand-icon-box {
+  background: #FFFAF6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 2px 2px 6px rgba(215, 168, 148, 0.45), -2px -2px 6px rgba(255, 255, 255, 0.98) !important;
+}
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-logo-group:hover .brand-icon-box,
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-icon-box:hover {
+  background: #FBEFE8 !important;
+  box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.55), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
 }
