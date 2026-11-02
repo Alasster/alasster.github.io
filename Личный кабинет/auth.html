@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=neumorphism-18">
+  <link rel="stylesheet" href="/static/styles.css?v=neumorphism-19">
 </head>
 <body class="auth-page">
   <main class="auth-card glass-card" id="auth-card">
@@ -26,6 +26,12 @@
           <p>Уже есть аккаунт? Вернитесь к входу и продолжите работу в кабинете.</p>
           <button class="button button-ghost promo-switch" type="button" data-auth-switch="login">Войти</button>
         </div>
+        <div class="promo-content" data-promo-content="reset" hidden>
+          <div class="brand-mark" aria-hidden="true">ALASSTER</div>
+          <h1>Восстановление</h1>
+          <p>Вспомнили пароль? Вернитесь ко входу и продолжите работу в кабинете.</p>
+          <button class="button button-ghost promo-switch" type="button" data-auth-switch="login">Войти</button>
+        </div>
       </section>
 
       <section class="auth-form-panel">
@@ -37,6 +43,9 @@
               <input class="field" id="login-username" name="username" type="email" autocomplete="username" aria-label="Email" required autofocus placeholder="Введите email">
               <input class="field" id="login-password" name="password" type="password" autocomplete="current-password" aria-label="Пароль" required placeholder="Введите пароль">
               <button class="button button-primary" id="login-submit" type="submit">Войти в кабинет</button>
+              <div class="auth-forgot-row">
+                <button class="auth-link-forgot" type="button" data-auth-switch="reset">Забыли пароль?</button>
+              </div>
             </form>
           </div>
 
@@ -52,12 +61,54 @@
               <button class="button button-primary" id="register-submit" type="submit">Создать аккаунт</button>
             </form>
           </div>
+
+          <div class="auth-view" data-auth-view="reset" aria-labelledby="reset-title" hidden>
+            <h2 id="reset-title">Сброс пароля</h2>
+            <div class="alert alert-error" data-auth-alert="reset" role="alert" hidden></div>
+            
+            <!-- Шаг 1: Запрос кода на email -->
+            <form id="reset-request-form" novalidate>
+              <p class="reset-desc">Введите email вашего аккаунта. Мы отправим 4-значный код подтверждения.</p>
+              <input class="field" id="reset-email" name="email" type="email" autocomplete="email" aria-label="Email" required placeholder="Введите email">
+              <button class="button button-primary" id="reset-request-submit" type="submit">Получить код</button>
+              <div class="auth-forgot-row">
+                <button class="auth-link-forgot" type="button" data-auth-switch="login">Вспомнили пароль? Войти</button>
+              </div>
+            </form>
+
+            <!-- Шаг 2: Ввод 4 цифр и нового пароля -->
+            <form id="reset-confirm-form" novalidate hidden>
+              <p class="reset-desc">Код отправлен на <b id="reset-target-email"></b></p>
+              
+              <div class="code-inputs-group">
+                <label class="field-label" style="margin-top:0; margin-bottom:8px;">Код из письма</label>
+                <div class="code-boxes" id="reset-code-boxes">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-box" data-code-idx="0" required autocomplete="one-time-code">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-box" data-code-idx="1" required>
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-box" data-code-idx="2" required>
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-box" data-code-idx="3" required>
+                </div>
+              </div>
+
+              <input class="field" id="reset-new-password" name="password" type="password" autocomplete="new-password" aria-label="Новый пароль" minlength="8" required placeholder="Новый пароль (от 8 символов)">
+              <input class="field" id="reset-new-password-confirm" name="password_confirm" type="password" autocomplete="new-password" aria-label="Повторите новый пароль" minlength="8" required placeholder="Повторите новый пароль">
+              
+              <button class="button button-primary" id="reset-confirm-submit" type="submit">Сменить пароль и войти</button>
+
+              <div class="reset-resend-row">
+                <span id="reset-timer-text" class="reset-timer">Повторная отправка через <b id="reset-timer-sec">60</b>с</span>
+                <button type="button" id="reset-resend-btn" class="auth-link-forgot" style="display:none;">Отправить код ещё раз</button>
+              </div>
+              <div class="auth-forgot-row" style="margin-top:10px;">
+                <button class="auth-link-forgot" type="button" id="reset-back-to-step1">Изменить email</button>
+              </div>
+            </form>
+          </div>
         </div>
       </section>
     </div>
   </main>
 
-  <script src="/static/auth.js?v=auth-redirect-v7"></script>
+  <script src="/static/auth.js?v=auth-reset-v8"></script>
 </body>
 </html>
-

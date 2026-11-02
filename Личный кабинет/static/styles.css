@@ -483,3 +483,85 @@ select.profile-select {
     align-items: center;
   }
 }
+
+
+/* ==========================================================================
+   СТИЛИ ДЛЯ СБРОСА ПАРОЛЯ И ВВОДА 4-ЗНАЧНОГО КОДА
+   ========================================================================== */
+.auth-forgot-row {
+  margin-top: 14px;
+  text-align: center;
+}
+.auth-link-forgot {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  opacity: 0.88;
+  transition: opacity 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.auth-link-forgot:hover {
+  opacity: 1;
+  color: var(--primary-dark);
+}
+.auth-link-forgot:active {
+  transform: translateY(1px);
+}
+.reset-desc {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  text-align: left;
+}
+.code-inputs-group {
+  margin-bottom: 14px;
+  text-align: center;
+}
+.code-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.code-box {
+  width: 54px;
+  height: 58px;
+  border: 0;
+  border-radius: 16px;
+  outline: 0;
+  text-align: center;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--shadow-in);
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+}
+.code-box:focus {
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-in), 0 0 0 3px rgba(83, 109, 254, 0.25);
+}
+.code-box.is-invalid {
+  color: #a24d58;
+  background: #f4e7ea;
+  box-shadow: inset 3px 3px 7px rgba(184, 119, 129, 0.22), inset -3px -3px 7px rgba(255, 248, 249, 0.82), 0 0 0 1px rgba(190, 92, 106, 0.16);
+}
+.reset-resend-row {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+.reset-timer b {
+  color: var(--primary);
+  font-weight: 700;
+}

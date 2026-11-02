@@ -24,7 +24,9 @@ function clearRegisterError() {
 }
 
 function getMode() {
-  return window.location.pathname === '/register' ? 'register' : 'login';
+  if (window.location.pathname === '/register') return 'register';
+  if (window.location.pathname === '/reset-password' || window.location.pathname === '/reset') return 'reset';
+  return 'login';
 }
 
 function setAlert(mode, message, type = 'error') {
@@ -74,8 +76,8 @@ function switchMode(mode, updateUrl = true) {
     } else {
       authCard.classList.remove('is-switching');
     }
-    document.title = mode === 'register' ? 'Регистрация — Личный кабинет' : 'Вход — Личный кабинет';
-    if (updateUrl) window.history.pushState({}, '', mode === 'register' ? '/register' : '/login');
+    document.title = mode === 'register' ? 'Регистрация — Личный кабинет' : (mode === 'reset' ? 'Сброс пароля — Личный кабинет' : 'Вход — Личный кабинет');
+    if (updateUrl) window.history.pushState({}, '', mode === 'register' ? '/register' : (mode === 'reset' ? '/reset-password' : '/login'));
     authViews.find((view) => view.dataset.authView === mode)?.querySelector('input')?.focus();
   }, 160);
 }
@@ -211,3 +213,235 @@ registerForm.addEventListener('submit', async (event) => {
 });
 
 registerFields.forEach((field) => field.addEventListener('input', clearRegisterError));
+
+
+// ==========================================================================
+// ЛОГИКА СБРОСА ПАРОЛЯ И ВВОДА 4-ЗНАЧНОГО КОДА
+// ==========================================================================
+const resetRequestForm = document.getElementById('reset-request-form');
+const resetConfirmForm = document.getElementById('reset-confirm-form');
+const resetEmailInput = document.getElementById('reset-email');
+const resetCodeBoxes = [...document.querySelectorAll('#reset-code-boxes .code-box')];
+const resetNewPassword = document.getElementById('reset-new-password');
+const resetNewPasswordConfirm = document.getElementById('reset-new-password-confirm');
+const resetResendBtn = document.getElementById('reset-resend-btn');
+const resetTimerSec = document.getElementById('reset-timer-sec');
+const resetTimerText = document.getElementById('reset-timer-text');
+const resetBackToStep1 = document.getElementById('reset-back-to-step1');
+
+let currentResetEmail = '';
+let resetTimerInterval = null;
+
+function startResetTimer(seconds = 60) {
+  if (resetTimerInterval) clearInterval(resetTimerInterval);
+  let remaining = seconds;
+  if (resetTimerText) resetTimerText.style.display = 'inline';
+  if (resetResendBtn) resetResendBtn.style.display = 'none';
+  if (resetTimerSec) resetTimerSec.textContent = remaining;
+
+  resetTimerInterval = setInterval(() => {
+    remaining--;
+    if (resetTimerSec) resetTimerSec.textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(resetTimerInterval);
+      resetTimerInterval = null;
+      if (resetTimerText) resetTimerText.style.display = 'none';
+      if (resetResendBtn) resetResendBtn.style.display = 'inline-block';
+    }
+  }, 1000);
+}
+
+// 4-ячеечный ввод кода
+resetCodeBoxes.forEach((box, index) => {
+  box.addEventListener('input', (e) => {
+    box.classList.remove('is-invalid');
+    const val = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = val ? val.slice(-1) : '';
+    if (val && index < resetCodeBoxes.length - 1) {
+      resetCodeBoxes[index + 1].focus();
+    } else if (val && index === resetCodeBoxes.length - 1) {
+      resetNewPassword?.focus();
+    }
+  });
+
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !box.value && index > 0) {
+      resetCodeBoxes[index - 1].focus();
+    }
+  });
+
+  box.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const pasteData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 4);
+    if (!pasteData) return;
+    for (let i = 0; i < resetCodeBoxes.length; i++) {
+      resetCodeBoxes[i].value = pasteData[i] || '';
+      resetCodeBoxes[i].classList.remove('is-invalid');
+    }
+    if (pasteData.length >= 4) {
+      resetNewPassword?.focus();
+    } else {
+      resetCodeBoxes[pasteData.length]?.focus();
+    }
+  });
+});
+
+// Отправка запроса на получение кода (Шаг 1)
+if (resetRequestForm) {
+  resetRequestForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = resetEmailInput.value.trim().toLowerCase();
+    const submitBtn = document.getElementById('reset-request-submit');
+    setAlert('reset', '');
+    resetEmailInput.classList.remove('is-invalid');
+
+    if (!email) {
+      resetEmailInput.classList.add('is-invalid');
+      setAlert('reset', 'Пожалуйста, введите email', 'error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Отправляем код...';
+
+    try {
+      const response = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Не удалось отправить код');
+
+      currentResetEmail = email;
+      const targetEmailEl = document.getElementById('reset-target-email');
+      if (targetEmailEl) targetEmailEl.textContent = email;
+
+      resetRequestForm.hidden = true;
+      resetConfirmForm.hidden = false;
+      resetCodeBoxes.forEach(box => box.value = '');
+      setAlert('reset', '4-значный код отправлен на вашу почту!', 'success');
+      startResetTimer(60);
+      resetCodeBoxes[0]?.focus();
+    } catch (err) {
+      resetEmailInput.classList.add('is-invalid');
+      setAlert('reset', err.message || 'Ошибка отправки кода', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Получить код';
+    }
+  });
+}
+
+// Повторная отправка кода
+if (resetResendBtn) {
+  resetResendBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (!currentResetEmail) return;
+    setAlert('reset', '');
+    resetResendBtn.style.display = 'none';
+
+    try {
+      const response = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentResetEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Не удалось отправить код');
+
+      setAlert('reset', 'Новый код отправлен на почту!', 'success');
+      startResetTimer(60);
+      resetCodeBoxes.forEach(box => {
+        box.value = '';
+        box.classList.remove('is-invalid');
+      });
+      resetCodeBoxes[0]?.focus();
+    } catch (err) {
+      setAlert('reset', err.message || 'Ошибка повторной отправки', 'error');
+      resetResendBtn.style.display = 'inline-block';
+    }
+  });
+}
+
+// Изменить email (вернуться на Шаг 1)
+if (resetBackToStep1) {
+  resetBackToStep1.addEventListener('click', (e) => {
+    e.preventDefault();
+    setAlert('reset', '');
+    resetConfirmForm.hidden = true;
+    resetRequestForm.hidden = false;
+    resetEmailInput.focus();
+  });
+}
+
+// Подтверждение кода и смена пароля (Шаг 2)
+if (resetConfirmForm) {
+  resetConfirmForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = resetCodeBoxes.map(b => b.value.trim()).join('');
+    const newPass = resetNewPassword.value;
+    const confirmPass = resetNewPasswordConfirm.value;
+    const submitBtn = document.getElementById('reset-confirm-submit');
+    setAlert('reset', '');
+    resetCodeBoxes.forEach(b => b.classList.remove('is-invalid'));
+    resetNewPassword.classList.remove('is-invalid');
+    resetNewPasswordConfirm.classList.remove('is-invalid');
+
+    if (code.length !== 4) {
+      resetCodeBoxes.forEach(b => b.classList.add('is-invalid'));
+      setAlert('reset', 'Введите 4-значный код из письма', 'error');
+      resetCodeBoxes[0]?.focus();
+      return;
+    }
+
+    if (newPass.length < 8) {
+      resetNewPassword.classList.add('is-invalid');
+      setAlert('reset', 'Пароль должен содержать минимум 8 символов', 'error');
+      resetNewPassword.focus();
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      resetNewPasswordConfirm.classList.add('is-invalid');
+      setAlert('reset', 'Пароли не совпадают', 'error');
+      resetNewPasswordConfirm.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Сохраняем...';
+
+    try {
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: currentResetEmail,
+          code,
+          password: newPass,
+          password_confirm: confirmPass
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'Не удалось изменить пароль');
+
+      // Пароль успешно сменён! Переключаем на экран входа
+      resetConfirmForm.hidden = true;
+      resetRequestForm.hidden = false;
+      switchMode('login');
+      setAlert('login', 'Пароль успешно изменён! Войдите с новым паролем.', 'success');
+      const loginUser = document.getElementById('login-username');
+      if (loginUser) loginUser.value = currentResetEmail;
+      document.getElementById('login-password')?.focus();
+    } catch (err) {
+      if ((err.message || '').toLowerCase().includes('код')) {
+        resetCodeBoxes.forEach(b => b.classList.add('is-invalid'));
+      }
+      setAlert('reset', err.message || 'Ошибка смены пароля', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Сменить пароль и войти';
+    }
+  });
+}

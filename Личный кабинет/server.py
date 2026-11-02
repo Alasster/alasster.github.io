@@ -435,6 +435,18 @@ class AdminPasswordResetRequest(BaseModel):
 
 
 
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+class ResetPasswordConfirmRequest(BaseModel):
+    email: str
+    code: str
+    password: str
+    password_confirm: str
+
+
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
@@ -589,6 +601,15 @@ def init_db() -> None:
 
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 
+            );
+
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL COLLATE NOCASE,
+                code_hash TEXT NOT NULL,
+                attempts_left INTEGER NOT NULL DEFAULT 5,
+                expires_at INTEGER NOT NULL,
+                created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
             );
 
             CREATE TABLE IF NOT EXISTS lesson_visibility (
@@ -2141,6 +2162,14 @@ def register_page(request: Request):
 
 
 
+@app.get("/reset-password", response_class=HTMLResponse)
+@app.get("/reset", response_class=HTMLResponse)
+def reset_password_page(request: Request):
+    if get_user_from_request(request) is not None:
+        return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+    return page("auth.html")
+
+
 @app.get("/api/me")
 
 def current_user(request: Request):
@@ -2631,6 +2660,213 @@ def register(payload: RegisterRequest):
 
 
 
+
+
+def generate_reset_email_html(code: str) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Код сброса пароля ALASSTER</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f1f5f9; padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:500px; background:#ffffff; border-radius:24px; overflow:hidden; box-shadow:0 12px 30px rgba(15,23,42,0.08);">
+          <tr>
+            <td style="background:linear-gradient(135deg, #172039 0%, #2e3c68 100%); padding:32px 24px; text-align:center;">
+              <div style="display:inline-block; padding:6px 16px; background:rgba(255,255,255,0.12); border-radius:12px; color:#f0d58f; font-weight:800; font-size:14px; letter-spacing:0.12em;">ALASSTER</div>
+              <h1 style="margin:16px 0 0; color:#ffffff; font-size:22px; font-weight:700;">Восстановление доступа</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 28px; text-align:center; color:#334155; font-size:15px; line-height:1.6;">
+              <p style="margin:0 0 16px; color:#334155;">Здравствуйте! Вы запросили восстановление пароля для личного кабинета <strong>ALASSTER</strong>.</p>
+              <div style="margin:24px 0; background:#f8fafc; border:2px dashed #cbd5e1; border-radius:18px; padding:20px 24px;">
+                <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#64748b; margin-bottom:10px; font-weight:700;">Ваш 4-значный код</div>
+                <div style="font-family:'Courier New', Courier, monospace; font-size:42px; font-weight:800; letter-spacing:14px; color:#1e3a8a; margin-left:14px;">{code}</div>
+              </div>
+              <p style="margin:0; font-size:13px; color:#64748b;">Код действителен <strong>10 минут</strong>. Введите его в окне входа для смены пароля.<br>Если вы не запрашивали сброс, просто проигнорируйте письмо.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f8fafc; padding:18px 24px; text-align:center; font-size:12px; color:#94a3b8; border-top:1px solid #f1f5f9;">
+              ALASSTER.SITE · Личный кабинет
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+
+def send_resend_email(to_email: str, subject: str, html_content: str) -> tuple[bool, str]:
+    api_key = os.environ.get("RESEND_API_KEY", "").strip()
+    if not api_key:
+        return False, "Почтовый сервис не настроен (отсутствует RESEND_API_KEY в .env)"
+
+    from_email = os.environ.get("RESEND_FROM_EMAIL", "ALASSTER <noreply@alasster.site>").strip()
+
+    payload = json.dumps({
+        "from": from_email,
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "AlassterCabinet/1.0"
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            if resp.status in (200, 201):
+                return True, "OK"
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8", errors="ignore")
+        logging.error("Resend HTTP error %s: %s", e.code, error_body)
+        if "not verified" in error_body and from_email != "ALASSTER <onboarding@resend.dev>":
+            try:
+                fallback_payload = json.dumps({
+                    "from": "ALASSTER <onboarding@resend.dev>",
+                    "to": [to_email],
+                    "subject": subject,
+                    "html": html_content
+                }).encode("utf-8")
+                req_fallback = urllib.request.Request(
+                    "https://api.resend.com/emails",
+                    data=fallback_payload,
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                        "User-Agent": "AlassterCabinet/1.0"
+                    },
+                    method="POST"
+                )
+                with urllib.request.urlopen(req_fallback, timeout=12) as fresp:
+                    if fresp.status in (200, 201):
+                        return True, "OK"
+            except Exception as fe:
+                logging.error("Fallback Resend error: %s", fe)
+        try:
+            err_json = json.loads(error_body)
+            msg = err_json.get("message", error_body)
+        except Exception:
+            msg = error_body
+        return False, f"Ошибка сервиса отправки: {msg}"
+    except Exception as e:
+        logging.error("Resend unexpected error: %s", e)
+        return False, f"Ошибка отправки: {e}"
+    return False, "Не удалось отправить письмо"
+
+
+@app.post("/api/forgot-password")
+def forgot_password(payload: ForgotPasswordRequest):
+    email = payload.email.strip().lower()
+    if not EMAIL_PATTERN.match(email):
+        return JSONResponse({"detail": "Введите корректный email адрес"}, status_code=400)
+
+    with closing(open_db()) as db:
+        user = db.execute("SELECT id, username FROM users WHERE username = ?", (email,)).fetchone()
+        if not user:
+            return JSONResponse({"detail": "Пользователь с таким email не найден"}, status_code=404)
+
+        recent = db.execute(
+            "SELECT created_at FROM password_resets WHERE email = ? AND created_at > strftime('%s', 'now') - 60",
+            (email,)
+        ).fetchone()
+        if recent:
+            return JSONResponse({"detail": "Пожалуйста, подождите 1 минуту перед повторным запросом кода"}, status_code=429)
+
+        code = f"{secrets.randbelow(9000) + 1000}"
+        code_hash = hashlib.sha256(f"{email}:{code}".encode("utf-8")).hexdigest()
+        expires_at = int(time.time()) + 600  # 10 minutes
+
+        db.execute("DELETE FROM password_resets WHERE email = ?", (email,))
+        db.execute(
+            "INSERT INTO password_resets (email, code_hash, attempts_left, expires_at, created_at) VALUES (?, ?, 5, ?, strftime('%s', 'now'))",
+            (email, code_hash, expires_at)
+        )
+        db.commit()
+
+    html = generate_reset_email_html(code)
+    ok, msg = send_resend_email(email, f"{code} — код для сброса пароля ALASSTER", html)
+    if not ok:
+        return JSONResponse({"detail": f"Не удалось отправить письмо: {msg}"}, status_code=500)
+
+    return {"ok": True, "message": "Код отправлен на вашу почту"}
+
+
+@app.post("/api/reset-password")
+def reset_password(payload: ResetPasswordConfirmRequest):
+    email = payload.email.strip().lower()
+    code = payload.code.strip()
+    password = payload.password
+    password_confirm = payload.password_confirm
+
+    if not code or len(code) != 4 or not code.isdigit():
+        return JSONResponse({"detail": "Введите 4-значный цифровой код из письма"}, status_code=400)
+
+    if len(password) < 8:
+        return JSONResponse({"detail": "Пароль должен содержать не менее 8 символов"}, status_code=400)
+
+    if password != password_confirm:
+        return JSONResponse({"detail": "Пароли не совпадают"}, status_code=400)
+
+    with closing(open_db()) as db:
+        user = db.execute("SELECT id, username FROM users WHERE username = ?", (email,)).fetchone()
+        if not user:
+            return JSONResponse({"detail": "Пользователь не найден"}, status_code=404)
+
+        reset_entry = db.execute(
+            "SELECT id, code_hash, attempts_left, expires_at FROM password_resets WHERE email = ? ORDER BY id DESC LIMIT 1",
+            (email,)
+        ).fetchone()
+
+        if not reset_entry:
+            return JSONResponse({"detail": "Код не запрашивался или устарел. Запросите код заново."}, status_code=400)
+
+        now = int(time.time())
+        if reset_entry["expires_at"] < now:
+            db.execute("DELETE FROM password_resets WHERE id = ?", (reset_entry["id"],))
+            db.commit()
+            return JSONResponse({"detail": "Срок действия кода истёк (10 минут). Запросите новый код."}, status_code=400)
+
+        if reset_entry["attempts_left"] <= 0:
+            db.execute("DELETE FROM password_resets WHERE id = ?", (reset_entry["id"],))
+            db.commit()
+            return JSONResponse({"detail": "Превышено количество попыток. Запросите новый код."}, status_code=400)
+
+        expected_hash = hashlib.sha256(f"{email}:{code}".encode("utf-8")).hexdigest()
+        if not hmac.compare_digest(reset_entry["code_hash"], expected_hash):
+            new_attempts = reset_entry["attempts_left"] - 1
+            if new_attempts <= 0:
+                db.execute("DELETE FROM password_resets WHERE id = ?", (reset_entry["id"],))
+                db.commit()
+                return JSONResponse({"detail": "Неверный код. Попытки исчерпаны. Запросите новый код."}, status_code=400)
+            else:
+                db.execute("UPDATE password_resets SET attempts_left = ? WHERE id = ?", (new_attempts, reset_entry["id"]))
+                db.commit()
+                return JSONResponse({"detail": f"Неверный код. Осталось попыток: {new_attempts}"}, status_code=400)
+
+        new_hash = hash_password(password)
+        db.execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, user["id"]))
+        db.execute("DELETE FROM sessions WHERE user_id = ?", (user["id"],))
+        db.execute("DELETE FROM password_resets WHERE email = ?", (email,))
+        db.commit()
+
+    return {"ok": True, "message": "Пароль успешно изменён! Теперь войдите с новым паролем."}
 
 
 def require_superadmin(request: Request) -> sqlite3.Row | JSONResponse:
