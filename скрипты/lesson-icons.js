@@ -1198,6 +1198,7 @@
     "arrow-trend-down": "chart-line-up",
     "arrow-up": "arrow-right",
     "bug": "triangle-warning",
+    "bullhorn": "volume",
     "calculator": "calculator",
     "circle-dot": "target",
     "circle-nodes": "network",

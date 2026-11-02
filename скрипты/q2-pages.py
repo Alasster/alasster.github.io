@@ -100,7 +100,7 @@ SHELL = """\ufeff<!DOCTYPE html>
   <script src="../../скрипты/q2-scenes.js?v=q2-2026-11-01-15"></script>
   <script src="../../скрипты/q2-engine.js?v=q2-2026-11-02-18"></script>
   <script src="../../скрипты/q2-data-{data}.js?v=q2-2026-11-01-15"></script>
-  <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-02-v18"></script>
+  <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-02-v19"></script>
   <script src="../../скрипты/lessons.js?v=auth-cloud-20261101-v7"></script>
 </body>
 </html>
