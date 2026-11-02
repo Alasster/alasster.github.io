@@ -3611,7 +3611,15 @@ body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact {
 
 body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-rec-slide-split {
   grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
-  align-items: center;
+  align-items: stretch;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-rec-slide-split .q2-split-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 body.lesson-page[data-lesson-id="10emn-q2-1"] .q2-recursion-compact {

@@ -292,17 +292,17 @@
                   { icon: 'fas fa-stop', title: 'База рекурсии (Stop)', text: 'Условие выхода: простейший случай (<code>if n == 0:</code>), где функция сразу завершается через <code>return</code> и больше себя не вызывает.', tone: 'green' },
                   { icon: 'fas fa-rotate-left', title: 'Рекурсивный шаг', text: 'Вызов той же функции с уменьшенным аргументом (<code>countdown(n - 1)</code>). Шаг за шагом задача уменьшается и приближается к базе.', tone: 'violet' }
                 ]
-              },
-              {
-                t: 'callout',
-                icon: 'fas fa-circle-info',
-                title: 'Главное правило',
-                text: 'В любой рекурсии <b>обязаны быть и база, и шаг</b>: без базы произойдёт переполнение стека (<code>RecursionError</code>), а без шага задача никогда не дойдёт до базы.'
               }
             ],
             right: [
               { t: 'svg', cls: 'q2-recursion-compact', svg: REC_SCREEN_SVG, caption: 'Ход выполнения countdown(3)' }
             ]
+          },
+          {
+            t: 'callout',
+            icon: 'fas fa-circle-info',
+            title: 'Главное правило',
+            text: 'В любой рекурсии <b>обязаны быть и база, и шаг</b>: без базы произойдёт переполнение стека (<code>RecursionError</code>), а без шага задача никогда не дойдёт до базы.'
           }
         ]
       },
