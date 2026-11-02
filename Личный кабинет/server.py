@@ -2749,7 +2749,7 @@ def send_resend_email(to_email: str, subject: str, html_content: str) -> tuple[b
     if not api_key:
         return False, "Почтовый сервис не настроен (отсутствует RESEND_API_KEY в .env)"
 
-    from_email = os.environ.get("RESEND_FROM_EMAIL", "ALASSTER <alasster@alasster.site>").strip()
+    from_email = os.environ.get("RESEND_FROM_EMAIL", "ALASSTER <support@alasster.site>").strip()
 
     payload = json.dumps({
         "from": from_email,
