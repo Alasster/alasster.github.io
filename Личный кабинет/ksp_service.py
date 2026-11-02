@@ -2,6 +2,7 @@
 Includes deep pedagogical prompt, strict 45-minute timing, and zero OOP/ZPR.
 """
 from __future__ import annotations
+import ksp_content
 
 import base64
 import hashlib
@@ -168,7 +169,7 @@ def plain(html: str) -> str:
 
 
 def lesson_source(key: str) -> dict:
-    """Extract authoritative lesson metadata from project and confirmed timetable."""
+    """Extract authoritative lesson metadata from project, q2 data, and confirmed timetable."""
     key = unquote(key).lstrip('/')
     path = (ROOT / key).resolve()
     if not path.is_relative_to(ROOT.resolve()) or path.suffix != '.html':
@@ -179,12 +180,24 @@ def lesson_source(key: str) -> dict:
     if not path.is_file():
         raise ValueError('Файл урока не найден')
 
+    num = re.search(r'\d+', path.stem).group() if re.search(r'\d+', path.stem) else '1'
+    class_name = parts[0]
+    quarter = parts[1]
+
+    # For Quarter 2: extract rich structured content directly from q2-data-*.js
+    q2_data = {}
+    if quarter == '2 четверть':
+        try:
+            q2_data = ksp_content.get_q2_lesson_text(class_name, num)
+        except Exception:
+            q2_data = {}
+
     html = path.read_text(encoding='utf-8-sig')
     heading = re.search(r'<h1\b[^>]*>(.*?)</h1>', html, re.S | re.I)
-    title = re.sub(r'\s+', ' ', plain(heading.group(1))) if heading else path.stem
+    title = q2_data.get('title') or (re.sub(r'\s+', ' ', plain(heading.group(1))) if heading else path.stem)
 
     # Extract goal from lesson HTML definition
-    definitions = re.findall(r'<div\b[^>]*class=["\'][^"\']*\bdefinition\b[^"\']*["\'][^>]*>(.*?)</div>', html, re.S | re.I)
+    definitions = re.findall(r'<div\b[^>]*class=[\'"][^\'"]*\bdefinition\b[^\'"]*[\'"][^>]*>(.*?)</div>', html, re.S | re.I)
     html_goals = []
     for definition in definitions:
         for goal in re.split(r';\s*(?=\d+\.\d+\.\d+\.\d+)', plain(definition)):
@@ -198,23 +211,25 @@ def lesson_source(key: str) -> dict:
     schedule = json.loads(timetable_file.read_text(encoding='utf-8')) if timetable_file.is_file() else {}
     slot = schedule.get(key, {})
 
-    goals = slot.get('goals') or html_goals
+    goals = slot.get('goals') or []
+    if not goals and q2_data.get('goal'):
+        goals = [q2_data['goal']]
     if not goals and html_goals:
         goals = html_goals
     if not goals:
-        # Fallback to general topic goal if not in definition
-        goals = [f"{parts[0]}: освоение темы «{title}»"]
+        goals = [f"{class_name}: освоение темы «{title}»"]
 
     dates = re.findall(r'(?<!\d)(?:\d{2}\.\d{2}\.20\d{2}|20\d{2}-\d{2}-\d{2})(?!\d)', plain(html))
     date_val = slot.get('date') or (dates[0] if dates else '07.09.2026')
     section_val = slot.get('section') or 'Информатика'
-    theme_val = slot.get('theme') or title
-    num = re.search(r'\d+', path.stem).group() if re.search(r'\d+', path.stem) else '1'
+    theme_val = q2_data.get('title') or slot.get('theme') or title
+
+    lesson_content = q2_data.get('content') or plain(html)
 
     return dict(
         key=key,
-        class_name=parts[0],
-        quarter=parts[1],
+        class_name=class_name,
+        quarter=quarter,
         number=num,
         title=theme_val,
         goals=goals,
@@ -222,7 +237,7 @@ def lesson_source(key: str) -> dict:
         section=section_val,
         duration=45,
         language='ru',
-        content=plain(html)[:20000],
+        content=lesson_content,
         source_hash=hashlib.sha256(html.encode()).hexdigest()
     )
 
@@ -291,7 +306,12 @@ def generate(source: dict) -> dict:
    - ВСЕ без исключения этапы, формулировки учителя, вопросы разминки, теоретические объяснения, разобранные примеры (1 и 2), практические задания (1, 2, 3), дескрипторы, рефлексия и домашнее задание ДОЛЖНЫ БЫТЬ СТРОГО И ИСКЛЮЧИТЕЛЬНО ПО ТЕМЕ «{source['title']}»!
    - КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО использовать примеры, вопросы или термины из других тем! (Например, в теме про Искусственный Интеллект и этику КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО упоминать IP-адреса, маски подсетей или сетевое оборудование; в теме про сети — запрещено говорить о базах данных и т.д.).
    - Все термины, формулировки и сценарии бери СТРОГО из материалов урока:
-{source['content'][:7500]}
+{source['content'][:25000]}
+
+- СТРОЖАЙШЕЕ ПРАВИЛО ИСПОЛЬЗОВАНИЯ МАТЕРИАЛОВ САЙТА:
+   * Во 2 этапе (Актуализация): вопросы разминки, варианты ответов и объяснения бери СТРОГО из раздела «АКТУАЛИЗАЦИЯ И РАЗМИНКА (ВОПРОСЫ С ПЛАТФОРМЫ)».
+   * В 3 этапе (Объяснение): теоретические понятия, правила, термины и пошаговые разборы излагай СТРОГО по разделу «ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (ТЕОРИЯ С ПЛАТФОРМЫ)».
+   * В 4 этапе (Практическая работа): формулировки заданий 1, 2, 3, решения и дескрипторы оценивания бери СТРОГО из раздела «ПРАКТИЧЕСКАЯ РАБОТА И ЗАДАНИЯ (СТРОГО С ПЛАТФОРМЫ)». Никаких выдуманных сторонних задач!
 
 2. СТРОГИЕ ТРЕБОВАНИЯ К ФОРМАТИРОВАНИЮ (АБЗАЦЫ И ПУСТЫЕ СТРОКИ):
    - В полях teacher_actions и student_actions КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать монотонный сплошной текст!
@@ -386,7 +406,7 @@ def generate(source: dict) -> dict:
 - Тема урока: {source['title']}. Урок {source['number']}
 - Цели обучения: {' '.join(source['goals'])}
 - Материалы урока сайта:
-{source['content'][:7500]}
+{source['content'][:25000]}
 """
 
     payload = {
@@ -476,20 +496,8 @@ class KspService:
             db.close()
 
     def _ensure_local_pool(self, min_slots: int = 120):
-        """Maintain a hidden pool of user-owned placeholder files in КСП/.pool so Render can claim them."""
-        if not self.local:
-            return
-        try:
-            pool_dir = self.output_root / '.pool'
-            pool_dir.mkdir(parents=True, exist_ok=True)
-            existing = list(pool_dir.glob('slot_*.docx'))
-            if len(existing) < min_slots:
-                for i in range(1, min_slots + 40):
-                    slot = pool_dir / f'slot_{i:03d}.docx'
-                    if not slot.exists():
-                        slot.write_bytes(b'PK\x03\x04placeholder')
-        except Exception:
-            pass
+        """Disabled: no longer needed, avoids polluting Google Drive."""
+        return
 
     def _all_lesson_keys(self) -> set[str]:
         timetable_file = BASE / 'ksp-timetable.json'
@@ -658,16 +666,23 @@ class KspService:
             self.update(key, 'saving', 'Сборка DOCX…')
             if self.cloud:
                 tmp = self.state / 'out_cloud' / f'{uuid.uuid4().hex}.docx'
-                build_docx(self.template, tmp, source, plan)
-                self.update(key, 'saving', 'Загрузка в Google Диск…')
-                title = output_path(source, self.output_root).stem
-                doc_id = self.drive.upload_docx_as_gdoc(tmp, [source['class_name'], source['quarter']], title)
-                tmp.unlink(missing_ok=True)
-                import time
-                self._last_upload_ts = time.time()
-                self._index_ts = 0.0
-                self.update(key, 'ready', 'КСП сохранён в Google Диске', f'gdrive:{doc_id}')
-                return
+                tmp.parent.mkdir(parents=True, exist_ok=True)
+                try:
+                    build_docx(self.template, tmp, source, plan)
+                    self.update(key, 'saving', 'Загрузка в Google Диск…')
+                    title = output_path(source, self.output_root).stem
+                    doc_id = self.drive.upload_docx_as_gdoc(tmp, [source['class_name'], source['quarter']], title)
+                    import time
+                    self._last_upload_ts = time.time()
+                    self._index_ts = 0.0
+                    self.update(key, 'ready', 'КСП сохранён в Google Диске', f'gdrive:{doc_id}')
+                    return
+                finally:
+                    if tmp.exists():
+                        try:
+                            tmp.unlink(missing_ok=True)
+                        except Exception:
+                            pass
             target = output_path(source, self.output_root)
             build_docx(self.template, target, source, plan)
             import time

@@ -7,6 +7,7 @@
 - Strictly zero mentions of OOP / ZPR, interactive whiteboards, or laptops.
 """
 from __future__ import annotations
+import ksp_content
 
 import base64
 import hashlib
@@ -49,10 +50,19 @@ def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
     lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
     if not lesson_path.is_file():
         return []
+
+    parts_rel = Path(lesson_relative_path.lstrip('/')).parts
+    if len(parts_rel) >= 3 and parts_rel[1] == '2 четверть':
+        m_num = re.search(r'\d+', parts_rel[2])
+        num_str = m_num.group(0) if m_num else '1'
+        meta = ksp_content.get_q2_slides_meta(parts_rel[0], num_str)
+        if meta:
+            return meta
+
     try:
         html = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
         clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html, flags=re.S | re.I)
-        parts = re.split(r'(<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>)', clean_html)
+        parts = re.split(r"(<section\b[^>]*class=[\'\"][^\'\"]*slide[^'\"]*[\'\"][^>]*>)", clean_html)
         slides_info = []
         s_idx = 0
         for i in range(1, len(parts), 2):
@@ -67,40 +77,39 @@ def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
         return []
 
 
-def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
-    """Capture and cache crisp screenshots of all slides in the lesson."""
+def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False) -> dict[any, str]:
+    """Capture and cache crisp, fully-rendered screenshots of all slides in the lesson."""
     browser = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
     if not os.path.exists(browser):
         browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
     if not os.path.exists(browser):
-        browser = None  # cloud: only use screenshots already stored in ksp_screenshots/
+        browser = None
 
     lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
     if not lesson_path.is_file():
         return {}
 
     h_hash = hashlib.md5(lesson_relative_path.encode('utf-8')).hexdigest()[:10]
+    parts_rel = Path(lesson_relative_path.lstrip('/')).parts
+    is_q2 = len(parts_rel) >= 3 and parts_rel[1] == '2 четверть'
+
+    results = {}
+    user_data = None
+    temp_dir = Path(tempfile.gettempdir())
 
     try:
-        html = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
-        clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html, flags=re.S | re.I)
-        clean_html = re.sub(r'<link\b[^>]*http[^>]*>', '', clean_html, flags=re.I)
+        html_raw = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
         base_dir = lesson_path.parent.as_posix()
         base_tag = f'<base href="file:///{base_dir}/">'
-        clean_html = re.sub(r'(<head\b[^>]*>)', r'\1' + base_tag, clean_html, flags=re.I)
-        clean_html = re.sub(r'(</head>)', '<style>* { animation: none !important; transition: none !important; }</style>\\1', clean_html, flags=re.I)
 
-        parts = re.split(r'(<section\b[^>]*class=[\'"][^\'"]*slide[^\'"]*[\'"][^>]*>)', clean_html)
-        total_slides = (len(parts) - 1) // 2
+        slides_meta = get_lesson_slides_meta(lesson_relative_path)
+        total_slides = len(slides_meta)
         if total_slides <= 0:
             return {}
 
-        results = {}
-        user_data = None
-
         for slide_idx in range(total_slides):
             cache_file = SCREENSHOTS_DIR / f'slide_{h_hash}_s{slide_idx}.png'
-            if cache_file.is_file() and cache_file.stat().st_size > 1000:
+            if not force_rebuild and cache_file.is_file() and cache_file.stat().st_size > 1000:
                 results[slide_idx] = str(cache_file)
                 continue
 
@@ -110,47 +119,85 @@ def capture_lesson_slides(lesson_relative_path: str) -> dict[any, str]:
             if user_data is None:
                 user_data = tempfile.mkdtemp()
 
-            new_parts = []
-            s_idx = 0
-            for part in parts:
-                if re.match(r'<section\b[^>]*class=[\'"][^\'"]*slide', part):
-                    p = re.sub(r'\bactive\b', '', part)
-                    if s_idx == slide_idx:
-                        p = p.replace('class="', 'class="active ').replace("class='", "class='active ")
-                    s_idx += 1
-                    new_parts.append(p)
-                else:
-                    new_parts.append(part)
+            temp_html = temp_dir / f'temp_ksp_{h_hash}_s{slide_idx}.html'
 
-            mod_html = ''.join(new_parts)
-            temp_html = os.path.join(tempfile.gettempdir(), f'temp_{h_hash}_{slide_idx}.html')
-            with open(temp_html, 'w', encoding='utf-8') as f:
-                f.write(mod_html)
+            if is_q2:
+                # Q2 dynamic engine: inject base tag, disable animations, and activate slide via goToSlide
+                mod_html = html_raw
+                if '<head>' in mod_html:
+                    mod_html = mod_html.replace('<head>', f'<head>\n  {base_tag}')
+                inject = f'''
+<style>* {{ animation: none !important; transition: none !important; }}</style>
+<script>
+window.addEventListener('DOMContentLoaded', () => {{
+    setTimeout(() => {{
+        if (window.goToSlide) window.goToSlide({slide_idx});
+    }}, 150);
+}});
+</script>
+</body>
+'''
+                mod_html = mod_html.replace('</body>', inject)
+                temp_html.write_text(mod_html, encoding='utf-8')
 
-            cmd = [
-                browser,
-                '--headless=new',
-                '--disable-gpu',
-                '--no-sandbox',
-                '--window-size=1200,750',
-                f'--user-data-dir={user_data}',
-                f'--screenshot={str(cache_file)}',
-                'file:///' + temp_html.replace('\\', '/')
-            ]
+                cmd = [
+                    browser,
+                    '--headless=new',
+                    '--disable-gpu',
+                    '--no-sandbox',
+                    '--window-size=1200,750',
+                    '--virtual-time-budget=2500',
+                    f'--user-data-dir={user_data}',
+                    f'--screenshot={str(cache_file)}',
+                    temp_html.as_uri()
+                ]
+            else:
+                # Q1 static slides: activate slide_idx and render with fonts intact
+                clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html_raw, flags=re.S | re.I)
+                clean_html = re.sub(r'(<head\b[^>]*>)', r'\1' + base_tag, clean_html, flags=re.I)
+                clean_html = re.sub(r'(</head>)', '<style>* { animation: none !important; transition: none !important; }</style>\\1', clean_html, flags=re.I)
+
+                parts = re.split(r"(<section\b[^>]*class=[\'\"][^\'\"]*slide[^'\"]*[\'\"][^>]*>)", clean_html)
+                new_parts = []
+                s_idx = 0
+                for part in parts:
+                    if re.match(r"<section\b[^>]*class=['\"][^'\"]*slide", part):
+                        p = re.sub(r'\bactive\b', '', part)
+                        if s_idx == slide_idx:
+                            p = p.replace('class="', 'class="active ').replace("class='", "class='active ")
+                        s_idx += 1
+                        new_parts.append(p)
+                    else:
+                        new_parts.append(part)
+
+                mod_html = ''.join(new_parts)
+                temp_html.write_text(mod_html, encoding='utf-8')
+
+                cmd = [
+                    browser,
+                    '--headless=new',
+                    '--disable-gpu',
+                    '--no-sandbox',
+                    '--window-size=1200,750',
+                    '--virtual-time-budget=1500',
+                    f'--user-data-dir={user_data}',
+                    f'--screenshot={str(cache_file)}',
+                    temp_html.as_uri()
+                ]
+
             try:
-                subprocess.run(cmd, capture_output=True, timeout=12)
+                subprocess.run(cmd, capture_output=True, timeout=15)
                 if cache_file.is_file() and cache_file.stat().st_size > 1000:
                     results[slide_idx] = str(cache_file)
             except Exception:
                 pass
             finally:
-                if os.path.isfile(temp_html):
+                if temp_html.exists():
                     try:
-                        os.unlink(temp_html)
+                        temp_html.unlink()
                     except Exception:
                         pass
 
-        # Compatibility aliases
         if 0 in results: results['intro'] = results[0]
         if 1 in results: results['theory'] = results[1]
         if min(4, total_slides - 1) in results: results['practice'] = results[min(4, total_slides - 1)]
@@ -534,7 +581,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
         'Дата': source.get('date') or header.get('date', '________________'),
         'Класс': class_label,
         'Тема урока': theme_text,
-        'Цели обучения в соответствии с учебной программой': goals_text,
+        'Цели обучения': goals_text,
         'Цель урока': header.get('lesson_goals', ''),
         'Привитие ценностей': format_values_block(header.get('values', ''), source.get('title', ''), source.get('date', ''), source.get('number', '')),
         'Функциональная грамотность': header.get('functional_literacy', ''),
