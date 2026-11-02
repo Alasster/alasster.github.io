@@ -2665,6 +2665,10 @@ def register(payload: RegisterRequest):
 
 
 def generate_reset_email_html(code: str) -> str:
+    c0 = code[0] if len(code) > 0 else ""
+    c1 = code[1] if len(code) > 1 else ""
+    c2 = code[2] if len(code) > 2 else ""
+    c3 = code[3] if len(code) > 3 else ""
     return f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -2672,29 +2676,65 @@ def generate_reset_email_html(code: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Код сброса пароля ALASSTER</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f1f5f9; padding:32px 16px;">
+<body style="margin:0; padding:0; background-color:#e7ebf3; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#e7ebf3; padding:40px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:500px; background:#ffffff; border-radius:24px; overflow:hidden; box-shadow:0 12px 30px rgba(15,23,42,0.08);">
+        <!-- Главная неоморфная карточка -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:500px; background-color:#e7ebf3; border-radius:32px; box-shadow:12px 12px 28px #c2c9d6, -12px -12px 28px #ffffff; border:1px solid rgba(255, 255, 255, 0.85); overflow:hidden;">
           <tr>
-            <td style="background:linear-gradient(135deg, #172039 0%, #2e3c68 100%); padding:32px 24px; text-align:center;">
-              <div style="display:inline-block; padding:6px 16px; background:rgba(255,255,255,0.12); border-radius:12px; color:#f0d58f; font-weight:800; font-size:14px; letter-spacing:0.12em;">ALASSTER</div>
-              <h1 style="margin:16px 0 0; color:#ffffff; font-size:22px; font-weight:700;">Восстановление доступа</h1>
+            <td style="padding:42px 32px 36px; text-align:center;">
+              
+              <!-- Выпуклый неоморфный бейдж ALASSTER -->
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 22px;">
+                <tr>
+                  <td style="background-color:#e7ebf3; border-radius:14px; box-shadow:4px 4px 8px #c5ccd9, -4px -4px 8px #ffffff; border:1px solid rgba(255, 255, 255, 0.9); padding:7px 20px; font-weight:800; font-size:13px; letter-spacing:0.12em; color:#2563eb;">
+                    ALASSTER
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Заголовок -->
+              <h1 style="margin:0 0 10px; color:#172039; font-size:24px; font-weight:800; letter-spacing:-0.02em;">Восстановление доступа</h1>
+              <p style="margin:0 0 24px; color:#556480; font-size:15px; line-height:1.6;">Вы запросили сброс пароля в личном кабинете. Введите этот 4-значный код на сайте:</p>
+
+              <!-- Вдавленная полость с выпуклыми плитками цифр -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#dee4ee; border-radius:24px; box-shadow:inset 4px 4px 8px #c4cbd8, inset -4px -4px 8px #ffffff; padding:24px 16px; margin:0 auto;">
+                <tr>
+                  <td align="center">
+                    <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#78869e; margin-bottom:12px; font-weight:800;">Одноразовый код</div>
+                    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+                      <tr>
+                        <td style="width:54px; height:60px; background-color:#ffffff; border-radius:16px; text-align:center; font-family:'JetBrains Mono', Consolas, monospace; font-size:28px; font-weight:800; color:#1e3a8a; box-shadow:3px 3px 7px rgba(163, 174, 195, 0.45), -3px -3px 7px #ffffff; border:1px solid rgba(255, 255, 255, 0.95);">{c0}</td>
+                        <td style="width:10px;"></td>
+                        <td style="width:54px; height:60px; background-color:#ffffff; border-radius:16px; text-align:center; font-family:'JetBrains Mono', Consolas, monospace; font-size:28px; font-weight:800; color:#1e3a8a; box-shadow:3px 3px 7px rgba(163, 174, 195, 0.45), -3px -3px 7px #ffffff; border:1px solid rgba(255, 255, 255, 0.95);">{c1}</td>
+                        <td style="width:10px;"></td>
+                        <td style="width:54px; height:60px; background-color:#ffffff; border-radius:16px; text-align:center; font-family:'JetBrains Mono', Consolas, monospace; font-size:28px; font-weight:800; color:#1e3a8a; box-shadow:3px 3px 7px rgba(163, 174, 195, 0.45), -3px -3px 7px #ffffff; border:1px solid rgba(255, 255, 255, 0.95);">{c2}</td>
+                        <td style="width:10px;"></td>
+                        <td style="width:54px; height:60px; background-color:#ffffff; border-radius:16px; text-align:center; font-family:'JetBrains Mono', Consolas, monospace; font-size:28px; font-weight:800; color:#1e3a8a; box-shadow:3px 3px 7px rgba(163, 174, 195, 0.45), -3px -3px 7px #ffffff; border:1px solid rgba(255, 255, 255, 0.95);">{c3}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Бейдж таймера -->
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:22px auto 0;">
+                <tr>
+                  <td style="background-color:#e7ebf3; border-radius:12px; box-shadow:2px 2px 5px #c8cfdc, -2px -2px 5px #ffffff; border:1px solid rgba(255,255,255,0.8); padding:7px 18px; font-size:12px; font-weight:700; color:#64748b;">
+                    Код действителен 10 минут
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Подсказка безопасности -->
+              <p style="margin:24px 0 0; font-size:13px; color:#8592a6; line-height:1.5;">Если вы не совершали этот запрос, просто проигнорируйте письмо — ваш пароль в безопасности.</p>
             </td>
           </tr>
+
+          <!-- Футер карточки -->
           <tr>
-            <td style="padding:32px 28px; text-align:center; color:#334155; font-size:15px; line-height:1.6;">
-              <p style="margin:0 0 16px; color:#334155;">Здравствуйте! Вы запросили восстановление пароля для личного кабинета <strong>ALASSTER</strong>.</p>
-              <div style="margin:24px 0; background:#f8fafc; border:2px dashed #cbd5e1; border-radius:18px; padding:20px 24px;">
-                <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#64748b; margin-bottom:10px; font-weight:700;">Ваш 4-значный код</div>
-                <div style="font-family:'Courier New', Courier, monospace; font-size:42px; font-weight:800; letter-spacing:14px; color:#1e3a8a; margin-left:14px;">{code}</div>
-              </div>
-              <p style="margin:0; font-size:13px; color:#64748b;">Код действителен <strong>10 минут</strong>. Введите его в окне входа для смены пароля.<br>Если вы не запрашивали сброс, просто проигнорируйте письмо.</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:#f8fafc; padding:18px 24px; text-align:center; font-size:12px; color:#94a3b8; border-top:1px solid #f1f5f9;">
+            <td style="padding:16px 24px; text-align:center; font-size:12px; font-weight:600; color:#8592a6; border-top:1px solid rgba(255, 255, 255, 0.7); background-color:rgba(231, 235, 243, 0.6);">
               ALASSTER.SITE · Личный кабинет
             </td>
           </tr>
@@ -2704,8 +2744,6 @@ def generate_reset_email_html(code: str) -> str:
   </table>
 </body>
 </html>"""
-
-
 def send_resend_email(to_email: str, subject: str, html_content: str) -> tuple[bool, str]:
     api_key = os.environ.get("RESEND_API_KEY", "").strip()
     if not api_key:
