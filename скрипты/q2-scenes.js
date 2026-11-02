@@ -241,9 +241,6 @@
         .q2-rec-w2 { animation: q2-rec-win-2 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
         .q2-rec-w3 { animation: q2-rec-win-3 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
         .q2-rec-w4 { animation: q2-rec-win-4 8.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
-        @media (prefers-reduced-motion: reduce) {
-          .q2-rec-window-frame { animation: none; opacity: 1; transform: none; }
-        }
       </style>
       <rect x="12" y="12" width="416" height="346" rx="20" fill="#dce8f1" stroke="#b8cbd8" stroke-width="2"/>
       <path d="M32 12h376a20 20 0 0 1 20 20v24H12V32a20 20 0 0 1 20-20z" fill="#f4f8fb"/>

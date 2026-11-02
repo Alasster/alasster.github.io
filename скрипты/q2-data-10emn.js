@@ -107,10 +107,6 @@
       .q2-rec-o2 { opacity: 0; animation: q2-rec-out-2 10s ease-out infinite; }
       .q2-rec-o3 { opacity: 0; animation: q2-rec-out-3 10s ease-out infinite; }
       .q2-rec-o4 { opacity: 0; animation: q2-rec-out-4 10s ease-out infinite; }
-      @media (prefers-reduced-motion: reduce) {
-        .q2-rec-o1, .q2-rec-o2, .q2-rec-o3, .q2-rec-o4 { animation: none; opacity: 1; transform: none; }
-        .q2-rec-l-call, .q2-rec-l-def, .q2-rec-l-if, .q2-rec-l-print, .q2-rec-l-step, .q2-rec-l-bp, .q2-rec-l-br { animation: none; }
-      }
     </style>
     <rect x="8" y="8" width="544" height="374" rx="20" fill="#edf3f7" stroke="#c8d6e0" stroke-width="2"/>
     <path d="M28 8h504a20 20 0 0 1 20 20v30H8V28A20 20 0 0 1 28 8z" fill="#f9fbfd"/>
