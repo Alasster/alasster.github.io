@@ -160,7 +160,7 @@
           <span class="eyebrow">${slide.eyebrow || '01 · ВВЕДЕНИЕ'}</span>
           <h1>${slide.title}</h1>
           <p class="lead">${slide.lead || ''}</p>
-          ${slide.goal ? `<div class="q2-goal"><span class="q2-goal-code">${slide.goalCode || 'Цель обучения'}</span><p>${slide.goal}</p></div>` : ''}
+          ${slide.goal ? `<div class="q2-goal"><div class="q2-goal-header"><span class="q2-goal-code"><i class="fa-solid fa-crosshairs"></i> ${slide.goalCode || 'Цель'}</span><span class="q2-goal-title">ЦЕЛЬ ОБУЧЕНИЯ</span></div><p>${slide.goal}</p></div>` : ''}
           ${slide.chips ? `<div class="chips">${slide.chips.map(chip => `<span class="chip">${chip.icon ? `<i class="${chip.icon}"></i>` : ''}${chip.text || chip}</span>`).join('')}</div>` : ''}
           <div class="q2-hero-actions">
             <button class="start-btn" type="button" onclick="changeSlide(1)">${slide.cta || 'Начать урок'} <i class="fas fa-arrow-right"></i></button>

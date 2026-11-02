@@ -124,7 +124,7 @@
         title: 'Точки и линии',
         lead: 'Граф G = (V, E): V — множество вершин, E — множество рёбер. Вершина обозначает объект, ребро — связь между двумя объектами.',
         blocks: [
-          { t: 'svg', svg: INTRO_SVG, caption: 'Слева направо: вершина A связана с B и C, вершина C — ещё и с D' },
+          { t: 'svg', compact: true, svg: INTRO_SVG, caption: 'Слева направо: вершина A связана с B и C, вершина C — ещё и с D' },
           {
             t: 'definition',
             icon: 'fas fa-circle-nodes',
