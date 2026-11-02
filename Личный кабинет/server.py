@@ -442,6 +442,11 @@ class ForgotPasswordRequest(BaseModel):
     email: str
 
 
+class VerifyResetCodeRequest(BaseModel):
+    email: str
+    code: str
+
+
 class ResetPasswordConfirmRequest(BaseModel):
     email: str
     code: str
@@ -2846,6 +2851,49 @@ def forgot_password(payload: ForgotPasswordRequest):
         return JSONResponse({"detail": f"Не удалось отправить письмо: {msg}"}, status_code=500)
 
     return {"ok": True, "message": "Код отправлен на вашу почту"}
+
+
+@app.post("/api/verify-reset-code")
+def verify_reset_code(payload: VerifyResetCodeRequest):
+    email = payload.email.strip().lower()
+    code = payload.code.strip()
+
+    if not code or len(code) != 4 or not code.isdigit():
+        return JSONResponse({"detail": "Введите 4-значный цифровой код"}, status_code=400)
+
+    with closing(open_db()) as db:
+        reset_entry = db.execute(
+            "SELECT id, code_hash, attempts_left, expires_at FROM password_resets WHERE email = ? ORDER BY id DESC LIMIT 1",
+            (email,)
+        ).fetchone()
+
+        if not reset_entry:
+            return JSONResponse({"detail": "Код устарел или не запрашивался. Запросите код заново."}, status_code=400)
+
+        now = int(time.time())
+        if reset_entry["expires_at"] < now:
+            db.execute("DELETE FROM password_resets WHERE id = ?", (reset_entry["id"],))
+            db.commit()
+            return JSONResponse({"detail": "Срок действия кода истёк (10 минут). Запросите новый код."}, status_code=400)
+
+        if reset_entry["attempts_left"] <= 0:
+            db.execute("DELETE FROM password_resets WHERE id = ?", (reset_entry["id"],))
+            db.commit()
+            return JSONResponse({"detail": "Превышено количество попыток. Запросите новый код."}, status_code=400)
+
+        expected_hash = hashlib.sha256(f"{email}:{code}".encode("utf-8")).hexdigest()
+        if not hmac.compare_digest(reset_entry["code_hash"], expected_hash):
+            new_attempts = reset_entry["attempts_left"] - 1
+            if new_attempts <= 0:
+                db.execute("DELETE FROM password_resets WHERE id = ?", (reset_entry["id"],))
+                db.commit()
+                return JSONResponse({"detail": "Неверный код. Попытки исчерпаны. Запросите новый код."}, status_code=400)
+            else:
+                db.execute("UPDATE password_resets SET attempts_left = ? WHERE id = ?", (new_attempts, reset_entry["id"]))
+                db.commit()
+                return JSONResponse({"detail": f"Неверный код. Осталось попыток: {new_attempts}"}, status_code=400)
+
+    return {"ok": True, "message": "Код подтверждён"}
 
 
 @app.post("/api/reset-password")
