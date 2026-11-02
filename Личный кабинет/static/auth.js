@@ -310,7 +310,9 @@ if (resetRequestForm) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await response.json();
+      let data = {};
+      const resText = await response.text();
+      try { data = JSON.parse(resText); } catch (_) { data = { detail: resText || 'Ошибка сервера' }; }
       if (!response.ok) throw new Error(data.detail || 'Не удалось отправить код');
 
       currentResetEmail = email;
@@ -423,7 +425,9 @@ if (resetConfirmForm) {
           password_confirm: confirmPass
         }),
       });
-      const data = await response.json();
+      let data = {};
+      const resText = await response.text();
+      try { data = JSON.parse(resText); } catch (_) { data = { detail: resText || 'Ошибка сервера' }; }
       if (!response.ok) throw new Error(data.detail || 'Не удалось изменить пароль');
 
       // Пароль успешно сменён! Переключаем на экран входа

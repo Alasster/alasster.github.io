@@ -565,3 +565,22 @@ select.profile-select {
   color: var(--primary);
   font-weight: 700;
 }
+
+
+.promo-action-group {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.promo-action-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: rgba(235, 241, 255, 0.76);
+  margin-bottom: 8px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.auth-promo .promo-action-group .promo-switch {
+  margin-top: 0;
+}

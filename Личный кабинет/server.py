@@ -47,6 +47,8 @@ import threading
 import time
 
 import uuid
+import urllib.request
+import urllib.error
 
 from contextlib import closing
 
