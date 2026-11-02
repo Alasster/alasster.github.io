@@ -496,8 +496,20 @@ class KspService:
             db.close()
 
     def _ensure_local_pool(self, min_slots: int = 120):
-        """Disabled: no longer needed, avoids polluting Google Drive."""
-        return
+        """Maintain a hidden pool of user-owned placeholder files in КСП/.pool so Render can claim them."""
+        if not self.local:
+            return
+        try:
+            pool_dir = self.output_root / '.pool'
+            pool_dir.mkdir(parents=True, exist_ok=True)
+            existing = list(pool_dir.glob('slot_*.docx'))
+            if len(existing) < min_slots:
+                for i in range(1, min_slots + 40):
+                    slot = pool_dir / f'slot_{i:03d}.docx'
+                    if not slot.exists():
+                        slot.write_bytes(b'PK\x03\x04placeholder')
+        except Exception:
+            pass
 
     def _all_lesson_keys(self) -> set[str]:
         timetable_file = BASE / 'ksp-timetable.json'
