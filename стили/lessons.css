@@ -26376,6 +26376,36 @@ body.lesson-page .lesson-goal-card .goal-description {
   font-weight: 500 !important;
 }
 
+/* Specific Grade 10 EMN Palette for Goal Card */
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-goal-card,
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide :is(.lesson-goal-card, .goal, .goal-box, .goalitem, [class*="goal-card"]) {
+  background: #DFEEFA !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 0 !important;
+  box-shadow: inset 3px 3px 6px rgba(160, 195, 222, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-goal-card .goal-code-badge,
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .slide :is(.goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  background: #FFFFFF !important;
+  color: #2563EB !important;
+  border: 0 !important;
+  box-shadow: 2px 2px 5px rgba(160, 195, 222, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-goal-card .goal-code-badge i {
+  color: #2563EB !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-goal-card .goal-title-badge {
+  color: #547B9C !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .lesson-goal-card .goal-description {
+  color: #1E3A5F !important;
+}
+
 /* Specific Grade 11 Palette for Goal Card */
 body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .lesson-goal-card {
   background: #FBEFE8 !important;
