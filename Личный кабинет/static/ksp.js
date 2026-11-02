@@ -52,7 +52,7 @@
 
     refreshing = true;
     try {
-      const response = await fetch('/api/ksp', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+      const response = await fetch('/api/ksp?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(10000) });
       if (!response.ok) return;
       const result = await response.json();
       jobs = result.lessons || {};
@@ -83,7 +83,7 @@
     // If ready and not forcing re-generation: verify it still exists in Google Drive before opening!
     if (isReady && !isShiftClick) {
       try {
-        const checkResp = await fetch('/api/ksp', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+        const checkResp = await fetch('/api/ksp?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(8000) });
         if (checkResp.ok) {
           const checkData = await checkResp.json();
           jobs = checkData.lessons || {};

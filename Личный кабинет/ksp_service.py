@@ -584,8 +584,16 @@ class KspService:
 
     def public(self, row: dict) -> dict | None:
         result = {k: row[k] for k in ('id', 'status', 'message')}
-        if row.get('status') == 'ready' and row.get('path') and not str(row['path']).startswith('gdrive:') and not Path(row['path']).is_file():
-            return None
+        if row.get('status') == 'ready':
+            if self.cloud:
+                # If cloud, only consider ready if file is actually indexed on Google Drive
+                if str(row.get('path', '')).startswith('gdrive:'):
+                    file_id = str(row['path'])[7:]
+                    if file_id not in self._index.values():
+                        return None
+            else:
+                if row.get('path') and not Path(row['path']).is_file():
+                    return None
         if row.get('status') == 'ready':
             result['url'] = f"/api/ksp/{row['id']}/document"
             result['view_url'] = f"/api/ksp/{row['id']}/google-docs"
@@ -731,7 +739,10 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
         denied = authorize(request)
         if denied is not None:
             return denied
-        return {'lessons': get_service().statuses()}
+        resp = JSONResponse({'lessons': get_service().statuses()})
+        resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        resp.headers['Pragma'] = 'no-cache'
+        return resp
 
     @app.post('/api/ksp', status_code=202)
     def start(payload: KspStart, request: Request):
