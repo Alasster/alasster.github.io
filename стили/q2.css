@@ -4049,10 +4049,239 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .brand-
   box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.55), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
 }
 
+
 /* ==========================================================================
-   10 ЕМН: ПОЛНОЕ ОТКЛЮЧЕНИЕ РЕАКЦИИ НА НАВЕДЕНИЕ ДЛЯ ЦЕЛЕЙ УРОКА
-   Никаких анимаций, сдвигов, трансформаций или смены теней при hover
+   ЕДИНЫЙ ДИЗАЙН ЦЕЛЕЙ УРОКА ДЛЯ ВСЕХ КЛАССОВ (9, 10 ЕМН, 10 ОГН, 11)
    ========================================================================== */
+/* ==========================================================================
+   9 КЛАСС (Soft Lavender / Warm Purple): ДИЗАЙН ЦЕЛИ УРОКА (НЕОМОРФИЗМ)
+   ========================================================================== */
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 18px 24px !important;
+  margin: 14px 0 22px !important;
+  border-radius: 20px !important;
+  background: #EBE7F6 !important;
+  background-color: #EBE7F6 !important;
+  background-image: none !important;
+  border: none !important;
+  border-left: none !important;
+  box-shadow: inset 3px 3px 6px rgba(185, 175, 215, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  transform: none !important;
+  box-shadow: inset 3px 3px 6px rgba(185, 175, 215, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-header, .goal-header) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 5px 14px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(185, 175, 215, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #7C3AED !important;
+  white-space: nowrap !important;
+  cursor: default !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge):hover {
+  transform: none !important;
+  box-shadow: 2px 2px 5px rgba(185, 175, 215, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b) i {
+  font-size: 0.95rem !important;
+  color: #7C3AED !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge) {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #7C6E96 !important;
+  cursor: default !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description) {
+  margin: 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.6 !important;
+  color: #2E2548 !important;
+}
+
+/* ПОЛНОЕ ОТКЛЮЧЕНИЕ РЕАКЦИИ НА НАВЕДЕНИЕ ДЛЯ 9 КЛАСС (Soft Lavender / Warm Purple) */
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]),
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) * {
+  cursor: default !important;
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .q2-goal-title, .goal-title-badge, i, .lesson-flaticon) {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  background: #EBE7F6 !important;
+  background-color: #EBE7F6 !important;
+  background-image: none !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 6px rgba(185, 175, 215, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code):hover {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(185, 175, 215, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  color: #7C3AED !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(i, .lesson-flaticon):hover {
+  color: #7C3AED !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge):hover {
+  color: #7C6E96 !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description):hover {
+  color: #2E2548 !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+/* ==========================================================================
+   10 ЕМН (Soft Ice-Blue Azure): ДИЗАЙН ЦЕЛИ УРОКА (НЕОМОРФИЗМ)
+   ========================================================================== */
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 18px 24px !important;
+  margin: 14px 0 22px !important;
+  border-radius: 20px !important;
+  background: #DFEEFA !important;
+  background-color: #DFEEFA !important;
+  background-image: none !important;
+  border: none !important;
+  border-left: none !important;
+  box-shadow: inset 3px 3px 6px rgba(160, 195, 222, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  transform: none !important;
+  box-shadow: inset 3px 3px 6px rgba(160, 195, 222, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-header, .goal-header) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 5px 14px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(160, 195, 222, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #2563EB !important;
+  white-space: nowrap !important;
+  cursor: default !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge):hover {
+  transform: none !important;
+  box-shadow: 2px 2px 5px rgba(160, 195, 222, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b) i {
+  font-size: 0.95rem !important;
+  color: #2563EB !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge) {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #547B9C !important;
+  cursor: default !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description) {
+  margin: 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.6 !important;
+  color: #1E3A5F !important;
+}
+
+/* ПОЛНОЕ ОТКЛЮЧЕНИЕ РЕАКЦИИ НА НАВЕДЕНИЕ ДЛЯ 10 ЕМН (Soft Ice-Blue Azure) */
 html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]),
 html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) * {
   cursor: default !important;
@@ -4062,13 +4291,11 @@ html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is
   -webkit-transform: none !important;
 }
 
-/* Полный запрет pointer-events на бейджах и заголовках цели, чтобы не триггерить hover */
 html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .q2-goal-title, .goal-title-badge, i, .lesson-flaticon) {
   pointer-events: none !important;
   cursor: default !important;
 }
 
-/* Сохранение строго исходного вида при hover на саму плашку цели */
 html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
 html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
   background: #DFEEFA !important;
@@ -4082,7 +4309,6 @@ html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is
   cursor: default !important;
 }
 
-/* Сохранение строго исходного вида бейджа с кодом цели */
 html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code):hover {
   background: #FFFFFF !important;
   background-color: #FFFFFF !important;
@@ -4107,8 +4333,295 @@ html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is
   cursor: default !important;
 }
 
-html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) p:hover {
+html body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description):hover {
   color: #1E3A5F !important;
   transform: none !important;
   cursor: default !important;
 }
+
+/* ==========================================================================
+   10 ОГН (Soft Mint / Sage Green): ДИЗАЙН ЦЕЛИ УРОКА (НЕОМОРФИЗМ)
+   ========================================================================== */
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 18px 24px !important;
+  margin: 14px 0 22px !important;
+  border-radius: 20px !important;
+  background: #E5F3EC !important;
+  background-color: #E5F3EC !important;
+  background-image: none !important;
+  border: none !important;
+  border-left: none !important;
+  box-shadow: inset 3px 3px 6px rgba(165, 205, 185, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  transform: none !important;
+  box-shadow: inset 3px 3px 6px rgba(165, 205, 185, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-header, .goal-header) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 5px 14px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(165, 205, 185, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #059669 !important;
+  white-space: nowrap !important;
+  cursor: default !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge):hover {
+  transform: none !important;
+  box-shadow: 2px 2px 5px rgba(165, 205, 185, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b) i {
+  font-size: 0.95rem !important;
+  color: #059669 !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge) {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #047857 !important;
+  cursor: default !important;
+}
+
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description) {
+  margin: 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.6 !important;
+  color: #133826 !important;
+}
+
+/* ПОЛНОЕ ОТКЛЮЧЕНИЕ РЕАКЦИИ НА НАВЕДЕНИЕ ДЛЯ 10 ОГН (Soft Mint / Sage Green) */
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]),
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) * {
+  cursor: default !important;
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .q2-goal-title, .goal-title-badge, i, .lesson-flaticon) {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  background: #E5F3EC !important;
+  background-color: #E5F3EC !important;
+  background-image: none !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 6px rgba(165, 205, 185, 0.60), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code):hover {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(165, 205, 185, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  color: #059669 !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(i, .lesson-flaticon):hover {
+  color: #059669 !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge):hover {
+  color: #047857 !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description):hover {
+  color: #133826 !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+/* ==========================================================================
+   11 КЛАСС (Soft Warm Peach / Terracotta): ДИЗАЙН ЦЕЛИ УРОКА (НЕОМОРФИЗМ)
+   ========================================================================== */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 18px 24px !important;
+  margin: 14px 0 22px !important;
+  border-radius: 20px !important;
+  background: #FBEFE8 !important;
+  background-color: #FBEFE8 !important;
+  background-image: none !important;
+  border: none !important;
+  border-left: none !important;
+  box-shadow: inset 3px 3px 6px rgba(215, 168, 148, 0.55), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  cursor: default !important;
+  transition: none !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  transform: none !important;
+  box-shadow: inset 3px 3px 6px rgba(215, 168, 148, 0.55), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-header, .goal-header) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 5px 14px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(215, 168, 148, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #ED906C !important;
+  white-space: nowrap !important;
+  cursor: default !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b, .step-number, .num-badge):hover {
+  transform: none !important;
+  box-shadow: 2px 2px 5px rgba(215, 168, 148, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .goalitem b) i {
+  font-size: 0.95rem !important;
+  color: #ED906C !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge) {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #8C6D60 !important;
+  cursor: default !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description) {
+  margin: 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.6 !important;
+  color: #3F3530 !important;
+}
+
+/* ПОЛНОЕ ОТКЛЮЧЕНИЕ РЕАКЦИИ НА НАВЕДЕНИЕ ДЛЯ 11 КЛАСС (Soft Warm Peach / Terracotta) */
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]),
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) * {
+  cursor: default !important;
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code, .q2-goal-title, .goal-title-badge, i, .lesson-flaticon) {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):hover,
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]):focus {
+  background: #FBEFE8 !important;
+  background-color: #FBEFE8 !important;
+  background-image: none !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 6px rgba(215, 168, 148, 0.55), inset -3px -3px 6px rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-code, .goal-code-badge, .goal-code):hover {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: 2px 2px 5px rgba(215, 168, 148, 0.45), -2px -2px 5px rgba(255, 255, 255, 0.98) !important;
+  color: #ED906C !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(i, .lesson-flaticon):hover {
+  color: #ED906C !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(.q2-goal-title, .goal-title-badge):hover {
+  color: #8C6D60 !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-goal, .lesson-goal-card, .goal, .goal-box, [class*="goal-card"]) :is(p, .goal-description):hover {
+  color: #3F3530 !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
