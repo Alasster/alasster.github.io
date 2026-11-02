@@ -343,21 +343,6 @@
                 tone: 'cyan'
               }
             ]
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-layer-group',
-            title: 'Что такое стек вызовов (почему память не вечная)',
-            text: 'Когда функция вызывает саму себя, компьютер ставит текущую работу «на паузу» и кладёт её в стопку (стек) памяти:<br>' +
-                  '<div style="margin: 8px 0; padding: 10px 14px; background: rgba(0,0,0,0.035); border-radius: 12px; font-family: monospace; font-size: 0.93rem; line-height: 1.6;">' +
-                  '↓ Накопление вызовов:<br>' +
-                  '[Ждёт sum_to_n(3): вернёт 3 + ?]<br>' +
-                  '&nbsp;&nbsp;↳ [Ждёт sum_to_n(2): вернёт 2 + ?]<br>' +
-                  '&nbsp;&nbsp;&nbsp;&nbsp;↳ [Выполняется sum_to_n(1): возвращает 1]<br>' +
-                  '↑ Схлопывание снизу вверх после стоп-крана:<br>' +
-                  'sum_to_n(1) вернула 1 → sum_to_n(2) знает ответ: 2 + 1 = 3 → sum_to_n(3) знает ответ: 3 + 3 = 6.' +
-                  '</div>' +
-                  'Если забыть стоп-кран (базу), стопка будет расти бесконечно, пока не кончится память и Python не выдаст ошибку <code>RecursionError: maximum recursion depth exceeded</code>.'
           }
         ]
       },
