@@ -3502,11 +3502,38 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-goal p {
   color: #3F3530 !important;
 }
 
+/* 2 слайд: 2 колонки (определение слева, схема справа) */
+.q2-graph-split {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) !important;
+  gap: 20px !important;
+  align-items: stretch !important;
+  margin-bottom: 22px !important;
+}
+
+.q2-graph-split .q2-split-col {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.q2-graph-split .q2-definition,
+.q2-graph-split .q2-svg-wrap {
+  height: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 860px) {
+  .q2-graph-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* 2 слайд: компактная схема */
 body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-compact {
-  max-width: 480px !important;
-  margin: 0 auto 20px !important;
-  padding: 14px 18px !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 16px 20px !important;
   background: #FFF0E7 !important;
   border: 1px solid rgba(255, 255, 255, 0.70) !important;
   box-shadow: 
@@ -3518,12 +3545,30 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-comp
 }
 
 body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-compact svg {
-  max-width: 420px !important;
-  max-height: 200px !important;
+  max-width: 100% !important;
+  max-height: 240px !important;
   width: 100% !important;
   height: auto !important;
   margin: 0 auto !important;
   display: block !important;
+}
+
+/* В схеме 11 класса текст больше и четче */
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-wrap .q2-scene-node text {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-wrap .q2-scene-node-text {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  fill: #334155 !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-wrap .q2-scene-caption {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  fill: #64748b !important;
 }
 
 /* Карточки контента 11 класса в персиковых неоморфных тенях */
