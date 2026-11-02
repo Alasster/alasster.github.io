@@ -2581,8 +2581,9 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 
 .q2-rubric-panel .rubric-row {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
   padding: 10px 0;
   border-bottom: 1px dashed var(--q2-line);
 }
@@ -2590,11 +2591,17 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 .q2-rubric-panel .rubric-row:last-child { border-bottom: none; }
 
 .q2-rubric-panel .rubric-row strong {
-  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 5px 12px;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--q2-indigo);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .q2-rubric-panel .rubric-row span {

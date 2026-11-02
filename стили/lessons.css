@@ -26162,11 +26162,20 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.rubric 
   border: 0 !important;
 }
 
-body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.rubric .rs, .rubric-row > strong) {
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.rubric .rs, .rubric-row > strong, .q2-rubric-panel .rubric-row strong) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   background: #FBEFE8 !important;
-  box-shadow: inset 2px 2px 5px rgba(234, 201, 183, 0.50), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  box-shadow: inset 2px 2px 5px rgba(215, 168, 148, 0.55), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
   color: #ED906C !important;
   border: 0 !important;
+  border-radius: 12px !important;
+  padding: 5px 12px !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
 }
 
 /* 9. Interactive Inputs, Sliders, and Controls in Grade 11 */
