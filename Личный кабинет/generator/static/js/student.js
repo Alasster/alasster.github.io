@@ -247,7 +247,7 @@ function populateLaunchInfoOnScreens() {
   gradeSelect.innerHTML = '<option value="">Выберите класс</option>';
   letterSelect.innerHTML = '<option value="">Выберите букву</option>';
 
-  const CLASS_LETTERS = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П"];
+  const CLASS_LETTERS = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т"];
   const allowed = launchInfo.allowed_classes || [];
   const gradesSet = new Set();
   const lettersSet = new Set();

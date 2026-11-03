@@ -60,6 +60,8 @@
 
     html:not([data-user-role="superadmin"]):not([data-user-role="teacher"]) .sidebar-link[href="#tests"],
 
+    html:not([data-user-role="user"]) .sidebar-link[href="#safety"],
+
     html:not([data-user-role="superadmin"]) .site-summary,
 
     html:not([data-user-role="superadmin"]) [data-cabinet-section="overview"],
@@ -77,6 +79,8 @@
     body:not([data-user-role="superadmin"]) .sidebar-link[href="#materials"],
 
     body:not([data-user-role="superadmin"]):not([data-user-role="teacher"]) .sidebar-link[href="#tests"],
+
+    body:not([data-user-role="user"]) .sidebar-link[href="#safety"],
 
     body:not([data-user-role="superadmin"]) .site-summary,
 
@@ -194,6 +198,8 @@
         <a class="sidebar-link active" href="#overview"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="sidebar-label">Обзор</span></a>
 
         <a class="sidebar-link" href="#profile"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span><span class="sidebar-label">Профиль</span></a>
+
+        <a class="sidebar-link" href="#safety"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5.5c0 4.8-3.3 8.1-8 9.5-4.7-1.4-8-4.7-8-9.5V6z"/><path d="m8.7 12 2.1 2.1 4.5-4.7"/></svg></span><span class="sidebar-label">Техника безопасности</span></a>
 
         <a class="sidebar-link" href="#lessons"><span class="sidebar-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15M8 7h8M8 11h8"/></svg></span><span class="sidebar-label">Уроки и классы</span></a>
 
@@ -344,6 +350,16 @@
                       <option value="Е">Е</option>
                       <option value="Ж">Ж</option>
                       <option value="З">З</option>
+                      <option value="И">И</option>
+                      <option value="К">К</option>
+                      <option value="Л">Л</option>
+                      <option value="М">М</option>
+                      <option value="Н">Н</option>
+                      <option value="О">О</option>
+                      <option value="П">П</option>
+                      <option value="Р">Р</option>
+                      <option value="С">С</option>
+                      <option value="Т">Т</option>
                     </select>
                   </label>
                 </div>
@@ -361,6 +377,51 @@
 
           </form>
 
+        </article>
+
+        <article class="glass-card safety-card" id="safety" data-cabinet-section="safety">
+          <div class="safety-hero">
+            <div class="safety-hero-copy">
+              <span class="safety-kicker"><span class="safety-kicker-dot"></span>Личная безопасность</span>
+              <h2>Техника безопасности<br><span>в кабинете информатики</span></h2>
+              <p>Правила, которые помогают работать за компьютером спокойно, безопасно и с пользой. Изучи их перед началом занятий.</p>
+              <div class="safety-hero-meta">
+                <span class="safety-meta-pill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8.5"/></svg>6 важных правил</span>
+                <span class="safety-meta-pill"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/></svg>5 минут</span>
+              </div>
+            </div>
+            <div class="safety-hero-art" aria-hidden="true">
+              <div class="safety-orbit safety-orbit-one"></div>
+              <div class="safety-orbit safety-orbit-two"></div>
+              <div class="safety-monitor">
+                <div class="safety-monitor-screen"><span class="safety-screen-shield"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5.5c0 4.8-3.3 8.1-8 9.5-4.7-1.4-8-4.7-8-9.5V6z"/><path d="m8.7 12 2.1 2.1 4.5-4.7"/></svg></span><span class="safety-screen-line safety-screen-line-long"></span><span class="safety-screen-line"></span></div>
+                <div class="safety-monitor-stand"></div><div class="safety-monitor-base"></div>
+              </div>
+              <span class="safety-art-bubble safety-art-bubble-one">✓</span><span class="safety-art-bubble safety-art-bubble-two">⌁</span>
+            </div>
+          </div>
+
+          <div class="safety-intro-banner">
+            <span class="safety-intro-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 4.8-3.3 8.1-8 9.5-4.7-1.4-8-4.7-8-9.5V6z"/><path d="M12 8v4M12 16h.01"/></svg></span>
+            <div><strong>Главное правило</strong><p>Если ты заметил(а) неисправность, почувствовал(а) запах гари или тебе стало плохо — остановись и сразу сообщи учителю.</p></div>
+          </div>
+
+          <div class="safety-rules-heading"><div><span class="eyebrow">ПЕРЕД НАЧАЛОМ И ВО ВРЕМЯ РАБОТЫ</span><h3>6 правил безопасного кабинета</h3></div><span class="safety-rules-badge">Запомни главное</span></div>
+          <div class="safety-rules-grid">
+            <article class="safety-rule safety-rule-blue"><span class="safety-rule-number">01</span><span class="safety-rule-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5V6.8A1.8 1.8 0 0 1 7.6 6v5.7M7.6 11V4.8a1.8 1.8 0 0 1 3.6 0V11m0-5a1.8 1.8 0 0 1 3.6 0v5m0-3a1.8 1.8 0 0 1 3.6 0v6.2c0 3.7-2.8 5.8-6.3 5.8H9.2c-2.3 0-3.6-1.1-4.6-3l-1.8-3.4a1.8 1.8 0 0 1 3.2-1.7l.6 1.1"/></svg></span><h4>Начинай с разрешения</h4><p>Заходи в кабинет спокойно, занимай своё место и включай компьютер только после разрешения учителя.</p></article>
+            <article class="safety-rule safety-rule-violet"><span class="safety-rule-number">02</span><span class="safety-rule-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v14H6.5A2.5 2.5 0 0 0 4 19.5z"/><path d="M4 5.5v14M8 7h8M8 11h5"/></svg></span><h4>Сиди правильно</h4><p>Спина ровная, стопы на полу, экран на расстоянии 50–70 см. Не наклоняйся близко к монитору.</p></article>
+            <article class="safety-rule safety-rule-teal"><span class="safety-rule-number">03</span><span class="safety-rule-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 13h6l-1 9 8-11h-6z"/></svg></span><h4>Береги электричество</h4><p>Не трогай розетки, провода и разъёмы мокрыми руками. Не двигай технику самостоятельно.</p></article>
+            <article class="safety-rule safety-rule-amber"><span class="safety-rule-number">04</span><span class="safety-rule-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v7M3 3v5a2 2 0 0 0 4 0V3M5 10v11M16 3v18M16 3c3.3 0 5 2.4 5 5.5S19.3 14 16 14"/></svg></span><h4>Никакой еды и напитков</h4><p>Держи рабочее место сухим и аккуратным. Еда и напитки рядом с компьютером могут повредить технику.</p></article>
+            <article class="safety-rule safety-rule-rose"><span class="safety-rule-number">05</span><span class="safety-rule-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12h7M12 8.5v7"/></svg></span><h4>Будь внимателен онлайн</h4><p>Не открывай незнакомые ссылки и файлы, не сообщай пароли и личные данные. Сомневаешься — спроси учителя.</p></article>
+            <article class="safety-rule safety-rule-green"><span class="safety-rule-number">06</span><span class="safety-rule-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7 7 0 0 1 7 7c0 3.9-2.3 5.6-3.5 7.1-.6.8-.8 1.3-.8 2.1H9.3c0-.8-.2-1.3-.8-2.1C7.3 15.6 5 13.9 5 10a7 7 0 0 1 7-7Z"/><path d="M9 22h6M9.5 19h5"/></svg></span><h4>Заверши работу правильно</h4><p>Сохрани результат по инструкции, закрой программы и оставь место чистым. Не выключай технику без разрешения.</p></article>
+          </div>
+
+          <div class="safety-emergency"><span class="safety-emergency-icon">!</span><div><strong>Запомни на случай тревоги</strong><p>Не паникуй, не пользуйся неисправным устройством и не покидай кабинет самовольно. Следуй инструкциям учителя.</p></div></div>
+
+          <div class="safety-confirmation" id="safety-confirmation">
+            <div class="safety-confirmation-copy"><span class="safety-check-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.5"/></svg></span><div><span class="eyebrow">ФИНАЛЬНЫЙ ШАГ</span><h3>Ознакомление с правилами</h3><p>Поставь отметку, когда прочитаешь все правила техники безопасности.</p></div></div>
+            <div class="safety-confirmation-action"><label class="safety-agreement"><input type="checkbox" id="safety-agreement-checkbox"><span class="safety-custom-checkbox"></span><span>Я ознакомился(лась) с правилами</span></label><button class="button button-primary safety-confirm-button" id="safety-confirm-button" type="button" disabled>Подтвердить ознакомление</button><span class="safety-confirmed-note" id="safety-confirmed-note" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.5"/></svg>Ознакомление подтверждено</span></div>
+          </div>
         </article>
 
         <article class="glass-card lesson-catalog-card" id="lessons" data-cabinet-section="lessons">
@@ -1651,7 +1712,7 @@
 
           </div>
 
-          <!-- Буквы классов: чекбоксы от А до П (без Ё и Й) -->
+          <!-- Буквы классов: чекбоксы от А до Т (без Ё и Й) -->
 
           <div class="form-group">
 
@@ -1671,7 +1732,7 @@
 
             <div class="letter-checkbox-grid" id="new-test-letters-grid"></div>
 
-            <p class="form-hint">Буквы от А до П (без Ё и Й). Выбранные буквы будут доступны ученикам при входе.</p>
+            <p class="form-hint">Буквы от А до Т (без Ё и Й). Выбранные буквы будут доступны ученикам при входе.</p>
 
           </div>
 
@@ -2368,6 +2429,16 @@
             <option value="Ж">Ж</option>
 
             <option value="З">З</option>
+            <option value="И">И</option>
+            <option value="К">К</option>
+            <option value="Л">Л</option>
+            <option value="М">М</option>
+            <option value="Н">Н</option>
+            <option value="О">О</option>
+            <option value="П">П</option>
+            <option value="Р">Р</option>
+            <option value="С">С</option>
+            <option value="Т">Т</option>
 
           </select>
 

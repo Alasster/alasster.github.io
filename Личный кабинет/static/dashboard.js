@@ -132,6 +132,8 @@ const sectionHeadings = {
 
   materials: ['МОИ МАТЕРИАЛЫ', 'Личные материалы'],
 
+  safety: ['БЕЗОПАСНОСТЬ', 'Техника безопасности'],
+
 };
 
 const formatNumber = (value) => new Intl.NumberFormat('ru-RU').format(Number(value) || 0);
@@ -215,7 +217,7 @@ document.addEventListener('click', (event) => {
 const ROLE_SECTIONS = {
   superadmin: ['overview', 'profile', 'lessons', 'tests', 'materials'],
   teacher: ['profile', 'tests'],
-  user: ['profile']
+  user: ['profile', 'safety']
 };
 
 function getDefaultSectionForRole(role) {
@@ -256,6 +258,7 @@ const initialRole = document.body.dataset.userRole || (() => {
   } catch (_) { return 'user'; }
 })() || 'user';
 applyUserRole(initialRole);
+if (initialRole === 'user') initSafetyAcknowledgement(window.currentCabinetUser || { id: 'preview' });
 
 function syncSidebarActive() {
   const role = window.currentUserRole || document.body.dataset.userRole || 'user';
@@ -316,6 +319,38 @@ function showCabinetSection(section) {
 
   if (titleNode) titleNode.textContent = title;
 
+}
+
+function initSafetyAcknowledgement(user) {
+  const checkbox = document.getElementById('safety-agreement-checkbox');
+  const confirmButton = document.getElementById('safety-confirm-button');
+  const confirmedNote = document.getElementById('safety-confirmed-note');
+  if (!checkbox || !confirmButton || !confirmedNote) return;
+  if (checkbox.dataset.safetyInitialized === '1') return;
+  checkbox.dataset.safetyInitialized = '1';
+
+  const storageId = String(user?.id || user?.username || 'student').replace(/[^a-z0-9_-]/gi, '_');
+  const storageKey = `alasster-safety-acknowledged-${storageId}`;
+  let acknowledged = false;
+  try { acknowledged = localStorage.getItem(storageKey) === '1'; } catch (_) {}
+
+  const render = () => {
+    checkbox.checked = acknowledged || checkbox.checked;
+    checkbox.disabled = acknowledged;
+    confirmButton.disabled = acknowledged || !checkbox.checked;
+    confirmButton.hidden = acknowledged;
+    confirmedNote.hidden = !acknowledged;
+    document.getElementById('safety-confirmation')?.classList.toggle('is-confirmed', acknowledged);
+  };
+
+  checkbox.addEventListener('change', render);
+  confirmButton.addEventListener('click', () => {
+    if (!checkbox.checked) return;
+    acknowledged = true;
+    try { localStorage.setItem(storageKey, '1'); } catch (_) {}
+    render();
+  });
+  render();
 }
 
 document.querySelectorAll('.sidebar-link').forEach((link) => {
@@ -458,6 +493,8 @@ async function loadCurrentUser() {
   profileSnapshot = collectProfileChanges();
 
   profileDirty = false;
+
+  if (userRole === 'user') initSafetyAcknowledgement(user);
 
   const allowed = ROLE_SECTIONS[userRole] || [getDefaultSectionForRole(userRole)];
 

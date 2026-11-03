@@ -13,8 +13,8 @@ let liveEventSource = null;
 let pollInterval = null;
 let pendingDeleteAction = null;
 
-// Алфавит букв классов от А до П (без Ё и Й per Казахстанскому школьному стандарту)
-const CLASS_LETTERS = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П"];
+// Алфавит букв классов от А до Т (без Ё и Й)
+const CLASS_LETTERS = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т"];
 
 // Инициализация
 document.addEventListener("DOMContentLoaded", async () => {
@@ -136,7 +136,7 @@ function switchMainView(viewName) {
   }
 }
 
-// Отрисовка чекбоксов букв классов от А до П
+// Отрисовка чекбоксов букв классов от А до Т
 function renderLettersGrid() {
   const grid = document.getElementById("new-test-letters-grid");
   if (!grid) return;
