@@ -475,8 +475,8 @@
     }
 
     function setFeedback(message, state) {
-      feedback.textContent = message;
-      feedback.className = 'q2-feedback' + (state ? ` is-${state}` : '');
+      feedback.innerHTML = message;
+      feedback.className = 'q2-feedback' + (state ? ' ' + state.split(/\s+/).map(s => `is-${s}`).join(' ') : '');
     }
 
     function renderDots() {
@@ -533,7 +533,7 @@
       questionNode.textContent = isReview ? 'Повторение завершено' : 'Проверка завершена';
       counter.textContent = `${questions.length} из ${questions.length}`;
       const perfect = score === questions.length;
-      setFeedback(`Правильных ответов: ${score} из ${questions.length}. ${perfect ? 'Отлично: тема усвоена.' : 'Разберите ошибки по слайдам — и всё получится.'}`, perfect ? 'good' : 'bad');
+      setFeedback(`Правильных ответов: <span class="q2-feedback-score">${score} из ${questions.length}</span>. ${perfect ? 'Отлично: тема усвоена.' : 'Разберите ошибки по слайдам — и всё получится.'}`, `result ${perfect ? 'good' : 'bad'}`);
       nextButton.disabled = true;
       restartButton.hidden = false;
       if (dots) Array.from(dots.children).forEach(dot => { dot.className = 'is-done'; });

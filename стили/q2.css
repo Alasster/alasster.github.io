@@ -877,13 +877,13 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
 }
 
 .q2-feedback {
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 0.86rem;
-  line-height: 1.5;
+  padding: 13px 18px;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  line-height: 1.55;
   background: rgba(148, 163, 184, 0.1);
   color: #475569;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   transition: all 0.2s ease;
 }
 
@@ -905,6 +905,83 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   background: rgba(8, 145, 178, 0.08);
   border-color: rgba(8, 145, 178, 0.2);
   color: #0e7490;
+}
+
+.q2-feedback-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.05em;
+  padding: 2px 12px;
+  border-radius: 999px;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
+/* Итоговые результаты квиза в цветах классов */
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .q2-feedback.is-result {
+  background: #E2F5EC !important;
+  border: 1.5px solid rgba(5, 150, 105, 0.35) !important;
+  color: #065f46 !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  padding: 16px 24px !important;
+  border-radius: 18px !important;
+  box-shadow: 4px 4px 10px rgba(140, 188, 165, 0.35), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .q2-feedback-score {
+  background: #059669 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.35) !important;
+}
+
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .q2-feedback.is-result {
+  background: #DFEEFA !important;
+  border: 1.5px solid rgba(37, 99, 235, 0.32) !important;
+  color: #1e40af !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  padding: 16px 24px !important;
+  border-radius: 18px !important;
+  box-shadow: 4px 4px 10px rgba(145, 180, 212, 0.4), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .q2-feedback-score {
+  background: #2563EB !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35) !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-feedback.is-result {
+  background: #FFF0E7 !important;
+  border: 1.5px solid rgba(234, 88, 12, 0.32) !important;
+  color: #9a3412 !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  padding: 16px 24px !important;
+  border-radius: 18px !important;
+  box-shadow: 4px 4px 10px rgba(215, 168, 148, 0.35), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-feedback-score {
+  background: #ea580c !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.35) !important;
+}
+
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .q2-feedback.is-result {
+  background: #f3f0fc !important;
+  border: 1.5px solid rgba(109, 90, 235, 0.32) !important;
+  color: #4338ca !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  padding: 16px 24px !important;
+  border-radius: 18px !important;
+  box-shadow: 4px 4px 10px rgba(169, 161, 193, 0.35), -3px -3px 8px rgba(255, 255, 255, 0.95) !important;
+}
+body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .q2-feedback-score {
+  background: #6d5aeb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(109, 90, 235, 0.35) !important;
 }
 
 .q2-progress {
