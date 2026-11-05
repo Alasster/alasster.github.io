@@ -2151,7 +2151,7 @@
             <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-reset>Сброс</button>
           </div>
         </div>
-        <div class="q2-sort-code">${codeBlock({ code: (codeMap[algo] || SORT_CODE[algo]).join('\n'), title: labels[algo], compact: true })}</div>
+        <div class="q2-sort-code">${codeBlock({ code: (codeMap[algo] || SORT_CODE[algo]).join('\n'), title: labels[algo], compact: false })}</div>
       </div>`;
 
     const bars = el.querySelector('[data-bars]');

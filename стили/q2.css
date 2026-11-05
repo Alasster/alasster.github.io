@@ -2490,7 +2490,38 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-scene-row:nth-of-type(4) { anim
   gap: 7px;
 }
 
-.q2-sort-code { min-width: 0; }
+.q2-sort-code {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.q2-sort-code .q2-code {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+}
+
+.q2-sort-code .q2-code pre {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 0;
+  font-size: 0.98rem !important;
+  line-height: 1.85 !important;
+}
+
+.q2-sort-code .q2-code-line {
+  padding: 2px 18px 2px 0;
+}
+
+.q2-sort-code .q2-ln {
+  font-size: 0.86rem;
+  width: 36px;
+  padding-right: 12px;
+}
 
 /* --------------------------------------------------------------------------
    11. ГРАФЫ
