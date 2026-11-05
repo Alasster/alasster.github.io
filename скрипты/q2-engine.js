@@ -21,6 +21,15 @@
   const attr = value => esc(value).replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/\n/g, ' ');
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
+  function shuffledCopy(items) {
+    const result = Array.from(items || []);
+    for (let i = result.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+
   function hl(line) {
     const tokens = /("[^"]*"|'[^']*'|#[^\n]*|\b(?:def|return|if|elif|else|for|while|in|not|and|or|True|False|None|print|input|int|str|float|len|range|append|sorted|sort|split|map|reverse|end|list|sum|abs)\b|\b\d+(?:\.\d+)?\b)/g;
     return esc(line).replace(tokens, match => {
@@ -194,7 +203,7 @@
       body = `${head(slide)}${blocks(slide.before)}${tasks}${blocks(slide.after)}
         ${slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Дескриптор', items: slide.criteria }) : ''}`;
     } else if (kind === 'review') {
-      body = `${head({ eyebrow: slide.eyebrow || '02 · ПОВТОРЕНИЕ', title: slide.title || 'Повторение предыдущей темы', lead: slide.lead || 'Ответьте на 5 вопросов — они помогут вспомнить главное перед новой темой.' })}${widget('quiz', { questions: slide.questions, variant: 'review' })}`;
+      body = `${head({ eyebrow: slide.eyebrow || '02 · ПОВТОРЕНИЕ', title: slide.title || 'Повторение предыдущей темы', lead: slide.lead || 'Ответьте на 5 вопросов — они помогут вспомнить главное перед новой темой.' })}${widget('quiz', { questions: slide.questions, variant: 'review', shuffleOptions: slide.shuffleOptions })}`;
     } else if (kind === 'quiz') {
       body = `${head({ eyebrow: slide.eyebrow || 'ПРОВЕРКА', title: slide.title || 'Мини-проверка', lead: slide.lead || 'Пять вопросов по теме урока. Выберите один ответ в каждом.' })}${widget('quiz', { questions: slide.questions })}`;
     } else if (kind === 'summary') {
@@ -422,7 +431,13 @@
 
   /* ------------------------------- quiz ---------------------------------- */
   WIDGETS.quiz = function (el, cfg) {
-    const questions = cfg.questions || [];
+    const sourceQuestions = cfg.questions || [];
+    const questions = sourceQuestions.map(item => {
+      if (!cfg.shuffleOptions) return item;
+      const choices = (item.options || []).map((text, index) => ({ text, correct: index === item.answer }));
+      const options = shuffledCopy(choices);
+      return { ...item, options: options.map(option => option.text), answer: options.findIndex(option => option.correct) };
+    });
     const isReview = cfg.variant === 'review';
     let index = 0;
     let score = 0;
@@ -1217,13 +1232,14 @@
 
     function render() {
       const item = exprs[current];
-      const fn = compileExpr(item.expr);
-      const mid = item.mid ? { label: item.mid.label, fn: compileExpr(item.mid.expr) } : null;
-      const head = ['A', 'B', 'C'].slice(0, vars).map(v => `<th>${v}</th>`).join('') + (mid ? `<th>${mid.label}</th>` : '') + '<th>Y</th>';
+      const columns = item.columns || (item.mid ? [item.mid] : []);
+      const head = ['A', 'B', 'C'].slice(0, vars).map(v => `<th>${v}</th>`).join('')
+        + columns.map(column => `<th>${column.label}</th>`).join('')
+        + `<th>${item.resultLabel || 'Y'}</th>`;
       const body = rows.map((row, rowIndex) => {
         const values = row.map(value => `<td>${value}</td>`).join('');
-        const midCell = mid ? `<td><button type="button" class="q2-cell" data-row="${rowIndex}" data-col="mid" aria-label="Промежуточное значение, строка ${rowIndex + 1}">?</button></td>` : '';
-        return `<tr>${values}${midCell}<td><button type="button" class="q2-cell" data-row="${rowIndex}" data-col="res" aria-label="Результат, строка ${rowIndex + 1}">?</button></td></tr>`;
+        const intermediateCells = columns.map((column, columnIndex) => `<td><button type="button" class="q2-cell" data-row="${rowIndex}" data-col="${columnIndex}" aria-label="${attr(column.label)}, строка ${rowIndex + 1}">?</button></td>`).join('');
+        return `<tr>${values}${intermediateCells}<td><button type="button" class="q2-cell" data-row="${rowIndex}" data-col="res" aria-label="Результат, строка ${rowIndex + 1}">?</button></td></tr>`;
       }).join('');
       tableNode.innerHTML = `<div class="q2-table-wrap"><table class="q2-table q2-table-truth"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
       cells = Array.from(tableNode.querySelectorAll('.q2-cell'));
@@ -1235,19 +1251,20 @@
           cell.classList.remove('is-correct', 'is-wrong');
         });
       });
-      feedback.textContent = `Заполните столбцы для ${item.label}. Нажимайте на «?», чтобы поставить 0 или 1.`;
+      feedback.textContent = `Заполняйте столбцы слева направо для ${item.label}. Нажимайте на «?», чтобы поставить 0 или 1.`;
       feedback.className = 'q2-feedback is-hint';
     }
 
     function check(show) {
       const item = exprs[current];
       const fn = compileExpr(item.expr);
-      const mid = item.mid ? { label: item.mid.label, fn: compileExpr(item.mid.expr) } : null;
+      const columns = item.columns || (item.mid ? [item.mid] : []);
+      const columnFns = columns.map(column => compileExpr(column.expr));
       let filled = true;
       let allCorrect = true;
       cells.forEach(cell => {
         const row = rows[Number(cell.dataset.row)];
-        const expected = cell.dataset.col === 'mid' ? mid.fn(...row) : fn(...row);
+        const expected = cell.dataset.col === 'res' ? fn(...row) : columnFns[Number(cell.dataset.col)](...row);
         if (cell.textContent === '?') filled = false;
         const correct = Number(cell.textContent) === expected;
         if (show) {
@@ -1286,6 +1303,279 @@
     el.querySelector('[data-check]').addEventListener('click', () => check(false));
     el.querySelector('[data-reset]').addEventListener('click', render);
     el.querySelector('[data-show]').addEventListener('click', () => check(true));
+    render();
+  };
+
+  /* --------------------- порядок логических действий ------------------- */
+  const logicNot = child => ({ op: 'not', child });
+  const logicBinary = (op, left, right) => ({ op, left, right });
+  const logicSign = { and: '∧', or: '∨' };
+  function logicHTML(node) {
+    if (typeof node === 'string') return node;
+    if (node.op === 'not') return `<span class="q2-overline">${logicHTML(node.child)}</span>`;
+    const operand = child => typeof child !== 'string' && child.op !== 'not'
+      ? `(${logicHTML(child)})` : logicHTML(child);
+    return `${operand(node.left)} <span class="q2-logic-sign">${logicSign[node.op]}</span> ${operand(node.right)}`;
+  }
+  function logicText(node) {
+    if (typeof node === 'string') return node;
+    if (node.op === 'not') return `НЕ (${logicText(node.child)})`;
+    return `(${logicText(node.left)} ${logicSign[node.op]} ${logicText(node.right)})`;
+  }
+  function logicValue(node, A, B) {
+    if (node === 'A') return A;
+    if (node === 'B') return B;
+    if (node.op === 'not') return 1 - logicValue(node.child, A, B);
+    const left = logicValue(node.left, A, B);
+    const right = logicValue(node.right, A, B);
+    return node.op === 'and' ? left & right : left | right;
+  }
+  function logicColumns(node, result = []) {
+    if (typeof node === 'string') return result;
+    if (node.op === 'not') logicColumns(node.child, result);
+    else { logicColumns(node.left, result); logicColumns(node.right, result); }
+    if (!result.some(item => logicText(item) === logicText(node))) result.push(node);
+    return result;
+  }
+
+  WIDGETS.truthNotebook = function (el) {
+    const random = max => {
+      const values = new Uint32Array(1);
+      window.crypto.getRandomValues(values);
+      return values[0] % max;
+    };
+    const makeTree = count => {
+      if (count === 0) return random(2) ? 'A' : 'B';
+      if (random(4) === 0) return logicNot(makeTree(count - 1));
+      const leftCount = random(count);
+      return logicBinary(random(2) ? 'and' : 'or', makeTree(leftCount), makeTree(count - 1 - leftCount));
+    };
+    const suitable = (node, depth = 0) => {
+      if (typeof node === 'string') return true;
+      if (depth > 4) return false;
+      if (node.op === 'not') return node.child.op !== 'not' && suitable(node.child, depth + 1);
+      const left = logicText(node.left);
+      const right = logicText(node.right);
+      if (left === right || (node.left.op === 'not' && logicText(node.left.child) === right)
+        || (node.right.op === 'not' && logicText(node.right.child) === left)) return false;
+      return suitable(node.left, depth + 1) && suitable(node.right, depth + 1);
+    };
+    let previous = [];
+    try { previous = JSON.parse(localStorage.getItem('q2-9-2-notebook') || '[]'); } catch (_) { /* storage is optional */ }
+    const operationCounts = [3, 4, 4];
+    const tasks = operationCounts.map((operations, index) => {
+      let node;
+      while (true) {
+        node = makeTree(operations);
+        const signature = logicText(node);
+        const values = [[0,0],[0,1],[1,0],[1,1]].map(row => logicValue(node, ...row));
+        const usesBoth = /A/.test(signature) && /B/.test(signature);
+        const dependsBoth = (values[0] !== values[2] || values[1] !== values[3])
+          && (values[0] !== values[1] || values[2] !== values[3]);
+        const mixedOperations = signature.includes('НЕ') && (operations === 2 || (signature.includes('∧') && signature.includes('∨')));
+        if (usesBoth && dependsBoth && mixedOperations && suitable(node) && signature !== previous[index] && logicColumns(node).length === operations) break;
+      }
+      return node;
+    });
+    try { localStorage.setItem('q2-9-2-notebook', JSON.stringify(tasks.map(logicText))); } catch (_) { /* storage is optional */ }
+    const taskColumns = tasks.map(node => ['A', 'B', ...logicColumns(node)]);
+    const answers = taskColumns.map(columns => Array.from({ length: 4 }, () => columns.map(() => '?')));
+    const orderPool = taskColumns[2].slice(2, -1);
+    const orderChoices = shuffledCopy(orderPool.map((_, index) => index));
+    const selectedOrder = orderPool.map(() => '');
+    el.classList.add('q2-notebook');
+    el.innerHTML = `<div class="q2-notebook-tabs" role="tablist" aria-label="Задания практической работы">${tasks.map((_, index) => `<button type="button" role="tab" class="q2-notebook-tab${index === 0 ? ' is-active' : ''}" id="q2-notebook-tab-${index}" aria-controls="q2-notebook-panel" aria-selected="${index === 0}" tabindex="${index === 0 ? '0' : '-1'}" data-notebook-task="${index}"><span>0${index + 1}</span>Задание ${index + 1}<small>${[2,3,4][index]} балла</small></button>`).join('')}</div>
+      <div role="tabpanel" id="q2-notebook-panel" data-notebook-panel></div>`;
+    const tabs = Array.from(el.querySelectorAll('[data-notebook-task]'));
+    const render = index => {
+      tabs.forEach((tab, i) => { tab.classList.toggle('is-active', i === index); tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1; });
+      const panel = el.querySelector('[data-notebook-panel]');
+      panel.setAttribute('aria-labelledby', tabs[index].id);
+      const columns = taskColumns[index];
+      const columnNode = col => index === 2 && col >= 2 && col < columns.length - 1
+        ? (selectedOrder[col - 2] === '' ? null : orderPool[Number(selectedOrder[col - 2])])
+        : columns[col];
+      const columnLabel = col => col === columns.length - 1 ? 'Y' : columnNode(col) ? logicText(columnNode(col)) : `Промежуточное выражение ${col - 1}`;
+      const header = (node, col) => {
+        if (col === columns.length - 1) return '<th>Y</th>';
+        if (index !== 2 || col < 2) return `<th>${logicHTML(node)}</th>`;
+        const position = col - 2;
+        return `<th class="q2-order-column"><span class="q2-order-column-title" id="q2-order-title-${position}">Действие ${position + 1}</span><button type="button" class="q2-order-picker" data-notebook-order="${position}" value="${selectedOrder[position]}" aria-label="Выражение для действия ${position + 1}" aria-haspopup="listbox" aria-expanded="false" aria-controls="q2-order-menu-${position}"><span data-order-preview="${position}">${columnNode(col) ? logicHTML(columnNode(col)) : 'Выберите выражение'}</span><i aria-hidden="true"></i></button><div class="q2-order-menu" id="q2-order-menu-${position}" popover="auto" role="listbox" aria-labelledby="q2-order-title-${position}">${orderChoices.map(choice => `<button type="button" role="option" class="q2-order-choice" data-order-choice="${choice}" aria-label="${attr(logicText(orderPool[choice]))}" aria-selected="${selectedOrder[position] === String(choice)}">${logicHTML(orderPool[choice])}</button>`).join('')}</div></th>`;
+      };
+      panel.innerHTML = `<div class="q2-notebook-formula"><div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[index]))}">${logicHTML(tasks[index])}</div></div>
+        <p class="q2-notebook-instruction">Выполните работу в тетради. Таблицу на экране тоже можно заполнить: нажимайте на ячейки — ? → 0 → 1. ${index === 2 ? 'Самостоятельно выберите порядок промежуточных выражений в заголовках столбцов. Затем заполните A, B, промежуточные значения и Y.' : 'Сначала заполните A и B, затем промежуточные столбцы и Y.'}</p>
+        <div class="q2-table-wrap"><table class="q2-table q2-notebook-template"><caption>Заполните все ячейки самостоятельно</caption><thead><tr>${columns.map(header).join('')}</tr></thead><tbody>${answers[index].map((row, rowIndex) => `<tr>${row.map((value, col) => `<td><button type="button" class="q2-cell" data-notebook-row="${rowIndex}" data-notebook-col="${col}" aria-label="${attr(columnLabel(col))}, строка ${rowIndex + 1}">${value}</button></td>`).join('')}</tr>`).join('')}</tbody></table></div>
+        <div class="q2-notebook-check"><p class="q2-feedback" data-notebook-feedback role="status" aria-live="polite">Заполните таблицу и нажмите «Проверить».</p><button type="button" class="q2-btn" data-notebook-check>Проверить</button></div>`;
+      const feedback = panel.querySelector('[data-notebook-feedback]');
+      panel.querySelectorAll('[data-notebook-order]').forEach(select => {
+        const position = Number(select.dataset.notebookOrder);
+        const menu = panel.querySelector(`#q2-order-menu-${position}`);
+        const options = Array.from(menu.querySelectorAll('[data-order-choice]'));
+        const positionMenu = () => {
+          const rect = select.getBoundingClientRect();
+          const width = Math.min(Math.max(rect.width, 240), window.innerWidth - 24);
+          menu.style.width = `${width}px`;
+          menu.style.left = `${Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))}px`;
+          menu.style.top = `${rect.bottom + 8}px`;
+          const height = menu.getBoundingClientRect().height;
+          if (rect.bottom + 8 + height > window.innerHeight - 12) menu.style.top = `${Math.max(12, rect.top - height - 8)}px`;
+        };
+        const openMenu = () => {
+          if (menu.matches(':popover-open')) { menu.hidePopover(); return; }
+          positionMenu();
+          menu.showPopover();
+          positionMenu();
+          (options.find(option => option.getAttribute('aria-selected') === 'true') || options[0]).focus({ preventScroll: true });
+        };
+        panel.querySelector('.q2-table-wrap').addEventListener('scroll', () => {
+          if (menu.matches(':popover-open')) positionMenu();
+        });
+        select.addEventListener('click', openMenu);
+        select.addEventListener('keydown', event => {
+          if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+          event.preventDefault();
+          if (!menu.matches(':popover-open')) openMenu();
+        });
+        menu.addEventListener('toggle', () => select.setAttribute('aria-expanded', String(menu.matches(':popover-open'))));
+        options.forEach((option, optionIndex) => {
+          option.addEventListener('click', () => {
+            select.value = option.dataset.orderChoice;
+            options.forEach(item => item.setAttribute('aria-selected', String(item === option)));
+            select.dispatchEvent(new Event('change'));
+            menu.hidePopover();
+            select.focus({ preventScroll: true });
+          });
+          option.addEventListener('keydown', event => {
+            if (event.key === 'Escape') { event.preventDefault(); menu.hidePopover(); select.focus(); return; }
+            if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+            event.preventDefault();
+            const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : (optionIndex + (event.key === 'ArrowDown' ? 1 : options.length - 1)) % options.length;
+            options[next].focus();
+          });
+        });
+        select.addEventListener('change', () => {
+          const position = Number(select.dataset.notebookOrder);
+          selectedOrder[position] = select.value;
+          panel.querySelector(`[data-order-preview="${position}"]`).innerHTML = columnNode(position + 2) ? logicHTML(columnNode(position + 2)) : 'Выберите выражение';
+          panel.querySelectorAll('[data-notebook-row]').forEach(cell => {
+            cell.classList.remove('is-correct', 'is-wrong');
+            cell.removeAttribute('aria-invalid');
+            cell.setAttribute('aria-label', `${columnLabel(Number(cell.dataset.notebookCol))}, строка ${Number(cell.dataset.notebookRow) + 1}`);
+          });
+          panel.querySelectorAll('[data-notebook-order]').forEach(control => control.removeAttribute('aria-invalid'));
+          feedback.className = 'q2-feedback';
+          feedback.textContent = 'Порядок изменён. Проверьте значения в соответствующих столбцах и нажмите «Проверить».';
+        });
+      });
+      panel.querySelectorAll('[data-notebook-row]').forEach(cell => {
+        cell.addEventListener('click', () => {
+          const row = Number(cell.dataset.notebookRow);
+          const col = Number(cell.dataset.notebookCol);
+          const value = answers[index][row][col] === '0' ? '1' : '0';
+          answers[index][row][col] = value;
+          cell.textContent = value;
+          cell.classList.remove('is-correct', 'is-wrong');
+          cell.removeAttribute('aria-invalid');
+          feedback.className = 'q2-feedback';
+          feedback.textContent = 'Значение изменено. Нажмите «Проверить» ещё раз.';
+        });
+      });
+      panel.querySelector('[data-notebook-check]').addEventListener('click', () => {
+        if (index === 2) {
+          const available = new Set();
+          let validOrder = true;
+          panel.querySelectorAll('[data-notebook-order]').forEach(select => {
+            const choice = select.value === '' ? null : orderPool[Number(select.value)];
+            const signature = choice ? logicText(choice) : '';
+            const valid = choice && !available.has(signature)
+              && logicColumns(choice).slice(0, -1).every(child => available.has(logicText(child)));
+            select.setAttribute('aria-invalid', String(!valid));
+            if (valid) available.add(signature);
+            else validOrder = false;
+          });
+          if (!validOrder) {
+            feedback.className = 'q2-feedback is-bad';
+            feedback.textContent = 'Проверьте порядок: выберите каждое выражение один раз. Результат предыдущего действия должен быть готов до его использования в следующем.';
+            return;
+          }
+        }
+        let missing = 0;
+        let wrong = 0;
+        panel.querySelectorAll('[data-notebook-row]').forEach(cell => {
+          const row = Number(cell.dataset.notebookRow);
+          const col = Number(cell.dataset.notebookCol);
+          const value = answers[index][row][col];
+          const A = Math.floor(row / 2);
+          const B = row % 2;
+          const correct = value !== '?' && Number(value) === logicValue(columnNode(col), A, B);
+          if (value === '?') missing += 1;
+          else if (!correct) wrong += 1;
+          cell.classList.toggle('is-correct', correct);
+          cell.classList.toggle('is-wrong', !correct);
+          cell.setAttribute('aria-invalid', String(!correct));
+        });
+        feedback.className = 'q2-feedback ' + (missing || wrong ? 'is-bad' : 'is-good');
+        feedback.textContent = missing
+          ? `Не заполнено ячеек: ${missing}.${wrong ? ` Ошибок в заполненных ячейках: ${wrong}.` : ''} Заполните «?» и проверьте таблицу ещё раз.`
+          : wrong ? `Ошибок: ${wrong}. Исправьте выделенные ячейки. Проверьте наборы A и B и порядок действий.`
+            : 'Верно! Все значения таблицы заполнены правильно.';
+      });
+    };
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => render(index));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowRight' ? 1 : 2)) % 3;
+        render(next); tabs[next].focus();
+      });
+    });
+    render(0);
+  };
+
+  WIDGETS.expressionOrder = function (el) {
+    el.classList.add('q2-expression-order');
+    el.innerHTML = `<div class="q2-expression-map">
+        <span class="q2-formula-kicker">ЛОГИЧЕСКОЕ ВЫРАЖЕНИЕ</span>
+        <div class="q2-expression-main"><span class="q2-overline">A ∧ B</span> <em>∨</em> (A ∧ <span class="q2-overline">B</span>)</div>
+      </div>
+      <div class="q2-order-card">
+        <span class="q2-formula-kicker">ПОРЯДОК ДЕЙСТВИЙ</span>
+        <div class="q2-order-scheme" aria-label="Схема порядка действий: скобки, НЕ, И, ИЛИ">
+          <span>Скобки</span><i class="fas fa-arrow-right"></i><span>НЕ</span><i class="fas fa-arrow-right"></i><span>И</span><i class="fas fa-arrow-right"></i><span>ИЛИ</span>
+        </div>
+        <div class="q2-order-notes">
+          <p><b>Скобки</b>Сначала вычислите выражение внутри.</p>
+          <p><b>НЕ</b>Замените значение на противоположное: 0 ↔ 1.</p>
+          <p><b>И</b>Получится 1, только если обе части равны 1.</p>
+          <p><b>ИЛИ</b>Получится 1, если хотя бы одна часть равна 1.</p>
+        </div>
+      </div>
+      <div class="q2-teaching-table" data-teaching-table></div>`;
+    const leftAnd = logicBinary('and', 'A', 'B');
+    const leftNot = logicNot(leftAnd);
+    const rightNot = logicNot('B');
+    const rightAnd = logicBinary('and', 'A', rightNot);
+    const result = logicBinary('or', leftNot, rightAnd);
+    const columns = [leftAnd, leftNot, rightNot, rightAnd, result];
+    const descriptions = ['Записываем все наборы: 00, 01, 10, 11.', 'И: единица только при A = 1 и B = 1.', 'НЕ: меняем каждое значение предыдущего столбца на противоположное.', 'Отрицаем только B: 0 → 1, 1 → 0.', 'И: соединяем A и отрицание B.', 'ИЛИ: соединяем обе ветви. Единица, если хотя бы одна из них равна 1.'];
+    let step = 0;
+    const table = el.querySelector('[data-teaching-table]');
+    table.innerHTML = `<div class="q2-teaching-head"><h3>Как заполняется таблица</h3><span data-teaching-count></span></div><div class="q2-table-wrap"><table class="q2-table q2-teaching-grid"><thead><tr><th>A</th><th>B</th>${columns.map((node, index) => `<th data-teaching-col="${index}"><small>${index + 1}</small><span role="math" aria-label="${attr(logicText(node))}">${index === columns.length - 1 ? 'Y' : logicHTML(node)}</span></th>`).join('')}</tr></thead><tbody>${[[0,0],[0,1],[1,0],[1,1]].map(([A,B]) => `<tr><td>${A}</td><td>${B}</td>${columns.map((node, index) => `<td data-teaching-col="${index}"><span data-teaching-value="${logicValue(node,A,B)}">—</span></td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="q2-teaching-controls"><p data-teaching-explanation aria-live="polite"></p><div class="q2-truth-actions"><button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-teaching-back>Назад</button><button type="button" class="q2-btn q2-btn-sm" data-teaching-next>Первое действие</button></div></div>`;
+    const render = () => {
+      table.querySelectorAll('[data-teaching-col]').forEach(cell => {
+        const index = Number(cell.dataset.teachingCol);
+        cell.classList.toggle('is-current', index === step - 1);
+        const value = cell.querySelector('[data-teaching-value]');
+        if (value) value.textContent = index < step ? value.dataset.teachingValue : '—';
+      });
+      table.querySelector('[data-teaching-count]').textContent = `${step} / 5 действий`;
+      table.querySelector('[data-teaching-explanation]').textContent = descriptions[step];
+      table.querySelector('[data-teaching-back]').disabled = step === 0;
+      table.querySelector('[data-teaching-next]').textContent = step === 5 ? 'Повторить' : step === 0 ? 'Первое действие' : 'Следующее действие';
+    };
+    table.querySelector('[data-teaching-back]').addEventListener('click', () => { step = Math.max(0, step - 1); render(); });
+    table.querySelector('[data-teaching-next]').addEventListener('click', () => { step = (step + 1) % 6; render(); });
     render();
   };
 
