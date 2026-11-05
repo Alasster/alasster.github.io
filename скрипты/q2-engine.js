@@ -492,7 +492,7 @@
       answered = false;
       counter.textContent = `Вопрос ${index + 1} / ${questions.length}`;
       scoreNode.textContent = `Верно: ${score}`;
-      questionNode.textContent = item.q;
+      questionNode.innerHTML = (item.q || '').replace(/\n/g, '<br>');
       setFeedback(isReview ? 'Вспомните прошлый урок и выберите ответ.' : 'Выберите один вариант.', '');
       nextButton.disabled = true;
       nextButton.textContent = index === questions.length - 1 ? 'Показать результат' : 'Следующий вопрос';
