@@ -2124,10 +2124,11 @@
     let timer = null;
     const codeMap = cfg.code || SORT_CODE;
     const labels = cfg.labels || { bubble: 'Пузырьковая', selection: 'Выбором', insertion: 'Вставками' };
+    const algos = cfg.algos || (cfg.algo ? [cfg.algo] : ['bubble']);
 
     el.classList.add('q2-sort-lab');
     el.innerHTML = `<div class="q2-sort-top">
-        <div class="q2-truth-tabs">${['bubble', 'selection', 'insertion'].map(key => `<button type="button" class="q2-tab${key === algo ? ' is-active' : ''}" data-algo="${key}">${labels[key]}</button>`).join('')}</div>
+        ${algos.length > 1 ? `<div class="q2-truth-tabs">${algos.map(key => `<button type="button" class="q2-tab${key === algo ? ' is-active' : ''}" data-algo="${key}">${labels[key] || key}</button>`).join('')}</div>` : ''}
         <div class="q2-sort-input">
           <input class="q2-input q2-input-sm" type="text" value="${attr(source.join(', '))}" aria-label="Список чисел">
           <button type="button" class="q2-btn q2-btn-sm" data-apply>Применить</button>
