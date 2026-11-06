@@ -3520,7 +3520,8 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-scene-row:nth-of-type(4) { anim
   stroke-dasharray: 4 16;
   animation: q2-scene-flow 1.8s linear infinite;
 }
-.q2-scene-node circle {
+.q2-scene-node circle,
+circle.q2-scene-node {
   fill: rgba(255, 255, 255, 0.96);
   stroke: rgba(148, 163, 184, 0.6);
   stroke-width: 2.5;
@@ -3537,11 +3538,14 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-scene-row:nth-of-type(4) { anim
   font-weight: 800;
   fill: #475569;
 }
-.q2-scene-node.is-start circle { fill: rgba(79, 70, 229, 0.16); stroke: rgba(79, 70, 229, 0.65); }
+.q2-scene-node.is-start circle, circle.q2-scene-node.is-start { fill: rgba(79, 70, 229, 0.16); stroke: rgba(79, 70, 229, 0.65); }
 .q2-scene-node.is-start text { fill: #3730a3; }
-.q2-scene-node.is-level circle { fill: rgba(217, 119, 6, 0.12); stroke: rgba(217, 119, 6, 0.5); }
-.q2-scene-node.is-level-2 circle { fill: rgba(5, 150, 105, 0.1); stroke: rgba(5, 150, 105, 0.45); }
-.q2-scene-node.is-deep circle { fill: rgba(79, 70, 229, 0.13); stroke: rgba(79, 70, 229, 0.55); }
+.q2-scene-node.is-level circle, circle.q2-scene-node.is-level { fill: rgba(217, 119, 6, 0.12); stroke: rgba(217, 119, 6, 0.5); }
+.q2-scene-node.is-level text { fill: #b45309; }
+.q2-scene-node.is-level-2 circle, circle.q2-scene-node.is-level-2 { fill: rgba(5, 150, 105, 0.1); stroke: rgba(5, 150, 105, 0.45); }
+.q2-scene-node.is-level-2 text { fill: #047857; }
+.q2-scene-node.is-deep circle, circle.q2-scene-node.is-deep { fill: rgba(79, 70, 229, 0.13); stroke: rgba(79, 70, 229, 0.55); }
+.q2-scene-node.is-deep text { fill: #3730a3; }
 
 .q2-scene-ring { fill: none; stroke: rgba(79, 70, 229, 0.2); stroke-width: 1.5; stroke-dasharray: 4 6; }
 .q2-scene-ring.is-mid { stroke: rgba(217, 119, 6, 0.24); }
@@ -4134,18 +4138,18 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-comp
 }
 
 /* В схеме 11 класса текст больше и четче */
-body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-wrap .q2-scene-node text {
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-svg-wrap, .q2-visual) .q2-scene-node text {
   font-size: 20px !important;
   font-weight: 800 !important;
 }
 
-body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-wrap .q2-scene-node-text {
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-svg-wrap, .q2-visual) .q2-scene-node-text {
   font-size: 16px !important;
   font-weight: 800 !important;
   fill: #334155 !important;
 }
 
-body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-svg-wrap .q2-scene-caption {
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2-svg-wrap, .q2-visual) .q2-scene-caption {
   font-size: 15px !important;
   font-weight: 700 !important;
   fill: #64748b !important;

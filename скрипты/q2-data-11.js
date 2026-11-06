@@ -54,9 +54,9 @@
   </svg>`;
 
   const BFS_SVG = `<svg viewBox="0 0 560 280" role="img" aria-label="Слои обхода в ширину">
-    <line class="q2-scene-ring is-in" cx="70" cy="140" r="58" fill="none"/>
-    <line class="q2-scene-ring is-mid" cx="70" cy="140" r="118" fill="none"/>
-    <line class="q2-scene-ring" cx="70" cy="140" r="178" fill="none"/>
+    <circle class="q2-scene-ring is-in" cx="70" cy="140" r="58" fill="none"/>
+    <circle class="q2-scene-ring is-mid" cx="70" cy="140" r="118" fill="none"/>
+    <circle class="q2-scene-ring" cx="70" cy="140" r="178" fill="none"/>
     <line class="q2-scene-edge" x1="70" y1="140" x2="188" y2="86"/>
     <line class="q2-scene-edge" x1="70" y1="140" x2="188" y2="194"/>
     <line class="q2-scene-edge" x1="188" y1="86" x2="330" y2="60"/>

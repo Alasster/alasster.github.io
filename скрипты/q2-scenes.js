@@ -351,11 +351,30 @@
   };
 
   S.weighted = function () {
+    const nodes = [
+      ['A', 70, 170, 'is-start'],
+      ['B', 210, 84, 'is-level'],
+      ['C', 210, 256, 'is-level-2'],
+      ['D', 372, 170, 'is-deep']
+    ];
+    const edges = [
+      [94, 158, 186, 96, false],
+      [234, 96, 348, 158, false],
+      [94, 182, 186, 244, true],
+      [234, 244, 348, 182, true]
+    ];
+    const weights = [
+      ['1', 140, 118],
+      ['8', 292, 118],
+      ['4', 140, 224],
+      ['2', 292, 224]
+    ];
     return `<svg viewBox="0 0 460 340" role="img" aria-label="Взвешенный граф с двумя маршрутами">
-      ${[['A', 70, 170], ['B', 210, 84], ['C', 210, 256], ['D', 372, 170]].map(([id, x, y]) => `<circle class="q2-scene-node" cx="${x}" cy="${y}" r="24"/><text class="q2-scene-node-text" x="${x}" y="${y + 5}">${id}</text>`).join('')}
-      <line class="q2-scene-edge" x1="94" y1="158" x2="186" y2="96"/><line class="q2-scene-edge" x1="234" y1="96" x2="348" y2="158"/>
-      <line class="q2-scene-edge is-short" x1="94" y1="182" x2="186" y2="244"/><line class="q2-scene-edge is-short" x1="234" y1="244" x2="348" y2="182"/>
-      ${[['1', 140, 118], ['8', 292, 118], ['4', 140, 224], ['2', 292, 224]].map(([w, x, y]) => `<g class="q2-scene-weight"><rect x="${x - 14}" y="${y - 12}" width="28" height="22" rx="8"/><text x="${x}" y="${y + 4}">${w}</text></g>`).join('')}
+      ${edges.map(([x1, y1, x2, y2, isShort], i) => `<line class="q2-scene-edge${isShort ? ' is-short' : ''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i * 0.18}s"></line>
+        <line class="q2-scene-edge-flow" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i * 0.18 + 0.3}s"></line>`).join('')}
+      ${weights.map(([w, x, y]) => `<g class="q2-scene-weight"><rect x="${x - 14}" y="${y - 12}" width="28" height="22" rx="8"/><text x="${x}" y="${y + 4}">${w}</text></g>`).join('')}
+      ${nodes.map(([id, x, y, cls], i) => `<g class="q2-scene-node ${cls}" style="animation-delay:${i * 0.2}s">
+        <circle cx="${x}" cy="${y}" r="24"/><text x="${x}" y="${y + 5}">${id}</text></g>`).join('')}
       ${label(230, 314, '1 + 8 = 9   ·   4 + 2 = 6', 'q2-scene-caption')}
     </svg>`;
   };
