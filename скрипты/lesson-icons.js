@@ -1155,6 +1155,7 @@
     "spinner": "loading",
     "arrow-down-1-9": "arrow-comparison",
     "arrow-up-9-1": "arrow-comparison",
+    "arrow-down-9-1": "arrow-comparison",
     "arrow-down-a-z": "arrow-comparison",
     "arrow-up-z-a": "arrow-comparison",
     "arrows-up-down": "arrow-comparison",
