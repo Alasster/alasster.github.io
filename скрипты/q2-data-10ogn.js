@@ -566,8 +566,8 @@
         before: [
           {
             t: 'split',
-            cls: 'q2-split-40-60',
-            style: 'grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);',
+            cls: 'q2-split-50-50',
+            style: 'grid-template-columns: repeat(2, minmax(0, 1fr));',
             left: [
               {
                 t: 'cards',
