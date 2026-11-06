@@ -364,7 +364,6 @@
           { icon: 'fas fa-diagram-project', text: 'Выбор модели' }
         ],
         visual: 'weighted',
-        visualCaption: 'Стрелка задаёт направление, число — стоимость',
         cta: 'Сравнить модели'
       },
       {

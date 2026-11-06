@@ -405,9 +405,6 @@
         <circle cx="372" cy="170" r="24"></circle>
         <text x="372" y="175">D</text>
       </g>
-
-      <!-- Dynamic caption -->
-      <text class="q2-scene-label q2-scene-caption" data-q2-caption x="230" y="316">A→B→D: 15   ·   A→C→D: 15</text>
     </svg>`;
   };
 
