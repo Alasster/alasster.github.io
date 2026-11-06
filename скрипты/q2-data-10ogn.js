@@ -526,12 +526,12 @@
         k: 'concept',
         eyebrow: '04 · СКОЛЬКО РАБОТЫ',
         title: 'Число сравнений',
-        lead: 'Для списка из <code>n</code> элементов число сравнений вычисляется по формуле: <strong>C = n(n − 1) / 2 ≈ n² / 2</strong> (сложность <strong>O(n²)</strong>). Для 10 чисел это 45, для 100 — 4 950.',
+        lead: 'Для списка из <code>n</code> элементов число сравнений вычисляется по формуле: <strong>C = <span class="q2-frac" style="display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1;margin:0 4px;"><span class="q2-num" style="border-bottom:1.5px solid currentColor;padding:0 3px 2px;display:block;">n(n − 1)</span><span class="q2-den" style="display:block;padding:2px 3px 0;">2</span></span> ≈ <span class="q2-frac" style="display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1;margin:0 4px;"><span class="q2-num" style="border-bottom:1.5px solid currentColor;padding:0 3px 2px;display:block;">n²</span><span class="q2-den" style="display:block;padding:2px 3px 0;">2</span></span></strong> (сложность <strong>O(n²)</strong>). Для 10 чисел это 45, для 100 — 4 950.',
         blocks: [
           {
             t: 'table',
-            caption: 'Рост числа сравнений по формуле n(n − 1) / 2',
-            head: ['Число элементов (n)', 'Число сравнений: n(n − 1) / 2'],
+            caption: 'Рост числа сравнений по формуле C = n(n − 1) / 2',
+            head: ['Число элементов (n)', 'Число сравнений: <span class="q2-frac" style="display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1;margin:0 4px;"><span class="q2-num" style="border-bottom:1.5px solid currentColor;padding:0 3px 2px;display:block;">n(n − 1)</span><span class="q2-den" style="display:block;padding:2px 3px 0;">2</span></span>'],
             rows: [
               ['5', '10'],
               ['10', '45'],

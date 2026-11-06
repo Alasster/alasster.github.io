@@ -5119,3 +5119,23 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
   cursor: default !important;
 }
 
+
+/* --- Вертикальные математические дроби (делимое / делитель) --- */
+.q2-frac {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  font-size: 0.95em;
+  margin: 0 4px;
+}
+.q2-frac > .q2-num {
+  border-bottom: 1.5px solid currentColor !important;
+  padding: 0 3px 2px !important;
+  display: block !important;
+}
+.q2-frac > .q2-den {
+  display: block !important;
+  padding: 2px 3px 0 !important;
+}
