@@ -351,31 +351,63 @@
   };
 
   S.weighted = function () {
-    const nodes = [
-      ['A', 70, 170, 'is-start'],
-      ['B', 210, 84, 'is-level'],
-      ['C', 210, 256, 'is-level-2'],
-      ['D', 372, 170, 'is-deep']
-    ];
-    const edges = [
-      [94, 158, 186, 96, false],
-      [234, 96, 348, 158, false],
-      [94, 182, 186, 244, true],
-      [234, 244, 348, 182, true]
-    ];
-    const weights = [
-      ['1', 140, 118],
-      ['8', 292, 118],
-      ['4', 140, 224],
-      ['2', 292, 224]
-    ];
-    return `<svg viewBox="0 0 460 340" role="img" aria-label="Взвешенный граф с двумя маршрутами">
-      ${edges.map(([x1, y1, x2, y2, isShort], i) => `<line class="q2-scene-edge${isShort ? ' is-short' : ''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i * 0.18}s"></line>
-        <line class="q2-scene-edge-flow" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i * 0.18 + 0.3}s"></line>`).join('')}
-      ${weights.map(([w, x, y]) => `<g class="q2-scene-weight"><rect x="${x - 14}" y="${y - 12}" width="28" height="22" rx="8"/><text x="${x}" y="${y + 4}">${w}</text></g>`).join('')}
-      ${nodes.map(([id, x, y, cls], i) => `<g class="q2-scene-node ${cls}" style="animation-delay:${i * 0.2}s">
-        <circle cx="${x}" cy="${y}" r="24"/><text x="${x}" y="${y + 5}">${id}</text></g>`).join('')}
-      ${label(230, 314, '1 + 8 = 9   ·   4 + 2 = 6', 'q2-scene-caption')}
+    return `<svg viewBox="0 0 460 340" role="img" aria-label="Взвешенный граф с двумя маршрутами" data-q2-float-graph="weighted">
+      <!-- Edges -->
+      <g class="q2-float-edge" data-from="A" data-to="B">
+        <line class="q2-scene-edge" x1="70" y1="170" x2="210" y2="84"></line>
+        <line class="q2-scene-edge-flow" x1="70" y1="170" x2="210" y2="84"></line>
+      </g>
+      <g class="q2-float-edge" data-from="B" data-to="D">
+        <line class="q2-scene-edge" x1="210" y1="84" x2="372" y2="170"></line>
+        <line class="q2-scene-edge-flow" x1="210" y1="84" x2="372" y2="170"></line>
+      </g>
+      <g class="q2-float-edge" data-from="A" data-to="C">
+        <line class="q2-scene-edge is-short" x1="70" y1="170" x2="210" y2="256"></line>
+        <line class="q2-scene-edge-flow" x1="70" y1="170" x2="210" y2="256"></line>
+      </g>
+      <g class="q2-float-edge" data-from="C" data-to="D">
+        <line class="q2-scene-edge is-short" x1="210" y1="256" x2="372" y2="170"></line>
+        <line class="q2-scene-edge-flow" x1="210" y1="256" x2="372" y2="170"></line>
+      </g>
+
+      <!-- Weights -->
+      <g class="q2-scene-weight" data-edge="A-B">
+        <rect x="126" y="115" width="28" height="22" rx="8"></rect>
+        <text x="140" y="131">7</text>
+      </g>
+      <g class="q2-scene-weight" data-edge="B-D">
+        <rect x="277" y="115" width="28" height="22" rx="8"></rect>
+        <text x="291" y="131">8</text>
+      </g>
+      <g class="q2-scene-weight" data-edge="A-C">
+        <rect x="126" y="201" width="28" height="22" rx="8"></rect>
+        <text x="140" y="217">7</text>
+      </g>
+      <g class="q2-scene-weight" data-edge="C-D">
+        <rect x="277" y="201" width="28" height="22" rx="8"></rect>
+        <text x="291" y="217">8</text>
+      </g>
+
+      <!-- Nodes -->
+      <g class="q2-scene-node is-start" data-node="A">
+        <circle cx="70" cy="170" r="24"></circle>
+        <text x="70" y="175">A</text>
+      </g>
+      <g class="q2-scene-node is-level" data-node="B">
+        <circle cx="210" cy="84" r="24"></circle>
+        <text x="210" y="89">B</text>
+      </g>
+      <g class="q2-scene-node is-level-2" data-node="C">
+        <circle cx="210" cy="256" r="24"></circle>
+        <text x="210" y="261">C</text>
+      </g>
+      <g class="q2-scene-node is-deep" data-node="D">
+        <circle cx="372" cy="170" r="24"></circle>
+        <text x="372" y="175">D</text>
+      </g>
+
+      <!-- Dynamic caption -->
+      <text class="q2-scene-label q2-scene-caption" data-q2-caption x="230" y="316">A→B→D: 15   ·   A→C→D: 15</text>
     </svg>`;
   };
 

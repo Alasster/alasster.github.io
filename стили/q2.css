@@ -5196,3 +5196,21 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
 .q2-grid-1 {
   grid-template-columns: minmax(0, 1fr) !important;
 }
+
+/* Интерактивный парящий граф с живыми весами */
+[data-q2-float-graph] {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  overflow: visible !important;
+}
+[data-q2-float-graph] .q2-scene-node {
+  cursor: grab !important;
+  touch-action: none !important;
+}
+[data-q2-float-graph] .q2-scene-node:active {
+  cursor: grabbing !important;
+}
+[data-q2-float-graph] .q2-scene-weight,
+[data-q2-float-graph] .q2-float-edge {
+  pointer-events: none !important;
+}

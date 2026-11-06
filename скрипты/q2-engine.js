@@ -387,6 +387,249 @@
     });
   }
 
+  /* ------------------- динамический парящий граф со связанными весами ------------------ */
+  function initFloatGraphs(root) {
+    root.querySelectorAll('[data-q2-float-graph]').forEach(svg => {
+      if (svg.dataset.floatBound === '1') return;
+      svg.dataset.floatBound = '1';
+
+      const vb = (svg.getAttribute('viewBox') || '0 0 460 340').split(' ').map(Number);
+      const vbW = vb[2] || 460;
+      const vbH = vb[3] || 340;
+      const padding = 34;
+      const minX = padding;
+      const maxX = vbW - padding;
+      const minY = padding;
+      const maxY = vbH - (padding + 22);
+
+      const nodeElements = Array.from(svg.querySelectorAll('.q2-scene-node'));
+      if (!nodeElements.length) return;
+
+      const nodes = nodeElements.map((el, i) => {
+        const circle = el.querySelector('circle');
+        const text = el.querySelector('text');
+        const id = el.dataset.node || (text ? text.textContent.trim() : String.fromCharCode(65 + i));
+        const initX = circle ? Number(circle.getAttribute('cx')) || (70 + i * 90) : 70;
+        const initY = circle ? Number(circle.getAttribute('cy')) || 170 : 170;
+        const r = circle ? Number(circle.getAttribute('r')) || 24 : 24;
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.4 + Math.random() * 0.45;
+        return {
+          id,
+          el,
+          circle,
+          text,
+          x: initX,
+          y: initY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          r,
+          isDragging: false
+        };
+      });
+
+      const nodeMap = new Map();
+      nodes.forEach(n => nodeMap.set(n.id, n));
+
+      const edgeElements = Array.from(svg.querySelectorAll('.q2-float-edge'));
+      const edges = edgeElements.map(el => {
+        const fromId = el.dataset.from;
+        const toId = el.dataset.to;
+        const lines = Array.from(el.querySelectorAll('line'));
+        return {
+          from: nodeMap.get(fromId),
+          to: nodeMap.get(toId),
+          lines
+        };
+      }).filter(e => e.from && e.to);
+
+      const weightElements = Array.from(svg.querySelectorAll('.q2-scene-weight'));
+      const weights = weightElements.map(el => {
+        const edgeKey = el.dataset.edge;
+        const [uId, vId] = (edgeKey || '').split('-');
+        const rect = el.querySelector('rect');
+        const text = el.querySelector('text');
+        return {
+          key: edgeKey,
+          from: nodeMap.get(uId),
+          to: nodeMap.get(vId),
+          el,
+          rect,
+          text,
+          val: 0
+        };
+      }).filter(w => w.from && w.to);
+
+      const captionEl = svg.querySelector('[data-q2-caption]') || (svg.parentElement ? svg.parentElement.querySelector('.q2-svg-caption') : null);
+      const kind = svg.dataset.q2FloatGraph;
+
+      const getSvgPoint = (evt) => {
+        const rect = svg.getBoundingClientRect();
+        const scaleX = vbW / (rect.width || 1);
+        const scaleY = vbH / (rect.height || 1);
+        return {
+          x: (evt.clientX - rect.left) * scaleX,
+          y: (evt.clientY - rect.top) * scaleY
+        };
+      };
+
+      let activeDragNode = null;
+      nodes.forEach(n => {
+        n.el.style.cursor = 'grab';
+        n.el.addEventListener('pointerdown', evt => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          activeDragNode = n;
+          n.isDragging = true;
+          n.el.style.cursor = 'grabbing';
+          try { n.el.setPointerCapture(evt.pointerId); } catch (_) {}
+        });
+
+        n.el.addEventListener('pointermove', evt => {
+          if (!activeDragNode || activeDragNode !== n) return;
+          const pt = getSvgPoint(evt);
+          n.x = Math.max(minX, Math.min(maxX, pt.x));
+          n.y = Math.max(minY, Math.min(maxY, pt.y));
+        });
+
+        const release = (evt) => {
+          if (activeDragNode === n) {
+            n.isDragging = false;
+            n.el.style.cursor = 'grab';
+            n.vx = (Math.random() - 0.5) * 0.8;
+            n.vy = (Math.random() - 0.5) * 0.8;
+            activeDragNode = null;
+            try { n.el.releasePointerCapture(evt.pointerId); } catch (_) {}
+          }
+        };
+
+        n.el.addEventListener('pointerup', release);
+        n.el.addEventListener('pointercancel', release);
+      });
+
+      let animId = null;
+      const updateFrame = () => {
+        if (!svg.isConnected) {
+          if (animId) cancelAnimationFrame(animId);
+          return;
+        }
+
+        const slide = svg.closest('.slide');
+        if (slide && !slide.classList.contains('active')) {
+          animId = requestAnimationFrame(updateFrame);
+          return;
+        }
+
+        // Обновление позиций вершин (хаотичное органическое парение)
+        for (let i = 0; i < nodes.length; i++) {
+          const n = nodes[i];
+          if (!n.isDragging) {
+            n.vx += (Math.random() - 0.5) * 0.05;
+            n.vy += (Math.random() - 0.5) * 0.05;
+
+            const spd = Math.hypot(n.vx, n.vy);
+            if (spd > 0.95) {
+              n.vx = (n.vx / spd) * 0.95;
+              n.vy = (n.vy / spd) * 0.95;
+            } else if (spd < 0.25) {
+              n.vx *= 1.1;
+              n.vy *= 1.1;
+            }
+
+            for (let j = i + 1; j < nodes.length; j++) {
+              const other = nodes[j];
+              const dx = other.x - n.x;
+              const dy = other.y - n.y;
+              const dist = Math.hypot(dx, dy) || 1;
+              const minDist = (n.r + other.r) * 1.5;
+              if (dist < minDist) {
+                const force = (minDist - dist) * 0.003;
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+                n.vx -= fx;
+                n.vy -= fy;
+                other.vx += fx;
+                other.vy += fy;
+              }
+            }
+
+            n.x += n.vx;
+            n.y += n.vy;
+
+            if (n.x <= minX) { n.x = minX; n.vx = Math.abs(n.vx); }
+            else if (n.x >= maxX) { n.x = maxX; n.vx = -Math.abs(n.vx); }
+            if (n.y <= minY) { n.y = minY; n.vy = Math.abs(n.vy); }
+            else if (n.y >= maxY) { n.y = maxY; n.vy = -Math.abs(n.vy); }
+          }
+
+          if (n.circle) {
+            n.circle.setAttribute('cx', n.x.toFixed(1));
+            n.circle.setAttribute('cy', n.y.toFixed(1));
+          }
+          if (n.text) {
+            n.text.setAttribute('x', n.x.toFixed(1));
+            n.text.setAttribute('y', (n.y + 5).toFixed(1));
+          }
+        }
+
+        // Обновление линий (привязаны к вершинам)
+        edges.forEach(e => {
+          e.lines.forEach(line => {
+            line.setAttribute('x1', e.from.x.toFixed(1));
+            line.setAttribute('y1', e.from.y.toFixed(1));
+            line.setAttribute('x2', e.to.x.toFixed(1));
+            line.setAttribute('y2', e.to.y.toFixed(1));
+          });
+        });
+
+        // Обновление чисел на линиях в зависимости от расстояния
+        const weightMap = {};
+        weights.forEach(w => {
+          const mx = (w.from.x + w.to.x) / 2;
+          const my = (w.from.y + w.to.y) / 2;
+          const dist = Math.hypot(w.to.x - w.from.x, w.to.y - w.from.y);
+          const val = Math.max(1, Math.round(dist / 22));
+          w.val = val;
+          weightMap[w.key] = val;
+
+          const rectW = val >= 10 ? 32 : 28;
+          if (w.rect) {
+            w.rect.setAttribute('x', (mx - rectW / 2).toFixed(1));
+            w.rect.setAttribute('y', (my - 11).toFixed(1));
+            w.rect.setAttribute('width', String(rectW));
+          }
+          if (w.text) {
+            w.text.setAttribute('x', mx.toFixed(1));
+            w.text.setAttribute('y', (my + 4).toFixed(1));
+            w.text.textContent = String(val);
+          }
+        });
+
+        // Динамический пересчёт путей в подписи
+        if (captionEl) {
+          if (kind === 'weighted') {
+            const wAB = weightMap['A-B'] || 7;
+            const wBD = weightMap['B-D'] || 8;
+            const wAC = weightMap['A-C'] || 7;
+            const wCD = weightMap['C-D'] || 8;
+            captionEl.textContent = `A→B→D: ${wAB} + ${wBD} = ${wAB + wBD}   ·   A→C→D: ${wAC} + ${wCD} = ${wAC + wCD}`;
+          } else if (kind === 'weighted-concept') {
+            const wAC = weightMap['A-C'] || 7;
+            const wCD = weightMap['C-D'] || 10;
+            const wAB = weightMap['A-B'] || 8;
+            const wBC = weightMap['B-C'] || 8;
+            captionEl.textContent = `A→C→D: ${wAC} + ${wCD} = ${wAC + wCD}   ·   A→B→C→D: ${wAB} + ${wBC} + ${wCD} = ${wAB + wBC + wCD}`;
+          }
+        }
+
+        animId = requestAnimationFrame(updateFrame);
+      };
+
+      animId = requestAnimationFrame(updateFrame);
+    });
+  }
+
   function boot() {
     const id = document.body.dataset.lessonId;
     const lesson = Q2.lessons[id];
@@ -404,6 +647,7 @@
     root.innerHTML = (lesson.slides || []).map(renderSlide).join('');
     initSingleLamp(root);
     initAutoSort(root);
+    initFloatGraphs(root);
     initWidgets(root);
     document.dispatchEvent(new CustomEvent('q2:ready', { detail: { id } }));
   }

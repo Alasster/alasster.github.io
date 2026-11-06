@@ -37,20 +37,32 @@
     <text class="q2-scene-caption" x="260" y="240" text-anchor="middle">A → B читается «из A в B», обратного ребра нет</text>
   </svg>`;
 
-  const WEIGHT_SVG = `<svg viewBox="0 0 520 270" role="img" aria-label="Взвешенный граф с числами на рёбрах">
-    <line class="q2-scene-edge" x1="90" y1="80" x2="250" y2="62"/>
-    <line class="q2-scene-edge is-short" x1="90" y1="92" x2="168" y2="200"/>
-    <line class="q2-scene-edge" x1="262" y1="76" x2="182" y2="196"/>
-    <line class="q2-scene-edge" x1="180" y1="212" x2="400" y2="160"/>
-    <g class="q2-scene-weight"><rect x="156" y="52" width="28" height="20" rx="8"/><text x="170" y="67">4</text></g>
-    <g class="q2-scene-weight"><rect x="112" y="140" width="28" height="20" rx="8"/><text x="126" y="155">2</text></g>
-    <g class="q2-scene-weight"><rect x="212" y="128" width="28" height="20" rx="8"/><text x="226" y="143">5</text></g>
-    <g class="q2-scene-weight"><rect x="278" y="178" width="28" height="20" rx="8"/><text x="292" y="193">3</text></g>
-    <g class="q2-scene-node is-start"><circle cx="90" cy="80" r="23"/><text x="90" y="85">A</text></g>
-    <g class="q2-scene-node is-level"><circle cx="260" cy="62" r="23"/><text x="260" y="67">B</text></g>
-    <g class="q2-scene-node is-level-2"><circle cx="180" cy="210" r="23"/><text x="180" y="215">C</text></g>
-    <g class="q2-scene-node is-deep"><circle cx="400" cy="150" r="23"/><text x="400" y="155">D</text></g>
-    <text class="q2-scene-caption" x="260" y="245" text-anchor="middle">Вес ребра — стоимость, время или расстояние</text>
+  const WEIGHT_SVG = `<svg viewBox="0 0 520 270" role="img" aria-label="Взвешенный граф с числами на рёбрах" data-q2-float-graph="weighted-concept">
+    <g class="q2-float-edge" data-from="A" data-to="B">
+      <line class="q2-scene-edge" x1="90" y1="80" x2="260" y2="62"/>
+      <line class="q2-scene-edge-flow" x1="90" y1="80" x2="260" y2="62"/>
+    </g>
+    <g class="q2-float-edge" data-from="A" data-to="C">
+      <line class="q2-scene-edge is-short" x1="90" y1="80" x2="180" y2="210"/>
+      <line class="q2-scene-edge-flow" x1="90" y1="80" x2="180" y2="210"/>
+    </g>
+    <g class="q2-float-edge" data-from="B" data-to="C">
+      <line class="q2-scene-edge" x1="260" y1="62" x2="180" y2="210"/>
+      <line class="q2-scene-edge-flow" x1="260" y1="62" x2="180" y2="210"/>
+    </g>
+    <g class="q2-float-edge" data-from="C" data-to="D">
+      <line class="q2-scene-edge" x1="180" y1="210" x2="400" y2="150"/>
+      <line class="q2-scene-edge-flow" x1="180" y1="210" x2="400" y2="150"/>
+    </g>
+    <g class="q2-scene-weight" data-edge="A-B"><rect x="161" y="60" width="28" height="22" rx="8"/><text x="175" y="76">8</text></g>
+    <g class="q2-scene-weight" data-edge="A-C"><rect x="121" y="134" width="28" height="22" rx="8"/><text x="135" y="150">7</text></g>
+    <g class="q2-scene-weight" data-edge="B-C"><rect x="206" y="125" width="28" height="22" rx="8"/><text x="220" y="141">8</text></g>
+    <g class="q2-scene-weight" data-edge="C-D"><rect x="276" y="169" width="28" height="22" rx="8"/><text x="290" y="185">10</text></g>
+    <g class="q2-scene-node is-start" data-node="A"><circle cx="90" cy="80" r="23"/><text x="90" y="85">A</text></g>
+    <g class="q2-scene-node is-level" data-node="B"><circle cx="260" cy="62" r="23"/><text x="260" y="67">B</text></g>
+    <g class="q2-scene-node is-level-2" data-node="C"><circle cx="180" cy="210" r="23"/><text x="180" y="215">C</text></g>
+    <g class="q2-scene-node is-deep" data-node="D"><circle cx="400" cy="150" r="23"/><text x="400" y="155">D</text></g>
+    <text class="q2-scene-caption" data-q2-caption x="260" y="248" text-anchor="middle">Вес ребра равен расстоянию между вершинами</text>
   </svg>`;
 
   const BFS_SVG = `<svg viewBox="0 0 560 280" role="img" aria-label="Слои обхода в ширину">
