@@ -5156,3 +5156,34 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
   -webkit-touch-callout: none !important;
   pointer-events: none !important;
 }
+
+/* 40 / 60 раскладка для практики */
+.q2-split-40-60 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) !important;
+  gap: 22px !important;
+  align-items: stretch !important;
+}
+.q2-split-40-60 > .q2-split-left {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.q2-split-40-60 > .q2-split-left > .q2-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  margin-bottom: 0 !important;
+}
+.q2-split-40-60 > .q2-split-left > .q2-grid > .q2-card {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+@media (max-width: 900px) {
+  .q2-split-40-60 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+.q2-grid-1 {
+  grid-template-columns: minmax(0, 1fr) !important;
+}

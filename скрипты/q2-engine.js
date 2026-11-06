@@ -108,7 +108,7 @@
             <div><h4>${step.title}</h4><p>${step.text}</p></div>
           </div>`).join('')}</div>`;
       case 'split':
-        return `<div class="q2-split${item.cls ? ` ${item.cls}` : ''}">
+        return `<div class="q2-split${item.cls ? ` ${item.cls}` : ''}"${item.style ? ` style="${item.style}"` : ''}>
           <div class="q2-split-col q2-split-left">${blocks(item.left)}</div>
           <div class="q2-split-col q2-split-right">${blocks(item.right)}</div>
         </div>`;
