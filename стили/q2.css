@@ -5139,3 +5139,20 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
   display: block !important;
   padding: 2px 3px 0 !important;
 }
+
+/* --- Запрет выделения и копирования кода в карточках --- */
+.q2-card pre,
+.q2-card code,
+.q2-card .q2-code,
+.q2-code,
+.q2-code pre,
+.q2-code code,
+.q2-code-line,
+.q2-code-snippet {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  pointer-events: none !important;
+}

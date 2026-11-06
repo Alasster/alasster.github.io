@@ -89,5 +89,44 @@
   <script src="../../скрипты/q2-data-10ogn.js?v=q2-2026-11-05-29"></script>
   <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-02-v19"></script>
   <script src="../../скрипты/lessons.js?v=auth-cloud-20261101-v7"></script>
+
+  <script>
+    // Запрет контекстного меню (правый клик)
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      return false;
+    });
+
+    // Запрет открытия исходного кода и DevTools (F12, Ctrl+U, Ctrl+Shift+I/J/C, Ctrl+S)
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.keyCode === 123 || e.key === 'F12' ||
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    });
+
+    // Запрет выделения и копирования кода в карточках
+    document.addEventListener('copy', function(e) {
+      var sel = window.getSelection();
+      if (sel && sel.anchorNode) {
+        var el = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode;
+        if (el && el.closest('.q2-card, .q2-code, pre, code')) {
+          e.preventDefault();
+          return false;
+        }
+      }
+    });
+    document.addEventListener('selectstart', function(e) {
+      if (e.target && e.target.closest('.q2-code, pre, code')) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
 </body>
 </html>
