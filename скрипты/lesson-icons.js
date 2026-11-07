@@ -1229,7 +1229,20 @@
     "stopwatch": "time-fast",
     "superscript": "calculator",
     "table": "layers",
-    "table-cells-large": "layers"
+    "table-cells-large": "layers",
+    "binary": "binary",
+    "arrow-down": "arrow-comparison",
+    "shield": "shield-check",
+    "tree": "sitemap",
+    "code-compare": "scale",
+    "infinity": "refresh",
+    "gem": "star",
+    "spell-check": "text",
+    "arrows-spin": "refresh",
+    "arrows-split-up-and-left": "arrow-comparison",
+    "stopwatch-20": "time-fast",
+    "pen-ruler": "edit",
+    "lock": "lock"
   };
   const emoji = {
     "💻": "computer",
