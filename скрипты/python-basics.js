@@ -240,7 +240,14 @@ function initNavigation() {
     `).join("");
 
     topbar.innerHTML = `
-      <div class="topbar-logo">🐍 Py<span>thon</span></div>
+      <a href="../index.html" class="brand-logo-group" title="На главную страницу">
+        <div class="brand-icon-box">
+          <svg class="brand-book-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 6.5C9.4 4.8 6.2 4.5 3 5.4v12.1c3.2-.9 6.4-.6 9 1.1m0-12.1c2.6-1.7 5.8-2 9-1.1v12.1c-3.2-.9-6.4-.6-9 1.1m0-12.1v12.1" />
+          </svg>
+        </div>
+      </a>
+      <div class="topbar-logo">🐍&nbsp;Py<span>thon</span></div>
       <div class="lesson-select-wrap" id="lessonSelectWrap">
         <button class="topbar-badge" id="lessonSelectBtn" onclick="toggleLessonDropdown()" title="Выбрать урок">
           Урок ${currentLesson.num} из ${PY_LESSONS.length}: ${currentLesson.title} ▾
