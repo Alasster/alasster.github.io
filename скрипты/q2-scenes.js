@@ -270,6 +270,436 @@
     </svg>`;
   };
 
+
+  S.recursionStack = function () {
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Анимированный стек вызовов LIFO в оперативной памяти">
+      <style>
+        @keyframes q2-stk-f0 {
+          0%, 8% { opacity: 0.25; transform: translateY(-6px); }
+          14%, 82% { opacity: 1; transform: translateY(0); }
+          90%, 100% { opacity: 0.25; transform: translateY(-6px); }
+        }
+        @keyframes q2-stk-f1 {
+          0%, 20% { opacity: 0.25; transform: translateY(-6px); }
+          26%, 72% { opacity: 1; transform: translateY(0); }
+          80%, 100% { opacity: 0.25; transform: translateY(-6px); }
+        }
+        @keyframes q2-stk-f2 {
+          0%, 32% { opacity: 0.25; transform: translateY(-6px); }
+          38%, 62% { opacity: 1; transform: translateY(0); }
+          70%, 100% { opacity: 0.25; transform: translateY(-6px); }
+        }
+        @keyframes q2-stk-f3 {
+          0%, 42% { opacity: 0.2; transform: scale(0.95); }
+          48%, 56% { opacity: 1; transform: scale(1.02); }
+          64%, 100% { opacity: 0.2; transform: scale(0.95); }
+        }
+        @keyframes q2-stk-ret {
+          0%, 50% { opacity: 0; stroke-dashoffset: 180; }
+          62%, 88% { opacity: 1; stroke-dashoffset: 0; }
+          95%, 100% { opacity: 0; }
+        }
+        .q2-st-0 { animation: q2-stk-f0 7s ease-in-out infinite; }
+        .q2-st-1 { animation: q2-stk-f1 7s ease-in-out infinite; }
+        .q2-st-2 { animation: q2-stk-f2 7s ease-in-out infinite; }
+        .q2-st-3 { animation: q2-stk-f3 7s ease-in-out infinite; transform-origin: 220px 258px; }
+        .q2-st-ret-line { stroke-dasharray: 180; animation: q2-stk-ret 7s ease-in-out infinite; }
+      </style>
+      <defs>
+        <marker id="q2s-ar-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10z" fill="#2563eb"/>
+        </marker>
+        <marker id="q2s-ar-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10z" fill="#059669"/>
+        </marker>
+      </defs>
+      <!-- Outer RAM Frame -->
+      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
+      <rect x="28" y="26" width="384" height="32" rx="10" fill="#f5f9fd"/>
+      <circle cx="46" cy="42" r="5" fill="#3b82f6"/>
+      <text x="220" y="47" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800" letter-spacing="0.04em">CALL STACK · ПРИНЦИП LIFO (ПАМЯТЬ)</text>
+
+      <!-- Left Push Arrow -->
+      <path d="M62 86 V 262" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#q2s-ar-blue)"/>
+      <text x="46" y="176" text-anchor="middle" fill="#2563eb" font-family="sans-serif" font-size="11" font-weight="800" transform="rotate(-90 46 176)">1. PUSH · ВЫЗОВЫ</text>
+
+      <!-- Stack Frames -->
+      <g class="q2-st-0">
+        <rect x="88" y="72" width="264" height="44" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+        <text x="106" y="99" fill="#1e40af" font-family="monospace" font-size="13" font-weight="700">fact(3)</text>
+        <text x="336" y="99" text-anchor="end" fill="#1d4ed8" font-family="monospace" font-size="12" font-weight="600">return 3 * 2 = 6</text>
+      </g>
+      <g class="q2-st-1">
+        <rect x="88" y="126" width="264" height="44" rx="12" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2"/>
+        <text x="106" y="153" fill="#312e81" font-family="monospace" font-size="13" font-weight="700">fact(2)</text>
+        <text x="336" y="153" text-anchor="end" fill="#4338ca" font-family="monospace" font-size="12" font-weight="600">return 2 * 1 = 2</text>
+      </g>
+      <g class="q2-st-2">
+        <rect x="88" y="180" width="264" height="44" rx="12" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+        <text x="106" y="207" fill="#0c4a6e" font-family="monospace" font-size="13" font-weight="700">fact(1)</text>
+        <text x="336" y="207" text-anchor="end" fill="#0369a1" font-family="monospace" font-size="12" font-weight="600">return 1 * 1 = 1</text>
+      </g>
+      <g class="q2-st-3">
+        <rect x="88" y="234" width="264" height="48" rx="12" fill="#d1fae5" stroke="#059669" stroke-width="2.5"/>
+        <text x="106" y="257" fill="#065f46" font-family="monospace" font-size="13" font-weight="800">fact(0) → БАЗА</text>
+        <text x="336" y="257" text-anchor="end" fill="#047857" font-family="monospace" font-size="13" font-weight="800">return 1</text>
+        <text x="220" y="274" text-anchor="middle" fill="#059669" font-family="sans-serif" font-size="10" font-weight="700">вершина стека · разворот вверх</text>
+      </g>
+
+      <!-- Right Pop Arrow -->
+      <path class="q2-st-ret-line" d="M378 262 V 86" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#q2s-ar-green)"/>
+      <text x="396" y="176" text-anchor="middle" fill="#059669" font-family="sans-serif" font-size="11" font-weight="800" transform="rotate(90 396 176)">2. POP · ВОЗВРАТ</text>
+
+      <!-- Limit bar -->
+      <rect x="44" y="300" width="352" height="28" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="60" y="318" fill="#475569" font-family="monospace" font-size="11" font-weight="700">sys.getrecursionlimit() = 1000</text>
+      <rect x="286" y="306" width="96" height="16" rx="6" fill="#dcfce7"/>
+      <text x="334" y="318" text-anchor="middle" fill="#15803d" font-family="sans-serif" font-size="10" font-weight="800">ГЛУБИНА: 4 / 1000</text>
+      <text x="220" y="346" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">последний вызванный фрейм завершается первым</text>
+    </svg>`;
+  };
+
+  S.recursionTree = function () {
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Анимированное дерево рекурсивных вызовов Фибоначчи и формулы индукции">
+      <style>
+        @keyframes q2-fib-pulse-root {
+          0%, 100% { filter: drop-shadow(0 0 0px rgba(37,99,235,0)); transform: scale(1); }
+          15%, 85% { filter: drop-shadow(0 4px 10px rgba(37,99,235,0.28)); transform: scale(1.03); }
+        }
+        @keyframes q2-fib-lvl1 {
+          0%, 15% { opacity: 0.35; }
+          28%, 75% { opacity: 1; }
+          90%, 100% { opacity: 0.35; }
+        }
+        @keyframes q2-fib-leaf {
+          0%, 32% { opacity: 0.3; transform: scale(0.94); }
+          45%, 70% { opacity: 1; transform: scale(1.04); }
+          85%, 100% { opacity: 0.3; transform: scale(0.94); }
+        }
+        .q2-ft-root { animation: q2-fib-pulse-root 6.5s ease-in-out infinite; transform-origin: 220px 82px; }
+        .q2-ft-l1 { animation: q2-fib-lvl1 6.5s ease-in-out infinite; }
+        .q2-ft-leaf { animation: q2-fib-leaf 6.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      </style>
+      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
+      <!-- Formula Pill Header -->
+      <rect x="30" y="26" width="184" height="30" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+      <text x="122" y="45" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="12" font-weight="700">n! = n · (n - 1)!</text>
+      <rect x="226" y="26" width="184" height="30" rx="10" fill="#e0e7ff" stroke="#818cf8"/>
+      <text x="318" y="45" text-anchor="middle" fill="#3730a3" font-family="monospace" font-size="12" font-weight="700">aⁿ = a · aⁿ⁻¹</text>
+
+      <!-- Tree Edges -->
+      <g stroke="#64748b" stroke-width="2" stroke-linecap="round">
+        <line x1="220" y1="100" x2="132" y2="144"/>
+        <line x1="220" y1="100" x2="312" y2="144"/>
+        <line x1="132" y1="176" x2="82" y2="218"/>
+        <line x1="132" y1="176" x2="182" y2="218"/>
+        <line x1="312" y1="176" x2="266" y2="218"/>
+        <line x1="312" y1="176" x2="362" y2="218"/>
+        <line x1="82" y1="250" x2="52" y2="284"/>
+        <line x1="82" y1="250" x2="114" y2="284"/>
+      </g>
+
+      <!-- Root Node: fib(4) -->
+      <g class="q2-ft-root">
+        <rect x="166" y="66" width="108" height="36" rx="11" fill="#2563eb"/>
+        <text x="220" y="89" text-anchor="middle" fill="#ffffff" font-family="monospace" font-size="14" font-weight="800">fib(4) = 3</text>
+      </g>
+
+      <!-- Level 1: fib(3) and fib(2) -->
+      <g class="q2-ft-l1">
+        <rect x="84" y="142" width="96" height="34" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="132" y="164" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="13" font-weight="700">fib(3) = 2</text>
+
+        <rect x="264" y="142" width="96" height="34" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="312" y="164" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="13" font-weight="700">fib(2) = 1</text>
+      </g>
+
+      <!-- Level 2: fib(2) and base leaves -->
+      <g class="q2-ft-l1">
+        <rect x="40" y="218" width="84" height="32" rx="9" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>
+        <text x="82" y="239" text-anchor="middle" fill="#0369a1" font-family="monospace" font-size="12" font-weight="700">fib(2)=1</text>
+      </g>
+      <g class="q2-ft-leaf">
+        <rect x="142" y="218" width="82" height="32" rx="9" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+        <text x="183" y="239" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">fib(1)=1</text>
+      </g>
+      <g class="q2-ft-leaf">
+        <rect x="230" y="218" width="78" height="32" rx="9" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+        <text x="269" y="239" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">fib(1)=1</text>
+      </g>
+      <g class="q2-ft-leaf">
+        <rect x="322" y="218" width="82" height="32" rx="9" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+        <text x="363" y="239" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="12" font-weight="800">fib(0)=0</text>
+      </g>
+
+      <!-- Level 3 leaves under fib(2) -->
+      <g class="q2-ft-leaf">
+        <rect x="22" y="284" width="64" height="28" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.8"/>
+        <text x="54" y="302" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="11" font-weight="800">f(1)=1</text>
+      </g>
+      <g class="q2-ft-leaf">
+        <rect x="92" y="284" width="64" height="28" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+        <text x="124" y="302" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="11" font-weight="800">f(0)=0</text>
+      </g>
+
+      <!-- Summary badge -->
+      <rect x="176" y="282" width="234" height="32" rx="9" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="293" y="302" text-anchor="middle" fill="#1e3a8a" font-family="monospace" font-size="11" font-weight="700">2 базы: fib(0)=0, fib(1)=1</text>
+      <text x="220" y="344" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">каждый шаг ветвится на (n − 1) и (n − 2)</text>
+    </svg>`;
+  };
+
+  S.recursionDigits = function () {
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Анимированный разбор числа 482 через остаток % 10 и целочисленное деление // 10">
+      <style>
+        @keyframes q2-dg-s1 {
+          0%, 10% { opacity: 0.3; transform: translateX(-4px); }
+          18%, 85% { opacity: 1; transform: translateX(0); }
+          95%, 100% { opacity: 0.3; }
+        }
+        @keyframes q2-dg-s2 {
+          0%, 28% { opacity: 0.3; transform: translateX(-4px); }
+          36%, 85% { opacity: 1; transform: translateX(0); }
+          95%, 100% { opacity: 0.3; }
+        }
+        @keyframes q2-dg-s3 {
+          0%, 46% { opacity: 0.3; transform: scale(0.95); }
+          54%, 85% { opacity: 1; transform: scale(1); }
+          95%, 100% { opacity: 0.3; }
+        }
+        .q2-dg-1 { animation: q2-dg-s1 7s ease-in-out infinite; }
+        .q2-dg-2 { animation: q2-dg-s2 7s ease-in-out infinite; }
+        .q2-dg-3 { animation: q2-dg-s3 7s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      </style>
+      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
+      <rect x="28" y="24" width="384" height="32" rx="10" fill="#f5f9fd"/>
+      <text x="220" y="45" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">ДЕКОМПОЗИЦИЯ ЧИСЛА: n // 10 И n % 10</text>
+
+      <!-- Column headers -->
+      <text x="118" y="76" text-anchor="middle" fill="#2563eb" font-family="monospace" font-size="11" font-weight="800">ШАГ (n // 10)</text>
+      <text x="322" y="76" text-anchor="middle" fill="#d97706" font-family="monospace" font-size="11" font-weight="800">ЦИФРА (n % 10)</text>
+
+      <!-- Step 1: 482 -->
+      <g class="q2-dg-1">
+        <rect x="38" y="88" width="160" height="52" rx="13" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="118" y="112" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="16" font-weight="800">n = 482</text>
+        <text x="118" y="130" text-anchor="middle" fill="#3b82f6" font-family="monospace" font-size="11" font-weight="700">482 // 10 → 48</text>
+        <path d="M202 114 H 246" stroke="#d97706" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <rect x="252" y="92" width="140" height="44" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <text x="322" y="119" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="15" font-weight="800">482 % 10 = 2</text>
+      </g>
+
+      <path d="M118 142 V 162" stroke="#2563eb" stroke-width="2.5"/>
+
+      <!-- Step 2: 48 -->
+      <g class="q2-dg-2">
+        <rect x="38" y="164" width="160" height="52" rx="13" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2"/>
+        <text x="118" y="188" text-anchor="middle" fill="#312e81" font-family="monospace" font-size="16" font-weight="800">n = 48</text>
+        <text x="118" y="206" text-anchor="middle" fill="#4f46e5" font-family="monospace" font-size="11" font-weight="700">48 // 10 → 4</text>
+        <path d="M202 190 H 246" stroke="#d97706" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <rect x="252" y="168" width="140" height="44" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <text x="322" y="195" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="15" font-weight="800">48 % 10 = 8</text>
+      </g>
+
+      <path d="M118 218 V 238" stroke="#059669" stroke-width="2.5"/>
+
+      <!-- Step 3: Base 4 -->
+      <g class="q2-dg-3">
+        <rect x="38" y="240" width="160" height="48" rx="13" fill="#d1fae5" stroke="#059669" stroke-width="2.5"/>
+        <text x="118" y="262" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="15" font-weight="800">n = 4 (n &lt; 10)</text>
+        <text x="118" y="279" text-anchor="middle" fill="#059669" font-family="sans-serif" font-size="10" font-weight="800">БАЗА ДОСТИГНУТА</text>
+        <path d="M202 264 H 246" stroke="#059669" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <rect x="252" y="242" width="140" height="44" rx="12" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+        <text x="322" y="269" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="15" font-weight="800">return 4</text>
+      </g>
+
+      <!-- Result Sum Bar -->
+      <rect x="38" y="300" width="354" height="30" rx="10" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="215" y="320" text-anchor="middle" fill="#1e3a8a" font-family="monospace" font-size="13" font-weight="800">Сборка: 2 + 8 + 4 = 14  |  bin(6) → "110"</text>
+      <text x="220" y="347" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">% 10 забирает младший разряд, // 10 уменьшает число</text>
+    </svg>`;
+  };
+
+  S.recursionStrings = function () {
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Анимированная рекурсивная обработка строк: срезы голова и хвост и палиндром">
+      <style>
+        @keyframes q2-str-slice {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes q2-pal-glow {
+          0%, 100% { stroke-width: 2; opacity: 0.75; }
+          50% { stroke-width: 3; opacity: 1; }
+        }
+        .q2-str-head { animation: q2-str-slice 4s ease-in-out infinite; }
+        .q2-str-tail { animation: q2-str-slice 4s ease-in-out infinite 0.5s; }
+        .q2-pal-box { animation: q2-pal-glow 3.5s ease-in-out infinite; }
+      </style>
+      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
+      <rect x="28" y="24" width="384" height="30" rx="10" fill="#f5f9fd"/>
+      <text x="220" y="44" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">СРЕЗЫ СТРОК: ГОЛОВА s[0] · ХВОСТ s[1:]</text>
+
+      <!-- Top Section: Reverse String -->
+      <rect x="32" y="64" width="376" height="122" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="48" y="84" fill="#475569" font-family="sans-serif" font-size="11" font-weight="800">1. РАЗВОРОТ СТРОКИ: reverse("КОД")</text>
+
+      <!-- Head s[0] -->
+      <g class="q2-str-head">
+        <rect x="46" y="96" width="92" height="44" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="92" y="115" text-anchor="middle" fill="#6d28d9" font-family="monospace" font-size="11" font-weight="700">s[0] голова</text>
+        <text x="92" y="132" text-anchor="middle" fill="#4c1d95" font-family="monospace" font-size="15" font-weight="800">"К"</text>
+      </g>
+
+      <text x="152" y="124" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="16" font-weight="800">+</text>
+
+      <!-- Tail s[1:] -->
+      <g class="q2-str-tail">
+        <rect x="166" y="96" width="112" height="44" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="222" y="115" text-anchor="middle" fill="#1d4ed8" font-family="monospace" font-size="11" font-weight="700">s[1:] хвост</text>
+        <text x="222" y="132" text-anchor="middle" fill="#1e3a8a" font-family="monospace" font-size="15" font-weight="800">"ОД" → "ДО"</text>
+      </g>
+
+      <text x="292" y="124" text-anchor="middle" fill="#059669" font-family="monospace" font-size="16" font-weight="800">→</text>
+
+      <!-- Result "ДОК" -->
+      <rect x="306" y="96" width="88" height="44" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+      <text x="350" y="115" text-anchor="middle" fill="#047857" font-family="monospace" font-size="10" font-weight="700">s[1:] + s[0]</text>
+      <text x="350" y="132" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="15" font-weight="800">"ДОК"</text>
+
+      <text x="220" y="172" text-anchor="middle" fill="#475569" font-family="monospace" font-size="11" font-weight="700">return reverse(s[1:]) + s[0]  (база: len(s) &lt;= 1)</text>
+
+      <!-- Bottom Section: Palindrome -->
+      <rect x="32" y="198" width="376" height="126" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="48" y="218" fill="#475569" font-family="sans-serif" font-size="11" font-weight="800">2. ПРОВЕРКА ПАЛИНДРОМА: s[0] == s[-1] → s[1:-1]</text>
+
+      <!-- 5 Letter Tiles for Ш А Л А Ш -->
+      <g transform="translate(65 230)">
+        <rect class="q2-pal-box" x="0" y="0" width="48" height="44" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+        <text x="24" y="28" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="17" font-weight="800">Ш</text>
+
+        <rect class="q2-pal-box" x="64" y="0" width="48" height="44" rx="10" fill="#e0e7ff" stroke="#4f46e5"/>
+        <text x="88" y="28" text-anchor="middle" fill="#312e81" font-family="monospace" font-size="17" font-weight="800">А</text>
+
+        <rect x="128" y="0" width="54" height="44" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2.5"/>
+        <text x="155" y="28" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="17" font-weight="800">Л</text>
+
+        <rect class="q2-pal-box" x="198" y="0" width="48" height="44" rx="10" fill="#e0e7ff" stroke="#4f46e5"/>
+        <text x="222" y="28" text-anchor="middle" fill="#312e81" font-family="monospace" font-size="17" font-weight="800">А</text>
+
+        <rect class="q2-pal-box" x="262" y="0" width="48" height="44" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+        <text x="286" y="28" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="17" font-weight="800">Ш</text>
+      </g>
+
+      <text x="220" y="306" text-anchor="middle" fill="#059669" font-family="monospace" font-size="12" font-weight="800">s[0] == s[-1] ✓  →  сужаем срез s[1:-1] до базы</text>
+      <text x="220" y="346" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">последовательность уменьшается срезом на каждом шаге</text>
+    </svg>`;
+  };
+
+  S.recursionVsLoop = function () {
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Сравнение цикла O(1) и рекурсии O(N) по памяти и структуре">
+      <style>
+        @keyframes q2-loop-spin {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.04); }
+        }
+        .q2-cmp-pulse { animation: q2-loop-spin 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      </style>
+      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
+      <rect x="28" y="24" width="384" height="30" rx="10" fill="#f5f9fd"/>
+      <text x="220" y="44" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">АРХИТЕКТУРА ПАМЯТИ: ЦИКЛ O(1) VS РЕКУРСИЯ O(N)</text>
+
+      <!-- Left Column: Loop -->
+      <rect x="28" y="64" width="184" height="214" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.8"/>
+      <text x="120" y="88" text-anchor="middle" fill="#0f172a" font-family="sans-serif" font-size="13" font-weight="800">ЦИКЛ (for / while)</text>
+      <g class="q2-cmp-pulse">
+        <rect x="46" y="106" width="148" height="68" rx="12" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+        <text x="120" y="130" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">1 ячейка в RAM</text>
+        <text x="120" y="152" text-anchor="middle" fill="#047857" font-family="monospace" font-size="12" font-weight="700">res = 1 → 2 → 6</text>
+      </g>
+      <rect x="46" y="192" width="148" height="32" rx="9" fill="#ecfdf5" stroke="#6ee7b7"/>
+      <text x="120" y="212" text-anchor="middle" fill="#047857" font-family="monospace" font-size="12" font-weight="800">Память: O(1)</text>
+      <text x="120" y="246" text-anchor="middle" fill="#475569" font-family="sans-serif" font-size="11" font-weight="700">Перезапись переменной</text>
+      <text x="120" y="264" text-anchor="middle" fill="#059669" font-family="sans-serif" font-size="11" font-weight="800">✓ Нет переполнения</text>
+
+      <!-- Right Column: Recursion -->
+      <rect x="228" y="64" width="184" height="214" rx="16" fill="#f8fafc" stroke="#60a5fa" stroke-width="1.8"/>
+      <text x="320" y="88" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="13" font-weight="800">РЕКУРСИЯ (Стек)</text>
+      <rect x="246" y="100" width="148" height="24" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="320" y="116" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="11" font-weight="700">кадр 1: f(3)</text>
+      <rect x="246" y="128" width="148" height="24" rx="6" fill="#c7d2fe" stroke="#4f46e5" stroke-width="1.5"/>
+      <text x="320" y="144" text-anchor="middle" fill="#312e81" font-family="monospace" font-size="11" font-weight="700">кадр 2: f(2)</text>
+      <rect x="246" y="156" width="148" height="24" rx="6" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+      <text x="320" y="172" text-anchor="middle" fill="#0c4a6e" font-family="monospace" font-size="11" font-weight="700">кадр N: f(1)</text>
+
+      <rect x="246" y="192" width="148" height="32" rx="9" fill="#eff6ff" stroke="#93c5fd"/>
+      <text x="320" y="212" text-anchor="middle" fill="#1d4ed8" font-family="monospace" font-size="12" font-weight="800">Память: O(N)</text>
+      <text x="320" y="246" text-anchor="middle" fill="#475569" font-family="sans-serif" font-size="11" font-weight="700">Хранит N вызовов</text>
+      <text x="320" y="264" text-anchor="middle" fill="#2563eb" font-family="sans-serif" font-size="11" font-weight="800">✓ Деревья и НОД Евклида</text>
+
+      <!-- Bottom Euclid Banner -->
+      <rect x="28" y="288" width="384" height="36" rx="11" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="220" y="311" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="12" font-weight="800">Алгоритм Евклида: gcd(a, b) = gcd(b, a % b)</text>
+      <text x="220" y="346" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">выбирай цикл для линейных списков, рекурсию — для деревьев</text>
+    </svg>`;
+  };
+
+  S.recursionExam = function () {
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Интерактивная схема решения задач СОР по рекуррентным формулам">
+      <style>
+        @keyframes q2-sor-step {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        .q2-sor-card { animation: q2-sor-step 4.5s ease-in-out infinite; }
+      </style>
+      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
+      <rect x="28" y="24" width="384" height="30" rx="10" fill="#f5f9fd"/>
+      <text x="220" y="44" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">ПРАКТИКУМ СОР · ТРАССИРОВКА F(n) СНИЗУ ВВЕРХ</text>
+
+      <!-- Recurrence System Box -->
+      <rect x="30" y="64" width="380" height="108" rx="15" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+      <text x="48" y="88" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">Кусочная рекуррентная функция:</text>
+      <rect x="46" y="98" width="348" height="26" rx="7" fill="#d1fae5"/>
+      <text x="58" y="115" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">1) База: F(1) = 2</text>
+      <rect x="46" y="130" width="168" height="30" rx="7" fill="#dbeafe"/>
+      <text x="130" y="149" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="11" font-weight="700">Чётное: n + F(n-1)</text>
+      <rect x="226" y="130" width="168" height="30" rx="7" fill="#ede9fe"/>
+      <text x="310" y="149" text-anchor="middle" fill="#5b21b6" font-family="monospace" font-size="11" font-weight="700">Нечётное: 2 · F(n-2)</text>
+
+      <!-- Trace Chain F(1) -> F(5) -->
+      <text x="48" y="196" fill="#475569" font-family="sans-serif" font-size="11" font-weight="800">Ручная проверка от базы к ответу:</text>
+
+      <g class="q2-sor-card" transform="translate(30 206)">
+        <rect x="0" y="0" width="68" height="58" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+        <text x="34" y="24" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">F(1)</text>
+        <text x="34" y="45" text-anchor="middle" fill="#047857" font-family="monospace" font-size="15" font-weight="800">= 2</text>
+
+        <rect x="78" y="0" width="68" height="58" rx="11" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+        <text x="112" y="24" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="12" font-weight="800">F(2)</text>
+        <text x="112" y="45" text-anchor="middle" fill="#1d4ed8" font-family="monospace" font-size="15" font-weight="800">= 4</text>
+
+        <rect x="156" y="0" width="68" height="58" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="190" y="24" text-anchor="middle" fill="#5b21b6" font-family="monospace" font-size="12" font-weight="800">F(3)</text>
+        <text x="190" y="45" text-anchor="middle" fill="#6d28d9" font-family="monospace" font-size="15" font-weight="800">= 4</text>
+
+        <rect x="234" y="0" width="68" height="58" rx="11" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+        <text x="268" y="24" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="12" font-weight="800">F(4)</text>
+        <text x="268" y="45" text-anchor="middle" fill="#1d4ed8" font-family="monospace" font-size="15" font-weight="800">= 8</text>
+
+        <rect x="312" y="0" width="68" height="58" rx="11" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
+        <text x="346" y="24" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="12" font-weight="800">F(5)</text>
+        <text x="346" y="45" text-anchor="middle" fill="#b45309" font-family="monospace" font-size="15" font-weight="800">= 8</text>
+      </g>
+
+      <!-- Bottom Score & Counter Pill -->
+      <rect x="30" y="282" width="380" height="38" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="128" y="306" text-anchor="middle" fill="#1e3a8a" font-family="monospace" font-size="12" font-weight="800">Трибоначчи: 3 базы</text>
+      <rect x="242" y="289" width="156" height="24" rx="8" fill="#dcfce7"/>
+      <text x="320" y="305" text-anchor="middle" fill="#15803d" font-family="sans-serif" font-size="11" font-weight="800">ГОТОВНОСТЬ К СОР · 10/10</text>
+      <text x="220" y="346" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">сверь ручную трассировку с запуском программы в IDLE</text>
+    </svg>`;
+  };
+
   S.sort = function () {
     const items = [
       { id: 0, val: 7, h: 122 },

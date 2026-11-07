@@ -914,7 +914,7 @@
           { icon: 'fas fa-microchip', text: 'Кадры стека' },
           { icon: 'fas fa-triangle-exclamation', text: 'Лимит вызовов' }
         ],
-        visual: 'recursion',
+        visual: 'recursionStack',
         visualCaption: 'Каждый вызов кладется на вершину стека и ждет завершения',
         cta: 'Исследовать стек'
       },
@@ -1118,7 +1118,7 @@
           { icon: 'fas fa-superscript', text: 'Степень aⁿ' },
           { icon: 'fas fa-sitemap', text: 'Дерево Фибоначчи' }
         ],
-        visual: 'recursion',
+        visual: 'recursionTree',
         visualCaption: 'Каждый вызов делится на два новых: дерево Фибоначчи',
         cta: 'Перейти к вычислениям'
       },
@@ -1315,7 +1315,7 @@
           { icon: 'fas fa-percent', text: 'Остаток n % 10' },
           { icon: 'fas fa-code', text: 'Двоичный перевод' }
         ],
-        visual: 'recursion',
+        visual: 'recursionDigits',
         visualCaption: 'Отщепляем последнюю цифру и отправляем остаток на следующий шаг',
         cta: 'Изучить метод'
       },
@@ -1506,7 +1506,7 @@
           { icon: 'fas fa-arrows-rotate', text: 'Реверс строк' },
           { icon: 'fas fa-arrows-left-right', text: 'Палиндромы' }
         ],
-        visual: 'recursion',
+        visual: 'recursionStrings',
         visualCaption: 'Голова s[0] и хвост s[1:] — стандартный шаблон рекурсии строк',
         cta: 'Разобрать строки'
       },
@@ -1698,7 +1698,7 @@
           { icon: 'fas fa-scale-balanced', text: 'Когда что выбрать' },
           { icon: 'fas fa-diagram-project', text: 'Алгоритм Евклида' }
         ],
-        visual: 'recursion',
+        visual: 'recursionVsLoop',
         visualCaption: 'Цикл перезаписывает одну переменную, рекурсия строит стек фреймов',
         cta: 'Сравнить подходы'
       },
@@ -1890,7 +1890,7 @@
           { icon: 'fas fa-list-ol', text: 'Рекуррентные ряды' },
           { icon: 'fas fa-chart-line', text: 'Трассировка вызовов' }
         ],
-        visual: 'recursion',
+        visual: 'recursionExam',
         visualCaption: 'Четыре шага к максимальному баллу на суммативном оценивании',
         cta: 'Начать практикум'
       },
