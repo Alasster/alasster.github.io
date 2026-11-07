@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4F46E5">
+  <title>16. Рекурсия</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%234F46E5' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v4">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
+  <script src="../скрипты/analytics.js" defer></script>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">🐍 Py<span>thon</span></div>
+  <div class="topbar-badge">Урок 16</div>
+  <div class="topbar-progress"></div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout" id="layout">
+
+  <!-- LEFT: THEORY & PRACTICE -->
+  <div class="left-panel" id="leftPanel">
+    <div class="lesson-content">
+      <div class="lesson-hero">
+        <div class="snake-mascot"><i class="pb-icon" data-flaticon="refresh"></i></div>
+        <div class="lesson-num">Модуль 3 · Урок 16</div>
+        <h1 class="lesson-title"><span>Рекурсия</span> в Python</h1>
+        <p class="lesson-desc">Представь матрёшку, внутри которой лежит матрёшка поменьше, а в ней — ещё одна, пока ты не дойдёшь до самой маленькой фигурки. В программировании функция тоже может вызывать саму себя для более простой задачи — этот приём называется <b>рекурсией</b>.</p>
+      </div>
+
+      <!-- SECTION 1 -->
+      <div class="section" id="s1">
+        <div class="section-header">
+          <div class="section-icon blue"><i class="pb-icon" data-flaticon="layers"></i></div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 1</div>
+            <div class="section-title">Что такое рекурсия?</div>
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <p><strong>Рекурсия</strong> — это приём, когда функция вызывает <strong>саму себя</strong> внутри своего собственного кода.</p>
+          <p>Вместо того чтобы решать всю большую задачу сразу, рекурсивная функция делает <strong>один маленький шаг</strong>, а оставшуюся (уменьшенную!) задачу передаёт своей копии.</p>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-item">
+            <div class="compare-item-title"><i class="pb-icon" data-flaticon="layers"></i> Аналогия: Матрёшка</div>
+            <p>Открываешь большую куклу → внутри кукла поменьше → открываешь дальше, пока не встретишь цельную малышку, которую уже не открыть.</p>
+          </div>
+          <div class="compare-item">
+            <div class="compare-item-title"><i class="pb-icon" data-flaticon="users"></i> Аналогия: Очередь</div>
+            <p>Чтобы узнать свой номер в очереди, спроси соседа спереди: «Какой ты по счёту?» — и прибавь <span class="ic">1</span>. Первый в очереди сразу ответит: «Я — первый!».</p>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-lang">Python — Первый пример рекурсии</span></div>
+          <pre id="code1"><span class="ck">def</span> <span class="cf">countdown</span>(n):
+    <span class="ck">if</span> n == <span class="cn">0</span>:              <span class="cc"># 1. Точка остановки (базовый случай)</span>
+        <span class="cf">print</span>(<span class="cs">"Старт!"</span>)
+        <span class="ck">return</span>
+    <span class="cf">print</span>(n)                 <span class="cc"># Печатаем текущее число</span>
+    countdown(n - <span class="cn">1</span>)         <span class="cc"># 2. Функция вызывает саму себя с числом поменьше!</span>
+
+countdown(<span class="cn">3</span>)</pre>
+        </div>
+
+        <div class="output-preview">
+          <div class="op-label"># Вывод в консоли:</div>
+          <div class="op-out">3<br>2<br>1<br>Старт!</div>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Какая функция называется рекурсивной?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Функция, в которой есть цикл for или while</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q1')">Функция, которая вызывает саму себя внутри своего тела</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Функция, которая принимает больше двух параметров</button>
+          </div>
+          <div class="quiz-feedback" id="q1-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 2 -->
+      <div class="section" id="s2">
+        <div class="section-header">
+          <div class="section-icon orange"><i class="pb-icon" data-flaticon="shield-check"></i></div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 2</div>
+            <div class="section-title">Два главных закона рекурсии</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p>Чтобы рекурсия не превратилась в бесконечный круг, в каждой рекурсивной функции <strong>обязательно</strong> должны быть две части:</p>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-item">
+            <div class="compare-item-title"><i class="pb-icon" data-flaticon="lock"></i> 1. Базовый случай (стоп-кран)</div>
+            <p>Самый простой случай, когда ответ известен сразу и <strong>не нужно</strong> вызывать функцию снова. Записывается через <span class="ic">if ...: return</span> в самом начале функции.</p>
+          </div>
+          <div class="compare-item">
+            <div class="compare-item-title"><i class="pb-icon" data-flaticon="arrow-right"></i> 2. Рекурсивный шаг</div>
+            <p>Вызов функции самой себя, но с <strong>изменённым аргументом</strong>, который приближает нас к базовому случаю (например, <span class="ic">n - 1</span> или <span class="ic">n // 10</span>).</p>
+          </div>
+        </div>
+
+        <div class="card highlight-orange">
+          <p><strong><i class="pb-icon" data-flaticon="triangle-warning"></i> Что будет, если забыть базовый случай?</strong></p>
+          <p>Функция будет вызывать себя сотни раз подряд, пока Python принудительно не остановит её с ошибкой <span class="ic">RecursionError: maximum recursion depth exceeded</span> (превышена максимальная глубина рекурсии — обычно около 1000 вызовов).</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-lang">Python — Пример с ошибкой RecursionError</span></div>
+          <pre id="code2"><span class="ck">def</span> <span class="cf">broken</span>(n):
+    <span class="cf">print</span>(n)
+    broken(n - <span class="cn">1</span>)  <span class="cc"># Ошибка! Нет условия остановки if n == 0</span>
+
+broken(<span class="cn">3</span>)</pre>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что произойдёт, если в рекурсивной функции забыть базовый случай?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">Функция просто вернёт 0</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q2')">Возникнет ошибка переполнения стека (RecursionError)</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">Python автоматически остановит её после 3 повторов</button>
+          </div>
+          <div class="quiz-feedback" id="q2-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 3 -->
+      <div class="section" id="s3">
+        <div class="section-header">
+          <div class="section-icon green"><i class="pb-icon" data-flaticon="calculator"></i></div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 3</div>
+            <div class="section-title">Возврат значения: сумма и факториал</div>
+          </div>
+        </div>
+
+        <div class="card highlight-green">
+          <p>Рекурсия особенно удобна, когда функция возвращает результат через <span class="ic">return</span>. Посмотрим, как посчитать <strong>сумму чисел от 1 до N</strong> и <strong>факториал</strong> числа.</p>
+          <p>Идея проста: сумма чисел от <span class="ic">1</span> до <span class="ic">4</span> — это число <span class="ic">4</span> плюс сумма чисел от <span class="ic">1</span> до <span class="ic">3</span>!</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-lang">Python — Сумма от 1 до N и Факториал</span></div>
+          <pre id="code3"><span class="cc"># 1) Сумма чисел от 1 до n:</span>
+<span class="ck">def</span> <span class="cf">sum_to</span>(n):
+    <span class="ck">if</span> n == <span class="cn">1</span>:              <span class="cc"># База: сумма до 1 равна 1</span>
+        <span class="ck">return</span> <span class="cn">1</span>
+    <span class="ck">return</span> n + sum_to(n - <span class="cn">1</span>) <span class="cc"># Шаг: n + сумма остальных</span>
+
+<span class="cf">print</span>(<span class="cs">"Сумма от 1 до 5:"</span>, sum_to(<span class="cn">5</span>))  <span class="cc"># 15</span>
+
+
+<span class="cc"># 2) Факториал числа (1 * 2 * ... * n):</span>
+<span class="ck">def</span> <span class="cf">factorial</span>(n):
+    <span class="ck">if</span> n &lt;= <span class="cn">1</span>:              <span class="cc"># База: 1! = 1 (и 0! = 1)</span>
+        <span class="ck">return</span> <span class="cn">1</span>
+    <span class="ck">return</span> n * factorial(n - <span class="cn">1</span>)
+
+<span class="cf">print</span>(<span class="cs">"Факториал 4! ="</span>, factorial(<span class="cn">4</span>))  <span class="cc"># 24</span></pre>
+        </div>
+
+        <div class="card">
+          <p><strong><i class="pb-icon" data-flaticon="sitemap"></i> Как Python считает <span class="ic">factorial(4)</span> по шагам:</strong></p>
+          <p>1. <strong>Погружение (прямой ход):</strong> <span class="ic">factorial(4)</span> ждёт ответа от <span class="ic">4 * factorial(3)</span> → тот ждёт <span class="ic">3 * factorial(2)</span> → тот ждёт <span class="ic">2 * factorial(1)</span>.</p>
+          <p>2. <strong>Дно рекурсии (база):</strong> <span class="ic">factorial(1)</span> сразу возвращает <span class="ic">1</span>.</p>
+          <p>3. <strong>Подъём (обратный ход):</strong> <span class="ic">2 * 1 = 2</span> → <span class="ic">3 * 2 = 6</span> → <span class="ic">4 * 6 = 24</span>. Готово!</p>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Чему равен результат вызова sum_to(3), если sum_to(n) возвращает n + sum_to(n - 1), а при n == 1 возвращает 1?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">3</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q3')">6 (потому что 3 + 2 + 1 = 6)</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">9</button>
+          </div>
+          <div class="quiz-feedback" id="q3-feedback"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 4 -->
+      <div class="section" id="s4">
+        <div class="section-header">
+          <div class="section-icon purple"><i class="pb-icon" data-flaticon="magic-wand"></i></div>
+          <div class="section-meta">
+            <div class="section-tag">Тема 4</div>
+            <div class="section-title">Рекурсия с цифрами числа, строками и списками</div>
+          </div>
+        </div>
+
+        <div class="card highlight-purple">
+          <p>В рекурсии можно использовать всё, что ты изучил в прошлых уроках:</p>
+          <p>• <strong>Деление <span class="ic">// 10</span> и остаток <span class="ic">% 10</span></strong> (Урок 6) — чтобы отрезать по одной цифре от числа.</p>
+          <p>• <strong>Срезы списков и строк <span class="ic">[1:]</span></strong> (Уроки 11 и 13) — чтобы на каждом шаге обрабатывать первый элемент <span class="ic">[0]</span>, а в рекурсию передавать хвост <span class="ic">[1:]</span>.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="code-block-lang">Python — Цифры числа и сумма списка</span></div>
+          <pre id="code4"><span class="cc"># Сумма цифр числа через % 10 и // 10:</span>
+<span class="ck">def</span> <span class="cf">sum_digits</span>(n):
+    <span class="ck">if</span> n &lt; <span class="cn">10</span>:               <span class="cc"># База: однозначное число</span>
+        <span class="ck">return</span> n
+    <span class="ck">return</span> (n % <span class="cn">10</span>) + sum_digits(n // <span class="cn">10</span>)
+
+<span class="cf">print</span>(<span class="cs">"Сумма цифр 483:"</span>, sum_digits(<span class="cn">483</span>))  <span class="cc"># 3 + 8 + 4 = 15</span>
+
+
+<span class="cc"># Сумма элементов списка через срез [1:]:</span>
+<span class="ck">def</span> <span class="cf">recursive_list_sum</span>(items):
+    <span class="ck">if</span> <span class="bi">len</span>(items) == <span class="cn">0</span>:      <span class="cc"># База: пустой список</span>
+        <span class="ck">return</span> <span class="cn">0</span>
+    <span class="ck">return</span> items[<span class="cn">0</span>] + recursive_list_sum(items[<span class="cn">1</span>:])
+
+<span class="cf">print</span>(<span class="cs">"Сумма списка:"</span>, recursive_list_sum([<span class="cn">10</span>, <span class="cn">20</span>, <span class="cn">30</span>]))  <span class="cc"># 60</span></pre>
+        </div>
+
+        <div class="quiz-card" style="margin-bottom:16px">
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что возвращает срез items[1:] при рекурсивном обходе списка items = [10, 20, 30]?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q4')">Только первый элемент 10</button>
+            <button class="quiz-opt" onclick="quiz(this,'correct','q4')">Хвост списка без первого элемента: [20, 30]</button>
+            <button class="quiz-opt" onclick="quiz(this,'wrong','q4')">Последний элемент 30</button>
+          </div>
+          <div class="quiz-feedback" id="q4-feedback"></div>
+        </div>
+
+        <button class="try-card" onclick="loadLessonExample()">
+          <span class="try-icon"><i class="pb-icon" data-flaticon="play"></i></span>
+          <div>
+            <div class="try-text-title">Запустить примеры рекурсии в компиляторе!</div>
+            <div class="try-text-sub">Посмотри, как работают факториал, сумма цифр и обратный отсчёт →</div>
+          </div>
+          <span class="try-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- SECTION 5: PRACTICE -->
+      <div class="section" id="recursion-practice">
+        <div class="section-header">
+          <div class="section-icon blue"><i class="pb-icon" data-flaticon="book-alt"></i></div>
+          <div class="section-meta">
+            <div class="section-tag">Практика · Урок 16</div>
+            <div class="section-title">Задания: от простого вызова до рекурсивных алгоритмов</div>
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <p>В каждом задании сначала продумывай <strong>базовый случай</strong> (когда функция должна остановиться через <span class="ic">if ...: return</span>), а затем — <strong>рекурсивный шаг</strong>!</p>
+        </div>
+
+        <ul class="steps">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>Обратный отсчёт:</strong> Напиши рекурсивную функцию <span class="ic">countdown(n)</span>, которая выводит числа от <span class="ic">n</span> до <span class="ic">1</span>, а при <span class="ic">n == 0</span> выводит <span class="ic">"Поехали!"</span> и завершает работу (<span class="ic">return</span>). Вызови <span class="ic">countdown(5)</span>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Эхо-повторитель (строки + рекурсия):</strong> Создай рекурсивную функцию <span class="ic">repeat_word(word, times)</span>, которая выводит строку <span class="ic">word</span> на экран ровно <span class="ic">times</span> раз (базовый случай: <span class="ic">if times == 0: return</span>).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              <strong>От 1 до N по возрастанию:</strong> Напиши рекурсивную функцию <span class="ic">print_up(n)</span>, которая выводит числа от <span class="ic">1</span> до <span class="ic">n</span>. Подсказка: если вызвать <span class="ic">print_up(n - 1)</span> <strong>перед</strong> <span class="ic">print(n)</span>, числа напечатаются на обратном ходу по возрастанию!
+            </div>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <div>
+              <strong>Сумма от 1 до N (input + return):</strong> Попроси пользователя ввести число <span class="ic">n = int(input())</span>. Напиши рекурсивную функцию <span class="ic">sum_to(n)</span>, которая возвращает сумму чисел от <span class="ic">1</span> до <span class="ic">n</span>, и выведи ответ в f-строке.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">5</span>
+            <div>
+              <strong>Факториал числа:</strong> Напиши рекурсивную функцию <span class="ic">factorial(n)</span>, которая возвращает произведение чисел от <span class="ic">1</span> до <span class="ic">n</span> (при <span class="ic">n &lt;= 1</span> возвращает <span class="ic">1</span>). Выведи факториал для числа из <span class="ic">int(input())</span>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">6</span>
+            <div>
+              <strong>Возведение в степень:</strong> Напиши рекурсивную функцию <span class="ic">power(a, b)</span>, которая возвращает число <span class="ic">a</span> в целой степени <span class="ic">b</span> без использования <span class="ic">**</span> (база: при <span class="ic">b == 0</span> вернуть <span class="ic">1</span>, шаг: <span class="ic">a * power(a, b - 1)</span>).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">7</span>
+            <div>
+              <strong>Количество цифр в числе (// 10):</strong> Напиши рекурсивную функцию <span class="ic">count_digits(n)</span>, которая считает, сколько цифр в положительном целом числе <span class="ic">n</span> (база: если <span class="ic">n &lt; 10</span>, вернуть <span class="ic">1</span>, иначе <span class="ic">1 + count_digits(n // 10)</span>).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">8</span>
+            <div>
+              <strong>Сумма цифр числа (% 10 и // 10):</strong> Пользователь вводит число <span class="ic">n = int(input())</span>. Напиши рекурсивную функцию <span class="ic">sum_digits(n)</span>, которая складывает последнюю цифру <span class="ic">n % 10</span> с результатом <span class="ic">sum_digits(n // 10)</span>.
+            </div>
+          </li>
+          <li>
+            <span class="step-num">9</span>
+            <div>
+              <strong>Сумма элементов списка (срезы + рекурсия):</strong> Дан список чисел <span class="ic">nums = [12, 5, 8, 20, 15]</span>. Напиши рекурсивную функцию <span class="ic">list_sum(arr)</span>, которая возвращает сумму элементов через <span class="ic">arr[0] + list_sum(arr[1:])</span> (база: пустой список возвращает <span class="ic">0</span>).
+            </div>
+          </li>
+          <li>
+            <span class="step-num">10</span>
+            <div>
+              <strong>Числа Фибоначчи и разворот строки:</strong> Напиши рекурсивную функцию <span class="ic">fib(n)</span>, которая возвращает <span class="ic">n</span>-е число Фибоначчи (при <span class="ic">n &lt;= 1</span> возвращает <span class="ic">n</span>, иначе <span class="ic">fib(n - 1) + fib(n - 2)</span>). С помощью цикла <span class="ic">for</span> выведи первые 8 чисел Фибоначчи в одну строку через <span class="ic">end=" "</span>.
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider" id="divider"></div>
+
+  <!-- RIGHT: COMPILER -->
+  <div class="right-panel" id="rightPanel">
+    <div class="right-header">
+      <div class="right-header-title">
+        🐍 Python — компилятор
+        <span class="live-badge">LIVE</span>
+        <span id="pyStatus" class="py-status">Загрузка анализатора...</span>
+      </div>
+      <div class="rh-actions">
+        <div class="font-size-wrap" id="fontSizeWrap">
+          <button class="font-size-btn" onclick="toggleFontMenu()" id="fontSizeLabel">Аа 13px ▾</button>
+          <div class="font-size-dropdown" id="fontSizeMenu">
+            <button class="font-size-opt" onclick="setFontSize(11)">Аа 11px — мелкий</button>
+            <button class="font-size-opt active" onclick="setFontSize(13)">Аа 13px — обычный</button>
+            <button class="font-size-opt" onclick="setFontSize(15)">Аа 15px — крупный</button>
+            <button class="font-size-opt" onclick="setFontSize(17)">Аа 17px — большой</button>
+            <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
+          </div>
+        </div>
+        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()"><i class="pb-icon" data-flaticon="play"></i> Запустить</button>
+      </div>
+    </div>
+    <div class="compiler-wrap">
+      <div class="editor-area">
+        <div class="editor-gutter" id="gutter"></div>
+        <div class="editor-wrap">
+          <div class="editor-highlight" id="editorHighlight" aria-hidden="true"></div>
+          <textarea class="editor-input" id="codeEditor" spellcheck="false" autocorrect="off" autocapitalize="off"
+            oninput="onEditorInput()"
+            onkeydown="handleKeyDown(event)"
+            onscroll="syncScroll()"># Урок 16: Рекурсия
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+print("5! =", factorial(5))
+</textarea>
+        </div>
+      </div>
+      <div class="output-area">
+        <div class="output-header">
+          <span>Вывод (Python Shell)</span>
+          <span class="output-status" id="outputStatus"></span>
+        </div>
+        <div class="output-body" id="output">
+          <span class="out-hint">Нажми <i class="pb-icon" data-flaticon="play"></i> Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
+<script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-07-v3"></script>
+</body>
+</html>

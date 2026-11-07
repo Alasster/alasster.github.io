@@ -153,6 +153,16 @@ const PY_LESSONS = [
     examples: {
       default: `# Дозапись в файл (режим "a") и чтение построчно\nwith open("notes.txt", "a") as f:\n    f.write("Новая заметка!\\n")\n\nwith open("notes.txt", "r") as f:\n    lines = f.readlines()\n    print(f"Всего строк в файле: {len(lines)}")\n    for line in lines:\n        print("->", line.strip())\n`
     }
+  },
+  {
+    num: 16,
+    file: "16.Рекурсия.html",
+    title: "Рекурсия",
+    module: "Модуль 3 · Коллекции и функции",
+    starter: `# Урок 16: Рекурсия (функция вызывает саму себя)\ndef factorial(n):\n    if n <= 1:          # Базовый случай (точка остановки)\n        return 1\n    return n * factorial(n - 1)  # Рекурсивный шаг\n\nprint("Факториал 5! =", factorial(5))\n`,
+    examples: {
+      default: `# Три примера рекурсии:\n\n# 1. Обратный отсчёт\ndef countdown(n):\n    if n == 0:\n        print("Старт!")\n        return\n    print(n, end="... ")\n    countdown(n - 1)\n\ncountdown(4)\n\n# 2. Сумма цифр числа\ndef sum_digits(n):\n    if n < 10:\n        return n\n    return (n % 10) + sum_digits(n // 10)\n\nprint("Сумма цифр числа 2025:", sum_digits(2025))\n`
+    }
   }
 ];
 
@@ -314,7 +324,7 @@ function initNavigation() {
     footer.className = "lesson-footer-nav";
     footer.innerHTML = `
       ${prevLesson ? `<a class="lesson-footer-btn prev" href="${prevLesson.file}">← Урок ${prevLesson.num}: ${prevLesson.title}</a>` : `<span></span>`}
-      ${nextLesson ? `<a class="lesson-footer-btn next" href="${nextLesson.file}">Урок ${nextLesson.num}: ${nextLesson.title} →</a>` : `<span style="font-weight:700;color:var(--accent3)"><i class="pb-icon" data-flaticon="trophy"></i> Все 15 уроков курса пройдены!</span>`}
+      ${nextLesson ? `<a class="lesson-footer-btn next" href="${nextLesson.file}">Урок ${nextLesson.num}: ${nextLesson.title} →</a>` : `<span style="font-weight:700;color:var(--accent3)"><i class="pb-icon" data-flaticon="trophy"></i> Все ${PY_LESSONS.length} уроков курса пройдены!</span>`}
     `;
     lessonContent.appendChild(footer);
   }
@@ -939,6 +949,8 @@ function getFinalHint(errStr, code) {
     return "По числу нельзя пройтись циклом <b>for</b> напрямую. Если хочешь повторить цикл N раз, напиши <b>for i in range(N):</b>.";
   if (full.includes("no such file or directory") || full.includes("filenotfounderror"))
     return "Файл с таким именем ещё не создан! Сначала создай его в режиме записи <b>open(\"имя.txt\", \"w\")</b> или проверь имя файла.";
+  if (full.includes("maximum recursion depth exceeded") || full.includes("recursionerror"))
+    return "Бесконечная рекурсия: функция вызывает сама себя слишком много раз без остановки! Проверь, есть ли в начале функции <b>базовый случай</b> (<b>if ...: return</b>) и уменьшается ли аргумент при каждом рекурсивном вызове (например, <b>n - 1</b>).";
   if (full.includes("timelimiterror") || full.includes("program exceeded run time limit"))
     return "Программа выполнялась слишком долго (возможно, получился бесконечный цикл <b>while</b>, в котором не меняется счётчик и нет <b>break</b>).";
   if (full.includes("invalid syntax"))
