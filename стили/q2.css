@@ -3794,6 +3794,35 @@ body.lesson-page:is([class*="lesson-10emn"], [data-lesson-id^="10emn"]) .chips .
   color: #2563EB !important;
 }
 
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(
+  .q2-card-icon,
+  .q2-step-icon,
+  .q2-definition h3 i,
+  .q2-callout h3 i,
+  .q2-panel h3 i,
+  .q2-ref summary i,
+  .q2-list li > i,
+  .q2-summary-points .clean-list li > i,
+  .q2-ticket ul li > i,
+  .q2-quote .quote-badge,
+  .slide .q2-card .q2-card-icon
+) {
+  background: #FFF0E7 !important;
+  background-color: #FFF0E7 !important;
+  background-image: none !important;
+  color: #EA580C !important;
+  box-shadow: inset 2.5px 2.5px 5px rgba(215, 168, 148, 0.60), inset -2.5px -2.5px 5px rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(215, 168, 148, 0.45) !important;
+  border-radius: 12px !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .chips .chip i {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  color: #EA580C !important;
+}
+
 /* Крупные вдавленные ключевые слова (inline code) в карточках и абзацах Q2 */
 body.q2-lesson .q2-slide :is(p, li, h2, h3, td) code {
   display: inline-block !important;
@@ -3820,6 +3849,23 @@ body.lesson-page:is([class*="lesson-10ogn"], [data-lesson-id^="10ogn"]) .q2-slid
   background: #E2F5EC !important;
   color: #065f46 !important;
   box-shadow: inset 2px 2px 5px rgba(140, 188, 165, 0.55), inset -2px -2px 5px rgba(255, 255, 255, 0.96) !important;
+}
+
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-slide :is(p, li, h2, h3, td, .q2-ping-row) code,
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) code:not(.q2-code code) {
+  background: #FFF0E7 !important;
+  color: #3F3530 !important;
+  border: 1px solid rgba(215, 168, 148, 0.55) !important;
+  box-shadow: inset 1.5px 1.5px 3.5px rgba(215, 168, 148, 0.55), inset -1.5px -1.5px 3.5px rgba(255, 255, 255, 0.95) !important;
+  border-radius: 9px !important;
+  padding: 4px 10px !important;
+  margin: 3px 5px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-weight: 700 !important;
+  font-size: 0.90rem !important;
+  white-space: nowrap !important;
 }
 
 .q2-card .q2-code {
@@ -5249,72 +5295,75 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important;
-  margin-bottom: 0 !important;
-}
-
-.q2-split-equal .q2-svg-wrap svg {
-  margin: auto auto !important;
-  display: block !important;
-  max-width: 100% !important;
-}
-
-.q2-split-equal .q2-svg-wrap .q2-caption {
-  margin-top: 14px !important;
-  text-align: center !important;
-  width: 100% !important;
-}
-
-/* Оформление таблицы степеней */
-.q2-table-wrap {
-  border-radius: 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.95) !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  box-shadow: var(--q2-shadow-sm) !important;
-  backdrop-filter: blur(8px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
   overflow: hidden !important;
+  border-radius: 20px !important;
 }
 
-.q2-table {
+.q2-split-equal .q2-table {
+  height: 100% !important;
   width: 100% !important;
+  flex: 1 1 100% !important;
   border-collapse: collapse !important;
+  margin: 0 !important;
+  table-layout: fixed !important;
 }
 
-.q2-table caption {
-  padding: 14px 18px 8px !important;
-  font-size: 0.88rem !important;
-  font-weight: 700 !important;
-  color: #475569 !important;
-  text-align: left !important;
+.q2-split-equal .q2-table tbody {
+  height: 100% !important;
 }
 
-.q2-table th {
-  padding: 12px 16px !important;
-  font-size: 0.74rem !important;
+.q2-split-equal .q2-table tbody tr {
+  height: 25% !important;
+}
+
+.q2-split-equal .q2-table th {
+  padding: 16px 20px !important;
+  font-size: 0.78rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
-  color: #64748b !important;
-  background: rgba(241, 245, 249, 0.6) !important;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+  color: #7A5C50 !important;
+  background: rgba(243, 229, 220, 0.85) !important;
+  border-bottom: 1px solid rgba(215, 168, 148, 0.45) !important;
 }
 
-.q2-table td {
-  padding: 12px 16px !important;
-  font-size: 0.92rem !important;
+.q2-split-equal .q2-table td {
+  padding: 14px 20px !important;
+  font-size: 0.95rem !important;
   font-weight: 600 !important;
-  color: #334155 !important;
-  border-bottom: 1px solid rgba(241, 245, 249, 0.9) !important;
+  color: #3F3530 !important;
+  border-bottom: 1px solid rgba(215, 168, 148, 0.22) !important;
   vertical-align: middle !important;
+  background: rgba(255, 255, 255, 0.6) !important;
 }
 
-.q2-table tr:last-child td {
+.q2-split-equal .q2-table tr:last-child td {
   border-bottom: none !important;
 }
 
-.q2-table tr.is-highlight td {
-  background: rgba(99, 102, 241, 0.08) !important;
-  color: #312e81 !important;
+.q2-split-equal .q2-table tr.is-highlight td {
+  background: rgba(234, 88, 12, 0.12) !important;
+  color: #C2410C !important;
+  font-weight: 700 !important;
+}
+
+.q2-split-equal .q2-table th:first-child,
+.q2-split-equal .q2-table td:first-child {
+  text-align: left !important;
+  padding-left: 22px !important;
+}
+
+.q2-split-equal .q2-table th:not(:first-child),
+.q2-split-equal .q2-table td:not(:first-child) {
+  text-align: center !important;
+}
+
+.q2-split-equal .q2-table td:not(:first-child) {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
 }
 
 /* Вкладки (Tabs Widget) для практики */
@@ -5479,10 +5528,38 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-card-bad
   border: none !important;
 }
 
-body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-card-icon {
-  background: #FBEFE8 !important;
-  box-shadow: inset 2px 2px 4px rgba(215, 168, 148, 0.4), inset -2px -2px 4px rgba(255, 255, 255, 0.95) !important;
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-card-icon,
+body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.callout, .q2-callout) h3 i {
+  background: #FFF0E7 !important;
+  background-color: #FFF0E7 !important;
+  background-image: none !important;
+  box-shadow: inset 2.5px 2.5px 5px rgba(215, 168, 148, 0.60), inset -2.5px -2.5px 5px rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(215, 168, 148, 0.45) !important;
   color: #EA580C !important;
+}
+
+/* Список пингов и путей в практических заданиях 11 класса */
+.q2-ping-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 12px 0 16px !important;
+}
+
+.q2-ping-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px 10px !important;
+  line-height: 1.6 !important;
+}
+
+.q2-ping-bullet {
+  color: #EA580C !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+  margin-right: 2px !important;
+  user-select: none !important;
 }
 
 /* Дескриптор оценивания 11 класса */
