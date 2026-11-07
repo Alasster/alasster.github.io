@@ -353,23 +353,23 @@
   S.weighted = function () {
     return `<svg viewBox="0 0 460 340" role="img" aria-label="Взвешенный граф с двумя маршрутами" data-q2-float-graph="weighted">
       <defs>
-        <filter id="q2-node-inset-sw" x="-30%" y="-30%" width="160%" height="160%">
-          <feOffset dx="2.5" dy="2.5"/>
-          <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
-          <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-          <feFlood flood-color="#475569" flood-opacity="0.45" result="color"/>
-          <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+        <filter id="q2-node-inset-sw" x="-40%" y="-40%" width="180%" height="180%">
+          <feOffset dx="2.5" dy="2.5" in="SourceAlpha" result="offsetDark"/>
+          <feGaussianBlur stdDeviation="2.2" in="offsetDark" result="blurDark"/>
+          <feComposite operator="out" in="SourceAlpha" in2="blurDark" result="inverseDark"/>
+          <feFlood flood-color="#B28774" flood-opacity="0.55" result="colorDark"/>
+          <feComposite operator="in" in="colorDark" in2="inverseDark" result="shadowDark"/>
 
-          <feOffset dx="-2" dy="-2"/>
-          <feGaussianBlur stdDeviation="1.8" result="offset-blur-light"/>
-          <feComposite operator="out" in="SourceGraphic" in2="offset-blur-light" result="inverse-light"/>
-          <feFlood flood-color="#ffffff" flood-opacity="0.95" result="color-light"/>
-          <feComposite operator="in" in="color-light" in2="inverse-light" result="highlight"/>
+          <feOffset dx="-2" dy="-2" in="SourceAlpha" result="offsetLight"/>
+          <feGaussianBlur stdDeviation="1.8" in="offsetLight" result="blurLight"/>
+          <feComposite operator="out" in="SourceAlpha" in2="blurLight" result="inverseLight"/>
+          <feFlood flood-color="#ffffff" flood-opacity="0.95" result="colorLight"/>
+          <feComposite operator="in" in="colorLight" in2="inverseLight" result="shadowLight"/>
 
           <feMerge>
             <feMergeNode in="SourceGraphic"/>
-            <feMergeNode in="shadow"/>
-            <feMergeNode in="highlight"/>
+            <feMergeNode in="shadowDark"/>
+            <feMergeNode in="shadowLight"/>
           </feMerge>
         </filter>
       </defs>

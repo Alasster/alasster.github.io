@@ -26,23 +26,23 @@
   const DIRECTED_SVG = `<svg viewBox="0 0 520 250" role="img" aria-label="Ориентированный граф со стрелками на рёбрах">
     <defs>
       <marker id="q11-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c8aa5"/></marker>
-      <filter id="q2-node-inset-d" x="-30%" y="-30%" width="160%" height="160%">
-        <feOffset dx="2.5" dy="2.5"/>
-        <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
-        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-        <feFlood flood-color="#475569" flood-opacity="0.45" result="color"/>
-        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <filter id="q2-node-inset-d" x="-40%" y="-40%" width="180%" height="180%">
+        <feOffset dx="2.5" dy="2.5" in="SourceAlpha" result="offsetDark"/>
+        <feGaussianBlur stdDeviation="2.2" in="offsetDark" result="blurDark"/>
+        <feComposite operator="out" in="SourceAlpha" in2="blurDark" result="inverseDark"/>
+        <feFlood flood-color="#B28774" flood-opacity="0.55" result="colorDark"/>
+        <feComposite operator="in" in="colorDark" in2="inverseDark" result="shadowDark"/>
 
-        <feOffset dx="-2" dy="-2"/>
-        <feGaussianBlur stdDeviation="1.8" result="offset-blur-light"/>
-        <feComposite operator="out" in="SourceGraphic" in2="offset-blur-light" result="inverse-light"/>
-        <feFlood flood-color="#ffffff" flood-opacity="0.95" result="color-light"/>
-        <feComposite operator="in" in="color-light" in2="inverse-light" result="highlight"/>
+        <feOffset dx="-2" dy="-2" in="SourceAlpha" result="offsetLight"/>
+        <feGaussianBlur stdDeviation="1.8" in="offsetLight" result="blurLight"/>
+        <feComposite operator="out" in="SourceAlpha" in2="blurLight" result="inverseLight"/>
+        <feFlood flood-color="#ffffff" flood-opacity="0.95" result="colorLight"/>
+        <feComposite operator="in" in="colorLight" in2="inverseLight" result="shadowLight"/>
 
         <feMerge>
           <feMergeNode in="SourceGraphic"/>
-          <feMergeNode in="shadow"/>
-          <feMergeNode in="highlight"/>
+          <feMergeNode in="shadowDark"/>
+          <feMergeNode in="shadowLight"/>
         </feMerge>
       </filter>
     </defs>
@@ -59,23 +59,23 @@
 
   const WEIGHT_SVG = `<svg viewBox="0 0 520 260" role="img" aria-label="Взвешенный граф с числами на рёбрах" data-q2-float-graph="weighted-concept">
     <defs>
-      <filter id="q2-node-inset-w" x="-30%" y="-30%" width="160%" height="160%">
-        <feOffset dx="2.5" dy="2.5"/>
-        <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
-        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-        <feFlood flood-color="#475569" flood-opacity="0.45" result="color"/>
-        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <filter id="q2-node-inset-w" x="-40%" y="-40%" width="180%" height="180%">
+        <feOffset dx="2.5" dy="2.5" in="SourceAlpha" result="offsetDark"/>
+        <feGaussianBlur stdDeviation="2.2" in="offsetDark" result="blurDark"/>
+        <feComposite operator="out" in="SourceAlpha" in2="blurDark" result="inverseDark"/>
+        <feFlood flood-color="#B28774" flood-opacity="0.55" result="colorDark"/>
+        <feComposite operator="in" in="colorDark" in2="inverseDark" result="shadowDark"/>
 
-        <feOffset dx="-2" dy="-2"/>
-        <feGaussianBlur stdDeviation="1.8" result="offset-blur-light"/>
-        <feComposite operator="out" in="SourceGraphic" in2="offset-blur-light" result="inverse-light"/>
-        <feFlood flood-color="#ffffff" flood-opacity="0.95" result="color-light"/>
-        <feComposite operator="in" in="color-light" in2="inverse-light" result="highlight"/>
+        <feOffset dx="-2" dy="-2" in="SourceAlpha" result="offsetLight"/>
+        <feGaussianBlur stdDeviation="1.8" in="offsetLight" result="blurLight"/>
+        <feComposite operator="out" in="SourceAlpha" in2="blurLight" result="inverseLight"/>
+        <feFlood flood-color="#ffffff" flood-opacity="0.95" result="colorLight"/>
+        <feComposite operator="in" in="colorLight" in2="inverseLight" result="shadowLight"/>
 
         <feMerge>
           <feMergeNode in="SourceGraphic"/>
-          <feMergeNode in="shadow"/>
-          <feMergeNode in="highlight"/>
+          <feMergeNode in="shadowDark"/>
+          <feMergeNode in="shadowLight"/>
         </feMerge>
       </filter>
     </defs>
@@ -433,7 +433,6 @@
             right: [
               {
                 t: 'table',
-                caption: 'Степени вершин графа',
                 head: ['Вершина', 'Входящая (in)', 'Исходящая (out)'],
                 rows: [
                   ['A (источник)', '0', '2'],
@@ -480,13 +479,6 @@
                 compact: true,
                 svg: WEIGHT_SVG,
                 caption: 'Динамическая модель: перетаскивайте вершины — веса пересчитываются'
-              },
-              {
-                t: 'callout',
-                tone: 'good',
-                icon: 'fas fa-lightbulb',
-                title: 'Главное отличие от обычного графа',
-                text: 'В обычном графе кратчайший путь — это просто наименьшее количество рёбер (BFS). Во взвешенном графе путь из трёх «быстрых» рёбер (2 + 1 + 2 = 5) выгоднее прямого пути из одного дорогого ребра с весом 12.'
               }
             ],
             right: [
@@ -507,54 +499,23 @@
                     title: 'Пропускная способность и узкие места',
                     text: '<b>Что делаем:</b> скорость передачи данных ограничена самым медленным («узким») ребром: <code>min(вес)</code>.<br><b>Где работает:</b> передача трафика в дата-центрах, балансировка CDN-серверов, расчет предельной нагрузки мостов и нефтепроводов.',
                     tone: 'cyan'
-                  },
-                  {
-                    badge: '3. Остовное дерево',
-                    icon: 'fas fa-network-wired',
-                    title: 'Минимальная стоимость всей сети',
-                    text: '<b>Что делаем:</b> соединяем все вершины между собой без циклов так, чтобы суммарная стоимость всех проложенных рёбер была минимальной.<br><b>Где работает:</b> прокладка магистрального кабеля между серверами, проектирование энергосетей (Краскал, Прим).',
-                    tone: 'amber'
                   }
                 ]
               }
             ]
-          }
-        ]
-      },
-      {
-        k: 'lab',
-        eyebrow: '05 · ИНТЕРАКТИВ',
-        title: 'Включите направление и веса',
-        lead: 'Переключайте кнопки «Ориентированный» и «Взвешенный». Следите, как меняются список соседей и достижимость из вершины A.',
-        widget: {
-          kind: 'graphTypes',
-          config: {
-            start: 'A',
-            directed: false,
-            weighted: false,
-            nodes: [
-              { id: 'A', x: 80, y: 90 },
-              { id: 'B', x: 250, y: 60 },
-              { id: 'C', x: 260, y: 200 },
-              { id: 'D', x: 430, y: 120 },
-              { id: 'E', x: 120, y: 250 }
-            ],
-            edges: [['A', 'B', 4], ['B', 'C', 2], ['C', 'D', 5], ['A', 'D', 9], ['B', 'D', 3], ['E', 'B', 7]]
-          }
-        },
-        after: [
+          },
           {
             t: 'callout',
             tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Что вы должны были заметить',
-            text: 'В неориентированном графе вершина E достижима из A через B. В ориентированном — нет: ребро E → B идёт в другую сторону. Веса не меняют достижимость, но добавляют данные для выбора маршрута.'
+            icon: 'fas fa-lightbulb',
+            title: 'Главное отличие от обычного графа',
+            text: 'В обычном графе кратчайший путь — это просто наименьшее количество рёбер (BFS). Во взвешенном графе путь из трёх «быстрых» рёбер (2 + 1 + 2 = 5) выгоднее прямого пути из одного дорогого ребра с весом 12.'
           }
         ]
       },
       {
         k: 'practice',
-        eyebrow: '06 · ПРАКТИКУМ В ТЕТРАДИ',
+        eyebrow: '05 · ПРАКТИКУМ В ТЕТРАДИ',
         title: 'Оптимизация транспортных и сетевых маршрутов',
         lead: 'Переключайте вкладки с практическими задачами. Решите три инженерные задачи в тетради по дескриптору (10 баллов).',
         before: [
@@ -633,7 +594,7 @@
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '06 · ПРОВЕРКА',
         questions: [
           { q: 'Чем ориентированный граф отличается от неориентированного?', options: ['У рёбер есть направление', 'У рёбер есть вес', 'В нём нет вершин', 'В нём не бывает петель'], answer: 0, explain: 'Дуга идёт из одной вершины в другую.' },
           { q: 'Что такое вес ребра?', options: ['Число вершин', 'Числовая характеристика связи', 'Номер вершины', 'Длина списка'], answer: 1, explain: 'Вес — расстояние, время, стоимость и т. п.' },

@@ -683,7 +683,7 @@
           <feOffset dx="2" dy="2.5" in="SourceAlpha" result="offsetDark"/>
           <feGaussianBlur stdDeviation="2.2" in="offsetDark" result="blurDark"/>
           <feComposite operator="out" in="SourceAlpha" in2="blurDark" result="inverseDark"/>
-          <feFlood flood-color="#334155" flood-opacity="0.36" result="colorDark"/>
+          <feFlood flood-color="#B28774" flood-opacity="0.55" result="colorDark"/>
           <feComposite operator="in" in="colorDark" in2="inverseDark" result="shadowDark"/>
 
           <feOffset dx="-2" dy="-2" in="SourceAlpha" result="offsetLight"/>
