@@ -9,7 +9,7 @@ const PY_LESSONS = [
     file: "1.Основа.html",
     title: "Введение в Python",
     module: "Модуль 1 · Старт",
-    starter: `# Урок 1: Введение в Python\n# Нажми "▶ Запустить" (или Ctrl+Enter)\n\nprint("Привет, Python!")\nprint("Я начинаю программировать 🚀")\nprint(2025)\n`,
+    starter: `# Урок 1: Введение в Python\n# Нажми "Запустить" (или Ctrl+Enter)\n\nprint("Привет, Python!")\nprint("Я начинаю программировать!")\nprint(2025)\n`,
     examples: {
       default: `# Пример первой программы\nprint("Hello, World!")\nprint("Привет! Меня зовут Алекс.")\nprint("Результат 2 + 2 =", 2 + 2)\n`
     }
@@ -81,7 +81,7 @@ const PY_LESSONS = [
     module: "Модуль 2 · Логика и циклы",
     starter: `# Урок 8: Условия if / elif / else\nscore = 85\n\nif score >= 90:\n    print("Оценка: 5 (Отлично!)")\nelif score >= 70:\n    print("Оценка: 4 (Хорошо)")\nelse:\n    print("Нужно ещё потренироваться")\n`,
     examples: {
-      default: `temp = int(input("Какая температура на улице? "))\n\nif temp >= 25:\n    print("Жарко! Надень футболку ☀️")\nelif temp >= 12:\n    print("Прохладно, накинь кофту 🌤")\nelse:\n    print("Холодно! Обязательно надень куртку 🧥")\n`
+      default: `temp = int(input("Какая температура на улице? "))\n\nif temp >= 25:\n    print("Жарко! Надень футболку")\nelif temp >= 12:\n    print("Прохладно, накинь кофту")\nelse:\n    print("Холодно! Обязательно надень куртку")\n`
     }
   },
   {
@@ -91,7 +91,7 @@ const PY_LESSONS = [
     module: "Модуль 2 · Логика и циклы",
     starter: `# Урок 9: Цикл for и функция range()\nfor i in range(1, 6):\n    print(f"Шаг цикла №{i}")\n`,
     examples: {
-      default: `# Три режима range():\nprint("1) range(5):")\nfor i in range(5):\n    print(i, end=" ")\nprint()\n\nprint("2) Четные числа от 2 до 10:")\nfor i in range(2, 11, 2):\n    print(i, end=" ")\nprint()\n\nprint("3) Обратный отсчёт:")\nfor i in range(5, 0, -1):\n    print(i, end="... ")\nprint("Пуск! 🚀")\n`
+      default: `# Три режима range():\nprint("1) range(5):")\nfor i in range(5):\n    print(i, end=" ")\nprint()\n\nprint("2) Четные числа от 2 до 10:")\nfor i in range(2, 11, 2):\n    print(i, end=" ")\nprint()\n\nprint("3) Обратный отсчёт:")\nfor i in range(5, 0, -1):\n    print(i, end="... ")\nprint("Пуск!")\n`
     }
   },
   {
@@ -99,7 +99,7 @@ const PY_LESSONS = [
     file: "10.While.html",
     title: "Цикл while",
     module: "Модуль 2 · Логика и циклы",
-    starter: `# Урок 10: Цикл while\ncount = 5\nwhile count > 0:\n    print("Обратный отсчёт:", count)\n    count -= 1\nprint("Старт! 🚀")\n`,
+    starter: `# Урок 10: Цикл while\ncount = 5\nwhile count > 0:\n    print("Обратный отсчёт:", count)\n    count -= 1\nprint("Старт!")\n`,
     examples: {
       default: `while True:\n    word = input("Введи слово (или 'стоп' для выхода): ")\n    if word.lower() == "стоп":\n        print("Цикл остановлен командой break!")\n        break\n    print("Ты ввёл:", word)\n`
     }
@@ -314,7 +314,7 @@ function initNavigation() {
     footer.className = "lesson-footer-nav";
     footer.innerHTML = `
       ${prevLesson ? `<a class="lesson-footer-btn prev" href="${prevLesson.file}">← Урок ${prevLesson.num}: ${prevLesson.title}</a>` : `<span></span>`}
-      ${nextLesson ? `<a class="lesson-footer-btn next" href="${nextLesson.file}">Урок ${nextLesson.num}: ${nextLesson.title} →</a>` : `<span style="font-weight:700;color:var(--accent3)">🎉 Все 15 уроков курса пройдены!</span>`}
+      ${nextLesson ? `<a class="lesson-footer-btn next" href="${nextLesson.file}">Урок ${nextLesson.num}: ${nextLesson.title} →</a>` : `<span style="font-weight:700;color:var(--accent3)"><i class="pb-icon" data-flaticon="trophy"></i> Все 15 уроков курса пройдены!</span>`}
     `;
     lessonContent.appendChild(footer);
   }
@@ -361,7 +361,7 @@ function initContentWidgets() {
     header.innerHTML = `
       <span class="code-block-lang">${langText}</span>
       <div class="code-block-actions">
-        <button class="run-inline-btn" onclick="runCodeFromBlock('${pre.id}', ${!isErrorExample})" title="Отправить этот код в компилятор справа">▶ В редактор</button>
+        <button class="run-inline-btn" onclick="runCodeFromBlock('${pre.id}', ${!isErrorExample})" title="Отправить этот код в компилятор справа"><i class="pb-icon" data-flaticon="play"></i> В редактор</button>
         <button class="copy-btn" onclick="copyCode(this, '${pre.id}')">Копировать</button>
       </div>
     `;
@@ -398,8 +398,8 @@ function initContentWidgets() {
         const actions = document.createElement("div");
         actions.className = "task-actions";
         actions.innerHTML = `
-          <button class="task-solve-btn" type="button">💻 Решать в редакторе</button>
-          <button class="task-check-btn" type="button">${savedDone.includes(taskNum) ? '✓ Выполнено' : '○ Отметить выполненным'}</button>
+          <button class="task-solve-btn" type="button"><i class="pb-icon" data-flaticon="computer"></i> Решать в редакторе</button>
+          <button class="task-check-btn" type="button">${savedDone.includes(taskNum) ? '<i class="pb-icon" data-flaticon="check"></i> Выполнено' : '○ Отметить выполненным'}</button>
         `;
         const solveBtn = actions.querySelector(".task-solve-btn");
         solveBtn.onclick = () => startTaskInEditor(taskNum, rawText);
@@ -420,11 +420,11 @@ function toggleTaskDone(li, btn, taskNum) {
   if (list.includes(taskNum)) {
     list = list.filter(n => n !== taskNum);
     li.classList.remove("task-done");
-    btn.textContent = "○ Отметить выполненным";
+    btn.innerHTML = "○ Отметить выполненным";
   } else {
     list.push(taskNum);
     li.classList.add("task-done");
-    btn.textContent = "✓ Выполнено";
+    btn.innerHTML = '<i class="pb-icon" data-flaticon="check"></i> Выполнено';
   }
   try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) {}
 }
@@ -514,14 +514,14 @@ function initCompilerPanel() {
     resetBtn.className = "rh-btn";
     resetBtn.id = "resetCodeBtn";
     resetBtn.title = "Вернуть стартовый код урока";
-    resetBtn.textContent = "↺ Шаблон";
+    resetBtn.innerHTML = '<i class="pb-icon" data-flaticon="refresh"></i> Шаблон';
     resetBtn.onclick = resetStarterCode;
 
     const clearBtn = document.createElement("button");
     clearBtn.className = "rh-btn";
     clearBtn.id = "clearCodeBtn";
     clearBtn.title = "Очистить редактор";
-    clearBtn.textContent = "🗑";
+    clearBtn.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i>';
     clearBtn.onclick = clearEditorCode;
 
     actions.insertBefore(resetBtn, runBtn);
@@ -542,7 +542,7 @@ function initCompilerPanel() {
     clearOutBtn.textContent = "Очистить вывод";
     clearOutBtn.onclick = () => {
       const outEl = document.getElementById("output");
-      if (outEl) outEl.innerHTML = '<span class="out-hint">Нажми ▶ Запустить (или Ctrl+Enter), чтобы увидеть результат</span>';
+      if (outEl) outEl.innerHTML = '<span class="out-hint">Нажми <i class="pb-icon" data-flaticon="play"></i> Запустить (или Ctrl+Enter), чтобы увидеть результат</span>';
       outStatus.textContent = "";
       outStatus.className = "output-status";
     };
@@ -577,9 +577,9 @@ function renderVfsBar() {
   if (!bar) return;
   const names = Object.keys(vfsFiles);
   bar.innerHTML = `
-    <span class="vfs-label">📂 Виртуальные файлы (нажми, чтобы посмотреть):</span>
-    ${names.map(fn => `<button type="button" class="vfs-file-pill" onclick="previewVfsFile('${fn}')">📄 ${fn}</button>`).join("")}
-    <button type="button" class="vfs-file-pill" style="color:var(--text3)" onclick="resetVfsFiles()" title="Восстановить исходные файлы">↺ сброс файлов</button>
+    <span class="vfs-label"><i class="pb-icon" data-flaticon="folder"></i> Виртуальные файлы (нажми, чтобы посмотреть):</span>
+    ${names.map(fn => `<button type="button" class="vfs-file-pill" onclick="previewVfsFile('${fn}')"><i class="pb-icon" data-flaticon="book-alt"></i> ${fn}</button>`).join("")}
+    <button type="button" class="vfs-file-pill" style="color:var(--text3)" onclick="resetVfsFiles()" title="Восстановить исходные файлы"><i class="pb-icon" data-flaticon="refresh"></i> сброс файлов</button>
   `;
 }
 
@@ -593,7 +593,7 @@ function previewVfsFile(filename) {
   headerLine.className = "out-line";
   headerLine.style.color = "var(--accent)";
   headerLine.style.fontWeight = "700";
-  headerLine.textContent = `📄 Содержимое файла "${filename}":\n────────────────────────────`;
+  headerLine.innerHTML = `<i class="pb-icon" data-flaticon="book-alt"></i> Содержимое файла "${escHtml(filename)}":\n────────────────────────────`;
   outEl.appendChild(headerLine);
 
   const bodyLine = document.createElement("span");
@@ -602,7 +602,7 @@ function previewVfsFile(filename) {
   outEl.appendChild(bodyLine);
 
   if (status) {
-    status.textContent = `📄 ${filename}`;
+    status.innerHTML = `<i class="pb-icon" data-flaticon="book-alt"></i> ${escHtml(filename)}`;
     status.className = "output-status ok";
   }
 }
@@ -973,16 +973,16 @@ function showErrorBox(msg, hint, lineNum) {
   const box = document.createElement("div");
   box.className = "out-error-block";
   box.innerHTML = `
-    <div class="out-error-type">⚠ Ошибка в программе${lineNum ? ` (строка ${lineNum})` : ""}</div>
+    <div class="out-error-type"><i class="pb-icon" data-flaticon="triangle-warning"></i> Ошибка в программе${lineNum ? ` (строка ${lineNum})` : ""}</div>
     <div class="out-error-msg">${escHtml(cleanErr(msg))}</div>
     <div class="out-error-tip">
-      <span class="out-error-tip-label">💡 Как исправить:</span>
+      <span class="out-error-tip-label"><i class="pb-icon" data-flaticon="bulb"></i> Как исправить:</span>
       ${hint}
     </div>
   `;
   outEl.appendChild(box);
   if (status) {
-    status.textContent = "✗ Ошибка";
+    status.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> Ошибка';
     status.className = "output-status err";
   }
 }
@@ -1092,10 +1092,10 @@ function setRunningUI(running) {
   const btn = document.getElementById("runStopBtn");
   if (!btn) return;
   if (running) {
-    btn.textContent = "⏹ Остановить";
+    btn.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> Остановить';
     btn.className = "rh-btn stop-btn";
   } else {
-    btn.textContent = "▶ Запустить";
+    btn.innerHTML = '<i class="pb-icon" data-flaticon="play"></i> Запустить';
     btn.className = "rh-btn run-btn";
   }
 }
@@ -1121,7 +1121,7 @@ async function runCode() {
   setRunningUI(true);
 
   outEl.innerHTML = "";
-  status.textContent = "⏳ выполняется…";
+  status.innerHTML = '<i class="pb-icon" data-flaticon="time-fast"></i> выполняется…';
   status.className = "output-status running";
 
   const usesFiles = /\bopen\s*\(/.test(rawCode);
@@ -1227,10 +1227,10 @@ async function runCode() {
     if (outEl.children.length === 0) {
       const emptyHint = document.createElement("span");
       emptyHint.className = "out-hint";
-      emptyHint.textContent = "✓ Программа успешно выполнилась (нет вывода на экран). Добавь print(), чтобы увидеть результат.";
+      emptyHint.innerHTML = '<i class="pb-icon" data-flaticon="check"></i> Программа успешно выполнилась (нет вывода на экран). Добавь print(), чтобы увидеть результат.';
       outEl.appendChild(emptyHint);
     }
-    status.textContent = "✓ выполнено";
+    status.innerHTML = '<i class="pb-icon" data-flaticon="check"></i> выполнено';
     status.className = "output-status ok";
   } catch (e) {
     let finalErr = e.toString();
@@ -1239,9 +1239,9 @@ async function runCode() {
       const stopLine = document.createElement("span");
       stopLine.className = "out-hint";
       stopLine.style.color = "#ef4444";
-      stopLine.textContent = "⏹ Выполнение программы остановлено пользователем.";
+      stopLine.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> Выполнение программы остановлено пользователем.';
       outEl.appendChild(stopLine);
-      status.textContent = "⏹ остановлено";
+      status.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> остановлено';
       status.className = "output-status err";
     } else {
       // Adjust line number if VFS preamble was prepended
@@ -1291,11 +1291,11 @@ function quiz(btn, type, qid) {
   const fb = document.getElementById(qid + "-feedback") || q.querySelector(".quiz-feedback");
   if (fb) {
     if (type === "correct") {
-      fb.textContent = "✅ Верно! Отличная работа.";
+      fb.innerHTML = '<i class="pb-icon" data-flaticon="check"></i> Верно! Отличная работа.';
       fb.className = "quiz-feedback show ok";
       q.querySelectorAll(".quiz-opt").forEach(b => b.disabled = true);
     } else {
-      fb.textContent = "❌ Пока не так. Подумай ещё раз и выбери другой вариант!";
+      fb.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> Пока не так. Подумай ещё раз и выбери другой вариант!';
       fb.className = "quiz-feedback show no";
     }
   }
@@ -1318,3 +1318,4 @@ if (document.readyState === "loading") {
 } else {
   initPythonBasicsApp();
 }
+

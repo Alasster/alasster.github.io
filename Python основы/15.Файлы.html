@@ -7,7 +7,7 @@
   <title>15.Файлы</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%234F46E5' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v1">
+  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v2">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
   <script src="../скрипты/analytics.js" defer></script>
 </head>
@@ -27,7 +27,7 @@
   <div class="left-panel" id="leftPanel">
     <div class="lesson-content">
       <div class="lesson-hero">
-<div class="snake-mascot">📁</div>
+<div class="snake-mascot"><i class="pb-icon" data-flaticon="folder"></i></div>
 <div class="lesson-num">Модуль 1</div>
 <h1 class="lesson-title">Работа с <span>файлами</span></h1>
 <p class="lesson-desc">Обычно данные в программе исчезают сразу после её закрытия. Чтобы сохранить результат своей работы — например, рекорд в игре или список дел — нам нужно научиться работать с файлами.</p>
@@ -36,7 +36,7 @@
 <!-- SECTION 1 -->
 <div class="section">
     <div class="section-header">
-      <div class="section-icon blue">🔓</div>
+      <div class="section-icon blue"><i class="pb-icon" data-flaticon="unlock"></i></div>
       <div class="section-title">Открытие и закрытие</div>
     </div>
     <div class="card">
@@ -55,7 +55,7 @@ f.<span class="tk-bi">close</span>() <span class="tk-cm"># Обязательн�
 <!-- SECTION 2 -->
 <div class="section">
     <div class="section-header">
-      <div class="section-icon orange">✍️</div>
+      <div class="section-icon orange"><i class="pb-icon" data-flaticon="edit"></i></div>
       <div class="section-title">Запись в файл: write()</div>
     </div>
     <div class="card">
@@ -71,7 +71,7 @@ f.<span class="tk-bi">close</span>()</pre>
 <!-- SECTION 3 -->
 <div class="section">
     <div class="section-header">
-      <div class="section-icon green">📖</div>
+      <div class="section-icon green"><i class="pb-icon" data-flaticon="book-alt"></i></div>
       <div class="section-title">Чтение файла: read()</div>
     </div>
     <div class="card">
@@ -85,7 +85,7 @@ f.<span class="tk-bi">close</span>()</pre>
     </div>
 
     <div class="quiz-card">
-        <div style="font-weight:700; margin-bottom:12px;">🎯 Какой режим нужно выбрать, чтобы прочитать данные из файла?</div>
+        <div style="font-weight:700; margin-bottom:12px;"><i class="pb-icon" data-flaticon="target"></i> Какой режим нужно выбрать, чтобы прочитать данные из файла?</div>
         <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">"w"</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q1')">"r"</button>
@@ -99,7 +99,7 @@ f.<span class="tk-bi">close</span>()</pre>
 <!-- SECTION 4 -->
 <div class="section">
     <div class="section-header">
-      <div class="section-icon purple">🛡️</div>
+      <div class="section-icon purple"><i class="pb-icon" data-flaticon="shield-check"></i></div>
       <div class="section-title">Дозапись ("a") и конструкция with open()</div>
     </div>
     <div class="card highlight-purple">
@@ -118,7 +118,7 @@ f.<span class="tk-bi">close</span>()</pre>
     <span class="tk-bi">print</span>(<span class="tk-str">"Всего строк:"</span>, <span class="tk-bi">len</span>(lines))</pre>
     </div>
     <button class="try-card" onclick="loadLessonExample()">
-      <span class="try-icon">▶️</span>
+      <span class="try-icon"><i class="pb-icon" data-flaticon="play"></i></span>
       <div>
         <div class="try-text-title">Попробуй работу с файлами прямо в браузере!</div>
         <div class="try-text-sub">Встроенная виртуальная файловая система сохраняет твои .txt файлы →</div>
@@ -128,7 +128,7 @@ f.<span class="tk-bi">close</span>()</pre>
 </div>
 
 <div class="quiz-card" style="margin-bottom:28px">
-      <div class="quiz-q">🎯 В чём главное преимущество конструкции with open(...) as f:?</div>
+      <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> В чём главное преимущество конструкции with open(...) as f:?</div>
       <div class="quiz-opts">
         <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">Она удаляет файл после чтения</button>
         <button class="quiz-opt" onclick="quiz(this,'correct','q2')">Python сам автоматически закрывает файл после работы</button>
@@ -139,7 +139,7 @@ f.<span class="tk-bi">close</span>()</pre>
 <!-- SECTION: FILES PRACTICE -->
       <div class="section" id="files-practice">
         <div class="section-header">
-          <div class="section-icon orange">📂</div>
+          <div class="section-icon orange"><i class="pb-icon" data-flaticon="folder"></i></div>
           <div class="section-meta">
             <div class="section-tag">Файлы</div>
             <div class="section-title">Задания: хранение данных</div>
@@ -245,7 +245,7 @@ f.<span class="tk-bi">close</span>()</pre>
             <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
           </div>
         </div>
-        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()">▶ Запустить</button>
+        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()"><i class="pb-icon" data-flaticon="play"></i> Запустить</button>
       </div>
     </div>
     <div class="compiler-wrap">
@@ -267,7 +267,7 @@ print("Hello, World!")
           <span class="output-status" id="outputStatus"></span>
         </div>
         <div class="output-body" id="output">
-          <span class="out-hint">Нажми ▶ Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
+          <span class="out-hint">Нажми <i class="pb-icon" data-flaticon="play"></i> Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
         </div>
       </div>
     </div>
@@ -277,6 +277,6 @@ print("Hello, World!")
 
 <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
 <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
-<script src="../скрипты/python-basics.js?v=2026-11-07-v1"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-07-v2"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
   <title>3. Переменные</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%234F46E5' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v1">
+  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v2">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
   <script src="../скрипты/analytics.js" defer></script>
 </head>
@@ -27,7 +27,7 @@
   <div class="left-panel" id="leftPanel">
     <div class="lesson-content">
       <div class="lesson-hero">
-        <div class="snake-mascot">📦</div>
+        <div class="snake-mascot"><i class="pb-icon" data-flaticon="layers"></i></div>
         <div class="lesson-num">Модуль 1</div>
         <h1 class="lesson-title"><span>Переменные</span></h1>
         <p class="lesson-desc">Как программа запоминает данные и где она их хранит. Разберемся, как создавать «коробочки» для информации и правильно их подписывать.</p>
@@ -37,7 +37,7 @@
       <!-- SECTION 1 -->
       <div class="section" id="s1">
         <div class="section-header">
-          <div class="section-icon blue">📦</div>
+          <div class="section-icon blue"><i class="pb-icon" data-flaticon="layers"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 1</div>
             <div class="section-title">Что такое переменная</div>
@@ -71,7 +71,7 @@ age = <span class="cn">25</span>
         </div>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Какую роль выполняет переменная в программировании?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Какую роль выполняет переменная в программировании?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Выводит текст на экран</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q1')">Хранит данные в памяти</button>
@@ -86,7 +86,7 @@ age = <span class="cn">25</span>
       <!-- SECTION 2 -->
       <div class="section" id="s2">
         <div class="section-header">
-          <div class="section-icon orange">✍️</div>
+          <div class="section-icon orange"><i class="pb-icon" data-flaticon="edit"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 2</div>
             <div class="section-title">Правила именования переменных</div>
@@ -120,11 +120,11 @@ age = <span class="cn">25</span>
 
         <div class="compare-grid">
           <div class="compare-item">
-            <div class="compare-item-title">✅ Правильно</div>
+            <div class="compare-item-title"><i class="pb-icon" data-flaticon="check"></i> Правильно</div>
             <p>user_name = "Alice"<br>score1 = 100<br>_top_secret = 42</p>
           </div>
           <div class="compare-item">
-            <div class="compare-item-title">❌ Ошибка</div>
+            <div class="compare-item-title"><i class="pb-icon" data-flaticon="cross"></i> Ошибка</div>
             <p>1_place = "Gold"<br>user-name = "Bob"<br>my age = 20</p>
           </div>
         </div>
@@ -134,7 +134,7 @@ age = <span class="cn">25</span>
         </div>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Какое имя переменной вызовет ошибку?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Какое имя переменной вызовет ошибку?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">player_1</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q2')">1_player</button>
@@ -149,7 +149,7 @@ age = <span class="cn">25</span>
       <!-- SECTION 3 -->
       <div class="section" id="s3">
         <div class="section-header">
-          <div class="section-icon green">➡</div>
+          <div class="section-icon green"><i class="pb-icon" data-flaticon="arrow-right"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 3</div>
             <div class="section-title">Присваивание значений</div>
@@ -176,7 +176,7 @@ total = x <span class="ck">+</span> y
         </div>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Что будет лежать в переменной x после кода: x = 10 + 5 * 2?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что будет лежать в переменной x после кода: x = 10 + 5 * 2?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">30</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q3')">20</button>
@@ -191,7 +191,7 @@ total = x <span class="ck">+</span> y
       <!-- SECTION 4 -->
       <div class="section" id="s4">
         <div class="section-header">
-          <div class="section-icon purple">🔄</div>
+          <div class="section-icon purple"><i class="pb-icon" data-flaticon="refresh"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 4</div>
             <div class="section-title">Изменение значения переменной</div>
@@ -226,7 +226,7 @@ score = score <span class="ck">+</span> <span class="cn">5</span>
         </div>
 
         <button class="try-card" onclick="loadVariableExample()">
-          <span class="try-icon">▶️</span>
+          <span class="try-icon"><i class="pb-icon" data-flaticon="play"></i></span>
           <div>
             <div class="try-text-title">Попробуй изменить переменную!</div>
             <div class="try-text-sub">Загрузить пример в компилятор →</div>
@@ -235,7 +235,7 @@ score = score <span class="ck">+</span> <span class="cn">5</span>
         </button>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Что выведет код: x = 1; x = x + 1; print(x)?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что выведет код: x = 1; x = x + 1; print(x)?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q4')">1</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q4')">2</button>
@@ -250,7 +250,7 @@ score = score <span class="ck">+</span> <span class="cn">5</span>
     <!-- SECTION: VARIABLES PRACTICE -->
       <div class="section" id="variables-practice">
         <div class="section-header">
-          <div class="section-icon purple">📦</div>
+          <div class="section-icon purple"><i class="pb-icon" data-flaticon="layers"></i></div>
           <div class="section-meta">
             <div class="section-tag">Переменные</div>
             <div class="section-title">Задания: работа с данными</div>
@@ -356,7 +356,7 @@ score = score <span class="ck">+</span> <span class="cn">5</span>
             <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
           </div>
         </div>
-        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()">▶ Запустить</button>
+        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()"><i class="pb-icon" data-flaticon="play"></i> Запустить</button>
       </div>
     </div>
     <div class="compiler-wrap">
@@ -378,7 +378,7 @@ print("Hello, World!")
           <span class="output-status" id="outputStatus"></span>
         </div>
         <div class="output-body" id="output">
-          <span class="out-hint">Нажми ▶ Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
+          <span class="out-hint">Нажми <i class="pb-icon" data-flaticon="play"></i> Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
         </div>
       </div>
     </div>
@@ -388,6 +388,6 @@ print("Hello, World!")
 
 <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
 <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
-<script src="../скрипты/python-basics.js?v=2026-11-07-v1"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-07-v2"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
   <title>4. Типы данных</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%234F46E5' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v1">
+  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v2">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
   <script src="../скрипты/analytics.js" defer></script>
 </head>
@@ -27,7 +27,7 @@
   <div class="left-panel" id="leftPanel">
     <div class="lesson-content">
       <div class="lesson-hero">
-        <div class="snake-mascot">🧊</div>
+        <div class="snake-mascot"><i class="pb-icon" data-flaticon="layers"></i></div>
         <div class="lesson-num">Модуль 1</div>
         <h1 class="lesson-title">4. <span>Типы данных</span></h1>
         <p class="lesson-desc">В Python всё имеет свой тип. Разберемся, чем отличаются целые числа от дробных, как работать со строками и что такое логические значения.</p>
@@ -44,7 +44,7 @@
       <!-- SECTION 1 -->
       <div class="section" id="s1">
         <div class="section-header">
-          <div class="section-icon blue">🔢</div>
+          <div class="section-icon blue"><i class="pb-icon" data-flaticon="binary"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 1</div>
             <div class="section-title">Числовые типы (int, float)</div>
@@ -70,7 +70,7 @@ x = <span class="cn">5.0</span>          <span class="cc"># это float</span><
         </div>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Какого типа будет значение 15.0?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Какого типа будет значение 15.0?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">int</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q1')">float</button>
@@ -85,7 +85,7 @@ x = <span class="cn">5.0</span>          <span class="cc"># это float</span><
       <!-- SECTION 2 -->
       <div class="section" id="s2">
         <div class="section-header">
-          <div class="section-icon orange">🔤</div>
+          <div class="section-icon orange"><i class="pb-icon" data-flaticon="text"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 2</div>
             <div class="section-title">Строковый тип (str)</div>
@@ -114,7 +114,7 @@ x = <span class="cs">"42"</span>         <span class="cc"># Это текст, �
         </div>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Что выведет код: print("5" + "5")?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что выведет код: print("5" + "5")?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">10</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q2')">55</button>
@@ -129,7 +129,7 @@ x = <span class="cs">"42"</span>         <span class="cc"># Это текст, �
       <!-- SECTION 3 -->
       <div class="section" id="s3">
         <div class="section-header">
-          <div class="section-icon green">⚖️</div>
+          <div class="section-icon green"><i class="pb-icon" data-flaticon="scale"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 3</div>
             <div class="section-title">Логический тип (bool)</div>
@@ -157,7 +157,7 @@ is_finished = <span class="cn">False</span>
         </div>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Как правильно пишутся логические значения в Python?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Как правильно пишутся логические значения в Python?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q3')">true и false (с маленькой буквы)</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q3')">True и False (с большой буквы)</button>
@@ -172,7 +172,7 @@ is_finished = <span class="cn">False</span>
       <!-- SECTION 4 -->
       <div class="section" id="s4">
         <div class="section-header">
-          <div class="section-icon purple">🔍</div>
+          <div class="section-icon purple"><i class="pb-icon" data-flaticon="search"></i></div>
           <div class="section-meta">
             <div class="section-tag">Тема 4</div>
             <div class="section-title">Определение типа: функция type()</div>
@@ -195,7 +195,7 @@ is_finished = <span class="cn">False</span>
         </div>
 
         <button class="try-card" onclick="loadTypeExample()">
-          <span class="try-icon">▶️</span>
+          <span class="try-icon"><i class="pb-icon" data-flaticon="play"></i></span>
           <div>
             <div class="try-text-title">Попробуй type()!</div>
             <div class="try-text-sub">Загрузить проверку типов в компилятор →</div>
@@ -204,7 +204,7 @@ is_finished = <span class="cn">False</span>
         </button>
 
         <div class="quiz-card">
-          <div class="quiz-q">🎯 Что вернет type("True")?</div>
+          <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что вернет type("True")?</div>
           <div class="quiz-opts">
             <button class="quiz-opt" onclick="quiz(this,'wrong','q4')">bool</button>
             <button class="quiz-opt" onclick="quiz(this,'correct','q4')">str</button>
@@ -219,7 +219,7 @@ is_finished = <span class="cn">False</span>
      <!-- SECTION: DATA TYPES PRACTICE -->
       <div class="section" id="data-types-practice">
         <div class="section-header">
-          <div class="section-icon green">📊</div>
+          <div class="section-icon green"><i class="pb-icon" data-flaticon="chart-histogram"></i></div>
           <div class="section-meta">
             <div class="section-tag">Типы данных</div>
             <div class="section-title">Задания: изучаем типы</div>
@@ -324,7 +324,7 @@ is_finished = <span class="cn">False</span>
             <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
           </div>
         </div>
-        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()">▶ Запустить</button>
+        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()"><i class="pb-icon" data-flaticon="play"></i> Запустить</button>
       </div>
     </div>
     <div class="compiler-wrap">
@@ -346,7 +346,7 @@ print("Hello, World!")
           <span class="output-status" id="outputStatus"></span>
         </div>
         <div class="output-body" id="output">
-          <span class="out-hint">Нажми ▶ Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
+          <span class="out-hint">Нажми <i class="pb-icon" data-flaticon="play"></i> Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
         </div>
       </div>
     </div>
@@ -356,6 +356,6 @@ print("Hello, World!")
 
 <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
 <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
-<script src="../скрипты/python-basics.js?v=2026-11-07-v1"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-07-v2"></script>
 </body>
 </html>

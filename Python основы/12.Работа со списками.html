@@ -7,7 +7,7 @@
   <title>12.Работа со списками</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 25c-12-8-25-9-39-5v52c14-4 27-3 39 6m0-53c12-8 25-9 39-5v52c-14-4-27-3-39 6m0-53v53' fill='none' stroke='%234F46E5' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v1">
+  <link rel="stylesheet" href="../стили/python-basics.css?v=2026-11-07-v2">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
   <script src="../скрипты/analytics.js" defer></script>
 </head>
@@ -27,7 +27,7 @@
   <div class="left-panel" id="leftPanel">
     <div class="lesson-content">
       <div class="lesson-hero">
-<div class="snake-mascot">📋</div>
+<div class="snake-mascot"><i class="pb-icon" data-flaticon="list-check"></i></div>
 <div class="lesson-num">Модуль 1</div>
 <h1 class="lesson-title">Работа со <span>списками</span></h1>
 <p class="lesson-desc">Списки редко остаются неизменными. Мы постоянно добавляем в них новые задачи, вычеркиваем выполненные и ищем среди них самые важные. Сегодня научимся управлять содержимым «полок» нашего стеллажа.</p>
@@ -36,7 +36,7 @@
 <!-- SECTION 1 -->
   <div class="section" id="s1">
     <div class="section-header">
-      <div class="section-icon blue">➕</div>
+      <div class="section-icon blue"><i class="pb-icon" data-flaticon="plus"></i></div>
       <div class="section-meta">
         <div class="section-title">Добавление: append()</div>
       </div>
@@ -57,7 +57,7 @@ inventory.append(<span class="cs">"зелье"</span>)
   <!-- SECTION 2 -->
   <div class="section" id="s2">
     <div class="section-header">
-      <div class="section-icon red">❌</div>
+      <div class="section-icon red"><i class="pb-icon" data-flaticon="cross"></i></div>
       <div class="section-meta">
         <div class="section-title">Удаление: remove и pop</div>
       </div>
@@ -80,7 +80,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
   <!-- SECTION 3 -->
   <div class="section" id="s3">
     <div class="section-header">
-      <div class="section-icon green">🔄</div>
+      <div class="section-icon green"><i class="pb-icon" data-flaticon="refresh"></i></div>
       <div class="section-meta">
         <div class="section-title">Перебор списка циклом</div>
       </div>
@@ -100,7 +100,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
   <!-- SECTION 4 -->
   <div class="section" id="s4">
     <div class="section-header">
-      <div class="section-icon orange">📊</div>
+      <div class="section-icon orange"><i class="pb-icon" data-flaticon="chart-histogram"></i></div>
       <div class="section-meta">
         <div class="section-title">Максимум и минимум</div>
       </div>
@@ -114,7 +114,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
 <span class="cf">print</span>(<span class="bi">min</span>(scores)) <span class="cc"># 12</span></pre>
 </div>
 <div class="quiz-card">
-<div class="quiz-q">🎯 Что сделает команда list.append("Apple")?</div>
+<div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Что сделает команда list.append("Apple")?</div>
 <div class="quiz-opts">
 <button class="quiz-opt" onclick="quiz(this,'wrong','q1')">Заменит первый элемент на Apple</button>
 <button class="quiz-opt" onclick="quiz(this,'correct','q1')">Добавит Apple в конец списка</button>
@@ -135,7 +135,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
       <p>• <span class="ic">sum(список)</span> — считает сумму всех чисел в списке.</p>
     </div>
     <div class="quiz-card" style="margin-bottom:16px">
-      <div class="quiz-q">🎯 Какая функция найдёт самое большое число в списке scores?</div>
+      <div class="quiz-q"><i class="pb-icon" data-flaticon="target"></i> Какая функция найдёт самое большое число в списке scores?</div>
       <div class="quiz-opts">
         <button class="quiz-opt" onclick="quiz(this,'correct','q2')">max(scores)</button>
         <button class="quiz-opt" onclick="quiz(this,'wrong','q2')">scores.max()</button>
@@ -144,7 +144,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
       <div class="quiz-feedback" id="q2-feedback"></div>
     </div>
     <button class="try-card" onclick="loadLessonExample()">
-      <span class="try-icon">▶️</span>
+      <span class="try-icon"><i class="pb-icon" data-flaticon="play"></i></span>
       <div>
         <div class="try-text-title">Попробуй методы списков!</div>
         <div class="try-text-sub">Загрузить живой пример в компилятор →</div>
@@ -155,7 +155,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
 <!-- SECTION: LIST METHODS PRACTICE -->
       <div class="section" id="list-methods-practice">
         <div class="section-header">
-          <div class="section-icon orange">🛠️</div>
+          <div class="section-icon orange"><i class="pb-icon" data-flaticon="settings-sliders"></i></div>
           <div class="section-meta">
             <div class="section-tag">Методы списков</div>
             <div class="section-title">Задания: манипуляция данными</div>
@@ -260,7 +260,7 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
             <button class="font-size-opt" onclick="setFontSize(20)">Аа 20px — очень большой</button>
           </div>
         </div>
-        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()">▶ Запустить</button>
+        <button class="rh-btn run-btn" id="runStopBtn" onclick="toggleRunStop()"><i class="pb-icon" data-flaticon="play"></i> Запустить</button>
       </div>
     </div>
     <div class="compiler-wrap">
@@ -282,7 +282,7 @@ print("Hello, World!")
           <span class="output-status" id="outputStatus"></span>
         </div>
         <div class="output-body" id="output">
-          <span class="out-hint">Нажми ▶ Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
+          <span class="out-hint">Нажми <i class="pb-icon" data-flaticon="play"></i> Запустить (или Ctrl+Enter), чтобы увидеть результат</span>
         </div>
       </div>
     </div>
@@ -292,6 +292,6 @@ print("Hello, World!")
 
 <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
 <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
-<script src="../скрипты/python-basics.js?v=2026-11-07-v1"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-07-v2"></script>
 </body>
 </html>

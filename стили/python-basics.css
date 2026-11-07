@@ -2,6 +2,179 @@
    Python Основы — Неоморфный дизайн интерактивного учебника и компилятора
    ========================================================================== */
 
+@font-face {
+  font-family: "LessonFlaticonOutline";
+  src: url("./vendor/flaticon/uicons-regular-rounded.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+.pb-icon,
+[data-flaticon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: -0.12em;
+  flex-shrink: 0;
+  font-style: normal;
+}
+
+[data-flaticon]::before {
+  display: inline-block;
+  font-family: "LessonFlaticonOutline" !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-size: 1em !important;
+  line-height: 1;
+  text-transform: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+[data-flaticon="arrow-comparison"]::before { content: "\f187"; }
+[data-flaticon="arrow-left"]::before { content: "\f197"; }
+[data-flaticon="arrow-right"]::before { content: "\f19b"; }
+[data-flaticon="arrow-small-left"]::before { content: "\f19d"; }
+[data-flaticon="arrow-small-right"]::before { content: "\f19e"; }
+[data-flaticon="arrow-up-right-from-square"]::before { content: "\f1b3"; }
+[data-flaticon="binary"]::before { content: "\f24e"; }
+[data-flaticon="bolt"]::before { content: "\f26c"; }
+[data-flaticon="book-alt"]::before { content: "\f274"; }
+[data-flaticon="brain"]::before { content: "\f2de"; }
+[data-flaticon="bulb"]::before { content: "\f304"; }
+[data-flaticon="calculator"]::before { content: "\f31f"; }
+[data-flaticon="camera"]::before { content: "\f348"; }
+[data-flaticon="chart-histogram"]::before { content: "\f3a2"; }
+[data-flaticon="chart-line-up"]::before { content: "\f3a5"; }
+[data-flaticon="check"]::before { content: "\f3c8"; }
+[data-flaticon="cloud"]::before { content: "\f479"; }
+[data-flaticon="cloud-sun"]::before { content: "\f476"; }
+[data-flaticon="comment-alt"]::before { content: "\f4a1"; }
+[data-flaticon="comments"]::before { content: "\f4bc"; }
+[data-flaticon="computer"]::before { content: "\f4cc"; }
+[data-flaticon="credit-card"]::before { content: "\f4ee"; }
+[data-flaticon="cross"]::before { content: "\f4f7"; }
+[data-flaticon="database"]::before { content: "\f525"; }
+[data-flaticon="download"]::before { content: "\f591"; }
+[data-flaticon="edit"]::before { content: "\f5c1"; }
+[data-flaticon="eye"]::before { content: "\f5f8"; }
+[data-flaticon="flag"]::before { content: "\f695"; }
+[data-flaticon="flask"]::before { content: "\f69b"; }
+[data-flaticon="folder"]::before { content: "\f6ba"; }
+[data-flaticon="gamepad"]::before { content: "\f6df"; }
+[data-flaticon="globe"]::before { content: "\f705"; }
+[data-flaticon="graduation-cap"]::before { content: "\f70f"; }
+[data-flaticon="heart"]::before { content: "\f7a0"; }
+[data-flaticon="home"]::before { content: "\f7b8"; }
+[data-flaticon="interrogation"]::before { content: "\f81e"; }
+[data-flaticon="language"]::before { content: "\f868"; }
+[data-flaticon="layers"]::before { content: "\f87c"; }
+[data-flaticon="link"]::before { content: "\f8ba"; }
+[data-flaticon="list"]::before { content: "\f8c4"; }
+[data-flaticon="list-check"]::before { content: "\f8c0"; }
+[data-flaticon="loading"]::before { content: "\f8c8"; }
+[data-flaticon="lock"]::before { content: "\f8d5"; }
+[data-flaticon="magic-wand"]::before { content: "\f8e1"; }
+[data-flaticon="memory"]::before { content: "\f924"; }
+[data-flaticon="microchip"]::before { content: "\f941"; }
+[data-flaticon="microphone"]::before { content: "\f944"; }
+[data-flaticon="mobile-notch"]::before { content: "\f952"; }
+[data-flaticon="network"]::before { content: "\f9a1"; }
+[data-flaticon="paint-brush"]::before { content: "\f9ea"; }
+[data-flaticon="pen-clip"]::before { content: "\fa1d"; }
+[data-flaticon="pen-nib"]::before { content: "\fa22"; }
+[data-flaticon="pencil"]::before { content: "\fa29"; }
+[data-flaticon="picture"]::before { content: "\fa78"; }
+[data-flaticon="play"]::before { content: "\fa9e"; }
+[data-flaticon="plus"]::before { content: "\faac"; }
+[data-flaticon="presentation"]::before { content: "\fad1"; }
+[data-flaticon="print"]::before { content: "\fad6"; }
+[data-flaticon="puzzle"]::before { content: "\faec"; }
+[data-flaticon="refresh"]::before { content: "\fb34"; }
+[data-flaticon="robot"]::before { content: "\fb61"; }
+[data-flaticon="satellite-dish"]::before { content: "\fb8e"; }
+[data-flaticon="scale"]::before { content: "\fb97"; }
+[data-flaticon="school"]::before { content: "\fba1"; }
+[data-flaticon="search"]::before { content: "\fbba"; }
+[data-flaticon="settings-sliders"]::before { content: "\fbd1"; }
+[data-flaticon="shield-check"]::before { content: "\fbdb"; }
+[data-flaticon="sign-out-alt"]::before { content: "\fc0c"; }
+[data-flaticon="sitemap"]::before { content: "\fc24"; }
+[data-flaticon="smile"]::before { content: "\fc48"; }
+[data-flaticon="snowflake"]::before { content: "\fc54"; }
+[data-flaticon="star"]::before { content: "\fce9"; }
+[data-flaticon="stethoscope"]::before { content: "\fcf4"; }
+[data-flaticon="tachometer-fast"]::before { content: "\fd4b"; }
+[data-flaticon="tags"]::before { content: "\fd51"; }
+[data-flaticon="target"]::before { content: "\fd5f"; }
+[data-flaticon="text"]::before { content: "\fd85"; }
+[data-flaticon="time-fast"]::before { content: "\fda4"; }
+[data-flaticon="time-past"]::before { content: "\fdaa"; }
+[data-flaticon="triangle-warning"]::before { content: "\fe33"; }
+[data-flaticon="trophy"]::before { content: "\fe39"; }
+[data-flaticon="unlock"]::before { content: "\fe6f"; }
+[data-flaticon="upload"]::before { content: "\fe75"; }
+[data-flaticon="user"]::before { content: "\fea0"; }
+[data-flaticon="user-check"]::before { content: "\fe7d"; }
+[data-flaticon="user-gear"]::before { content: "\fe82"; }
+[data-flaticon="user-shield"]::before { content: "\fe97"; }
+[data-flaticon="users"]::before { content: "\fea6"; }
+[data-flaticon="users-alt"]::before { content: "\fea1"; }
+[data-flaticon="volume"]::before { content: "\fed0"; }
+[data-flaticon="wifi"]::before { content: "\ff08"; }
+
+.snake-mascot .pb-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  color: var(--accent);
+  font-size: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-icon.blue   { background: linear-gradient(135deg, #3d7fff20, #e7ebf3); color: var(--accent); }
+.section-icon.orange { background: linear-gradient(135deg, #ff6b3520, #e7ebf3); color: var(--accent2); }
+.section-icon.green  { background: linear-gradient(135deg, #22c55e20, #e7ebf3); color: var(--accent3); }
+.section-icon.red    { background: linear-gradient(135deg, #ef444420, #e7ebf3); color: #ef4444; }
+.section-icon.purple { background: linear-gradient(135deg, #8b5cf622, #e7ebf3); color: var(--purple); }
+.section-icon.yellow { background: linear-gradient(135deg, #f59e0b22, #e7ebf3); color: var(--yellow); }
+
+.tool-icon .pb-icon {
+  color: var(--accent);
+  font-size: 22px;
+}
+
+.quiz-q .pb-icon {
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+.try-icon .pb-icon {
+  font-size: 28px;
+  color: white;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.status-dot.red { background: #ef4444; }
+.status-dot.yellow { background: #eab308; }
+.status-dot.orange { background: #f97316; }
+.status-dot.blue { background: #3b82f6; }
+.status-dot.green { background: #10b981; }
+
 :root {
   --bg: #e7ebf3;
   --surface: #e7ebf3;
@@ -1458,3 +1631,4 @@ body {
 .output-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 .editor-input::-webkit-scrollbar { width: 6px; height: 6px; }
 .editor-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
