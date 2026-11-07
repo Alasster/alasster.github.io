@@ -1537,9 +1537,7 @@ body { display: block !important; }
     height: auto;
     min-height: 0;
   }
-}
 
-@media (max-width: 640px) {
   .nav-links-menu.is-open {
     left: auto;
     right: 0;
@@ -1562,7 +1560,9 @@ body { display: block !important; }
     justify-content: center;
     border-radius: 10px;
   }
+}
 
+@media (max-width: 640px) {
   .neu-auth-btn {
     width: 53px;
     height: 53px;
