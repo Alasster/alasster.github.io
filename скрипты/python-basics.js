@@ -525,12 +525,15 @@ function initCompilerPanel() {
   // Add Reset & Clear buttons to .rh-actions if not already present
   const actions = document.querySelector(".rh-actions");
   const runBtn = document.getElementById("runStopBtn");
+  if (runBtn) {
+    runBtn.innerHTML = '<i class="pb-icon" data-flaticon="play"></i> <span class="rh-btn-text">Запустить</span>';
+  }
   if (actions && runBtn && !document.getElementById("resetCodeBtn")) {
     const resetBtn = document.createElement("button");
     resetBtn.className = "rh-btn";
     resetBtn.id = "resetCodeBtn";
     resetBtn.title = "Вернуть стартовый код урока";
-    resetBtn.innerHTML = '<i class="pb-icon" data-flaticon="refresh"></i> Шаблон';
+    resetBtn.innerHTML = '<i class="pb-icon" data-flaticon="refresh"></i> <span class="rh-btn-text">Шаблон</span>';
     resetBtn.onclick = resetStarterCode;
 
     const clearBtn = document.createElement("button");
@@ -1110,10 +1113,10 @@ function setRunningUI(running) {
   const btn = document.getElementById("runStopBtn");
   if (!btn) return;
   if (running) {
-    btn.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> Остановить';
+    btn.innerHTML = '<i class="pb-icon" data-flaticon="cross"></i> <span class="rh-btn-text">Остановить</span>';
     btn.className = "rh-btn stop-btn";
   } else {
-    btn.innerHTML = '<i class="pb-icon" data-flaticon="play"></i> Запустить';
+    btn.innerHTML = '<i class="pb-icon" data-flaticon="play"></i> <span class="rh-btn-text">Запустить</span>';
     btn.className = "rh-btn run-btn";
   }
 }
