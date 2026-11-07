@@ -40,6 +40,254 @@
     <text class="q2-scene-caption" x="270" y="215" text-anchor="middle">нет базы → бесконечная рекурсия; нет шага → задача не уменьшается</text>
   </svg>`;
 
+  const BASE_STEP_SVG = `<svg viewBox="0 0 600 250" role="img" aria-label="Схема: База и рекурсивный шаг">
+    <defs>
+      <linearGradient id="g-base" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ecfdf5"/>
+        <stop offset="100%" stop-color="#d1fae5"/>
+      </linearGradient>
+      <linearGradient id="g-step" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#eff6ff"/>
+        <stop offset="100%" stop-color="#dbeafe"/>
+      </linearGradient>
+      <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+      </marker>
+      <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+      </marker>
+    </defs>
+    <!-- Base Card -->
+    <rect x="30" y="40" width="250" height="150" rx="14" fill="url(#g-base)" stroke="#10b981" stroke-width="2"/>
+    <text x="155" y="70" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#065f46" text-anchor="middle">1. База рекурсии (Стоп-кран)</text>
+    <rect x="50" y="85" width="210" height="38" rx="8" fill="#ffffff" stroke="#a7f3d0"/>
+    <text x="155" y="109" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600" fill="#047857" text-anchor="middle">if n &lt;= 1: return 1</text>
+    <text x="155" y="145" font-family="system-ui, sans-serif" font-size="12" fill="#065f46" text-anchor="middle">Простейший известный случай</text>
+    <text x="155" y="165" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#059669" text-anchor="middle">Возврат БЕЗ новых вызовов</text>
+
+    <!-- Step Card -->
+    <rect x="320" y="40" width="250" height="150" rx="14" fill="url(#g-step)" stroke="#2563eb" stroke-width="2"/>
+    <text x="445" y="70" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#1e40af" text-anchor="middle">2. Рекурсивный шаг</text>
+    <rect x="340" y="85" width="210" height="38" rx="8" fill="#ffffff" stroke="#bfdbfe"/>
+    <text x="445" y="109" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">return n * f(n - 1)</text>
+    <text x="445" y="145" font-family="system-ui, sans-serif" font-size="12" fill="#1e3a8a" text-anchor="middle">Уменьшение задачи на 1</text>
+    <text x="445" y="165" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#2563eb" text-anchor="middle">Движение В СТОРОНУ базы</text>
+
+    <!-- Flow Arrows -->
+    <path d="M 320 115 C 295 115, 295 115, 288 115" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <text x="300" y="225" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="middle">Без базы → переполнение стека | Без шага → задача не уменьшается</text>
+  </svg>`;
+
+  const STACK_ANIM_SVG = `<svg viewBox="0 0 600 270" role="img" aria-label="Стек вызовов LIFO">
+    <defs>
+      <style>
+        @keyframes stack-pulse {
+          0%, 100% { transform: translateY(0); opacity: 0.9; }
+          50% { transform: translateY(-3px); opacity: 1; }
+        }
+        .stk-box { animation: stack-pulse 3s ease-in-out infinite; }
+      </style>
+      <marker id="stk-down" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+      </marker>
+      <marker id="stk-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+      </marker>
+    </defs>
+    <!-- Stack container -->
+    <rect x="180" y="25" width="240" height="200" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="300" y="18" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#64748b" text-anchor="middle">ОПЕРАТИВНАЯ ПАМЯТЬ · СТЕК ВЫЗОВОВ (LIFO)</text>
+
+    <!-- Stack Frames from top to bottom -->
+    <g class="stk-box">
+      <rect x="195" y="40" width="210" height="34" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="300" y="62" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" fill="#1d4ed8" text-anchor="middle">factorial(3) [ждет n=2]</text>
+    </g>
+    <g class="stk-box" style="animation-delay: 0.2s;">
+      <rect x="195" y="82" width="210" height="34" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="300" y="104" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" fill="#1e40af" text-anchor="middle">factorial(2) [ждет n=1]</text>
+    </g>
+    <g class="stk-box" style="animation-delay: 0.4s;">
+      <rect x="195" y="124" width="210" height="34" rx="8" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="1.5"/>
+      <text x="300" y="146" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" fill="#1e3a8a" text-anchor="middle">factorial(1) [ждет n=0]</text>
+    </g>
+    <g class="stk-box" style="animation-delay: 0.6s;">
+      <rect x="195" y="166" width="210" height="38" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+      <text x="300" y="184" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#065f46" text-anchor="middle">factorial(0) = 1 (БАЗА)</text>
+      <text x="300" y="198" font-family="system-ui, sans-serif" font-size="10" fill="#047857" text-anchor="middle">Стоп! Начало возврата вверх</text>
+    </g>
+
+    <!-- Left Arrow: Push -->
+    <path d="M 140 45 L 140 185" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#stk-down)"/>
+    <text x="130" y="115" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#2563eb" text-anchor="end">1. Погружение</text>
+    <text x="130" y="130" font-family="system-ui, sans-serif" font-size="10" fill="#64748b" text-anchor="end">(вызовы вниз)</text>
+
+    <!-- Right Arrow: Pop / Return -->
+    <path d="M 460 185 L 460 45" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#stk-up)"/>
+    <text x="470" y="115" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#059669" text-anchor="start">2. Возврат значений</text>
+    <text x="470" y="130" font-family="system-ui, sans-serif" font-size="10" fill="#059669" text-anchor="start">1 → 1 → 2 → 6</text>
+
+    <!-- Bottom summary -->
+    <text x="300" y="250" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">LIFO: Последний вызванный фрейм завершается первым</text>
+  </svg>`;
+
+  const FIB_TREE_SVG = `<svg viewBox="0 0 600 250" role="img" aria-label="Дерево вызовов Фибоначчи">
+    <defs>
+      <marker id="fib-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+    <!-- Root -->
+    <rect x="250" y="15" width="100" height="34" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <text x="300" y="37" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">fib(4)</text>
+
+    <!-- Level 1 lines -->
+    <line x1="275" y1="50" x2="175" y2="85" stroke="#64748b" stroke-width="1.5" marker-end="url(#fib-ar)"/>
+    <line x1="325" y1="50" x2="425" y2="85" stroke="#64748b" stroke-width="1.5" marker-end="url(#fib-ar)"/>
+
+    <!-- Level 1 nodes -->
+    <rect x="130" y="85" width="90" height="32" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="175" y="106" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" fill="#1d4ed8" text-anchor="middle">fib(3)</text>
+
+    <rect x="380" y="85" width="90" height="32" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="425" y="106" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" fill="#1d4ed8" text-anchor="middle">fib(2)</text>
+
+    <!-- Level 2 lines -->
+    <line x1="155" y1="118" x2="95" y2="155" stroke="#64748b" stroke-width="1.5" marker-end="url(#fib-ar)"/>
+    <line x1="195" y1="118" x2="255" y2="155" stroke="#64748b" stroke-width="1.5" marker-end="url(#fib-ar)"/>
+    <line x1="405" y1="118" x2="355" y2="155" stroke="#64748b" stroke-width="1.5" marker-end="url(#fib-ar)"/>
+    <line x1="445" y1="118" x2="505" y2="155" stroke="#64748b" stroke-width="1.5" marker-end="url(#fib-ar)"/>
+
+    <!-- Level 2 nodes (fib(2), leaves) -->
+    <rect x="55" y="155" width="80" height="30" rx="6" fill="#bfdbfe" stroke="#1d4ed8"/>
+    <text x="95" y="175" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#1e3a8a" text-anchor="middle">fib(2)</text>
+
+    <rect x="215" y="155" width="80" height="30" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+    <text x="255" y="175" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">fib(1)=1</text>
+
+    <rect x="315" y="155" width="80" height="30" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+    <text x="355" y="175" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">fib(1)=1</text>
+
+    <rect x="465" y="155" width="80" height="30" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+    <text x="505" y="175" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#065f46" text-anchor="middle">fib(0)=0</text>
+
+    <!-- Bottom leaves of fib(2) -->
+    <line x1="80" y1="186" x2="55" y2="210" stroke="#64748b" stroke-width="1.2"/>
+    <line x1="110" y1="186" x2="135" y2="210" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="15" y="210" width="75" height="24" rx="5" fill="#d1fae5" stroke="#10b981"/>
+    <text x="52" y="226" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#065f46" text-anchor="middle">fib(1)=1</text>
+    <rect x="100" y="210" width="75" height="24" rx="5" fill="#d1fae5" stroke="#10b981"/>
+    <text x="137" y="226" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#065f46" text-anchor="middle">fib(0)=0</text>
+
+    <!-- Caption -->
+    <text x="380" y="228" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#475569">Ветвящаяся рекурсия: O(2ⁿ) операций</text>
+  </svg>`;
+
+  const DIGIT_PARSE_SVG = `<svg viewBox="0 0 600 230" role="img" aria-label="Декомпозиция числа на цифры">
+    <defs>
+      <marker id="num-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+      </marker>
+    </defs>
+    <!-- Main Box: Number 482 -->
+    <rect x="220" y="20" width="160" height="50" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <text x="300" y="52" font-family="'JetBrains Mono', monospace" font-size="24" font-weight="700" fill="#1e40af" text-anchor="middle">N = 482</text>
+
+    <!-- Branch left: % 10 -->
+    <line x1="250" y1="72" x2="150" y2="120" stroke="#2563eb" stroke-width="2" marker-end="url(#num-ar)"/>
+    <rect x="60" y="125" width="170" height="60" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <text x="145" y="148" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">n % 10 (Остаток)</text>
+    <text x="145" y="172" font-family="'JetBrains Mono', monospace" font-size="18" font-weight="700" fill="#92400e" text-anchor="middle">цифра = 2</text>
+
+    <!-- Branch right: // 10 -->
+    <line x1="350" y1="72" x2="450" y2="120" stroke="#2563eb" stroke-width="2" marker-end="url(#num-ar)"/>
+    <rect x="370" y="125" width="170" height="60" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+    <text x="455" y="148" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#1e40af" text-anchor="middle">n // 10 (Шаг)</text>
+    <text x="455" y="172" font-family="'JetBrains Mono', monospace" font-size="18" font-weight="700" fill="#1e3a8a" text-anchor="middle">остаток = 48</text>
+
+    <!-- Formula -->
+    <text x="300" y="215" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">digit_sum(482) = 2 + digit_sum(48) → ... → 2 + 8 + 4 = 14</text>
+  </svg>`;
+
+  const STRING_REVERSE_SVG = `<svg viewBox="0 0 600 230" role="img" aria-label="Схема рекурсивной обработки строки">
+    <defs>
+      <marker id="str-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+      </marker>
+    </defs>
+    <!-- Original string "КОД" -->
+    <rect x="180" y="20" width="240" height="46" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="300" y="50" font-family="'JetBrains Mono', monospace" font-size="18" font-weight="700" fill="#5b21b6" text-anchor="middle">s = "КОД"</text>
+
+    <!-- Slicing: Head and Tail -->
+    <line x1="240" y1="68" x2="160" y2="110" stroke="#7c3aed" stroke-width="2" marker-end="url(#str-ar)"/>
+    <line x1="360" y1="68" x2="440" y2="110" stroke="#7c3aed" stroke-width="2" marker-end="url(#str-ar)"/>
+
+    <rect x="70" y="115" width="170" height="55" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="155" y="137" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#6d28d9" text-anchor="middle">Голова: s[0]</text>
+    <text x="155" y="158" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#4c1d95" text-anchor="middle">"К"</text>
+
+    <rect x="360" y="115" width="170" height="55" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="445" y="137" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#6d28d9" text-anchor="middle">Хвост: s[1:]</text>
+    <text x="445" y="158" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#4c1d95" text-anchor="middle">"ОД"</text>
+
+    <!-- Assembly -->
+    <rect x="130" y="185" width="340" height="34" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+    <text x="300" y="207" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#065f46" text-anchor="middle">reverse(s[1:]) + s[0] → "ДО" + "К" = "ДОК"</text>
+  </svg>`;
+
+  const COMPARE_SVG = `<svg viewBox="0 0 600 240" role="img" aria-label="Сравнение цикла и рекурсии">
+    <!-- Left: Loop -->
+    <rect x="30" y="25" width="250" height="190" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+    <text x="155" y="52" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#1e293b" text-anchor="middle">Итерация (Цикл for/while)</text>
+    <rect x="50" y="65" width="210" height="50" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="155" y="88" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="middle">res = 1</text>
+    <text x="155" y="105" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="middle">for i in range(1, n+1):</text>
+    <text x="155" y="142" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#059669" text-anchor="middle">Память: O(1) (константа)</text>
+    <text x="155" y="162" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Переменные перезаписываются</text>
+    <text x="155" y="182" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#059669" text-anchor="middle">✓ Нет риска RecursionError</text>
+
+    <!-- Right: Recursion -->
+    <rect x="320" y="25" width="250" height="190" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="445" y="52" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#1e40af" text-anchor="middle">Рекурсия (Стек вызовов)</text>
+    <rect x="340" y="65" width="210" height="50" rx="8" fill="#ffffff" stroke="#bfdbfe"/>
+    <text x="445" y="88" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="middle">if n == 1: return 1</text>
+    <text x="445" y="105" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="middle">return n * fact(n - 1)</text>
+    <text x="445" y="142" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#dc2626" text-anchor="middle">Память: O(N) (линейная)</text>
+    <text x="445" y="162" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">N фреймов хранятся в стеке</text>
+    <text x="445" y="182" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#2563eb" text-anchor="middle">✓ Идеально для деревьев и графов</text>
+  </svg>`;
+
+  const EXAM_SUMMARY_SVG = `<svg viewBox="0 0 600 230" role="img" aria-label="План решения рекуррентных задач СОР">
+    <!-- 4 Cards -->
+    <rect x="20" y="30" width="125" height="150" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="82" y="58" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#1e40af" text-anchor="middle">1. БАЗА</text>
+    <text x="82" y="90" font-family="system-ui, sans-serif" font-size="11" fill="#1e3a8a" text-anchor="middle">Найти F(1) или</text>
+    <text x="82" y="110" font-family="system-ui, sans-serif" font-size="11" fill="#1e3a8a" text-anchor="middle">F(0), где нет</text>
+    <text x="82" y="130" font-family="system-ui, sans-serif" font-size="11" fill="#1e3a8a" text-anchor="middle">новых вызовов</text>
+
+    <rect x="165" y="30" width="125" height="150" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="227" y="58" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#6d28d9" text-anchor="middle">2. УСЛОВИЯ</text>
+    <text x="227" y="90" font-family="system-ui, sans-serif" font-size="11" fill="#5b21b6" text-anchor="middle">Разделить n % 2</text>
+    <text x="227" y="110" font-family="system-ui, sans-serif" font-size="11" fill="#5b21b6" text-anchor="middle">на четные и</text>
+    <text x="227" y="130" font-family="system-ui, sans-serif" font-size="11" fill="#5b21b6" text-anchor="middle">нечетные ветки</text>
+
+    <rect x="310" y="30" width="125" height="150" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="372" y="58" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#b45309" text-anchor="middle">3. ТРАССИРОВКА</text>
+    <text x="372" y="90" font-family="system-ui, sans-serif" font-size="11" fill="#92400e" text-anchor="middle">Посчитать F(1),</text>
+    <text x="372" y="110" font-family="system-ui, sans-serif" font-size="11" fill="#92400e" text-anchor="middle">F(2), F(3)...</text>
+    <text x="372" y="130" font-family="system-ui, sans-serif" font-size="11" fill="#92400e" text-anchor="middle">последовательно</text>
+
+    <rect x="455" y="30" width="125" height="150" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+    <text x="517" y="58" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#065f46" text-anchor="middle">4. IDLE ТЕСТ</text>
+    <text x="517" y="90" font-family="system-ui, sans-serif" font-size="11" fill="#047857" text-anchor="middle">Запустить код</text>
+    <text x="517" y="110" font-family="system-ui, sans-serif" font-size="11" fill="#047857" text-anchor="middle">и сверить ручной</text>
+    <text x="517" y="130" font-family="system-ui, sans-serif" font-size="11" fill="#047857" text-anchor="middle">ответ с выводом</text>
+
+    <text x="300" y="210" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#334155" text-anchor="middle">Алгоритм гарантирует 10 из 10 баллов на суммативном оценивании</text>
+  </svg>`;
+
+
   const REC_SCREEN_SVG = `<svg viewBox="0 0 560 390" role="img" aria-label="Светлая анимированная трассировка countdown в окне Python IDLE">
     <style>
       @keyframes q2-rec-line-call {
@@ -447,46 +695,46 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 2',
+        title: '<span class="accent-text">Рекурсия</span> · База и шаг',
         lead: 'Любая корректная рекурсия состоит из базы и шага. База отвечает «когда остановиться», шаг — «как приблизиться к остановке».',
-        goal: 'Выделять базу и рекурсивный шаг в рекурсивной функции.',
+        goal: 'Научиться выделять базу и рекурсивный шаг в рекурсивной функции и защищать алгоритм от бесконечного зацикливания.',
         goalCode: '10.2.1.1',
         chips: [
           { icon: 'fas fa-stop', text: 'Условие остановки' },
           { icon: 'fas fa-arrow-down-short-wide', text: 'Уменьшение задачи' },
-          { icon: 'fas fa-bug', text: 'Ошибки рекурсии' }
+          { icon: 'fas fa-shield-halved', text: 'Защита от зацикливания' }
         ],
         visual: 'recursion',
-        visualCaption: 'База — дно, шаг — путь к нему',
+        visualCaption: 'База — основание алгоритма, шаг — спуск к нему',
         cta: 'Разобрать структуру'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Что такое рекурсия?', options: ['Повторение обычного цикла for', 'Вызов функцией самой себя', 'Случайная системная ошибка', 'Копирование блока кода в файл'], answer: 1, explain: 'Рекурсия — это процесс, когда функция вызывает саму себя для решения подзадачи.' },
-          { q: 'Зачем в рекурсивной функции обязательно нужна база (условие выхода)?', options: ['Чтобы остановить вызовы и избежать переполнения стека', 'Чтобы ускорить работу процессора', 'Чтобы сохранить результат в файл', 'Чтобы напечатать ответ на экране'], answer: 0, explain: 'База (стоп-кран) прерывает бесконечную цепочку вызовов, когда задача дошла до простейшего случая.' },
-          { q: 'Что произойдёт, если в рекурсивной функции не предусмотреть базу (условие остановки)?', options: ['Функция выполнится один раз и завершится', 'Программа автоматически оптимизирует код в цикл', 'Возникнет бесконечная рекурсия и ошибка RecursionError', 'Компьютер мгновенно перезагрузится'], answer: 2, explain: 'Стек вызовов будет бесконечно наполняться, пока не возникнет ошибка RecursionError: maximum recursion depth exceeded.' },
-          { q: 'Какая задача по своей структуре естественно решается с помощью рекурсии?', options: ['Сложение двух простых чисел', 'Вывод одной строки текста', 'Присваивание переменной нового значения', 'Обход вложенных папок и файлов (дерева каталогов)'], answer: 3, explain: 'Папка может содержать внутри такие же папки — эта иерархическая структура естественно обходится рекурсией.' },
-          { q: 'Для чего в теле функции Python используется ключевое слово return?', options: ['Для запуска выполнения функции заново', 'Для возврата результата в точку вызова и завершения функции', 'Для вывода текста в консоль вместо print()', 'Для объявления нового имени функции'], answer: 1, explain: 'Инструкция return не просто возвращает вычисленное значение, но и немедленно завершает работу функции.' }
+          { q: 'Что такое рекурсия в программировании?', options: ['Повторение обычного цикла for', 'Вызов функцией самой же себя', 'Случайная системная ошибка', 'Копирование блока кода в файл'], answer: 1, explain: 'Рекурсия — это алгоритмический прием, при котором функция вызывает саму себя для решения подзадачи.' },
+          { q: 'Зачем в рекурсивной функции обязательно нужна база (условие выхода)?', options: ['Чтобы остановить вызовы и избежать переполнения памяти', 'Чтобы ускорить работу процессора', 'Чтобы сохранить результат в файл', 'Чтобы напечатать ответ на экране'], answer: 0, explain: 'База (стоп-кран) прерывает цепочку вызовов, когда задача дошла до простейшего случая.' },
+          { q: 'Что произойдет, если в рекурсивной функции забыть про базовый случай?', options: ['Функция выполнится один раз и завершится', 'Программа автоматически создаст цикл', 'Возникнет бесконечная рекурсия и RecursionError', 'Компьютер перезагрузится'], answer: 2, explain: 'Стек вызовов будет бесконечно наполняться, пока не сработает системный лимит глубины.' },
+          { q: 'Какая инструкция Python передает вычисленный результат обратно в точку вызова?', options: ['input()', 'print()', 'return', 'break'], answer: 2, explain: 'Инструкция return отдает значение обратно и немедленно завершает выполнение функции.' },
+          { q: 'Что делает шаг countdown(n - 1) при каждом повторении?', options: ['Увеличивает аргумент на единицу', 'Уменьшает аргумент на 1, приближая к базе', 'Обнуляет переданный параметр', 'Печатает текст на экране'], answer: 1, explain: 'Шаг рекурсии уменьшает параметр n, направляя задачу к условию остановки.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · СТРУКТУРА',
-        title: 'База и шаг',
-        lead: 'База — это самый простой случай, ответ для которого известен без вычислений. Шаг — правило перехода к более простому случаю.',
+        eyebrow: '03 · ДВА КИТА РЕКУРСИИ',
+        title: 'База и шаг: две неразрывные части',
+        lead: 'Рекурсивная функция не может работать только на вызовах самой себя — ей необходима точка выхода с готовым известным ответом.',
         blocks: [
-          { t: 'svg', svg: BASE_SVG, caption: 'Две части рекурсивной функции' },
+          { t: 'svg', svg: BASE_STEP_SVG, caption: 'Архитектура рекурсивной функции: база и шаг' },
           {
             t: 'table',
-            caption: 'База и шаг в знакомых задачах',
-            head: ['Задача', 'База', 'Шаг'],
+            caption: 'Примеры базы и шага в типовых задачах',
+            head: ['Задача', 'Базовый случай (Стоп-кран)', 'Рекурсивный шаг'],
             rows: [
-              ['Факториал', '0! = 1', 'n! = n × (n − 1)!'],
-              ['Сумма 1…n', 'S(0) = 0', 'S(n) = n + S(n − 1)'],
-              ['Сумма цифр', 'digit_sum(0) = 0', 'n % 10 + digit_sum(n // 10)'],
-              ['Разворот строки', 'пустая строка', 'reverse(s[1:]) + s[0]']
+              ['Обратный отсчет countdown(n)', 'n <= 0 → печать "Старт!" и return', 'print(n) и вызов countdown(n - 1)'],
+              ['Сумма натуральных чисел sum(n)', 'n == 1 → return 1', 'return n + sum(n - 1)'],
+              ['Факториал factorial(n)', 'n <= 1 → return 1', 'return n * factorial(n - 1)'],
+              ['Деление пополам halves(n)', 'n <= 1 → return 0', 'return 1 + halves(n // 2)']
             ],
             highlight: 0
           },
@@ -494,74 +742,77 @@
             t: 'callout',
             tone: 'warn',
             icon: 'fas fa-triangle-exclamation',
-            title: 'Две классические ошибки',
-            text: 'Первая — нет базы: функция вызывает себя бесконечно. Вторая — шаг не уменьшает задачу: например, factorial(n) вызывает factorial(n) вместо factorial(n − 1).'
-          },
-          {
-            t: 'code',
-            title: 'ошибки.py',
-            code: '# 1. Нет базы — RecursionError\n# def bad(n):\n#     return bad(n - 1)\n\n# 2. Шаг не уменьшает задачу\ndef bad2(n):\n    if n == 0:\n        return 1\n    return n * bad2(n)      # n не меняется!\n\nprint("Обе версии приведут к ошибке RecursionError")'
-          }
-        ]
-      },
-      {
-        k: 'lab',
-        eyebrow: '04 · ИНТЕРАКТИВ',
-        title: 'Факториал: от базы к результату',
-        lead: 'Постройте factorial(4). Найдите момент, когда срабатывает база, и проследите, как возвращаются значения.',
-        widget: {
-          kind: 'recursion',
-          config: { fn: 'fact', n: 4 }
-        },
-        after: [
-          {
-            t: 'callout',
-            tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Эталон',
-            text: 'factorial(4) = 4 × 3 × 2 × 1 × 1 = 24. База срабатывает на factorial(0) = 1, затем результаты умножаются при возврате.'
+            title: 'Золотое правило рекурсии',
+            text: 'Рекурсивный шаг обязан <b>строго уменьшать</b> сложность задачи. Если аргумент не меняется или отдаляется от базы, программа зависнет навсегда!'
           }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '05 · ПРОВЕРКА',
-        title: 'Как убедиться, что рекурсия корректна',
-        lead: 'Проверка состоит из трёх вопросов. Задавайте их каждый раз, когда пишете рекурсивную функцию.',
+        eyebrow: '04 · АНАЛИЗ ОШИБОК',
+        title: 'Почему рекурсивный код дает сбой?',
+        lead: 'Существуют две типичные ошибки начинающих программистов: отсутствие условия выхода и «топтание на месте».',
+        blocks: [
+          {
+            t: 'code',
+            title: 'ошибки_рекурсии.py',
+            code: '# Ошибка 1: Нет базы — функция зовет себя без остановки!\ndef bad_recursion_1(n):\n    return bad_recursion_1(n - 1)  # Падение: RecursionError\n\n# Ошибка 2: Шаг не уменьшает задачу (n не меняется)\ndef bad_recursion_2(n):\n    if n == 0:\n        return 1\n    return n * bad_recursion_2(n)   # Вызываем снова от n!'
+          },
+          {
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Симптом 1',
+                icon: 'fas fa-infinity',
+                title: 'Забытая база',
+                text: 'Если забыть ветку <code>if</code> со стоп-краном, функция будет погружаться всё глубже, пока память стека не переполнится.',
+                tone: 'rose'
+              },
+              {
+                badge: 'Симптом 2',
+                icon: 'fas fa-arrows-spin',
+                title: 'Ложный шаг',
+                text: 'Если передавать в вызов тот же аргумент <code>f(n)</code> или увеличивать его <code>f(n + 1)</code>, базовое условие никогда не наступит.',
+                tone: 'amber'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '05 · АЛГОРИТМ ПРОВЕРКИ',
+        title: 'Как проверить рекурсию до запуска?',
+        lead: 'Следуй проверочному алгоритму из трех шагов перед тем, как нажать клавишу F5 в редакторе IDLE.',
         blocks: [
           {
             t: 'steps',
             items: [
-              { title: 'Вопрос 1', text: 'Есть ли база и достигается ли она за конечное число шагов?' },
-              { title: 'Вопрос 2', text: 'Уменьшается ли задача на каждом вызове?' },
-              { title: 'Вопрос 3', text: 'Собирается ли результат правильно при возврате?' }
+              { title: 'Шаг 1 · Проверь базу', text: 'Задано ли простейшее условие if? Возвращает ли оно конкретное значение БЕЗ нового рекурсивного вызова?' },
+              { title: 'Шаг 2 · Проверь направление шага', text: 'Уменьшается ли аргумент при вызове (например, n - 1 или n // 2)? Двигается ли он точно к базе?' },
+              { title: 'Шаг 3 · Ручной расчет на пальцах', text: 'Проверь работу функции на значениях n = 1, n = 2 и n = 3 в тетради перед запуском в IDLE.' }
             ]
           },
           {
             t: 'compare',
             left: {
-              title: 'Корректно',
-              items: ['База покрывает простейший случай', 'Аргумент строго уменьшается', 'Возврат комбинирует результаты', 'Есть проверка на маленьких n']
+              title: 'Надежная рекурсия',
+              items: ['База покрывает простейшие значения (0 или 1)', 'Аргумент строго уменьшается к базе', 'Корректный return на всех ветках', 'Проверена вручную для n=1 и n=2']
             },
             right: {
-              title: 'Некорректно',
-              items: ['База недостижима', 'Аргумент не меняется', 'Результат теряется', 'Проверяли только на n = 1']
+              title: 'Опасный код',
+              items: ['Базовое условие отсутствует или недостижимо', 'Аргумент не меняется: f(n)', 'Забыт return перед рекурсивным вызовом', 'Падает с RecursionError']
             },
             vs: '≠'
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-flask',
-            title: 'Практический совет',
-            text: 'Проверяйте рекурсию на n = 0, n = 1 и n = 2. Если все три случая верны и шаг уменьшает аргумент, скорее всего, функция корректна.'
           }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '06 · ПРАКТИКА В PYTHON',
-        title: 'Задачки для самостоятельной практики',
-        lead: 'Попробуй написать код сам, не подглядывая в готовые решения. В каждой функции обязательно выдели базу (стоп-кран) и рекурсивный шаг.',
+        eyebrow: '06 · ПРАКТИКА В PYTHON IDLE',
+        title: 'Три задачи для практики',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
         blocks: [
           {
             t: 'cards',
@@ -569,29 +820,29 @@
             items: [
               {
                 badge: 'Задачка 1 · 3 балла',
-                icon: 'fas fa-calculator',
-                title: 'Сумма цифр: digit_sum(n)',
-                text: 'Напиши функцию <code>digit_sum(n)</code>, которая принимает целое неотрицательное число <code>n</code> и находит сумму его цифр (например, <code>digit_sum(345)</code> вернёт <code>12</code>, так как <code>3 + 4 + 5 = 12</code>).<br><br>' +
+                icon: 'fas fa-stopwatch',
+                title: 'Отсчет: countdown(n)',
+                text: 'Напиши функцию <code>countdown(n)</code>, которая принимает число <code>n</code>, выводит числа от <code>n</code> до 1, а в конце при <code>n &lt;= 0</code> печатает <code>"Старт!"</code>.<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
-                      'База: если <code>n &lt; 10</code> (осталась одна цифра), вернуть само <code>n</code>. Шаг рекурсии: последняя цифра плюс сумма оставшихся: <code>n % 10 + digit_sum(n // 10)</code>.',
+                      'База: если <code>n &lt;= 0</code>, напечатать <code>"Старт!"</code> и сделать <code>return</code>. Шаг: напечатать <code>n</code> и вызвать <code>countdown(n - 1)</code>.',
                 tone: 'violet'
               },
               {
                 badge: 'Задачка 2 · 3 балла',
-                icon: 'fas fa-arrows-rotate',
-                title: 'Разворот: reverse_str(s)',
-                text: 'Напиши функцию <code>reverse_str(s)</code>, которая переворачивает строку задом наперёд с помощью рекурсии (например, <code>reverse_str("код")</code> вернёт <code>"док"</code>, а <code>reverse_str("питон")</code> вернёт <code>"нотип"</code>).<br><br>' +
+                icon: 'fas fa-calculator',
+                title: 'Сумма ряда: sum_natural(n)',
+                text: 'Напиши функцию <code>sum_natural(n)</code>, вычисляющую сумму натуральных чисел от 1 до <code>n</code> (например, для <code>n = 4</code> сумма равна <code>4 + 3 + 2 + 1 = 10</code>).<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
-                      'База: если длина строки <code>len(s) &lt;= 1</code>, вернуть саму строку <code>s</code>. Шаг: последний символ плюс разворот оставшейся части: <code>s[-1] + reverse_str(s[:-1])</code>.',
+                      'База: если <code>n == 1</code>, вернуть <code>1</code>. Шаг: вернуть сумму текущего <code>n</code> и вызова <code>sum_natural(n - 1)</code>.',
                 tone: 'cyan'
               },
               {
                 badge: 'Задачка 3 · 4 балла ★',
                 icon: 'fas fa-star',
-                title: 'Фибоначчи: fibonacci(n)',
-                text: 'Числа Фибоначчи начинаются с 0 и 1, а каждое следующее число равно сумме двух предыдущих: <code>0, 1, 1, 2, 3, 5, 8, 13...</code> Напиши функцию <code>fibonacci(n)</code>, возвращающую <code>n</code>-е число (например, <code>fibonacci(6)</code> вернёт <code>8</code>).<br><br>' +
+                title: 'Деления: count_halves(n)',
+                text: 'Напиши функцию <code>count_halves(n)</code>, которая считает, сколько раз число <code>n</code> можно нацело разделить на 2, пока оно больше 1 (например, для 16: 16→8→4→2→1 — ровно 4 раза).<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
-                      'Двойная база: при <code>n == 0</code> вернуть <code>0</code>, при <code>n == 1</code> вернуть <code>1</code>. Шаг складывает два вызова: <code>fibonacci(n - 1) + fibonacci(n - 2)</code>.',
+                      'База: если <code>n &lt;= 1</code>, вернуть <code>0</code>. Шаг: прибавить 1 и вызвать <code>count_halves(n // 2)</code>.',
                 tone: 'amber'
               }
             ]
@@ -606,9 +857,9 @@
         questions: [
           { q: 'Что такое база рекурсии?', options: ['Первый запуск программы', 'Простейший случай с известным готовым ответом', 'Последняя строчка файла', 'Имя главной переменной'], answer: 1, explain: 'База — это условие остановки рекурсивных вызовов.' },
           { q: 'Что обязан делать каждый рекурсивный шаг?', options: ['Уменьшать задачу и приближать её к базе', 'Увеличивать значение аргумента n', 'Повторять вызов без изменения параметров', 'Очищать память компьютера'], answer: 0, explain: 'Если шаг не уменьшает задачу, база никогда не будет достигнута.' },
-          { q: 'Что произойдёт, если запустить рекурсивную функцию без базы?', options: ['Код автоматически оптимизируется', 'Функция завершится без ошибок', 'Возникнет ошибка RecursionError из-за переполнения стека', 'Программа создаст цикл while'], answer: 2, explain: 'Стек вызовов будет расти до исчерпания лимита рекурсии в Python.' },
-          { q: 'Чему равно значение факториала 4! (произведение 1·2·3·4)?', options: ['12', '16', '4', '24'], answer: 3, explain: '4! = 4 × 3 × 2 × 1 = 24.' },
-          { q: 'Сколько вызовов сделает factorial(3), включая базовый вызов factorial(0)?', options: ['3 вызова', '4 вызова', '2 вызова', '1 вызов'], answer: 1, explain: 'Будут вызваны: factorial(3), factorial(2), factorial(1) и базовый factorial(0) — ровно 4 вызова.' }
+          { q: 'Что произойдет, если запустить рекурсивную функцию без базы?', options: ['Код автоматически оптимизируется', 'Функция завершится без ошибок', 'Возникнет ошибка RecursionError из-за переполнения стека', 'Программа создаст цикл while'], answer: 2, explain: 'Стек вызовов будет расти до исчерпания системного лимита рекурсии.' },
+          { q: 'Чему равно значение sum_natural(4) (сумма от 1 до 4)?', options: ['7', '10', '12', '15'], answer: 1, explain: '1 + 2 + 3 + 4 = 10.' },
+          { q: 'Сколько раз вызовется countdown(3) до полного завершения (включая n=0)?', options: ['3 раза', '4 раза', '2 раза', '5 раз'], answer: 1, explain: 'Будут вызовы с n=3, n=2, n=1 и финальный базовый вызов с n=0 — всего 4 вызова.' }
         ]
       },
       {
@@ -617,30 +868,30 @@
         title: 'Главное и оценивание',
         lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Рекурсия всегда состоит из двух частей: базы и шага.',
-          'База — простейший случай (стоп-кран), для которого ответ известен без вычислений.',
-          'Рекурсивный шаг уменьшает задачу и обязательно приближает её к базе.',
-          'Без базы возникает ошибка переполнения стека RecursionError.'
+          'Рекурсия держится на двух элементах: базовом условии и рекурсивном шаге.',
+          'База — это простейший случай, для которого результат известен без дальнейших вызовов.',
+          'Шаг обязан строго уменьшать задачу, приближая её параметры к базовому значению.',
+          'Отсутствие базы или некорректный шаг приводят к ошибке переполнения памяти.'
         ],
         criteriaTitle: 'Дескриптор практики · 10 баллов',
         criteria: [
-          { mark: '1 балл', text: 'Задача 1 (Сумма цифр): выделена база if n < 10 с возвратом n.' },
-          { mark: '1 балл', text: 'Задача 1 (Сумма цифр): рекурсивный шаг отделяет цифру через n % 10 и n // 10.' },
-          { mark: '1 балл', text: 'Задача 1 (Сумма цифр): тестовый запуск digit_sum(345) возвращает 12.' },
-          { mark: '1 балл', text: 'Задача 2 (Разворот строки): выделена база len(s) <= 1 с возвратом s.' },
-          { mark: '1 балл', text: 'Задача 2 (Разворот строки): рекурсивный шаг уменьшает строку срезом.' },
-          { mark: '1 балл', text: 'Задача 2 (Разворот строки): тестовый запуск reverse_str("код") возвращает "док".' },
-          { mark: '1 балл', text: 'Задача 3 (Фибоначчи): функция принимает порядковый номер n.' },
-          { mark: '1 балл', text: 'Задача 3 (Фибоначчи): правильно оформлена база для n == 0 и n == 1.' },
-          { mark: '1 балл', text: 'Задача 3 (Фибоначчи): рекурсивный шаг выполняет fibonacci(n - 1) + fibonacci(n - 2).' },
-          { mark: '1 балл', text: 'Задача 3 (Фибоначчи): тестовый запуск fibonacci(6) возвращает 8.' }
+          { mark: '1 балл', text: 'Задание 1: Четко определено базовое условие остановки для граничного значения.' },
+          { mark: '1 балл', text: 'Задание 1: Описан рекурсивный шаг с корректным уменьшением входного аргумента.' },
+          { mark: '1 балл', text: 'Задание 1: Программа протестирована в IDLE и выводит верный порядок чисел.' },
+          { mark: '1 балл', text: 'Задание 2: Оформлена база рекурсии с возвратом единичного результата.' },
+          { mark: '1 балл', text: 'Задание 2: Реализован шаг сложения текущего числа с результатом подзадачи.' },
+          { mark: '1 балл', text: 'Задание 2: Программа возвращает точную сумму ряда на тестовых наборах.' },
+          { mark: '1 балл', text: 'Задание 3: Корректно задано условие выхода при завершении целочисленного деления.' },
+          { mark: '1 балл', text: 'Задание 3: Реализован шаг рекурсивного деления пополам с инкрементом счетчика.' },
+          { mark: '1 балл', text: 'Задание 3: Функция возвращает целочисленный результат без использования циклов.' },
+          { mark: '1 балл', text: 'Задание 3: Код проверен на степенях двойки и произвольных натуральных числах.' }
         ],
         ticketTitle: 'Выходной билет',
         ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'Что произойдёт, если в рекурсивной функции забыть базовый случай?',
-          'Почему для функции Фибоначчи нужны сразу два базовых условия (0 и 1)?',
-          'Какую из трёх практических задач тебе удалось решить самостоятельно?'
+          'Что произойдет, если в рекурсивной функции забыть базовый случай?',
+          'Каким образом шаг приближает выполнение к базе в задаче о делении пополам?',
+          'Какую из трех задач тебе удалось решить быстрее всего?'
         ]
       }
     ]
@@ -656,160 +907,202 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
-        lead: 'Пока функция не завершилась, Python хранит её вызов в стеке. Стек растёт вниз при вызовах и разбирается вверх при возвратах.',
-        goal: 'Объяснять, как работает стек вызовов и почему возникает RecursionError.',
-        goalCode: '10.2.1.2',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 3',
+        title: '<span class="accent-text">Рекурсия</span> · Стек вызовов',
+        lead: 'Как Python помнит, куда вернуться после каждого шага? Знакомимся с устройством стека вызовов (Call Stack), принципом LIFO и причиной RecursionError.',
+        goal: 'Понять принцип работы стека вызовов LIFO, научиться анализировать прямой и обратный ход и управлять глубиной рекурсии.',
+        goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-layer-group', text: 'LIFO: последний пришёл — первый вышел' },
-          { icon: 'fas fa-arrow-up', text: 'Возврат значений' },
-          { icon: 'fas fa-triangle-exclamation', text: 'Глубина рекурсии' }
+          { icon: 'fas fa-layer-group', text: 'Принцип LIFO' },
+          { icon: 'fas fa-microchip', text: 'Кадры стека' },
+          { icon: 'fas fa-triangle-exclamation', text: 'Лимит вызовов' }
         ],
         visual: 'recursion',
-        visualCaption: 'Кадры стека: вызовы вниз, возвраты вверх',
-        cta: 'Открыть стек'
+        visualCaption: 'Каждый вызов кладется на вершину стека и ждет завершения',
+        cta: 'Исследовать стек'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Что такое база рекурсии?', options: ['Простейший случай', 'Первый вызов', 'Ошибка', 'Цикл'], answer: 0, explain: 'База останавливает рекурсию.' },
-          { q: 'Что делает рекурсивный шаг?', options: ['Уменьшает задачу', 'Увеличивает n', 'Ничего', 'Завершает программу'], answer: 0, explain: 'Он приближает базу.' },
-          { q: 'Что будет без базы?', options: ['RecursionError', 'Ускорение', 'Ничего', 'Пустой вывод'], answer: 0, explain: 'Стек переполнится.' },
-          { q: 'Чему равно 3!?', options: ['6', '3', '9', '12'], answer: 0, explain: '3 × 2 × 1 = 6.' },
-          { q: 'Сколько вызовов у factorial(2) с базой?', options: ['3', '2', '1', '4'], answer: 0, explain: 'factorial(2), (1), (0).' }
+          { q: 'Из каких двух обязательных частей состоит любая рекурсивная функция?', options: ['Цикл for и список', 'База (условие остановки) и рекурсивный шаг', 'Ввод input() и вывод print()', 'Глобальные и локальные переменные'], answer: 1, explain: 'Без базы рекурсия зациклится, а без шага не приблизится к остановке.' },
+          { q: 'Что такое база рекурсии?', options: ['Простейший случай, для которого ответ известен сразу', 'Место сохранения файла на диске', 'Первая строчка вызова функции', 'Общий объем оперативной памяти'], answer: 0, explain: 'База — это граничный случай, не требующий дальнейших рекурсивных вызовов.' },
+          { q: 'В какую сторону обязан двигаться аргумент на каждом рекурсивном шаге?', options: ['В сторону бесконечности', 'В сторону базового значения', 'Оставаться неизменным', 'Всегда становиться отрицательным'], answer: 1, explain: 'Каждый шаг обязан приближать параметры вызова к базе.' },
+          { q: 'Что произойдет, если в функции написать return f(n + 1) при базе n <= 0 для положительного n?', options: ['Код выполнится мгновенно', 'Функция никогда не дойдет до базы и возникнет RecursionError', 'Программа посчитает корень из числа', 'Стек вызовов очистится'], answer: 1, explain: 'Аргумент удаляется от нуля, поэтому стоп-кран никогда не сработает.' },
+          { q: 'Чему равен факториал 0! в математике и программировании?', options: ['0', '1', '-1', 'Не существует'], answer: 1, explain: 'По определению 0! = 1, и это базовый случай факториала.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · МЕХАНИЗМ',
-        title: 'Как устроен стек',
-        lead: 'Каждый вызов создаёт кадр: имя функции, аргументы и место, куда вернуть результат. Кадры складываются друг на друга.',
+        eyebrow: '03 · ПРИНЦИП LIFO',
+        title: 'Что такое стек вызовов (Call Stack)?',
+        lead: 'Стек похож на стопку тарелок: положить новую тарелку можно только наверх, и снять можно только верхнюю. Это принцип <b>LIFO</b> (<i>Last In, First Out</i> — последним пришел, первым ушел).',
         blocks: [
-          { t: 'svg', svg: REC_SVG, caption: 'Стек вызовов factorial(4)' },
+          { t: 'svg', svg: STACK_ANIM_SVG, caption: 'Накопление фреймов в стеке и возврат значений' },
           {
-            t: 'steps',
+            t: 'cards',
+            cols: 2,
             items: [
-              { title: 'Вызов', text: 'factorial(4) создаёт кадр и вызывает factorial(3).' },
-              { title: 'Рост', text: 'Кадры накапливаются: 4 → 3 → 2 → 1 → 0.' },
-              { title: 'База', text: 'factorial(0) возвращает 1 и больше никого не вызывает.' },
-              { title: 'Возврат', text: 'Кадры закрываются сверху вниз: 1 → 1 → 2 → 6 → 24.' }
+              {
+                badge: 'Фаза 1 · Погружение',
+                icon: 'fas fa-arrow-down',
+                title: 'Прямой ход (Push)',
+                text: 'При каждом вызове в памяти выделяется новый <b>кадр стека (stack frame)</b>. В нем хранятся аргументы и локальные переменные. Предыдущая функция «замирает» и ждет ответа.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Фаза 2 · Всплытие',
+                icon: 'fas fa-arrow-up',
+                title: 'Обратный ход (Pop)',
+                text: 'Когда база вернула значение, функции начинают завершаться в обратном порядке: снизу вверх. Кадр удаляется из памяти, а результат передается наверх.',
+                tone: 'green'
+              }
             ]
-          },
-          {
-            t: 'callout',
-            tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'RecursionError',
-            text: 'По умолчанию Python допускает около 1000 вложенных вызовов. Если база не достигается, стек переполняется и программа падает с ошибкой RecursionError: maximum recursion depth exceeded.'
-          },
-          {
-            t: 'code',
-            title: 'stack_depth.py',
-            code: 'import sys\n\nprint(sys.getrecursionlimit())   # 1000 — предел по умолчанию\n\ndef depth(n):\n    if n == 0:\n        return 0\n    return 1 + depth(n - 1)\n\nprint(depth(10))    # 10 кадров\n# depth(2000) → RecursionError'
           }
         ]
       },
       {
-        k: 'lab',
-        eyebrow: '04 · ИНТЕРАКТИВ',
-        title: 'Понаблюдайте за стеком',
-        lead: 'Запустите вычисление и следите, сколько кадров накоплено в каждый момент.',
-        widget: {
-          kind: 'recursion',
-          config: { fn: 'countdown', n: 4 }
-        },
-        after: [
+        k: 'concept',
+        eyebrow: '04 · ПРЯМОЙ И ОБРАТНЫЙ ХОД',
+        title: 'Где писать команды: до вызова или после?',
+        lead: 'Команды до рекурсивного вызова выполняются «на пути вниз» (прямой порядок), а команды после вызова — «на пути вверх» (обратный порядок).',
+        blocks: [
+          {
+            t: 'code',
+            title: 'прямой_и_обратный_ход.py',
+            code: 'def trace(n):\n    if n == 0:\n        print("--- База достигнута! ---")\n        return\n\n    print("Вход в стек:", n)   # До вызова: 3, 2, 1\n    trace(n - 1)                # Рекурсивный спуск\n    print("Выход из стека:", n)  # После вызова: 1, 2, 3!\n\ntrace(3)'
+          },
           {
             t: 'callout',
             tone: 'good',
             icon: 'fas fa-lightbulb',
-            title: 'Вывод',
-            text: 'Максимальная глубина стека равна n + 1: кадры от n до 0. Чем больше n, тем больше памяти занимает рекурсия.'
+            title: 'Почему обратный порядок выводит 1, 2, 3?',
+            text: 'Потому что вызов <code>trace(1)</code> завершится раньше, чем <code>trace(2)</code>, а <code>trace(3)</code> завершится самым последним! В этом и заключается суть LIFO.'
           }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '05 · ГЛУБИНА',
-        title: 'Сколько кадров нужно',
-        lead: 'Глубина рекурсии — это максимальное число одновременно открытых вызовов.',
+        eyebrow: '05 · ЛИМИТ ГЛУБИНЫ',
+        title: 'Модуль sys и переполнение стека',
+        lead: 'Оперативная память не бесконечна. Чтобы защитить компьютер от зависания, Python по умолчанию ограничивает глубину рекурсии числом 1000 вызовов.',
         blocks: [
           {
-            t: 'table',
-            caption: 'Глубина для разных задач',
-            head: ['Функция', 'Вызов', 'Глубина', 'Примечание'],
-            rows: [
-              ['factorial', 'factorial(5)', '6', 'от 5 до 0'],
-              ['countdown', 'countdown(100)', '101', 'линейный рост'],
-              ['digit_sum', 'digit_sum(12345)', '6', 'по числу цифр'],
-              ['reverse', 'reverse("python")', '7', 'по длине строки']
-            ],
-            highlight: 1
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-gauge-high',
-            title: 'Практическое правило',
-            text: 'Если глубина может быть большой (десятки тысяч), рекурсию заменяют циклом. Рекурсия хороша там, где глубина невелика: деревья, разбор выражений, «разделяй и властвуй».'
-          },
-          {
-            t: 'compare',
-            left: { title: 'Плюсы стека', items: ['Автоматическое хранение состояния', 'Короткая запись', 'Естественность для деревьев'] },
-            right: { title: 'Минусы стека', items: ['Ограничение глубины', 'Расход памяти на кадры', 'Риск RecursionError'] },
-            vs: '⇄'
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Проверка лимита',
+                icon: 'fas fa-shield',
+                title: 'sys.getrecursionlimit()',
+                text: 'Функция возвращает текущий системный лимит глубины вызовов (в стандартном Python он равен 1000).',
+                codeTitle: 'проверка_лимита.py',
+                code: 'import sys\nprint(sys.getrecursionlimit())  # 1000',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Изменение лимита',
+                icon: 'fas fa-sliders',
+                title: 'sys.setrecursionlimit()',
+                text: 'Позволяет увеличить допустимый предел, например до 2000 или 5000, если задача требует глубокого погружения.',
+                codeTitle: 'смена_лимита.py',
+                code: 'import sys\nsys.setrecursionlimit(2000)\nprint("Новый лимит:", sys.getrecursionlimit())',
+                tone: 'amber'
+              }
+            ]
           }
         ]
       },
       {
-        k: 'practice',
-        eyebrow: '06 · ПРАКТИКА',
-        title: 'Считаем кадры',
-        lead: 'Определите глубину стека и предскажите результат.',
-        tasks: [
-          { title: 'Глубина', q: 'Сколько кадров одновременно открыто при вызове factorial(4)?', answer: '5', type: 'number', explain: 'Кадры 4, 3, 2, 1, 0 — пять.', hint: 'Не забудьте базу.' },
-          { title: 'Порядок', q: 'Какой вызов закроется первым?', answer: ['factorial(0)', 'factorial0', 'база', 'последний'], explain: 'Стек работает по принципу LIFO.', hint: 'Последний пришёл — первый вышел.' },
-          { title: 'Ошибка', q: 'Как называется ошибка переполнения стека?', answer: ['recursionerror', 'recursion error', 'maximum recursion depth exceeded'], explain: 'Python сообщает RecursionError.', hint: 'Слово начинается с «Recursion».' },
-          { title: 'Предел', q: 'Сколько вызовов допускает Python по умолчанию (примерно)?', answer: '1000', type: 'number', explain: 'sys.getrecursionlimit() возвращает 1000.', hint: 'Круглое число, тысяча.' },
-          { title: 'Вывод', q: 'Что выведет depth(3), если depth возвращает 1 + depth(n - 1), а база 0?', answer: '3', type: 'number', explain: 'Три шага до базы.', hint: 'Считайте кадры без базового.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Порядок LIFO объяснён.' },
-          { mark: '1 балл', text: 'Глубина вычислена верно.' },
-          { mark: '1 балл', text: 'Причина RecursionError названа.' }
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКА В PYTHON IDLE',
+        title: 'Три задачи для практики',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              {
+                badge: 'Задачка 1 · 3 балла',
+                icon: 'fas fa-arrows-up-down',
+                title: 'Зеркало: mirror_count(n)',
+                text: 'Напиши функцию <code>mirror_count(n)</code>, которая принимает число <code>n</code> и выводит числа от <code>n</code> до 1 (при погружении), а затем от 1 до <code>n</code> (при выходе из стека).<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'Один <code>print(n)</code> сделай <b>до</b> рекурсивного вызова, а второй <code>print(n)</code> — <b>после</b> него. База: <code>n == 0</code>.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Задачка 2 · 3 балла',
+                icon: 'fas fa-chart-line',
+                title: 'Глубина: depth_tracker(n, d=1)',
+                text: 'Напиши функцию <code>depth_tracker(n, d=1)</code>, которая печатает текущую глубину рекурсии <code>d</code> и значение <code>n</code> при спуске до базы <code>n == 1</code>.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'Печатай <code>"Глубина d, n = n"</code>. На шаге рекурсии передавай <code>n - 1</code> и увеличивай глубину: <code>d + 1</code>.',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Задачка 3 · 4 балла ★',
+                icon: 'fas fa-star',
+                title: 'Безопасность: safe_factorial(n, max_d=20)',
+                text: 'Напиши функцию <code>safe_factorial(n, max_d=20)</code>, которая вычисляет факториал, но если глубина <code>n &gt; max_d</code>, не падает, а печатает предупреждение о превышении лимита и возвращает <code>None</code>.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'В самом начале проверь: если <code>n &gt; max_d</code>, выведи сообщение и сделай <code>return None</code>. Если порог в норме, выполни расчет факториала.',
+                tone: 'amber'
+              }
+            ]
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА',
+        title: 'Проверим знания стека вызовов',
+        lead: 'Выбери один правильный ответ в каждом вопросе.',
         questions: [
-          { q: 'По какому принципу работает стек?', options: ['LIFO', 'FIFO', 'Случайно', 'По алфавиту'], answer: 0, explain: 'Последний пришёл — первый вышел.' },
-          { q: 'Что хранится в кадре вызова?', options: ['Аргументы и точка возврата', 'Только имя функции', 'Только результат', 'Ничего'], answer: 0, explain: 'Кадр хранит состояние вызова.' },
-          { q: 'Когда кадры закрываются?', options: ['При возврате значения', 'При новом вызове', 'При запуске', 'Никогда'], answer: 0, explain: 'Возврат закрывает верхний кадр.' },
-          { q: 'Что вызовет RecursionError?', options: ['Отсутствие базы', 'Наличие базы', 'Маленькое n', 'Печать результата'], answer: 0, explain: 'Стек переполнится.' },
-          { q: 'Сколько кадров у factorial(3)?', options: ['4', '3', '2', '5'], answer: 0, explain: '3, 2, 1, 0.' }
+          { q: 'Что означает принцип LIFO?', options: ['Первым пришел — первым ушел', 'Последним пришел — первым ушел', 'Данные стираются случайным образом', 'Функции выполняются параллельно'], answer: 1, explain: 'LIFO (Last In, First Out): последний добавленный в стек кадр завершается первым.' },
+          { q: 'Что такое фрейм (кадр) стека?', options: ['Участок памяти с аргументами и переменными одного вызова', 'Размер окна графической программы', 'Количество строк в файле Python', 'Скорость работы процессора'], answer: 0, explain: 'Кадр стека создается при каждом вызове функции и хранит ее локальный контекст.' },
+          { q: 'Когда выполнится строчка print(n), если она написана ПОСЛЕ рекурсивного вызова?', options: ['До первого рекурсивного вызова', 'На обратном ходе рекурсии при выходе из стека', 'Она никогда не выполнится', 'Только в момент старта Python'], answer: 1, explain: 'Команды после рекурсивного вызова ждут возврата и выполняются на обратном ходе.' },
+          { q: 'Какой системный лимит глубины рекурсии установлен в Python по умолчанию?', options: ['10 вызовов', '100 вызовов', '1000 вызовов', 'Бесконечность'], answer: 2, explain: 'Стандартный лимит sys.getrecursionlimit() составляет 1000 фреймов.' },
+          { q: 'Какая ошибка возникает при превышении максимальной глубины стека?', options: ['ZeroDivisionError', 'RecursionError', 'IndexError', 'SyntaxError'], answer: 1, explain: 'Python защищает память и выбрасывает ошибку RecursionError: maximum recursion depth exceeded.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Стек вызовов хранит незавершённые вызовы.',
-          'Работает по принципу LIFO.',
-          'База закрывает верхний кадр.',
-          'Глубина равна числу одновременных вызовов.',
-          'Переполнение стека даёт RecursionError.'
+          'Стек вызовов работает по принципу LIFO: последняя вызванная функция завершается первой.',
+          'Код до рекурсивного шага выполняется на прямом ходе, после шага — на обратном.',
+          'Каждый вызов занимает кадр памяти, хранящий локальные переменные.',
+          'Модуль sys позволяет отслеживать и настраивать лимит рекурсии (по умолчанию 1000).'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задание 1: Задано базовое условие остановки зеркального вывода.' },
+          { mark: '1 балл', text: 'Задание 1: Разделен вывод данных на прямом и обратном ходе стека.' },
+          { mark: '1 балл', text: 'Задание 1: Программа протестирована в IDLE и демонстрирует принцип LIFO.' },
+          { mark: '1 балл', text: 'Задание 2: Организован счетчик глубины рекурсии через параметры функции.' },
+          { mark: '1 балл', text: 'Задание 2: На каждом шаге рекурсивного погружения глубина увеличивается.' },
+          { mark: '1 балл', text: 'Задание 2: Программа корректно выводит историю погружения до базового случая.' },
+          { mark: '1 балл', text: 'Задание 3: Реализована предварительная проверка глубины перед рекурсией.' },
+          { mark: '1 балл', text: 'Задание 3: Предусмотрен вывод информативного сообщения о лимите стека.' },
+          { mark: '1 балл', text: 'Задание 3: В безопасном режиме функция возвращает вычисленный факториал.' },
+          { mark: '1 балл', text: 'Задание 3: Код проверен на штатных значениях и при превышении лимита.' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'Стек вызовов нужен, чтобы ...',
-          'LIFO означает ...',
-          'RecursionError возникает, когда ...'
+          'В каком порядке завершаются вложенные функции согласно принципу LIFO?',
+          'Чем отличается выполнение команд до рекурсивного вызова и после него?',
+          'Почему Python ограничивает максимальную глубину рекурсии?'
         ]
       }
     ]
   });
 
   /* ==========================================================================
-     УРОК 4. Факториал
+     УРОК 4. Факториал и степени
      ========================================================================== */
   Q2.add('10emn-q2-4', {
     num: 4,
@@ -818,183 +1111,195 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
-        lead: 'Факториал — первая рекурсивная функция, которую пишут почти все. Он короткий, но содержит всё: базу, шаг, стек и возврат значений.',
-        goal: 'Записывать факториал рекурсивно и объяснять каждый шаг вычисления.',
-        goalCode: '10.2.1.3',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 4',
+        title: '<span class="accent-text">Рекурсия</span> · Факториал и степени',
+        lead: 'Математическая индукция на практике: как выразить факториал N!, быстрое возведение в степень aⁿ и ветвящееся дерево чисел Фибоначчи.',
+        goal: 'Освоить классические математические рекуррентные алгоритмы, понять структуру дерева рекурсии и ветвление вызовов.',
+        goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-superscript', text: '0! = 1' },
-          { icon: 'fas fa-code', text: 'return n * f(n - 1)' },
-          { icon: 'fas fa-database', text: 'Python-практикум' }
+          { icon: 'fas fa-calculator', text: 'Факториал n!' },
+          { icon: 'fas fa-superscript', text: 'Степень aⁿ' },
+          { icon: 'fas fa-sitemap', text: 'Дерево Фибоначчи' }
         ],
         visual: 'recursion',
-        visualCaption: 'Умножение при возврате',
-        cta: 'Разобрать код'
+        visualCaption: 'Каждый вызов делится на два новых: дерево Фибоначчи',
+        cta: 'Перейти к вычислениям'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Как работает стек вызовов?', options: ['LIFO', 'FIFO', 'Случайно', 'По алфавиту'], answer: 0, explain: 'Последний пришёл — первый вышел.' },
-          { q: 'Что хранит кадр вызова?', options: ['Аргументы и точку возврата', 'Только результат', 'Только имя', 'Ничего'], answer: 0, explain: 'Состояние вызова.' },
-          { q: 'Когда закрывается кадр?', options: ['При возврате значения', 'При вызове', 'При старте', 'Никогда'], answer: 0, explain: 'Возврат закрывает кадр.' },
-          { q: 'Что даёт RecursionError?', options: ['Переполнение стека', 'Наличие базы', 'Малое n', 'Печать'], answer: 0, explain: 'Стек не бесконечен.' },
-          { q: 'Сколько кадров у factorial(2)?', options: ['3', '2', '1', '4'], answer: 0, explain: '2, 1, 0.' }
+          { q: 'По какому принципу работает стек вызовов (Call Stack)?', options: ['FIFO (первым пришел — первым ушел)', 'LIFO (последним пришел — первым ушел)', 'Случайный выбор очередности', 'По алфавиту имен функций'], answer: 1, explain: 'Стек вызовов работает строго по принципу LIFO (Last In, First Out).' },
+          { q: 'Что такое фрейм стека в оперативной памяти?', options: ['Файл с исходным кодом', 'Блок памяти для аргументов и переменных одного вызова', 'Разрешение экрана монитора', 'Кэш веб-браузера'], answer: 1, explain: 'Фрейм хранит параметры и контекст конкретного активного вызова функции.' },
+          { q: 'Какая функция модуля sys позволяет узнать системный лимит глубины рекурсии?', options: ['sys.getdepth()', 'sys.getrecursionlimit()', 'sys.check_memory()', 'sys.max_calls()'], answer: 1, explain: 'sys.getrecursionlimit() возвращает текущее ограничение глубины вызовов (по умолчанию 1000).' },
+          { q: 'Когда выполняются инструкции, написанные ПОСЛЕ строки рекурсивного вызова?', options: ['До первого рекурсивного вызова', 'На обратном ходе при возврате из стека', 'Они пропускаются интерпретатором', 'В момент компиляции файла'], answer: 1, explain: 'Строки после вызова ждут завершения дочерней функции и выполняются на обратном ходе.' },
+          { q: 'Что произойдет, если рекурсивная глубина превысит установленный лимит?', options: ['Компьютер перезагрузится', 'Программа выбросит RecursionError', 'Код оптимизируется в цикл', 'Значения обнулятся'], answer: 1, explain: 'Python генерирует RecursionError: maximum recursion depth exceeded.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · ОПРЕДЕЛЕНИЕ',
-        title: 'Математика и код',
-        lead: 'Факториал определён рекурсивно: 0! = 1, n! = n × (n − 1)!. Код повторяет это определение почти дословно.',
+        eyebrow: '03 · МАТЕМАТИЧЕСКАЯ ИНДУКЦИЯ',
+        title: 'Факториал и степени в рекурсии',
+        lead: 'Математическая индукция строится так же, как рекурсия: задаем базу для n = 0 или 1, а затем выражаем n-й шаг через предыдущий (n - 1).',
         blocks: [
           {
-            t: 'definition',
-            term: 'Факториал',
-            text: 'Факториал числа n (n!) — произведение всех натуральных чисел от 1 до n. По определению 0! = 1.',
-            sub: 'n! = n × (n − 1)!,  0! = 1'
-          },
-          {
-            t: 'code',
-            title: 'factorial.py',
-            code: 'def factorial(n):\n    if n == 0:              # база\n        return 1\n    return n * factorial(n - 1)   # шаг\n\nprint(factorial(0))   # 1\nprint(factorial(1))   # 1\nprint(factorial(5))   # 120\nprint(factorial(10))  # 3628800'
-          },
-          {
-            t: 'table',
-            caption: 'Трассировка factorial(4)',
-            head: ['Вызов', 'Возвращает', 'Значение'],
-            rows: [
-              ['factorial(0)', '1', '1'],
-              ['factorial(1)', '1 × 1', '1'],
-              ['factorial(2)', '2 × 1', '2'],
-              ['factorial(3)', '3 × 2', '6'],
-              ['factorial(4)', '4 × 6', '24']
-            ],
-            highlight: 4
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-lightbulb',
-            title: 'Почему база именно 0',
-            text: 'Можно взять базу n == 1 и вернуть 1 — результат тот же для n ≥ 1. Но тогда factorial(0) придётся обрабатывать отдельно, поэтому база n == 0 удобнее и соответствует математическому определению.'
-          }
-        ]
-      },
-      {
-        k: 'lab',
-        eyebrow: '04 · ИНТЕРАКТИВ',
-        title: 'Соберите factorial(5)',
-        lead: 'Запустите вычисление и проверьте, на каком шаге срабатывает база и как растёт произведение.',
-        widget: {
-          kind: 'recursion',
-          config: { fn: 'fact', n: 5 }
-        },
-        after: [
-          {
-            t: 'callout',
-            tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Результат',
-            text: 'factorial(5) = 120. Обратите внимание: умножение выполняется на обратном пути, когда кадры закрываются.'
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Алгоритм 1',
+                icon: 'fas fa-calculator',
+                title: 'Факториал: n!',
+                text: 'Факториал <code>n!</code> — произведение всех чисел от 1 до <code>n</code>.<br>' +
+                      '• База: <code>0! = 1</code> и <code>1! = 1</code>.<br>' +
+                      '• Шаг: <code>n! = n × (n - 1)!</code>',
+                codeTitle: 'factorial.py',
+                code: 'def fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)\n\nprint(fact(5))  # 120',
+                tone: 'violet'
+              },
+              {
+                badge: 'Алгоритм 2',
+                icon: 'fas fa-superscript',
+                title: 'Степень: aⁿ',
+                text: 'Возведение числа <code>a</code> в натуральную степень <code>n</code>.<br>' +
+                      '• База: <code>a⁰ = 1</code>.<br>' +
+                      '• Шаг: <code>aⁿ = a × aⁿ⁻¹</code>',
+                codeTitle: 'power.py',
+                code: 'def power(a, n):\n    if n == 0:\n        return 1\n    return a * power(a, n - 1)\n\nprint(power(2, 4))  # 16',
+                tone: 'cyan'
+              }
+            ]
           }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '05 · PYTHON-ПРАКТИКУМ',
-        title: 'Пишем и проверяем',
-        lead: 'Соберите функцию в редакторе, затем проверьте её на нескольких значениях.',
+        eyebrow: '04 · ДЕРЕВО ВЕТВЛЕНИЯ',
+        title: 'Ветвящаяся рекурсия: числа Фибоначчи',
+        lead: 'Когда функция внутри себя вызывает саму себя <b>дважды</b>, возникает не линейная цепочка, а ветвящееся дерево вызовов.',
         blocks: [
-          {
-            t: 'widget',
-            kind: 'pythonRef',
-            config: {
-              title: 'Напоминание Python',
-              groups: [
-                {
-                  title: 'Функции',
-                  items: [
-                    { cmd: 'def f(n):', text: 'объявление функции' },
-                    { cmd: 'return значение', text: 'вернуть результат' },
-                    { cmd: 'if n == 0:', text: 'проверка базы' },
-                    { cmd: 'f(n - 1)', text: 'рекурсивный вызов' }
-                  ]
-                },
-                {
-                  title: 'Проверка',
-                  items: [
-                    { cmd: 'print(f(5))', text: 'вывести результат' },
-                    { cmd: 'assert f(5) == 120', text: 'проверка утверждением' },
-                    { cmd: 'for n in range(6):', text: 'перебор значений' },
-                    { cmd: 'math.factorial(5)', text: 'готовая функция из math' }
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            t: 'code',
-            title: 'test_factorial.py',
-            code: 'def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n - 1)\n\nfor n in range(6):\n    print(n, "! =", factorial(n))\n\nassert factorial(0) == 1\nassert factorial(5) == 120\nprint("Все проверки пройдены")'
-          },
+          { t: 'svg', svg: FIB_TREE_SVG, caption: 'Дерево рекурсивных вызовов fib(4)' },
           {
             t: 'callout',
             tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'Отрицательные числа',
-            text: 'factorial(-1) с такой базой уйдёт в бесконечную рекурсию: n == 0 никогда не станет истинным. Добавьте проверку if n < 0: raise ValueError("n должно быть неотрицательным").'
+            icon: 'fas fa-tree',
+            title: 'Экспоненциальная сложность O(2ⁿ)',
+            text: 'Обрати внимание: <code>fib(2)</code> вычисляется два раза, а <code>fib(1)</code> — три раза! Из-за повторных вычислений наивный алгоритм Фибоначчи для n = 40 будет работать несколько минут.'
           }
         ]
       },
       {
-        k: 'practice',
-        eyebrow: '06 · ПРАКТИКА',
-        title: 'Факториал в деталях',
-        lead: 'Вычисляйте и объясняйте.',
-        tasks: [
-          { title: 'Значение', q: 'Чему равно 6!?', answer: '720', type: 'number', explain: '6 × 120 = 720.', hint: '5! = 120.' },
-          { title: 'База', q: 'Какое условие является базой в factorial?', answer: ['n == 0', 'n==0', 'if n == 0', 'n = 0'], explain: 'При n == 0 возвращается 1.', hint: 'Самое маленькое значение.' },
-          { title: 'Возврат', q: 'Что возвращает factorial(1)?', answer: '1', type: 'number', explain: '1 × factorial(0) = 1 × 1.', hint: 'Единица в любой степени.' },
-          { title: 'Ошибка', q: 'Что будет при factorial(-1)?', answer: ['recursionerror', 'бесконечная рекурсия', 'ошибка'], explain: 'База не достигается.', hint: 'n уменьшается, но не равно 0.' },
-          { title: 'Модуль', q: 'Из какого модуля готовая функция factorial?', answer: ['math', 'import math', 'math.factorial'], explain: 'math.factorial(n).', hint: 'Математический модуль.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Функция написана без ошибок.' },
-          { mark: '1 балл', text: 'Проверки assert проходят.' },
-          { mark: '1 балл', text: 'Обработка отрицательных чисел добавлена.' }
+        k: 'concept',
+        eyebrow: '05 · ДВОЙНАЯ БАЗА',
+        title: 'Особенность базы для Фибоначчи',
+        lead: 'Поскольку шаг <code>fib(n - 1) + fib(n - 2)</code> обращается сразу к двум предыдущим элементам, рекурсии требуются <b>два</b> базовых случая!',
+        blocks: [
+          {
+            t: 'code',
+            title: 'fibonacci.py',
+            code: 'def fib(n):\n    # Две базы: для нулевого и первого элементов\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n\n    # Рекурсивный шаг: сумма двух предыдущих\n    return fib(n - 1) + fib(n - 2)\n\nprint(fib(6))  # 8'
+          },
+          {
+            t: 'table',
+            caption: 'Первые члены ряда Фибоначчи',
+            head: ['n (индекс)', '0', '1', '2', '3', '4', '5', '6', '7'],
+            rows: [
+              ['fib(n)', '0', '1', '1', '2', '3', '5', '8', '13']
+            ],
+            highlight: 6
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКА В PYTHON IDLE',
+        title: 'Три задачи для практики',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              {
+                badge: 'Задачка 1 · 3 балла',
+                icon: 'fas fa-calculator',
+                title: 'Факториал: factorial(n)',
+                text: 'Напиши рекурсивную функцию <code>factorial(n)</code>, которая принимает натуральное число <code>n</code> и возвращает его факториал.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: если <code>n &lt;= 1</code>, вернуть <code>1</code>. Шаг: умножить текущее <code>n</code> на результат <code>factorial(n - 1)</code>.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Задачка 2 · 3 балла',
+                icon: 'fas fa-superscript',
+                title: 'Степень: power(a, n)',
+                text: 'Напиши функцию <code>power(a, n)</code>, которая возводит число <code>a</code> в целую неотрицательную степень <code>n</code> с помощью рекурсии.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: любое число в степени 0 равно 1 (при <code>n == 0</code> вернуть <code>1</code>). Шаг: <code>a * power(a, n - 1)</code>.',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Задачка 3 · 4 балла ★',
+                icon: 'fas fa-star',
+                title: 'Фибоначчи: fibonacci(n)',
+                text: 'Напиши функцию <code>fibonacci(n)</code>, возвращающую <code>n</code>-е число Фибоначчи (0, 1, 1, 2, 3, 5, 8, 13...).<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'Используй двойную базу: <code>if n == 0: return 0</code> и <code>if n == 1: return 1</code>. Шаг: сложить два вызова от <code>n - 1</code> и <code>n - 2</code>.',
+                tone: 'amber'
+              }
+            ]
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА',
+        title: 'Проверим знания формул рекурсии',
+        lead: 'Выбери один правильный ответ в каждом вопросе.',
         questions: [
-          { q: 'Чему равно 0!?', options: ['1', '0', 'Не определено', '10'], answer: 0, explain: 'По определению 0! = 1.' },
-          { q: 'Какая строка — рекурсивный шаг?', options: ['return n * factorial(n - 1)', 'if n == 0:', 'return 1', 'print(n)'], answer: 0, explain: 'Шаг вызывает функцию с меньшим n.' },
-          { q: 'Чему равно 5!?', options: ['120', '60', '24', '100'], answer: 0, explain: '5 × 4 × 3 × 2 × 1.' },
-          { q: 'Когда выполняется умножение?', options: ['При возврате из вызовов', 'До вызова', 'Одновременно', 'Никогда'], answer: 0, explain: 'На обратном пути.' },
-          { q: 'Что будет при factorial(-1)?', options: ['RecursionError', '1', '0', '-1'], answer: 0, explain: 'База недостижима.' }
+          { q: 'Чему равно значение factorial(4)?', options: ['12', '16', '24', '48'], answer: 2, explain: '4! = 4 × 3 × 2 × 1 = 24.' },
+          { q: 'Какое базовое условие используется при рекурсивном возведении в степень aⁿ?', options: ['n == 1: return a', 'n == 0: return 1', 'a == 0: return 0', 'n < 0: return -1'], answer: 1, explain: 'a⁰ = 1 — классическое базовое условие для степени.' },
+          { q: 'Почему для вычисления чисел Фибоначчи необходимы две базы?', options: ['Потому что функция вызывается в двух файлах', 'Потому что рекурсивный шаг обращается к двум предыдущим членам (n-1 и n-2)', 'Чтобы занять больше оперативной памяти', 'Это требование операционной системы'], answer: 1, explain: 'Для вычисления n-го числа нужны два предшественника, поэтому начальные f(0) и f(1) должны быть заданы явно.' },
+          { q: 'Какую форму имеет граф вызовов функции Фибоначчи?', options: ['Прямая линия', 'Двоичное ветвящееся дерево', 'Замкнутый круг', 'Квадратная матрица'], answer: 1, explain: 'Каждый узел порождает два потомка, образуя двоичное дерево вызовов.' },
+          { q: 'Чему равно 6-е число Фибоначчи fibonacci(6), если ряд начинается с 0, 1, 1, 2...?', options: ['5', '8', '13', '21'], answer: 1, explain: 'fib(0)=0, fib(1)=1, fib(2)=1, fib(3)=2, fib(4)=3, fib(5)=5, fib(6)=8.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Факториал: 0! = 1, n! = n × (n − 1)!.',
-          'Код повторяет математическое определение.',
-          'Умножение происходит при возврате.',
-          'Глубина стека равна n + 1.',
-          'Отрицательные аргументы нужно проверять отдельно.'
+          'Математические формулы естественно переводятся в рекурсию через принцип индукции.',
+          'Факториал и степень имеют линейный стек глубиной n кадров.',
+          'Функция Фибоначчи порождает двоичное дерево вызовов с повторными вычислениями.',
+          'При обращении к (n - 1) и (n - 2) обязательно задаются два базовых условия.'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задание 1: Задан базовый случай факториала для n <= 1.' },
+          { mark: '1 балл', text: 'Задание 1: Описан шаг умножения аргумента на вызов факториала n - 1.' },
+          { mark: '1 балл', text: 'Задание 1: Программа протестирована в IDLE на контрольных числах.' },
+          { mark: '1 балл', text: 'Задание 2: Реализована база степени при показателе exp == 0.' },
+          { mark: '1 балл', text: 'Задание 2: Оформлен рекурсивный шаг возведения в степень.' },
+          { mark: '1 балл', text: 'Задание 2: Функция возвращает верное значение степени для различных оснований.' },
+          { mark: '1 балл', text: 'Задание 3: Реализованы оба базовых условия для индексов 0 и 1.' },
+          { mark: '1 балл', text: 'Задание 3: Описан шаг сложения двух рекурсивных ветвей.' },
+          { mark: '1 балл', text: 'Задание 3: Программа возвращает корректные числа ряда без ошибок глубины.' },
+          { mark: '1 балл', text: 'Задание 3: Проведено комплексное тестирование всех функций в среде IDLE.' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'База факториала — ...',
-          'Шаг факториала — ...',
-          'Умножение выполняется, когда ...'
+          'Как рекурсивное определение степени aⁿ связано с базовым случаем a⁰ = 1?',
+          'Почему дерево вызовов Фибоначчи растет так быстро?',
+          'Какая задача из трех вызвала наибольший интерес?'
         ]
       }
     ]
   });
 
   /* ==========================================================================
-     УРОК 5. Сумма цифр числа
+     УРОК 5. Разбор чисел
      ========================================================================== */
   Q2.add('10emn-q2-5', {
     num: 5,
@@ -1003,186 +1308,189 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
-        lead: 'Число 4721 — это 1 плюс сумма цифр числа 472. Один остаток от деления и один целочисленный раздел — и задача стала меньше.',
-        goal: 'Применять рекурсию к разбору числа на цифры.',
-        goalCode: '10.2.1.4',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 5',
+        title: '<span class="accent-text">Рекурсия</span> · Разбор чисел',
+        lead: 'Фундаментальный алгоритмический прием: как разобрать число на разряды без циклов и строк, используя операции % 10 и // 10.',
+        goal: 'Освоить декомпозицию целых чисел в рекурсии, научиться вычислять сумму цифр и переводить числа в двоичную систему счисления.',
+        goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-percent', text: 'n % 10 — последняя цифра' },
-          { icon: 'fas fa-divide', text: 'n // 10 — остальные цифры' },
-          { icon: 'fas fa-arrow-trend-down', text: 'Число уменьшается' }
+          { icon: 'fas fa-divide', text: 'Срез n // 10' },
+          { icon: 'fas fa-percent', text: 'Остаток n % 10' },
+          { icon: 'fas fa-binary', text: 'Двоичный перевод' }
         ],
         visual: 'recursion',
-        visualCaption: 'Каждый шаг отрезает одну цифру',
-        cta: 'Разобрать пример'
+        visualCaption: 'Отщепляем последнюю цифру и отправляем остаток на следующий шаг',
+        cta: 'Изучить метод'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Чему равно 0!?', options: ['1', '0', 'Не определено', '10'], answer: 0, explain: 'По определению.' },
-          { q: 'Чему равно 5!?', options: ['120', '60', '24', '100'], answer: 0, explain: '5 × 4 × 3 × 2 × 1.' },
-          { q: 'Какая строка — шаг в factorial?', options: ['return n * factorial(n - 1)', 'if n == 0:', 'return 1', 'print(n)'], answer: 0, explain: 'Вызов с меньшим n.' },
-          { q: 'Когда выполняется умножение?', options: ['При возврате', 'До вызова', 'Сразу', 'Никогда'], answer: 0, explain: 'На обратном пути.' },
-          { q: 'Что будет при factorial(-1)?', options: ['RecursionError', '1', '0', '-1'], answer: 0, explain: 'База недостижима.' }
+          { q: 'Чему равно значение 17 % 10 в языке Python?', options: ['1', '7', '1.7', '0'], answer: 1, explain: 'Оператор % вычисляет остаток от деления: 17 % 10 = 7 (последняя цифра).' },
+          { q: 'Чему равен результат операции целочисленного деления 482 // 10?', options: ['48', '48.2', '2', '4'], answer: 0, explain: 'Оператор // отбрасывает дробную часть: 482 // 10 = 48 (число без последней цифры).' },
+          { q: 'Какое условие является естественной базой при разборе положительного числа по одной цифре?', options: ['n < 10 (осталась одна цифра)', 'n > 100', 'n == 0', 'n % 2 == 0'], answer: 0, explain: 'Когда число n < 10, в нем осталась всего одна цифра, для которой ответ очевиден.' },
+          { q: 'Сколько членов ряда Фибоначчи складываются на каждом шаге?', options: ['Один', 'Два (n-1 и n-2)', 'Три', 'Все предыдущие'], answer: 1, explain: 'Ряд Фибоначчи определяется как сумма двух предыдущих членов.' },
+          { q: 'Чему равен факториал 1!?', options: ['0', '1', '2', '-1'], answer: 1, explain: '1! = 1.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · ИДЕЯ',
-        title: 'Последняя цифра и остаток',
-        lead: 'Операция % 10 даёт последнюю цифру, // 10 отбрасывает её. Это готовый шаг уменьшения задачи.',
+        eyebrow: '03 · ПРИЕМ ДЕКОМПОЗИЦИИ',
+        title: 'Как рекурсия видит число?',
+        lead: 'Любое десятичное число можно разделить на две части: <b>последнюю цифру</b> (<code>n % 10</code>) и <b>все остальные разряды</b> (<code>n // 10</code>).',
         blocks: [
+          { t: 'svg', svg: DIGIT_PARSE_SVG, caption: 'Схема отщепления цифр числа 482' },
           {
             t: 'table',
-            caption: 'Разбор числа 4721',
-            head: ['Число', 'n % 10', 'n // 10'],
+            caption: 'Шаги рекурсивного разбора числа 482',
+            head: ['Вызов', 'Последняя цифра (n % 10)', 'Остаток числа (n // 10)', 'Действие'],
             rows: [
-              ['4721', '1', '472'],
-              ['472', '2', '47'],
-              ['47', '7', '4'],
-              ['4', '4', '0']
+              ['digit_sum(482)', '2', '48', '2 + digit_sum(48)'],
+              ['digit_sum(48)', '8', '4', '8 + digit_sum(4)'],
+              ['digit_sum(4)', '4 (база n < 10)', '—', 'Возврат 4']
             ],
-            highlight: 0
-          },
-          {
-            t: 'code',
-            title: 'digit_sum.py',
-            code: 'def digit_sum(n):\n    if n == 0:                      # база\n        return 0\n    return n % 10 + digit_sum(n // 10)   # шаг\n\nprint(digit_sum(4721))   # 4+7+2+1 = 14\nprint(digit_sum(9))      # 9\nprint(digit_sum(1000))   # 1'
-          },
-          {
-            t: 'steps',
-            items: [
-              { title: 'Шаг 1', text: 'digit_sum(4721) = 1 + digit_sum(472)' },
-              { title: 'Шаг 2', text: 'digit_sum(472) = 2 + digit_sum(47)' },
-              { title: 'Шаг 3', text: 'digit_sum(47) = 7 + digit_sum(4)' },
-              { title: 'Шаг 4', text: 'digit_sum(4) = 4 + digit_sum(0)' },
-              { title: 'База', text: 'digit_sum(0) = 0, сумма собирается обратно: 4 + 7 + 2 + 1 = 14' }
-            ]
-          },
-          {
-            t: 'callout',
-            tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'Ноль — особый случай',
-            text: 'digit_sum(0) = 0 по базе. Но если спросить «сколько цифр в числе 0», ответ 1, а не 0. Для подсчёта цифр базу делают иначе: if n < 10: return 1.'
+            highlight: 2
           }
         ]
       },
       {
-        k: 'lab',
-        eyebrow: '04 · ИНТЕРАКТИВ',
-        title: 'Сумма цифр по шагам',
-        lead: 'Введите число и проследите, как отрезаются цифры и складывается результат.',
-        widget: {
-          kind: 'recursion',
-          config: { fn: 'digits', n: 4721 }
-        },
-        after: [
+        k: 'concept',
+        eyebrow: '04 · РАЗБОР КОДА',
+        title: 'Сумма цифр числа в 4 строчки',
+        lead: 'Посмотри, насколько лаконичным получается рекурсивный код по сравнению с громоздкими циклами.',
+        blocks: [
+          {
+            t: 'code',
+            title: 'сумма_цифр.py',
+            code: 'def digit_sum(n):\n    # База: если число однозначное, сумма равна самой цифре\n    if n < 10:\n        return n\n\n    # Шаг: последняя цифра + сумма цифр оставшейся части\n    return (n % 10) + digit_sum(n // 10)\n\nprint("Сумма цифр 482:", digit_sum(482))  # 14'
+          },
           {
             t: 'callout',
             tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Проверка',
-            text: 'Для 4721 сумма равна 14. Попробуйте 999 — получится 27, и 100000 — получится 1.'
+            icon: 'fas fa-sparkles',
+            title: 'Почему не через str(n)?',
+            text: 'Преобразование числа в строку расходует дополнительную память на создание строкового объекта. Математический разбор через <code>% 10</code> и <code>// 10</code> работает напрямую с регистрами процессора.'
           }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '05 · PYTHON-ПРАКТИКУМ',
-        title: 'Считаем цифры и ищем максимум',
-        lead: 'Тот же приём решает несколько задач: сумма, количество и максимальная цифра.',
+        eyebrow: '05 · ДВОИЧНЫЙ ПЕРЕВОД',
+        title: 'Перевод чисел в двоичную систему',
+        lead: 'Тот же принцип работает для перевода в любую систему счисления: делим не на 10, а на основание системы (на 2 для двоичной).',
         blocks: [
           {
-            t: 'widget',
-            kind: 'pythonRef',
-            config: {
-              title: 'Напоминание Python',
-              groups: [
-                {
-                  title: 'Операции с числом',
-                  items: [
-                    { cmd: 'n % 10', text: 'последняя цифра' },
-                    { cmd: 'n // 10', text: 'число без последней цифры' },
-                    { cmd: 'max(a, b)', text: 'большее из двух' },
-                    { cmd: 'n < 10', text: 'число из одной цифры' }
-                  ]
-                },
-                {
-                  title: 'Полезное',
-                  items: [
-                    { cmd: 'len(str(n))', text: 'количество цифр через строку' },
-                    { cmd: 'sum(map(int, str(n)))', text: 'сумма цифр без рекурсии' },
-                    { cmd: 'while n > 0:', text: 'циклический вариант' },
-                    { cmd: 'n //= 10', text: 'сокращённая запись n = n // 10' }
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            t: 'code',
-            title: 'digit_tasks.py',
-            code: 'def digit_sum(n):\n    if n == 0:\n        return 0\n    return n % 10 + digit_sum(n // 10)\n\ndef digit_count(n):\n    if n < 10:\n        return 1\n    return 1 + digit_count(n // 10)\n\ndef max_digit(n):\n    if n < 10:\n        return n\n    return max(n % 10, max_digit(n // 10))\n\nprint(digit_sum(4721))     # 14\nprint(digit_count(4721))   # 4\nprint(max_digit(4721))     # 7'
-          },
-          {
-            t: 'compare',
-            left: { title: 'Рекурсия', items: ['Код повторяет определение', 'Не нужны счётчики', 'Глубина = число цифр'] },
-            right: { title: 'Цикл', items: ['Не боится больших чисел', 'Нужна переменная-накопитель', 'Чуть длиннее'] },
-            vs: '⇄'
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Логика перевода',
+                icon: 'fas fa-binary',
+                title: 'Остатки от деления на 2',
+                text: 'При делении числа на 2 остатки <code>n % 2</code> дают двоичные биты. Рекурсия удобна тем, что собирает биты на обратном ходе в правильном порядке!',
+                tone: 'violet'
+              },
+              {
+                badge: 'Код перевода',
+                icon: 'fas fa-code',
+                title: 'to_binary.py',
+                text: 'База: если <code>n <= 1</code>, вернуть <code>str(n)</code>. Шаг: вызвать функцию от <code>n // 2</code> и приклеить остаток <code>str(n % 2)</code>.',
+                tone: 'cyan'
+              }
+            ]
           }
         ]
       },
       {
-        k: 'practice',
-        eyebrow: '06 · ПРАКТИКА',
-        title: 'Считаем цифры',
-        lead: 'Вычислите вручную или мысленно выполните код.',
-        tasks: [
-          { title: 'Сумма', q: 'Чему равна сумма цифр числа 4721?', answer: '14', type: 'number', explain: '4 + 7 + 2 + 1 = 14.', hint: 'Сложите все цифры.' },
-          { title: 'Последняя', q: 'Что вернёт 4721 % 10?', answer: '1', type: 'number', explain: 'Остаток от деления на 10 — последняя цифра.', hint: 'Последняя цифра числа.' },
-          { title: 'Остаток', q: 'Что вернёт 4721 // 10?', answer: '472', type: 'number', explain: 'Целочисленное деление отбрасывает последнюю цифру.', hint: 'Уберите последнюю цифру.' },
-          { title: 'База', q: 'Что возвращает digit_sum(0)?', answer: '0', type: 'number', explain: 'База функции.', hint: 'Сумма цифр нуля по базе.' },
-          { title: 'Цифры', q: 'Сколько цифр в числе 4721?', answer: '4', type: 'number', explain: 'Четыре цифры: 4, 7, 2, 1.', hint: 'Посчитайте символы.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Шаг уменьшения задачи объяснён.' },
-          { mark: '1 балл', text: 'Значения вычислены верно.' },
-          { mark: '1 балл', text: 'Различие базы для суммы и количества понято.' }
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКА В PYTHON IDLE',
+        title: 'Три задачи для практики',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              {
+                badge: 'Задачка 1 · 3 балла',
+                icon: 'fas fa-calculator',
+                title: 'Сумма цифр: digit_sum(n)',
+                text: 'Напиши функцию <code>digit_sum(n)</code>, которая принимает целое положительное число <code>n</code> и возвращает сумму его цифр.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: если <code>n &lt; 10</code>, вернуть <code>n</code>. Шаг: сложить последнюю цифру <code>n % 10</code> и вызов <code>digit_sum(n // 10)</code>.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Задачка 2 · 3 балла',
+                icon: 'fas fa-list-ol',
+                title: 'Четные цифры: count_evens(n)',
+                text: 'Напиши функцию <code>count_evens(n)</code>, которая подсчитывает количество четных цифр в числе <code>n</code> (например, для 2481 вернет 3).<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: если <code>n &lt; 10</code>, вернуть 1 (если <code>n % 2 == 0</code>), иначе 0. Шаг: проверить последнюю цифру и сложить с результатом от <code>n // 10</code>.',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Задачка 3 · 4 балла ★',
+                icon: 'fas fa-star',
+                title: 'Двоичный код: to_binary(n)',
+                text: 'Напиши функцию <code>to_binary(n)</code>, которая принимает число <code>n</code> и возвращает его двоичную запись в виде строки (например, для 13 вернет "1101").<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: если <code>n &lt;= 1</code>, вернуть <code>str(n)</code>. Шаг: соединить строки <code>to_binary(n // 2) + str(n % 2)</code>.',
+                tone: 'amber'
+              }
+            ]
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА',
+        title: 'Проверим знания разбора чисел',
+        lead: 'Выбери один правильный ответ в каждом вопросе.',
         questions: [
-          { q: 'Что даёт n % 10?', options: ['Последнюю цифру', 'Первую цифру', 'Количество цифр', 'Сумму цифр'], answer: 0, explain: 'Остаток от деления на 10.' },
-          { q: 'Что даёт n // 10?', options: ['Число без последней цифры', 'Последнюю цифру', 'Удвоенное число', 'Ноль'], answer: 0, explain: 'Целочисленное деление.' },
-          { q: 'База digit_sum — это ...', options: ['n == 0 → 0', 'n == 1 → 1', 'n < 10 → n', 'нет базы'], answer: 0, explain: 'Сумма цифр нуля равна нулю.' },
-          { q: 'Сумма цифр 999?', options: ['27', '18', '9', '999'], answer: 0, explain: '9 + 9 + 9 = 27.' },
-          { q: 'Глубина digit_sum(4721)?', options: ['5', '4', '3', '6'], answer: 0, explain: '4721, 472, 47, 4, 0 — пять кадров.' }
+          { q: 'Какая операция отщепляет последнюю цифру от десятичного числа?', options: ['n // 10', 'n % 10', 'n ** 10', 'n - 10'], answer: 1, explain: 'Остаток n % 10 возвращает последнюю цифру числа.' },
+          { q: 'Какая операция удаляет последнюю цифру, уменьшая число для следующего вызова?', options: ['n // 10', 'n % 10', 'n / 10', 'abs(n)'], answer: 0, explain: 'Целочисленное деление n // 10 отбрасывает младший разряд.' },
+          { q: 'Чему равна сумма цифр числа 502?', options: ['5', '7', '10', '52'], answer: 1, explain: '5 + 0 + 2 = 7.' },
+          { q: 'Каков правильный базовый случай для нахождения суммы цифр натурального числа?', options: ['n == 0: return 0', 'n < 10: return n', 'n == 1: return 1', 'n > 10: return 0'], answer: 1, explain: 'Если n < 10, число состоит из единственной цифры, она и есть сумма.' },
+          { q: 'Как запишется число 6 в двоичной системе счисления?', options: ['110', '101', '011', '111'], answer: 0, explain: '6 = 4 + 2 + 0, в двоичной системе это 110₂.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'n % 10 — последняя цифра, n // 10 — остальные.',
-          'Сумма цифр: n % 10 + digit_sum(n // 10).',
-          'База суммы — digit_sum(0) = 0.',
-          'Для количества цифр база другая: n < 10 → 1.',
-          'Глубина равна числу цифр плюс один.'
+          'Операция % 10 выделяет младший разряд (последнюю цифру) числа.',
+          'Операция // 10 выполняет шаг рекурсии, уменьшая число на один разряд.',
+          'Условие n < 10 служит естественной базой для однозначных чисел.',
+          'Тот же принцип деления на основание системы используется для перевода в двоичный код.'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задание 1: Задано условие остановки для однозначного числа n < 10.' },
+          { mark: '1 балл', text: 'Задание 1: Реализовано сложение последней цифры и уменьшенного числа.' },
+          { mark: '1 балл', text: 'Задание 1: Программа протестирована в IDLE и возвращает верную сумму.' },
+          { mark: '1 балл', text: 'Задание 2: Оформлена проверка базового случая с учетом четности.' },
+          { mark: '1 балл', text: 'Задание 2: Реализован рекурсивный шаг инкремента счетчика четных цифр.' },
+          { mark: '1 балл', text: 'Задание 2: Функция возвращает точное количество четных цифр.' },
+          { mark: '1 балл', text: 'Задание 3: Реализована база рекурсии для значений n <= 1.' },
+          { mark: '1 балл', text: 'Задание 3: Шаг формирует конкатенацию битовой строки на выходе.' },
+          { mark: '1 балл', text: 'Задание 3: Функция возвращает двоичную строку в корректном порядке битов.' },
+          { mark: '1 балл', text: 'Задание 3: Код проверен на контрольных числах в среде IDLE.' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'Последняя цифра числа — это ...',
-          'Шаг digit_sum — ...',
-          'Для количества цифр база ...'
+          'Как комбинация % 10 и // 10 позволяет разобрать любое число?',
+          'Почему при переводе в двоичную систему остатки приклеиваются справа?',
+          'С какой задачей удалось справиться без подсказок?'
         ]
       }
     ]
   });
 
   /* ==========================================================================
-     УРОК 6. Переворот строки
+     УРОК 6. Строки и списки
      ========================================================================== */
   Q2.add('10emn-q2-6', {
     num: 6,
@@ -1191,169 +1499,190 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
-        lead: '«дом» → «мод». Чтобы перевернуть строку рекурсивно, отрежем первый символ и перевернём остаток, а потом приклеим символ в конец.',
-        goal: 'Писать рекурсивную функцию разворота строки и объяснять порядок склейки.',
-        goalCode: '10.2.1.5',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 6',
+        title: '<span class="accent-text">Рекурсия</span> · Строки и списки',
+        lead: 'Рекурсивная обработка текста и коллекций: отделяем первый символ от хвоста срезом, разворачиваем слова и проверяем палиндромы.',
+        goal: 'Научиться применять рекурсию к строкам и спискам через срезы [0] и [1:], решать задачи на поиск и симметрию.',
+        goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-scissors', text: 's[1:] — остаток строки' },
-          { icon: 'fas fa-plus', text: 's[0] — первый символ' },
-          { icon: 'fas fa-rotate-left', text: 'Склейка при возврате' }
+          { icon: 'fas fa-font', text: 'Срезы s[0] и s[1:]' },
+          { icon: 'fas fa-arrows-rotate', text: 'Реверс строк' },
+          { icon: 'fas fa-arrows-split-up-and-left', text: 'Палиндромы' }
         ],
         visual: 'recursion',
-        visualCaption: 'Символы возвращаются в обратном порядке',
-        cta: 'Перевернуть'
+        visualCaption: 'Голова s[0] и хвост s[1:] — стандартный шаблон рекурсии строк',
+        cta: 'Разобрать строки'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Что даёт n % 10?', options: ['Последнюю цифру', 'Первую цифру', 'Длину', 'Сумму'], answer: 0, explain: 'Остаток от деления на 10.' },
-          { q: 'Что даёт n // 10?', options: ['Число без последней цифры', 'Последнюю цифру', 'Удвоение', 'Ноль'], answer: 0, explain: 'Целочисленное деление.' },
-          { q: 'База digit_sum?', options: ['n == 0 → 0', 'n == 1 → 1', 'n < 10 → n', 'нет базы'], answer: 0, explain: 'Сумма цифр нуля.' },
-          { q: 'Сумма цифр 999?', options: ['27', '18', '9', '999'], answer: 0, explain: '9 + 9 + 9.' },
-          { q: 'Глубина digit_sum(4721)?', options: ['5', '4', '3', '6'], answer: 0, explain: 'Пять кадров.' }
+          { q: 'Что вернет выражение "информатика"[0] в Python?', options: ['"и"', '"ин"', '"информатика"', 'Ошибку'], answer: 0, explain: 'Индекс [0] возвращает первый символ строки (голову).' },
+          { q: 'Что вернет срез "питон"[1:]?', options: ['"итон"', '"п"', '"питон"', '"и"'], answer: 0, explain: 'Срез [1:] возвращает всю строку без первого символа (хвост).' },
+          { q: 'Какова естественная база при рекурсивной обработке строки?', options: ['Длина строки len(s) <= 1', 'Строка состоит из 100 букв', 'Строка содержит цифры', 'Первая буква заглавная'], answer: 0, explain: 'Пустая строка или строка из одного символа не требует обработки.' },
+          { q: 'Что такое палиндром?', options: ['Слово, которое читается одинаково слева направо и справа налево', 'Слово, написанное заглавными буквами', 'Функция без аргументов', 'Список целых чисел'], answer: 0, explain: 'Палиндромы («шалаш», «казак», «топот») абсолютно симметричны.' },
+          { q: 'Какая операция отщепляет последнюю цифру десятичного числа?', options: ['n % 10', 'n // 10', 'n * 10', 'n / 10'], answer: 0, explain: 'Остаток от деления на 10 дает последнюю цифру.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · СРЕЗЫ',
-        title: 'Срез — это уменьшение',
-        lead: 'Срез s[1:] возвращает строку без первого символа. Это и есть задача меньшего размера.',
+        eyebrow: '03 · ПРИЕМ «ГОЛОВА И ХВОСТ»',
+        title: 'Как рекурсия разбирает последовательности',
+        lead: 'Любую строку или список можно представить как первый элемент (голову) и оставшуюся подстроку (хвост): <code>s = s[0] + s[1:]</code>.',
         blocks: [
+          { t: 'svg', svg: STRING_REVERSE_SVG, caption: 'Разбиение строки на голову s[0] и хвост s[1:]' },
           {
-            t: 'table',
-            caption: 'Разбор строки «дом»',
-            head: ['Строка', 's[0]', 's[1:]'],
-            rows: [
-              ['дом', 'д', 'ом'],
-              ['ом', 'о', 'м'],
-              ['м', 'м', ''],
-              ['', '—', '—']
-            ],
-            highlight: 2
-          },
-          {
-            t: 'code',
-            title: 'reverse.py',
-            code: 'def reverse(s):\n    if s == "":                 # база\n        return ""\n    return reverse(s[1:]) + s[0]   # шаг\n\nprint(reverse("дом"))     # мод\nprint(reverse("python"))  # nohtyp\nprint(reverse(""))        # пустая строка'
-          },
-          {
-            t: 'steps',
+            t: 'cards',
+            cols: 2,
             items: [
-              { title: 'reverse("дом")', text: 'reverse("ом") + "д"' },
-              { title: 'reverse("ом")', text: 'reverse("м") + "о"' },
-              { title: 'reverse("м")', text: 'reverse("") + "м"' },
-              { title: 'База', text: 'reverse("") = ""' },
-              { title: 'Сборка', text: '"м" → "мо" → "мод"' }
+              {
+                badge: 'Базовый случай',
+                icon: 'fas fa-stop',
+                title: 'Пустая строка или 1 символ',
+                text: 'Если <code>len(s) &lt;= 1</code>, переворачивать нечего — возвращаем саму строку <code>return s</code>. Это наш стоп-кран.',
+                tone: 'green'
+              },
+              {
+                badge: 'Рекурсивный шаг',
+                icon: 'fas fa-arrow-right-arrow-left',
+                title: 'Хвост вперед, голова назад',
+                text: 'Разворачиваем хвост и приписываем голову в самый конец: <code>reverse(s[1:]) + s[0]</code>. Для "КОД" это "ОД" + "К" → "ДО" + "К" = "ДОК".',
+                tone: 'violet'
+              }
             ]
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-lightbulb',
-            title: 'Почему символ в конце',
-            text: 'Первый символ должен оказаться последним, поэтому его приклеивают после результата разворота остатка. Если поставить s[0] + reverse(s[1:]), строка не изменится.'
           }
         ]
       },
       {
-        k: 'lab',
-        eyebrow: '04 · ИНТЕРАКТИВ',
-        title: 'Разворот по шагам',
-        lead: 'Введите слово и проследите, как символы «отклеиваются» и возвращаются в обратном порядке.',
-        widget: {
-          kind: 'recursion',
-          config: { fn: 'reverse', n: 5 }
-        },
-        after: [
+        k: 'concept',
+        eyebrow: '04 · ПРОВЕРКА ПАЛИНДРОМОВ',
+        title: 'Симметрия: сужение строки с двух концов',
+        lead: 'Слово является палиндромом, если его первая и последняя буквы совпадают, а середина — тоже палиндром!',
+        blocks: [
+          {
+            t: 'code',
+            title: 'палиндром.py',
+            code: 'def is_palindrome(s):\n    # База: строки длины 0 или 1 всегда палиндромы\n    if len(s) <= 1:\n        return True\n\n    # Если крайние буквы не равны — точно не палиндром\n    if s[0] != s[-1]:\n        return False\n\n    # Шаг: проверяем подстроку без крайних букв\n    return is_palindrome(s[1:-1])\n\nprint(is_palindrome("шалаш"))  # True\nprint(is_palindrome("питон"))  # False'
+          },
           {
             t: 'callout',
             tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Сравнение',
-            text: 'Для строки «python» результат — «nohtyp». В Python есть готовый способ: s[::-1], но рекурсивная версия показывает саму идею.'
+            icon: 'fas fa-check-double',
+            title: 'Сужение срезом s[1:-1]',
+            text: 'Срез <code>s[1:-1]</code> отсекает первый и последний символы одновременно: "шалаш" → "ала" → "л" (база reached, True).'
           }
         ]
       },
       {
-        k: 'lab',
-        eyebrow: '05 · PYTHON-ПРАКТИКУМ',
-        title: 'Что выведет программа',
-        lead: 'Прочитайте код и выберите верный результат.',
-        widget: {
-          kind: 'codePredict',
-          config: {
-            title: 'predict.py',
-            code: 'def reverse(s):\n    if s == "":\n        return ""\n    return reverse(s[1:]) + s[0]\n\nprint(reverse("abc"))',
-            options: ['cba', 'abc', 'bc', 'Ошибка'],
-            answer: 0,
-            explain: 'Символы возвращаются в обратном порядке: reverse("bc") + "a" → reverse("c") + "b" + "a" → "c" + "b" + "a" = "cba".'
-          }
-        },
-        after: [
+        k: 'concept',
+        eyebrow: '05 · РЕКУРСИЯ ПО СПИСКАМ',
+        title: 'Обработка числовых списков',
+        lead: 'Точно так же, как со строками, рекурсия легко считает сумму, максимум или количество элементов в обычном списке Python.',
+        blocks: [
           {
-            t: 'code',
-            title: 'варианты.py',
-            code: '# без рекурсии\nprint("abc"[::-1])          # cba\nprint("".join(reversed("abc")))   # cba\n\n# палиндром\nword = "шалаш"\nprint(word == word[::-1])   # True'
-          },
-          {
-            t: 'callout',
-            tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'Срез и индекс',
-            text: 's[1:] — строка без первого символа, а s[1] — второй символ. Не путайте срез с индексом: в базе нужно проверять пустую строку, а не длину 1.'
+            t: 'table',
+            caption: 'Шаблон обхода последовательности',
+            head: ['Элемент шаблона', 'Для строк (str)', 'Для списков (list)'],
+            rows: [
+              ['База', 'if len(s) == 0: return ""', 'if len(lst) == 0: return 0'],
+              ['Голова', 's[0]', 'lst[0]'],
+              ['Хвост', 's[1:]', 'lst[1:]'],
+              ['Шаг суммирования', 's[0] + rec(s[1:])', 'lst[0] + rec(lst[1:])']
+            ],
+            highlight: 0
           }
         ]
       },
       {
-        k: 'practice',
-        eyebrow: '06 · ПРАКТИКА',
-        title: 'Разворот строки',
-        lead: 'Предскажите результат и запишите ответ без кавычек.',
-        tasks: [
-          { title: 'Слово', q: 'Что вернёт reverse("дом")?', answer: ['мод', 'mod'], explain: 'Символы идут в обратном порядке.', hint: 'Прочитайте справа налево.' },
-          { title: 'Срез', q: 'Что вернёт "python"[1:]?', answer: 'ython', explain: 'Строка без первого символа.', hint: 'Уберите «p».' },
-          { title: 'База', q: 'Что возвращает reverse("")?', answer: ['""', 'пустая строка', 'пусто'], explain: 'База — пустая строка.', hint: 'Ничего.' },
-          { title: 'Палиндром', q: 'Является ли «шалаш» палиндромом?', answer: ['да', 'yes'], explain: 'Читается одинаково в обе стороны.', hint: 'Сравните с обратной записью.' },
-          { title: 'Порядок', q: 'Что вернёт "abc"[::-1]?', answer: 'cba', explain: 'Срез с шагом −1 переворачивает строку.', hint: 'Справа налево.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Порядок склейки объяснён.' },
-          { mark: '1 балл', text: 'Результаты предсказаны верно.' },
-          { mark: '1 балл', text: 'Палиндром проверен через разворот.' }
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКА В PYTHON IDLE',
+        title: 'Три задачи для практики',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              {
+                badge: 'Задачка 1 · 3 балла',
+                icon: 'fas fa-arrows-rotate',
+                title: 'Реверс: reverse_str(s)',
+                text: 'Напиши функцию <code>reverse_str(s)</code>, которая переворачивает строку задом наперед с помощью рекурсии.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: если <code>len(s) &lt;= 1</code>, вернуть <code>s</code>. Шаг: вызвать функцию для хвоста <code>s[1:]</code> и приклеить голову <code>s[0]</code> в конец.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Задачка 2 · 3 балла',
+                icon: 'fas fa-spell-check',
+                title: 'Гласные: count_vowels(s)',
+                text: 'Напиши функцию <code>count_vowels(s)</code>, которая подсчитывает число гласных букв в строке <code>s</code> (гласные: "ауоыиэяюёе").<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: пустая строка <code>len(s) == 0</code> вернет 0. Шаг: прибавить 1, если <code>s[0].lower()</code> среди гласных, плюс вызов для <code>s[1:]</code>.',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Задачка 3 · 4 балла ★',
+                icon: 'fas fa-star',
+                title: 'Палиндром: is_palindrome(s)',
+                text: 'Напиши функцию <code>is_palindrome(s)</code>, которая проверяет, читается ли слово одинаково в обе стороны.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: при <code>len(s) &lt;= 1</code> вернуть <code>True</code>. Если <code>s[0] != s[-1]</code>, вернуть <code>False</code>, иначе вызвать <code>is_palindrome(s[1:-1])</code>.',
+                tone: 'amber'
+              }
+            ]
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА',
+        title: 'Проверим знания рекурсии со строками',
+        lead: 'Выбери один правильный ответ в каждом вопросе.',
         questions: [
-          { q: 'Что возвращает s[1:]?', options: ['Строку без первого символа', 'Первый символ', 'Строку без последнего', 'Пустую строку'], answer: 0, explain: 'Срез от второго символа до конца.' },
-          { q: 'Где в шаге стоит s[0]?', options: ['После reverse(s[1:])', 'Перед reverse(s[1:])', 'Внутри базы', 'Нигде'], answer: 0, explain: 'Первый символ должен стать последним.' },
-          { q: 'База reverse — это ...', options: ['s == "" → ""', 'len(s) == 1', 's == "a"', 'нет базы'], answer: 0, explain: 'Пустая строка.' },
-          { q: 'Результат reverse("abc")?', options: ['cba', 'abc', 'bc', 'cb'], answer: 0, explain: 'Обратный порядок.' },
-          { q: 'Альтернатива без рекурсии?', options: ['s[::-1]', 's[1:]', 's[0]', 'len(s)'], answer: 0, explain: 'Срез с шагом −1.' }
+          { q: 'Что вернет reverse_str("код"), если функция написана верно?', options: ['"код"', '"док"', '"кдо"', '"одк"'], answer: 1, explain: '"код" задом наперед читается как "док".' },
+          { q: 'Какой срез отсекает первый символ строки?', options: ['s[0]', 's[1:]', 's[:-1]', 's[::2]'], answer: 1, explain: 's[1:] возвращает всю строку начиная со второго символа (хвост).' },
+          { q: 'Является ли слово «казак» палиндромом?', options: ['Да, оно абсолютно симметрично', 'Нет', 'Только если записано латиницей', 'Зависит от версии Python'], answer: 0, explain: '«казак» читается одинаково в обоих направлениях.' },
+          { q: 'Какое условие завершает рекурсивную проверку палиндрома с положительным ответом?', options: ['len(s) <= 1', 'len(s) > 10', 's[0] == "а"', 'len(s) == 2'], answer: 0, explain: 'Если остался 1 символ или 0 символов, все пары совпали — возвращается True.' },
+          { q: 'Какой срез отсекает одновременно первый и последний символ строки?', options: ['s[1:]', 's[:-1]', 's[1:-1]', 's[0:-1]'], answer: 2, explain: 'Срез s[1:-1] отбрасывает крайние символы с обеих сторон.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Срез s[1:] уменьшает строку на символ.',
-          'Шаг: reverse(s[1:]) + s[0].',
-          'База — пустая строка.',
-          'Символы склеиваются при возврате.',
-          'Без рекурсии работает s[::-1].'
+          'Прием «голова и хвост» — стандартная схема рекурсивной обработки последовательностей.',
+          'Срез s[1:] уменьшает длину строки на 1, приближая алгоритм к базовой пустой строке.',
+          'Проверка палиндрома использует встречное сужение через срез s[1:-1].',
+          'Те же правила применимы к спискам: первый элемент lst[0] и хвост lst[1:].'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задание 1: Задано условие остановки для строки длины <= 1.' },
+          { mark: '1 балл', text: 'Задание 1: Оформлен рекурсивный шаг перестановки символов через срез.' },
+          { mark: '1 балл', text: 'Задание 1: Программа протестирована в IDLE и возвращает зеркальную строку.' },
+          { mark: '1 балл', text: 'Задание 2: Реализована база для пустой строки.' },
+          { mark: '1 балл', text: 'Задание 2: Оформлена проверка вхождения символа в набор гласных букв.' },
+          { mark: '1 балл', text: 'Задание 2: Функция возвращает верное количество гласных на тестовых строках.' },
+          { mark: '1 балл', text: 'Задание 3: Реализовано базовое условие симметрии для коротких подстрок.' },
+          { mark: '1 балл', text: 'Задание 3: Описана проверка несовпадения крайних символов строки.' },
+          { mark: '1 балл', text: 'Задание 3: Реализован рекурсивный вызов для суженного среза s[1:-1].' },
+          { mark: '1 балл', text: 'Задание 3: Проверены тестовые слова (палиндромы и несимметричные слова).' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'Срез s[1:] возвращает ...',
-          'В шаге первый символ ставится ...',
-          'База разворота — ...'
+          'Как срезы s[0] и s[1:] помогают организовать рекурсию?',
+          'Почему при проверке палиндрома строка уменьшается на два символа за шаг?',
+          'Какое тестовое слово ты проверил(а) в третьей задаче?'
         ]
       }
     ]
   });
 
   /* ==========================================================================
-     УРОК 7. Рекурсия и цикл
+     УРОК 7. Рекурсия или цикл
      ========================================================================== */
   Q2.add('10emn-q2-7', {
     num: 7,
@@ -1362,187 +1691,190 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
-        lead: 'Любую линейную рекурсию можно записать циклом, и наоборот. Вопрос не «что лучше», а «что понятнее в конкретной задаче».',
-        goal: 'Сравнивать рекурсивное и циклическое решения, переводить одно в другое.',
-        goalCode: '10.2.1.6',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 7',
+        title: '<span class="accent-text">Рекурсия</span> · Рекурсия или цикл',
+        lead: 'Битва подходов: итерация против рекурсии. Почему цикл экономит память O(1), а рекурсия незаменима для иерархий и алгоритма Евклида.',
+        goal: 'Сравнить циклы и рекурсию по времени и памяти, научиться транслировать циклы в рекурсию и выбирать лучший инструмент.',
+        goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-repeat', text: 'Цикл while' },
-          { icon: 'fas fa-arrows-rotate', text: 'Перевод решения' },
-          { icon: 'fas fa-scale-balanced', text: 'Выбор подхода' }
+          { icon: 'fas fa-memory', text: 'Память O(1) vs O(N)' },
+          { icon: 'fas fa-scale-balanced', text: 'Когда что выбрать' },
+          { icon: 'fas fa-diagram-project', text: 'Алгоритм Евклида' }
         ],
         visual: 'recursion',
-        visualCaption: 'Одна задача — две записи',
-        cta: 'Сравнить'
+        visualCaption: 'Цикл перезаписывает одну переменную, рекурсия строит стек фреймов',
+        cta: 'Сравнить подходы'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Что возвращает s[1:]?', options: ['Строку без первого символа', 'Первый символ', 'Строку без последнего', 'Пустую строку'], answer: 0, explain: 'Срез с индекса 1.' },
-          { q: 'Где в шаге разворота стоит s[0]?', options: ['После reverse(s[1:])', 'Перед ним', 'В базе', 'Нигде'], answer: 0, explain: 'Первый символ должен стать последним.' },
-          { q: 'База reverse?', options: ['s == "" → ""', 'len(s) == 1', 's == "a"', 'нет базы'], answer: 0, explain: 'Пустая строка.' },
-          { q: 'Результат reverse("abc")?', options: ['cba', 'abc', 'bc', 'cb'], answer: 0, explain: 'Обратный порядок.' },
-          { q: 'Альтернатива без рекурсии?', options: ['s[::-1]', 's[1:]', 's[0]', 'len(s)'], answer: 0, explain: 'Срез с шагом −1.' }
+          { q: 'Сколько оперативной памяти расходует обычный цикл for при миллионе итераций?', options: ['Константный объем O(1) — только для переменной счетчика', 'Один гигабайт', 'Память переполняется сразу', 'Стек вызовов заполняется до предела'], answer: 0, explain: 'Цикл не создает новых фреймов, а лишь перезаписывает значение переменной.' },
+          { q: 'Что происходит с памятью при глубокой рекурсии без оптимизации?', options: ['Память освобождается', 'Каждый вызов занимает фрейм в стеке O(N)', 'Компьютер переключается на жесткий диск', 'Ничего не меняется'], answer: 1, explain: 'Каждый шаг рекурсии сохраняет параметры в отдельном фрейме стека вызовов.' },
+          { q: 'Для каких структур данных рекурсия подходит лучше всего?', options: ['Только для простых чисел', 'Для иерархических структур: деревьев, вложенных папок, графов', 'Только для коротких строк', 'Для пустых файлов'], answer: 1, explain: 'Иерархические и древовидные структуры естественно обходятся рекурсивными вызовами.' },
+          { q: 'Какой алгоритм находит наибольший общий делитель (НОД) двух чисел?', options: ['Алгоритм Евклида', 'Сортировка пузырьком', 'Бинарный поиск', 'Шифр Цезаря'], answer: 0, explain: 'Алгоритм Евклида — классический и один из самых быстрых методов нахождения НОД.' },
+          { q: 'Что делает оператор % в алгоритме Евклида?', options: ['Вычисляет процент от числа', 'Находит остаток от деления большего числа на меньшее', 'Возводит число в степень', 'Округляет до целого'], answer: 1, explain: 'Остаток от деления a % b является основой шага алгоритма Евклида.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · СРАВНЕНИЕ',
-        title: 'Одна задача — две записи',
-        lead: 'Сравним сумму чисел от 1 до n, записанную двумя способами.',
+        eyebrow: '03 · ПАМЯТЬ И СКОРОСТЬ',
+        title: 'Архитектура: Цикл против Рекурсии',
+        lead: 'Любой цикл можно переписать через рекурсию, и наоборот. Но с точки зрения ресурсов компьютера они работают принципиально по-разному.',
         blocks: [
-          {
-            t: 'compare',
-            left: {
-              title: 'Рекурсия',
-              items: ['Короткая запись', 'Повторяет определение', 'Расходует стек', 'Глубина растёт с n']
-            },
-            right: {
-              title: 'Цикл',
-              items: ['Не ограничен глубиной', 'Нужна переменная-накопитель', 'Чуть более «процедурная» запись', 'Работает для больших n']
-            },
-            vs: '⇄'
-          },
-          {
-            t: 'code',
-            title: 'two_ways.py',
-            code: '# рекурсия\ndef total_rec(n):\n    if n == 0:\n        return 0\n    return n + total_rec(n - 1)\n\n# цикл\ndef total_loop(n):\n    total = 0\n    while n > 0:\n        total += n\n        n -= 1\n    return total\n\nprint(total_rec(5), total_loop(5))   # 15 15'
-          },
+          { t: 'svg', svg: COMPARE_SVG, caption: 'Сравнение расхода памяти: переменная O(1) vs стек фреймов O(N)' },
           {
             t: 'table',
-            caption: 'Что выбрать',
-            head: ['Ситуация', 'Лучше'],
+            caption: 'Сравнительный анализ двух подходов',
+            head: ['Критерий', 'Итерация (Цикл for / while)', 'Рекурсия (Функция зовет себя)'],
             rows: [
-              ['Дерево, граф, вложенные папки', 'Рекурсия'],
-              ['Длинный список, десятки тысяч шагов', 'Цикл'],
-              ['Математическое определение', 'Рекурсия'],
-              ['Подсчёт в цикле по коллекции', 'Цикл']
+              ['Расход памяти', 'O(1) — постоянный, минимальный', 'O(N) — пропорционален глубине стека'],
+              ['Скорость вызова', 'Быстрее (нет накладных расходов)', 'Медленнее (создание и удаление фреймов)'],
+              ['Риск сбоя', 'Бесконечный цикл (зависание)', 'RecursionError (переполнение стека)'],
+              ['Читаемость кода', 'Проще для линейных массивов', 'Лаконичнее для деревьев, разбора и фракталов']
             ],
             highlight: 0
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-code-branch',
-            title: 'Правило перевода',
-            text: 'База рекурсии становится начальным значением накопителя, а шаг — телом цикла. Например, для факториала: result = 1, затем result *= n при уменьшении n.'
           }
         ]
-      },
-      {
-        k: 'lab',
-        eyebrow: '04 · ТРЕНАЖЁР',
-        title: 'Переведите рекурсию в цикл',
-        lead: 'Пять коротких вопросов на соответствие двух записей.',
-        widget: {
-          kind: 'mini',
-          config: {
-            tasks: [
-              { title: 'Накопитель', q: 'С чего начинается накопитель для суммы 1…n?', answer: '0', type: 'number', explain: 'Нейтральный элемент сложения — 0.', hint: 'Прибавление нуля ничего не меняет.' },
-              { title: 'Факториал', q: 'С чего начинается накопитель для факториала?', answer: '1', type: 'number', explain: 'Нейтральный элемент умножения — 1.', hint: 'Умножение на единицу ничего не меняет.' },
-              { title: 'Условие', q: 'Какое условие цикла соответствует базе n == 0?', answer: ['while n > 0', 'while n > 0:', 'n > 0'], explain: 'Цикл идёт, пока n положительно.', hint: 'Пока не дошли до нуля.' },
-              { title: 'Шаг', q: 'Как в цикле уменьшить n на единицу?', answer: ['n -= 1', 'n = n - 1', 'n = n-1', 'n-=1'], explain: 'Уменьшение на 1.', hint: 'Сокращённая запись вычитания.' },
-              { title: 'Стек', q: 'Что экономит цикл по сравнению с рекурсией?', answer: ['стек', 'память стека', 'стек вызовов'], explain: 'Цикл не создаёт кадры вызовов.', hint: 'То, что переполняется.' }
-            ]
-          }
-        }
       },
       {
         k: 'concept',
-        eyebrow: '05 · PYTHON-ПРАКТИКУМ',
-        title: 'Две функции — один результат',
-        lead: 'Напишите обе версии и сравните их на одинаковых данных.',
+        eyebrow: '04 · АЛГОРИТМ ЕВКЛИДА',
+        title: 'Триумф рекурсии: НОД двух чисел',
+        lead: 'Алгоритм Евклида для нахождения наибольшего общего делителя в рекурсивном виде выглядит как шедевр лаконичности.',
         blocks: [
           {
-            t: 'widget',
-            kind: 'pythonRef',
-            config: {
-              title: 'Напоминание Python',
-              groups: [
-                {
-                  title: 'Цикл',
-                  items: [
-                    { cmd: 'while n > 0:', text: 'цикл с условием' },
-                    { cmd: 'total += n', text: 'накопление суммы' },
-                    { cmd: 'result *= n', text: 'накопление произведения' },
-                    { cmd: 'n -= 1', text: 'уменьшение счётчика' }
-                  ]
-                },
-                {
-                  title: 'Сравнение',
-                  items: [
-                    { cmd: 'assert f(5) == g(5)', text: 'проверка совпадения' },
-                    { cmd: 'range(1, n + 1)', text: 'числа от 1 до n' },
-                    { cmd: 'for i in range(n):', text: 'цикл по количеству' },
-                    { cmd: 'time.perf_counter()', text: 'замер времени' }
-                  ]
-                }
-              ]
-            }
-          },
-          {
             t: 'code',
-            title: 'compare.py',
-            code: 'import sys\nsys.setrecursionlimit(5000)\n\ndef fact_rec(n):\n    if n == 0:\n        return 1\n    return n * fact_rec(n - 1)\n\ndef fact_loop(n):\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result\n\nfor n in (0, 1, 5, 10):\n    assert fact_rec(n) == fact_loop(n)\n    print(n, fact_rec(n), fact_loop(n))'
+            title: 'gcd_euclid.py',
+            code: 'def gcd(a, b):\n    # База: если остаток b равен 0, то a и есть НОД\n    if b == 0:\n        return a\n\n    # Рекурсивный шаг Евклида: gcd(b, остаток от a // b)\n    return gcd(b, a % b)\n\nprint("НОД(48, 18):", gcd(48, 18))  # 6\nprint("НОД(100, 25):", gcd(100, 25))  # 25'
           },
           {
             t: 'callout',
-            tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'Предел глубины',
-            text: 'fact_rec(2000) при стандартном лимите вызовет RecursionError, а fact_loop(2000) посчитает огромное число без ошибки (хотя оно будет очень длинным).'
+            tone: 'good',
+            icon: 'fas fa-gem',
+            title: 'Почему рекурсивный Евклид идеален?',
+            text: 'Рекурсивная версия состоит всего из двух строк! Числа уменьшаются логарифмически быстро, поэтому глубина стека никогда не превысит пары десятков вызовов.'
           }
         ]
       },
       {
-        k: 'practice',
-        eyebrow: '06 · ПРАКТИКА',
-        title: 'Перевод и выбор',
-        lead: 'Отвечайте коротко.',
-        tasks: [
-          { title: 'Выбор', q: 'Что лучше для обхода дерева папок: рекурсия или цикл?', answer: ['рекурсия', 'recursion'], explain: 'Дерево имеет рекурсивную структуру.', hint: 'Структура повторяет себя.' },
-          { title: 'Выбор', q: 'Что лучше для суммы миллиона чисел?', answer: ['цикл', 'loop'], explain: 'Рекурсия упрётся в глубину стека.', hint: 'Не нужен стек.' },
-          { title: 'Накопитель', q: 'Начальное значение накопителя произведения?', answer: '1', type: 'number', explain: 'Нейтральный элемент умножения.', hint: 'Не ноль.' },
-          { title: 'Результат', q: 'Чему равна сумма 1…5?', answer: '15', type: 'number', explain: '1+2+3+4+5 = 15.', hint: 'Сложите числа.' },
-          { title: 'Ошибка', q: 'Какая ошибка возникает у глубокой рекурсии?', answer: ['recursionerror', 'recursion error'], explain: 'Переполнение стека.', hint: 'Название начинается с Recursion.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Обе версии написаны и совпадают.' },
-          { mark: '1 балл', text: 'Выбор подхода обоснован.' },
-          { mark: '1 балл', text: 'Ограничение глубины упомянуто.' }
+        k: 'concept',
+        eyebrow: '05 · ПРАВИЛА ВЫБОРА',
+        title: 'Когда выбирать цикл, а когда рекурсию?',
+        lead: 'Запомни простое инженерное правило выбора подходящей парадигмы.',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Выбирай цикл for / while',
+                icon: 'fas fa-repeat',
+                title: 'Линейные структуры',
+                text: '• Одноуровневые списки и массивы<br>• Простые счетчики и переборы<br>• Задачи с миллионами повторений (где важна экономия памяти O(1))',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Выбирай рекурсию',
+                icon: 'fas fa-sitemap',
+                title: 'Иерархии и ветвления',
+                text: '• Вложенные списки неизвестной глубины<br>• Деревья каталогов и файлов на диске<br>• Алгоритмы «Разделяй и властвуй» (быстрая сортировка, слияние)',
+                tone: 'violet'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКА В PYTHON IDLE',
+        title: 'Три задачи для практики',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              {
+                badge: 'Задачка 1 · 3 балла',
+                icon: 'fas fa-code-compare',
+                title: 'Два факториала: loop и rec',
+                text: 'Напиши две функции: <code>fact_loop(n)</code> (через цикл <code>for</code>) и <code>fact_rec(n)</code> (через рекурсию). Сравни результаты их вызова для <code>n = 6</code>.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'В цикле используй накопитель <code>res = 1</code> и умножай в диапазоне. В рекурсии — базу <code>n <= 1</code> и шаг <code>n * fact_rec(n - 1)</code>.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Задачка 2 · 3 балла',
+                icon: 'fas fa-calculator',
+                title: 'НОД Евклида: gcd_rec(a, b)',
+                text: 'Напиши рекурсивную функцию <code>gcd_rec(a, b)</code>, вычисляющую наибольший общий делитель чисел <code>a</code> и <code>b</code> по алгоритму Евклида.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: если <code>b == 0</code>, вернуть <code>a</code>. Шаг: вернуть результат вызова <code>gcd_rec(b, a % b)</code>.',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Задачка 3 · 4 балла ★',
+                icon: 'fas fa-star',
+                title: 'Вложенный список: deep_sum(lst)',
+                text: 'Напиши функцию <code>deep_sum(lst)</code>, находящую сумму всех чисел во вложенном списке любой глубины (например, для <code>[1, [2, [3, 4]], 5]</code> вернет 15).<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'Проходи циклом по элементам: если элемент число — прибавляй его к сумме, а если элемент список — рекурсивно вызывай <code>deep_sum(x)</code>.',
+                tone: 'amber'
+              }
+            ]
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА',
+        title: 'Проверим понимание циклов и рекурсии',
+        lead: 'Выбери один правильный ответ в каждом вопросе.',
         questions: [
-          { q: 'Что становится базой при переводе в цикл?', options: ['Начальное значение накопителя', 'Тело цикла', 'Условие выхода', 'Комментарий'], answer: 0, explain: 'База задаёт стартовое значение.' },
-          { q: 'Что экономит цикл?', options: ['Стек вызовов', 'Переменные', 'Числа', 'Строки'], answer: 0, explain: 'Нет кадров вызовов.' },
-          { q: 'Когда рекурсия удобнее?', options: ['Для деревьев и графов', 'Для длинных списков', 'Для суммы миллиона чисел', 'Всегда'], answer: 0, explain: 'Структура задачи рекурсивна.' },
-          { q: 'Начальное значение для произведения?', options: ['1', '0', '−1', 'n'], answer: 0, explain: 'Нейтральный элемент умножения.' },
-          { q: 'Что случится с fact_rec(2000)?', options: ['RecursionError', 'Ноль', 'Бесконечность', 'Ничего'], answer: 0, explain: 'Превышен лимит глубины.' }
+          { q: 'Какова сложность по памяти у стандартного рекурсивного алгоритма глубиной N?', options: ['O(1)', 'O(N)', 'O(N²)', 'Память не расходуется'], answer: 1, explain: 'N одновременных кадров в стеке требуют памяти O(N).' },
+          { q: 'Что возвращает алгоритм Евклида gcd(48, 18)?', options: ['3', '6', '12', '18'], answer: 1, explain: 'Наибольший общий делитель 48 и 18 равен 6.' },
+          { q: 'Какое базовое условие останавливает рекурсивный алгоритм Евклида gcd(a, b)?', options: ['a == b', 'b == 0: return a', 'a == 0: return b', 'b == 1'], answer: 1, explain: 'Когда делитель b становится равен 0, предыдущий остаток a и есть НОД.' },
+          { q: 'Почему для обхода вложенных списков [1, [2, [3]]] рекурсия удобнее обычного цикла?', options: ['Потому что глубина вложенности заранее неизвестна, и стек сам отслеживает возврат', 'Потому что рекурсия работает быстрее видеокарты', 'Потому что цикл for не поддерживает списки', 'Это единственный способ вывести текст'], answer: 0, explain: 'Рекурсия автоматически адаптируется к любой глубине вложенности деревьев.' },
+          { q: 'Что произойдет, если в цикле while условие выхода никогда не выполнится?', options: ['RecursionError', 'Бесконечный цикл (программа зависнет, но стек не переполнится)', 'IndexError', 'Файл сотрется'], answer: 1, explain: 'Цикл зависнет на 100% процессора, но кадры стека создаваться не будут.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Линейная рекурсия переводится в цикл и наоборот.',
-          'База → начальное значение, шаг → тело цикла.',
-          'Цикл не ограничен глубиной стека.',
-          'Рекурсия понятнее для деревьев и графов.',
-          'Выбор зависит от структуры задачи.'
+          'Циклы экономичнее по памяти O(1) и быстрее для плоских линейных списков.',
+          'Рекурсия незаменима для иерархий, деревьев и структур с неизвестной вложенностью.',
+          'Рекурсивный алгоритм Евклида решает задачу НОД за минимальное число вызовов.',
+          'Выбор между циклом и рекурсией основывается на форме данных и требованиях к памяти.'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задание 1: Написана и протестирована циклическая функция факториала.' },
+          { mark: '1 балл', text: 'Задание 1: Написана эквивалентная рекурсивная функция факториала.' },
+          { mark: '1 балл', text: 'Задание 1: Результаты обеих функций совпадают на контрольных примерах.' },
+          { mark: '1 балл', text: 'Задание 2: Реализована база алгоритма Евклида при b == 0.' },
+          { mark: '1 балл', text: 'Задание 2: Оформлен рекурсивный шаг с остатком от деления a % b.' },
+          { mark: '1 балл', text: 'Задание 2: Функция возвращает точный наибольший общий делитель чисел.' },
+          { mark: '1 балл', text: 'Задание 3: Реализована проверка типа элемента (число или вложенный список).' },
+          { mark: '1 балл', text: 'Задание 3: Оформлен рекурсивный вызов для каждого вложенного списка.' },
+          { mark: '1 балл', text: 'Задание 3: Функция возвращает полную сумму элементов глубокого списка.' },
+          { mark: '1 балл', text: 'Задание 3: Программа успешно протестирована в среде IDLE без падений стека.' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'Цикл экономит ...',
-          'Рекурсия удобнее, когда ...',
-          'При переводе база становится ...'
+          'В каких задачах рекурсия выигрывает у цикла в читаемости и простоте?',
+          'Какое преимущество дает алгоритм Евклида при поиске делителя больших чисел?',
+          'Какой из двух подходов тебе ближе: итеративный или рекурсивный?'
         ]
       }
     ]
   });
 
   /* ==========================================================================
-     УРОК 8. Рекурсия: подготовка к СОР
+     УРОК 8. Практикум СОР
      ========================================================================== */
   Q2.add('10emn-q2-8', {
     num: 8,
@@ -1551,128 +1883,176 @@
     slides: [
       {
         k: 'hero',
-        eyebrow: '01 · ВВЕДЕНИЕ',
-        title: '<span class="accent-text">Рекурсия</span>',
-        lead: 'Семь уроков рекурсии сводятся к четырём умениям: найти базу, записать шаг, объяснить стек и выбрать между рекурсией и циклом.',
-        goal: 'Систематизировать тему рекурсии и подготовиться к суммативному оцениванию.',
-        goalCode: '10.2.1.7',
+        eyebrow: '10 ЕМН · 2 ЧЕТВЕРТЬ · УРОК 8',
+        title: '<span class="accent-text">Рекурсия</span> · Практикум СОР',
+        lead: 'Итоговый практикум перед суммативным оцениванием: решение сложных экзаменационных рекуррентных соотношений, подсчет количества вызовов и последовательности высшего порядка.',
+        goal: 'Закрепить все навыки раздела рекурсии, подготовиться к заданиям СОР и уверенно написать код для 10 из 10 баллов.',
+        goalCode: '10.2.1.1',
         chips: [
-          { icon: 'fas fa-list-check', text: 'Чек-лист темы' },
-          { icon: 'fas fa-dumbbell', text: 'Тренажёр' },
-          { icon: 'fas fa-file-pen', text: 'Формат СОР' }
+          { icon: 'fas fa-graduation-cap', text: 'Подготовка к СОР' },
+          { icon: 'fas fa-list-ol', text: 'Рекуррентные ряды' },
+          { icon: 'fas fa-chart-line', text: 'Трассировка вызовов' }
         ],
         visual: 'recursion',
-        visualCaption: 'Итоговая схема темы',
-        cta: 'Повторить'
+        visualCaption: 'Четыре шага к максимальному баллу на суммативном оценивании',
+        cta: 'Начать практикум'
       },
       {
         k: 'review',
         questions: [
-          { q: 'Что такое база рекурсии?', options: ['Простейший случай', 'Первый вызов', 'Ошибка', 'Цикл'], answer: 0, explain: 'Условие остановки.' },
-          { q: 'Что делает шаг?', options: ['Уменьшает задачу', 'Увеличивает n', 'Ничего', 'Завершает программу'], answer: 0, explain: 'Приближает базу.' },
-          { q: 'Как работает стек?', options: ['LIFO', 'FIFO', 'Случайно', 'По алфавиту'], answer: 0, explain: 'Последний пришёл — первый вышел.' },
-          { q: 'Чему равно 4!?', options: ['24', '12', '16', '4'], answer: 0, explain: '4 × 3 × 2 × 1.' },
-          { q: 'Что даёт n // 10?', options: ['Число без последней цифры', 'Последнюю цифру', 'Ноль', 'Сумму'], answer: 0, explain: 'Целочисленное деление.' }
+          { q: 'Что такое рекуррентное соотношение?', options: ['Правило, выражающее каждый член последовательности через предыдущие', 'Команда очистки экрана', 'Имя стандартного модуля Python', 'Тип ошибки в вычислениях'], answer: 0, explain: 'Рекуррентная формула определяет F(n) через F(n-1), F(n-2) и т.д.' },
+          { q: 'С чего ВСЕГДА нужно начинать ручную трассировку рекуррентной функции?', options: ['С базовых значений (F(1) или F(0))', 'С самого большого числа', 'Со случайного числа', 'С деления на ноль'], answer: 0, explain: 'Трассировку всегда ведут снизу вверх — от известных базовых значений к искомому.' },
+          { q: 'Чему равен НОД чисел 36 и 12?', options: ['6', '12', '3', '36'], answer: 1, explain: '36 делится на 12 без остатка, поэтому НОД равен 12.' },
+          { q: 'Что делает операция len(s) в Python?', options: ['Возвращает длину строки или списка', 'Переворачивает строку', 'Удаляет первый символ', 'Очищает память'], answer: 0, explain: 'Функция len() возвращает количество элементов.' },
+          { q: 'Какой предел глубины рекурсии по умолчанию установлен в Python?', options: ['100', '500', '1000', 'Бесконечный'], answer: 2, explain: 'Стандартный лимит составляет 1000 вызовов.' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · ЧЕК-ЛИСТ',
-        title: 'Что нужно уметь',
-        lead: 'Проверьте себя по каждому пункту: если пункт вызывает сомнение, вернитесь к соответствующему уроку.',
+        eyebrow: '03 · ПЛАН ПОДГОТОВКИ К СОР',
+        title: 'Типовые экзаменационные задачи',
+        lead: 'На суммативном оценивании проверяется умение переводить математические рекуррентные соотношения в код Python и анализировать дерево вызовов.',
+        blocks: [
+          { t: 'svg', svg: EXAM_SUMMARY_SVG, caption: '4 этапа решения задач на суммативном оценивании' },
+          {
+            t: 'cards',
+            cols: 2,
+            items: [
+              {
+                badge: 'Тип 1 на СОР',
+                icon: 'fas fa-code-branch',
+                title: 'Кусочные рекуррентные функции',
+                text: 'Формула задается разными правилами для четных и нечетных значений аргумента. В коде это реализуется через <code>if n % 2 == 0: ... else: ...</code>.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Тип 2 на СОР',
+                icon: 'fas fa-stopwatch-20',
+                title: 'Подсчет числа вызовов функции',
+                text: 'Требуется определить, сколько всего раз функция была вызвана при вычислении <code>F(n)</code>. Решается добавлением счетчика или вспомогательной функции.',
+                tone: 'cyan'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '04 · РАЗБОР ЗАДАЧИ СОР',
+        title: 'Пример реального задания СОР',
+        lead: 'Дано соотношение: F(1) = 1; при n > 1: если n четное, F(n) = n + F(n - 1); если n нечетное, F(n) = 2 × F(n - 2). Чему равно F(5)?',
         blocks: [
           {
-            t: 'table',
-            caption: 'Карта темы',
-            head: ['Умение', 'Урок', 'Проверка'],
-            rows: [
-              ['Объяснить, что такое рекурсия', '1', 'Привести пример из жизни'],
-              ['Найти базу и шаг', '2', 'Разметить код на две части'],
-              ['Описать стек вызовов', '3', 'Назвать порядок возвратов'],
-              ['Записать factorial', '4', 'Проверить на 0, 1, 5'],
-              ['Сумма цифр числа', '5', 'digit_sum(4721) = 14'],
-              ['Разворот строки', '6', 'reverse("дом") = "мод"'],
-              ['Сравнить с циклом', '7', 'Перевести сумму в while']
-            ],
-            highlight: 1
+            t: 'code',
+            title: 'решение_сор.py',
+            code: 'def F(n):\n    if n == 1:\n        return 1\n    if n % 2 == 0:\n        return n + F(n - 1)      # четное n\n    else:\n        return 2 * F(n - 2)      # нечетное n\n\n# Ручная трассировка:\n# F(1) = 1\n# F(2) = 2 + F(1) = 2 + 1 = 3\n# F(3) = 2 * F(1) = 2 * 1 = 2\n# F(4) = 4 + F(3) = 4 + 2 = 6\n# F(5) = 2 * F(3) = 2 * 2 = 4\nprint("F(5) =", F(5))  # 4'
           },
           {
             t: 'callout',
             tone: 'good',
-            icon: 'fas fa-check',
-            title: 'Универсальный шаблон',
-            text: 'def f(n):\n    if <база>:\n        return <простой ответ>\n    return <комбинация f(<меньшая задача>)>'
-          },
-          {
-            t: 'callout',
-            tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'Три ошибки, которые чаще всего теряют баллы',
-            text: 'Нет базы; шаг не уменьшает аргумент; результат не комбинируется (например, return factorial(n - 1) без умножения).'
+            icon: 'fas fa-graduation-cap',
+            title: 'Секрет успеха на СОР',
+            text: 'Сначала выполни расчет на черновике снизу вверх от F(1) до F(5), а затем запусти программу в IDLE. Если ответы совпали — решение гарантированно верное!'
           }
         ]
       },
       {
-        k: 'lab',
-        eyebrow: '04 · ТРЕНАЖЁР',
-        title: 'Быстрая проверка',
-        lead: 'Пять задач на все ключевые умения темы.',
-        widget: {
-          kind: 'mini',
-          config: {
-            tasks: [
-              { title: 'База', q: 'Какое условие нужно сделать базой для суммы 1…n?', answer: ['n == 0', 'n==0', 'if n == 0'], explain: 'При n == 0 сумма равна 0.', hint: 'Самое маленькое значение.' },
-              { title: 'Стек', q: 'Сколько кадров у factorial(4)?', answer: '5', type: 'number', explain: '4, 3, 2, 1, 0.', hint: 'Не забудьте базу.' },
-              { title: 'Цифры', q: 'Сумма цифр 4721?', answer: '14', type: 'number', explain: '4+7+2+1.', hint: 'Сложите цифры.' },
-              { title: 'Строка', q: 'Что вернёт reverse("кот")?', answer: ['ток', 'tok'], explain: 'Обратный порядок символов.', hint: 'Прочитайте справа налево.' },
-              { title: 'Ошибка', q: 'Как называется ошибка переполнения стека?', answer: ['recursionerror', 'recursion error'], explain: 'RecursionError.', hint: 'Recursion...' }
-            ]
+        k: 'concept',
+        eyebrow: '05 · ПОДСЧЕТ ВЫЗОВОВ',
+        title: 'Как посчитать число вызовов функции?',
+        lead: 'В задачах СОР часто спрашивают: «Сколько раз вызовется функция F при расчете значения?».',
+        blocks: [
+          {
+            t: 'code',
+            title: 'счетчик_вызовов.py',
+            code: 'calls = 0  # глобальный счетчик\n\ndef F(n):\n    global calls\n    calls += 1  # учитываем текущий вызов\n    if n <= 1:\n        return 1\n    return F(n - 1) + F(n - 2)\n\ncalls = 0\nres = F(4)\nprint(f"F(4) = {res}, всего вызовов: {calls}")  # 9 вызовов!'
           }
-        }
+        ]
       },
       {
-        k: 'practice',
-        eyebrow: '05 · ПРАКТИКА',
-        title: 'Формат СОР',
-        lead: 'Задания близки к тем, что будут на суммативном оценивании.',
-        tasks: [
-          { title: 'Код', q: 'Что вернёт factorial(3)?', answer: '6', type: 'number', explain: '3 × 2 × 1 = 6.', hint: 'Три множителя.' },
-          { title: 'Код', q: 'Что вернёт digit_sum(2024)?', answer: '8', type: 'number', explain: '2 + 0 + 2 + 4 = 8.', hint: 'Сложите цифры.' },
-          { title: 'Код', q: 'Что вернёт reverse("abc")?', answer: 'cba', explain: 'Обратный порядок.', hint: 'Справа налево.' },
-          { title: 'Анализ', q: 'Сколько рекурсивных вызовов сделает digit_sum(999)?', answer: '3', type: 'number', explain: 'Три шага до нуля.', hint: 'По одной цифре за шаг.' },
-          { title: 'Анализ', q: 'Какая ошибка появится, если убрать базу?', answer: ['recursionerror', 'recursion error', 'бесконечная рекурсия'], explain: 'Стек переполнится.', hint: 'Название ошибки на английском.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Значения вычислены верно.' },
-          { mark: '1 балл', text: 'База и шаг определены в коде.' },
-          { mark: '1 балл', text: 'Ошибки рекурсии объяснены.' }
+        k: 'concept',
+        eyebrow: '06 · ПРАКТИКУМ СОР В IDLE',
+        title: 'Три итоговые задачи для СОР',
+        lead: 'Напиши и протестируй программы в среде IDLE. Каждая задача оценивается отдельно (3 + 3 + 4 = 10 баллов).',
+        blocks: [
+          {
+            t: 'cards',
+            cols: 3,
+            items: [
+              {
+                badge: 'Задачка 1 · 3 балла',
+                icon: 'fas fa-pen-ruler',
+                title: 'Кусочная функция: calc_f(n)',
+                text: 'Задано соотношение: <code>F(1) = 2</code>; при <code>n &gt; 1</code>: если <code>n</code> четное, <code>F(n) = 3*n + F(n - 1)</code>; если нечетное, <code>F(n) = 2*n + F(n - 2)</code>. Напиши функцию и найди <code>F(7)</code>.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'База: <code>if n == 1: return 2</code>. Далее проверка четности <code>if n % 2 == 0:</code> и возврат формул.',
+                tone: 'violet'
+              },
+              {
+                badge: 'Задачка 2 · 3 балла',
+                icon: 'fas fa-stopwatch-20',
+                title: 'Подсчет вызовов: count_f_calls(n)',
+                text: 'Напиши функцию, которая возвращает количество вызовов при расчете чисел Фибоначчи для заданного <code>n</code>.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'Используй глобальную переменную <code>calls</code> или вспомогательную функцию: перед базой увеличивай счетчик на 1.',
+                tone: 'cyan'
+              },
+              {
+                badge: 'Задачка 3 · 4 балла ★',
+                icon: 'fas fa-star',
+                title: 'Трибоначчи: tribonacci(n)',
+                text: 'Числа Трибоначчи начинаются с 0, 0, 1, а каждый следующий член равен сумме <b>трех</b> предыдущих. Напиши функцию <code>tribonacci(n)</code> и найди 7-й член.<br><br>' +
+                      '<b>💡 Подсказка:</b><br>' +
+                      'Три базы: <code>if n == 0: return 0</code>, <code>if n == 1: return 0</code>, <code>if n == 2: return 1</code>. Шаг: сложить три вызова (n-1, n-2, n-3).',
+                tone: 'amber'
+              }
+            ]
+          }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '06 · ПРОВЕРКА',
+        eyebrow: '07 · МИНИ-ПРОВЕРКА К СОР',
+        title: 'Финальная проверка готовности к СОР',
+        lead: 'Выбери один правильный ответ в каждом вопросе.',
         questions: [
-          { q: 'Что обязательно в рекурсивной функции?', options: ['База и шаг', 'Только база', 'Только шаг', 'Цикл'], answer: 0, explain: 'Обе части обязательны.' },
-          { q: 'Порядок работы стека?', options: ['LIFO', 'FIFO', 'Случайный', 'По возрастанию'], answer: 0, explain: 'Последний пришёл — первый вышел.' },
-          { q: 'Что вернёт factorial(4)?', options: ['24', '12', '16', '8'], answer: 0, explain: '4 × 3 × 2 × 1.' },
-          { q: 'Что вернёт digit_sum(1234)?', options: ['10', '9', '8', '12'], answer: 0, explain: '1+2+3+4 = 10.' },
-          { q: 'Что вернёт reverse("мир")?', options: ['рим', 'мир', 'ир', 'ми'], answer: 0, explain: 'Обратный порядок.' }
+          { q: 'Если F(1) = 1, а F(n) = n + F(n - 1), чему равно F(4)?', options: ['7', '10', '12', '15'], answer: 1, explain: 'F(1)=1, F(2)=2+1=3, F(3)=3+3=6, F(4)=4+6=10.' },
+          { q: 'Сколько базовых условий необходимо для вычисления чисел Трибоначчи?', options: ['Одно', 'Два', 'Три (для n=0, n=1, n=2)', 'Четыре'], answer: 2, explain: 'Поскольку шаг обращается к трем предыдущим элементам, требуются три начальных значения.' },
+          { q: 'Чему равно значение F(3), если F(1) = 2, при четных F(n) = F(n-1) + 1, при нечетных F(n) = F(n-2) * 2?', options: ['2', '4', '6', '8'], answer: 1, explain: 'F(1)=2. Для n=3 число нечетное: F(3) = F(1) * 2 = 2 * 2 = 4.' },
+          { q: 'Какой способ проверки рекуррентного соотношения самый надежный перед сдачей работы?', options: ['Трассировка на бумаге от базы вверх + проверка запуском кода в IDLE', 'Просто поверить интуиции', 'Сдать без запуска', 'Посчитать на калькуляторе только последний шаг'], answer: 0, explain: 'Совпадение ручного расчета и вывода программы дает 100% гарантию верного ответа.' },
+          { q: 'Какая ошибка возникает, если перепутать знак в шаге и написать F(n + 1) вместо F(n - 1)?', options: ['RecursionError: maximum recursion depth exceeded', 'ZeroDivisionError', 'ValueError', 'SyntaxError'], answer: 0, explain: 'Аргумент начнет неограниченно расти, что вызовет переполнение стека.' }
         ]
       },
       {
         k: 'summary',
+        eyebrow: '08 · ИТОГИ УРОКА',
+        title: 'Главное и оценивание',
+        lead: 'Максимум за практическую работу — 10 баллов.',
         points: [
-          'Рекурсия = база + шаг.',
-          'Стек работает по принципу LIFO.',
-          'Факториал: 0! = 1, n! = n × (n − 1)!.',
-          'Сумма цифр: n % 10 + digit_sum(n // 10).',
-          'Разворот строки: reverse(s[1:]) + s[0].',
-          'Глубокая рекурсия заменяется циклом.'
+          'Раздел «Рекурсия» полностью освоен: изучены база, шаг, стек вызовов и разбор структур.',
+          'Рекуррентные соотношения переводятся в код через условные операторы if-else.',
+          'Трассировка снизу вверх — главный инструмент проверки алгоритмов на СОР.',
+          'Код написан, протестирован в Python IDLE и готов к сдаче на максимальный балл.'
         ],
+        criteriaTitle: 'Дескриптор практики · 10 баллов',
+        criteria: [
+          { mark: '1 балл', text: 'Задание 1: Задано базовое значение F(1) для кусочной функции.' },
+          { mark: '1 балл', text: 'Задание 1: Оформлено ветвление четных и нечетных аргументов через if-else.' },
+          { mark: '1 балл', text: 'Задание 1: Функция возвращает точное расчетное значение на контрольном тесте.' },
+          { mark: '1 балл', text: 'Задание 2: Реализован механизм учета каждого вызова рекурсивной функции.' },
+          { mark: '1 балл', text: 'Задание 2: Счетчик корректно обрабатывает все базовые и ветвящиеся шаги.' },
+          { mark: '1 балл', text: 'Задание 2: Программа выводит точное общее количество вызовов в консоль IDLE.' },
+          { mark: '1 балл', text: 'Задание 3: Реализованы все три базовых случая для ряда Трибоначчи.' },
+          { mark: '1 балл', text: 'Задание 3: Описан рекурсивный шаг сложения трех предшествующих элементов.' },
+          { mark: '1 балл', text: 'Задание 3: Функция возвращает верное число последовательности Трибоначчи.' },
+          { mark: '1 балл', text: 'Задание 3: Проведено комплексное тестирование и отладка всех программ в IDLE.' }
+        ],
+        ticketTitle: 'Выходной билет',
+        ticketLead: 'Ответь устно или в тетради:',
         ticket: [
-          'База нужна, чтобы ...',
-          'Стек вызовов работает так: ...',
-          'Рекурсию заменяют циклом, когда ...'
+          'Какие темы раздела рекурсии оказались для тебя наиболее понятными?',
+          'Как избежать ошибок при расчете рекуррентных соотношений на СОР?',
+          'Чувствуешь ли ты готовность к суммативному оцениванию?'
         ]
       }
     ]
