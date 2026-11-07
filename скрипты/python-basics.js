@@ -969,8 +969,16 @@ function getFinalHint(errStr, code) {
 }
 
 function extractLineNumber(errStr) {
-  const m = errStr.match(/line\s+(\d+)/i);
-  return m ? parseInt(m[1], 10) : null;
+  const cleaned = cleanErr(errStr);
+  const stdinMatches = [...errStr.matchAll(/<(?:stdin|exec)>"?,\s*line\s+(\d+)/gi)];
+  if (stdinMatches.length > 0) {
+    return parseInt(stdinMatches[stdinMatches.length - 1][1], 10);
+  }
+  const allMatches = [...cleaned.matchAll(/\bline\s+(\d+)/gi)];
+  if (allMatches.length > 0) {
+    return parseInt(allMatches[allMatches.length - 1][1], 10);
+  }
+  return null;
 }
 
 function cleanErr(err) {
