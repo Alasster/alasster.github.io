@@ -60,47 +60,21 @@
     }
 
     const steps = block.trace.steps;
-    const outputs = steps.filter(s => s.out != null);
-    const phaseMeta = {
-      down: { label: '↓ Погружение', cls: 'is-down' },
-      base: { label: '★ База (стоп)', cls: 'is-base' },
-      up:   { label: '↑ Возврат', cls: 'is-up' },
-      out:  { label: '✓ Вывод', cls: 'is-out' }
-    };
 
     return `<div class="q2-code-runner" data-q2-code-runner>
       ${codeHtml}
-      <div class="q2-exec-card">
-        <div class="q2-exec-head">
-          <span class="q2-exec-title"><i class="fas fa-bolt"></i> ${esc(block.trace.title || 'Пошаговое выполнение')}</span>
+      <div class="q2-exec-console">
+        <div class="q2-exec-console-head">
+          <span><i class="fas fa-terminal"></i> Результат в консоли (Python Shell)</span>
           <span class="q2-exec-counter" data-runner-counter>Шаг 1 / ${steps.length}</span>
         </div>
-        <div class="q2-exec-steps">
+        <div class="q2-exec-console-body">
+          ${block.trace.cmd ? `<div class="q2-exec-cmd">&gt;&gt;&gt; ${esc(block.trace.cmd)}</div>` : ''}
           ${steps.map((st, idx) => {
-            const pm = phaseMeta[st.phase || 'down'] || phaseMeta.down;
-            return `<div class="q2-exec-step ${pm.cls}${idx === 0 ? ' is-current' : ' is-pending'}" data-step-idx="${idx}" data-target-line="${st.line || 1}">
-              <span class="q2-exec-step-num">${idx + 1}</span>
-              <div class="q2-exec-step-main">
-                <div class="q2-exec-step-top">
-                  <code class="q2-exec-call">${esc(st.call || '')}</code>
-                  <span class="q2-exec-badge ${pm.cls}">${pm.label}</span>
-                </div>
-                <div class="q2-exec-desc">${st.desc || ''}</div>
-              </div>
-            </div>`;
+            const text = st.out != null ? st.out : `${st.call || ''}  →  ${st.desc || ''}`;
+            const isResult = st.out != null;
+            return `<div class="q2-exec-out-line${isResult ? ' is-result-line' : ' is-trace-line'}" data-out-step="${idx}" data-target-line="${st.line || 1}">${esc(text)}</div>`;
           }).join('')}
-        </div>
-        <div class="q2-exec-console">
-          <div class="q2-exec-console-head">
-            <span><i class="fas fa-terminal"></i> Результат в консоли (Python Shell)</span>
-          </div>
-          <div class="q2-exec-console-body">
-            ${block.trace.cmd ? `<div class="q2-exec-cmd">&gt;&gt;&gt; ${esc(block.trace.cmd)}</div>` : ''}
-            ${outputs.map(st => {
-              const stepIdx = steps.indexOf(st);
-              return `<div class="q2-exec-out-line" data-out-step="${stepIdx}">${esc(st.out)}</div>`;
-            }).join('')}
-          </div>
         </div>
       </div>
     </div>`;
@@ -787,38 +761,31 @@
       if (runner.dataset.runnerBound === '1') return;
       runner.dataset.runnerBound = '1';
 
-      const stepEls = Array.from(runner.querySelectorAll('.q2-exec-step'));
       const lineEls = Array.from(runner.querySelectorAll('.q2-code-line'));
       const outEls = Array.from(runner.querySelectorAll('.q2-exec-out-line'));
       const counterEl = runner.querySelector('[data-runner-counter]');
-      if (!stepEls.length) return;
+      if (!outEls.length) return;
 
       let current = 0;
-      const total = stepEls.length;
+      const total = outEls.length;
 
       const applyStep = (idx) => {
         current = idx;
         if (counterEl) counterEl.textContent = `Шаг ${idx + 1} / ${total}`;
-        const activeStep = stepEls[idx];
-        const targetLine = activeStep ? String(activeStep.dataset.targetLine || '1') : '1';
-
-        stepEls.forEach((el, i) => {
-          el.classList.toggle('is-current', i === idx);
-          el.classList.toggle('is-done', i < idx);
-          el.classList.toggle('is-pending', i > idx);
-        });
+        const activeOut = outEls[idx];
+        const targetLine = activeOut ? String(activeOut.dataset.targetLine || '1') : '1';
 
         lineEls.forEach(lineEl => {
           lineEl.classList.toggle('is-active', lineEl.dataset.line === targetLine);
         });
 
-        outEls.forEach(outEl => {
-          const outStep = Number(outEl.dataset.outStep);
-          outEl.classList.toggle('is-visible', outStep <= idx);
+        outEls.forEach((outEl, i) => {
+          outEl.classList.toggle('is-visible', i <= idx);
+          outEl.classList.toggle('is-current-line', i === idx);
         });
       };
 
-      stepEls.forEach((el, i) => {
+      outEls.forEach((el, i) => {
         el.addEventListener('click', () => {
           applyStep(i);
         });
