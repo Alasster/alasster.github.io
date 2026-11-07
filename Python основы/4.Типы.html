@@ -231,69 +231,64 @@ is_finished = <span class="cn">False</span>
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Целое и дробное:</strong> Создай переменную <span class="ic">x = 10</span> и <span class="ic">y = 10.0</span>. Выведи их типы. Убедись, что они разные (<span class="ic">int</span> и <span class="ic">float</span>).
+              <strong>Четыре базовых типа:</strong> Создай переменные <span class="ic">a = 25</span>, <span class="ic">b = 4.5</span>, <span class="ic">c = "Python"</span>, <span class="ic">d = True</span> и выведи их значения в одном <span class="ic">print()</span> через <span class="ic">sep=" | "</span>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Умножение строк:</strong> Создай переменную со словом <span class="ic">"Ха"</span>. Умножь её на 3 и выведи результат. Что получилось?
+              <strong>Проверка через type():</strong> Создай переменные <span class="ic">x = 10</span> и <span class="ic">y = 10.0</span>. Выведи <span class="ic">type(x)</span> и <span class="ic">type(y)</span> и убедись, что их типы отличаются (<span class="ic">int</span> и <span class="ic">float</span>).
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Преобразование в целое:</strong> Дано число <span class="ic">pi = 3.99</span>. Используй функцию <span class="ic">int(pi)</span> и выведи результат. Обрати внимание: число округлится или просто отбросится дробная часть?
+              <strong>Динамическая типизация:</strong> Создай переменную <span class="ic">data = "123"</span> и выведи её тип. Затем перезапиши <span class="ic">data = 123</span> и снова выведи <span class="ic">type(data)</span>.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Длина строки:</strong> Создай переменную <span class="ic">phrase</span> с любым текстом. Используй функцию <span class="ic">len(phrase)</span>, чтобы узнать количество символов в ней, и выведи это число.
+              <strong>Превращение строки в число:</strong> Дана переменная <span class="ic">text_num = "150"</span>. Преврати её в целое число с помощью <span class="ic">int(text_num)</span>, прибавь <span class="ic">50</span> и выведи результат.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Сложение строк и чисел:</strong> Попробуй сложить <span class="ic">"50"</span> и <span class="ic">50</span>. Получишь ошибку. Исправь её, превратив строку в число с помощью <span class="ic">int()</span>.
+              <strong>Отбрасывание дробной части:</strong> Создай переменную <span class="ic">pi = 3.99</span>. Сохрани результат <span class="ic">int(pi)</span> в переменную <span class="ic">whole</span> и выведи через f-строку: <span class="ic">f"Было: {pi}, стало: {whole}"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Тип результата деления:</strong> Создай переменную <span class="ic">res = 10 / 2</span>. Выведи <span class="ic">res</span> и её тип. Почему даже при делении нацело получается <span class="ic">float</span>?
+              <strong>Склейка строки и числа:</strong> Даны переменные <span class="ic">title = "Уровень "</span> и <span class="ic">level = 5</span>. Склей их с помощью <span class="ic">+</span>, предварительно превратив число в строку через <span class="ic">str(level)</span>, и выведи результат.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Многострочный текст:</strong> Создай переменную, используя тройные кавычки <span class="ic">""" текст """</span>, и запиши в неё небольшое стихотворение из 3-4 строк. Выведи её.
+              <strong>Повторение строки:</strong> Создай переменную <span class="ic">word = "Ура! "</span> и переменную <span class="ic">times = 3</span>. Выведи результат умножения строки на число <span class="ic">word * times</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Логика из чисел:</strong> Проверь, что вернет функция <span class="ic">bool()</span> для чисел <span class="ic">1</span>, <span class="ic">0</span> и <span class="ic">-5</span>. Выведи результаты.
+              <strong>Логический тип bool():</strong> Проверь и выведи на экран в одной строке (через <span class="ic">sep=", "</span>), что возвращает функция <span class="ic">bool()</span> для значений <span class="ic">1</span>, <span class="ic">0</span> и строки <span class="ic">"Привет"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Динамическая типизация:</strong> Создай переменную <span class="ic">data = "123"</span>. Выведи её тип. Затем в эту же переменную запиши число <span class="ic">123</span> (без кавычек) и снова выведи тип.
+              <strong>Сложение дробной строки и числа:</strong> Даны переменные <span class="ic">price_str = "199.5"</span> и <span class="ic">delivery = "50"</span>. Переведи первую в <span class="ic">float()</span>, вторую в <span class="ic">int()</span>, посчитай сумму <span class="ic">total</span> и выведи её значение и <span class="ic">type(total)</span>.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Проверка типа:</strong> Используй функцию <span class="ic">isinstance(v, int)</span>, чтобы проверить, является ли переменная <span class="ic">v = 42</span> целым числом. Выведи результат (должно быть <span class="ic">True</span>).
+              <strong>Паспорт ученика:</strong> Создай переменные <span class="ic">student = "Алия"</span>, <span class="ic">grade = "10"</span>, <span class="ic">gpa = "4.85"</span>. Преобразуй <span class="ic">grade</span> в <span class="ic">int</span>, <span class="ic">gpa</span> в <span class="ic">float</span>, увеличь класс на <span class="ic">1</span> и выведи итоговую карточку через f-строку.
             </div>
           </li>
         </ul>

@@ -348,69 +348,64 @@
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Несколько аргументов:</strong> Выведи в одном <span class="ic">print()</span> четыре аргумента: <span class="ic">"Имя:"</span>, <span class="ic">"Python"</span>, <span class="ic">"Версия:"</span>, <span class="ic">3.12</span>. Посмотри, как Python автоматически расставит пробелы.
+              <strong>Несколько аргументов:</strong> Выведи в одном <span class="ic">print()</span> через запятую четыре значения: <span class="ic">"Язык:"</span>, <span class="ic">"Python"</span>, <span class="ic">"Версия:"</span>, <span class="ic">3</span>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Кавычки внутри строки:</strong> Выведи фразу: <span class="ic">Книга "Мастер и Маргарита" — классика.</span> так, чтобы кавычки вокруг названия книги отобразились в консоли.
+              <strong>Пустая строка:</strong> Выведи слово <span class="ic">"Старт"</span>, затем пустую строку с помощью пустого <span class="ic">print()</span>, а затем слово <span class="ic">"Финиш"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Спецсимвол \n:</strong> Используй всего один <span class="ic">print()</span>, чтобы вывести три цвета (Красный, Желтый, Зеленый) так, чтобы каждый был на новой строке.
+              <strong>Разделитель sep:</strong> Выведи одним вызовом <span class="ic">print()</span> слова <span class="ic">"Яблоко"</span>, <span class="ic">"Банан"</span>, <span class="ic">"Вишня"</span> так, чтобы между ними стоял разделитель <span class="ic">" | "</span> (используй <span class="ic">sep=" | "</span>).
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Пустая строка:</strong> Выведи слово <span class="ic">"Начало"</span>, затем пустую строку, а затем слово <span class="ic">"Конец"</span>.
+              <strong>Дата через дефис:</strong> Выведи числа <span class="ic">15</span>, <span class="ic">11</span> и <span class="ic">2025</span> в одном <span class="ic">print()</span> с параметром <span class="ic">sep="-"</span>, чтобы получилось <span class="ic">15-11-2025</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Рисование символами:</strong> Используй оператор умножения строки <span class="ic">*</span> внутри <span class="ic">print()</span>, чтобы вывести линию из 30 звездочек.
+              <strong>Склейка строк через end:</strong> Используй два вызова <span class="ic">print()</span>: в первом выведи <span class="ic">"Загрузка"</span> с параметром <span class="ic">end="... "</span>, а во втором — <span class="ic">"Готово!"</span>, чтобы обе фразы оказались на одной строке.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Тройной разделитель:</strong> Выведи три слова: <span class="ic">"один"</span>, <span class="ic">"два"</span>, <span class="ic">"три"</span>. Сделай так, чтобы между ними стояло по три точки (<span class="ic">...</span>), используя параметр <span class="ic">sep</span>.
+              <strong>Перенос строки \n:</strong> Используя всего один <span class="ic">print()</span> и спецсимвол <span class="ic">\n</span>, выведи три цвета (<span class="ic">Красный</span>, <span class="ic">Жёлтый</span>, <span class="ic">Зелёный</span>) каждый с новой строки.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Табуляция \t:</strong> Создай "таблицу" из двух строк. В первой: <span class="ic">ID</span> и <span class="ic">Name</span>. Во второй: <span class="ic">1</span> и <span class="ic">Alex</span>. Используй <span class="ic">\t</span> между словами, чтобы колонки стояли ровно.
+              <strong>Кавычки и табуляция \t:</strong> Выведи двумя строками мини-таблицу с колонками через <span class="ic">\t</span>: в первой строке <span class="ic">Книга\tАвтор</span>, а во второй — название в экранированных кавычках <span class="ic">\"Ревизор\"\tГоголь</span>.
             </div>
           </li>
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Цепочка без перехода:</strong> Используй три вызова <span class="ic">print()</span>, чтобы вывести числа <span class="ic">1-2-3-</span> в одну строку. Используй <span class="ic">end</span>, чтобы после каждого числа стоял дефис.
+              <strong>Вычисление в f-строке:</strong> Используя f-строку <span class="ic">f"..."</span>, выведи фразу <span class="ic">"Сумма 15 и 25 равна 40"</span>, где число <span class="ic">40</span> вычисляется прямо внутри фигурных скобок <span class="ic">{15 + 25}</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Округление в f-строке:</strong> Создай переменную <span class="ic">pi = 3.14159</span>. Выведи фразу: <span class="ic">"Число Пи: 3.14"</span>, используя форматирование внутри f-строки (оставь 2 знака после запятой).
+              <strong>Комбинация sep и end:</strong> Выведи в одном <span class="ic">print()</span> числа <span class="ic">1</span>, <span class="ic">2</span>, <span class="ic">3</span> с разделителем <span class="ic">sep=" -> "</span> и окончанием <span class="ic">end=" -> Старт!\n"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Мини-чек:</strong> Создай переменные <span class="ic">item="Печенье"</span>, <span class="ic">price=150</span> и <span class="ic">count=3</span>. Одной f-строкой выведи: <span class="ic">"Товар: Печенье | Итого: 450 руб."</span> (расчет суммы сделай внутри строки).
+              <strong>Итоговая карточка заказа:</strong> Добавь комментарий <span class="ic"># Чек покупки</span>, выведи заголовок с переносом <span class="ic">\n</span>, затем строку с параметром <span class="ic">sep=" : "</span> (<span class="ic">"Товар"</span>, <span class="ic">"Тетрадь"</span>) и f-строку <span class="ic">f"К оплате за 4 шт.: {4 * 120} тг"</span>.
             </div>
           </li>
         </ul>

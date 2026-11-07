@@ -202,71 +202,64 @@
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Обратный отсчёт:</strong> Выведи числа от 10 до 1 включительно, используя цикл и функцию <span class="ic">range()</span>.
+              <strong>Пять шагов цикла:</strong> Используя цикл <span class="ic">for i in range(5):</span>, выведи числа от <span class="ic">0</span> до <span class="ic">4</span>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Посимвольный вывод:</strong> Попроси пользователя ввести слово. Используя цикл <span class="ic">for</span>, выведи каждую букву этого слова на отдельной строке.
+              <strong>Числа от 1 до 10 в строку:</strong> Используя <span class="ic">range(1, 11)</span> и параметр <span class="ic">end=" "</span> в <span class="ic">print()</span>, выведи числа от <span class="ic">1</span> до <span class="ic">10</span> в одну строку через пробел.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Степень двойки:</strong> Выведи все степени двойки от 2¹ до 2¹⁰ (2, 4, 8, 16... и так далее).
+              <strong>Квадраты чисел:</strong> С помощью цикла <span class="ic">for</span> выведи для каждого числа <span class="ic">i</span> от <span class="ic">1</span> до <span class="ic">7</span> строку вида <span class="ic">f"{i} в квадрате = {i ** 2}"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Квадраты чисел:</strong> Выведи квадраты всех чисел от 1 до 10 в формате: <span class="ic">"1 * 1 = 1"</span>.
+              <strong>Чётные числа с шагом 2:</strong> Используя третий аргумент шага в <span class="ic">range(2, 21, 2)</span>, выведи все чётные числа от <span class="ic">2</span> до <span class="ic">20</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Сумма нечетных:</strong> Найди сумму всех нечетных чисел в диапазоне от 1 до 50. Результат выведи на экран.
+              <strong>Обратный отсчёт:</strong> Выведи числа от <span class="ic">10</span> до <span class="ic">1</span> включительно с помощью <span class="ic">range(10, 0, -1)</span>, а после завершения цикла выведи <span class="ic">"Старт!"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Универсальная таблица:</strong> Пользователь вводит число. Выведи таблицу умножения для этого числа (от 1 до 10).
+              <strong>Посимвольный вывод слова:</strong> Попроси пользователя ввести слово через <span class="ic">input()</span> и с помощью цикла <span class="ic">for</span> выведи каждую его букву на отдельной строке.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Подсчёт чётных чисел:</strong> Используя цикл <span class="ic">for</span> и условие <span class="ic">if</span>, посчитай, сколько чётных чисел находится в диапазоне от 1 до 30 включительно, и выведи это количество.
+              <strong>Таблица умножения:</strong> Пользователь вводит число <span class="ic">n = int(input())</span>. Выведи таблицу умножения для этого числа от <span class="ic">1</span> до <span class="ic">10</span> в формате <span class="ic">f"{n} x {i} = {n * i}"</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Факториал:</strong> Попроси пользователя ввести число <span class="ic">n</span>. Найди его факториал (произведение всех чисел от 1 до n). 
-              <br><em>Например, для 5 это 1*2*3*4*5 = 120.</em>
+              <strong>Сумма от 1 до N:</strong> Запроси число <span class="ic">n = int(input())</span>. Создай накопитель <span class="ic">total = 0</span> и в цикле <span class="ic">for</span> посчитай сумму всех чисел от <span class="ic">1</span> до <span class="ic">n</span> включительно.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Проверка на простоту:</strong> Пользователь вводит число. Программа должна определить, является ли оно <strong>простым</strong> (делится только на 1 и на само себя). 
-              <br><em>Подсказка: попробуй перебрать все возможные делители в цикле.</em>
+              <strong>Подсчёт чётных и кратных 3:</strong> Запроси число <span class="ic">n = int(input())</span>. С помощью цикла <span class="ic">for</span> и условия <span class="ic">if i % 3 == 0</span> посчитай и выведи, сколько чисел от <span class="ic">1</span> до <span class="ic">n</span> делятся на <span class="ic">3</span>.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Вложенная таблица:</strong> Выведи полную таблицу умножения от 1 до 10 в виде аккуратного квадрата. Тебе понадобятся вложенные циклы (цикл внутри цикла).
+              <strong>Факториал и сумма покупок:</strong> Попроси пользователя ввести число <span class="ic">n = int(input())</span> и вычисли его факториал (произведение всех чисел от <span class="ic">1</span> до <span class="ic">n</span> в переменную <span class="ic">fact = 1</span>). Выведи результат в f-строке.
             </div>
           </li>
         </ul>

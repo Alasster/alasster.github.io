@@ -161,69 +161,64 @@
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Эхо-цикл:</strong> Напиши программу, которая просит пользователя ввести слово и повторяет его, пока пользователь не введет <span class="ic">"стоп"</span>.
+              <strong>Счётчик от 1 до 5:</strong> Создай переменную <span class="ic">i = 1</span> и с помощью цикла <span class="ic">while i &lt;= 5:</span> выведи числа от <span class="ic">1</span> до <span class="ic">5</span>, увеличивая <span class="ic">i += 1</span> на каждом шаге.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Счетчик до предела:</strong> Пользователь вводит целое число. Используя <span class="ic">while</span>, выведи все числа от 0 до этого числа включительно.
+              <strong>Отсчёт от числа пользователя:</strong> Запроси число <span class="ic">n = int(input())</span> и с помощью <span class="ic">while n &gt;= 1:</span> выведи обратный отсчёт до <span class="ic">1</span>.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Удвоение:</strong> Начни с числа <span class="ic">1</span>. В цикле увеличивай его в 2 раза, пока оно не станет больше 1000. Выведи итоговый результат.
+              <strong>Удвоение до 1000:</strong> Начни с <span class="ic">x = 1</span>. В цикле <span class="ic">while x &lt;= 1000:</span> выводи текущее значение <span class="ic">x</span> и увеличивай его в 2 раза (<span class="ic">x *= 2</span>).
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Фильтр чисел:</strong> Выведи числа от 1 до 20, но с помощью <span class="ic">continue</span> сделай так, чтобы числа, делящиеся на 3, не печатались.
+              <strong>Фильтр через continue:</strong> Выведи числа от <span class="ic">1</span> до <span class="ic">15</span> с помощью <span class="ic">while</span>, но используй <span class="ic">continue</span>, чтобы числа, делящиеся на <span class="ic">3</span> (<span class="ic">i % 3 == 0</span>), пропускались.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Бесконечный ввод:</strong> Создай цикл <span class="ic">while True</span>. Проси пользователя вводить числа. Если введено отрицательное число — прерви цикл с помощью <span class="ic">break</span>.
+              <strong>Эхо до стоп-слова (break):</strong> Создай цикл <span class="ic">while True:</span>, который просит пользователя ввести слово. Если введено <span class="ic">"стоп"</span> — заверши цикл через <span class="ic">break</span>, иначе выведи слово.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Средний балл:</strong> Программа принимает числа (оценки) до тех пор, пока не будет введено число <span class="ic">0</span>. После этого выведи среднее арифметическое всех введенных чисел.
+              <strong>Сумма чисел до нуля:</strong> Пользователь вводит числа по одному в цикле <span class="ic">while</span>. Складывай их в <span class="ic">total</span>, пока не будет введён <span class="ic">0</span>, затем выведи общую сумму.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Копилка:</strong> Пользователь вводит цель (сумму, которую хочет накопить). Затем в цикле вводит суммы, которые "кладет в копилку". Цикл должен завершиться, как только сумма станет равна или больше цели.
+              <strong>Копилка:</strong> Пользователь вводит цель <span class="ic">goal = int(input())</span>, а затем в цикле <span class="ic">while saved &lt; goal:</span> вводит суммы взносов. В конце выведи накопленную сумму и число взносов.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Игра "Холодно-Горячо":</strong> Загадай в коде число (например, <span class="ic">77</span>). Проси пользователя угадать его. Если введенное число меньше загаданного — пиши "Больше", если больше — "Меньше". Цикл прерывается только при угадывании.
+              <strong>Средний балл:</strong> Программа принимает оценки до тех пор, пока пользователь не введёт <span class="ic">0</span>. Посчитай и выведи среднее арифметическое всех введённых оценок (с округлением <span class="ic">round()</span>).
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Банкомат:</strong> У пользователя есть баланс (например, 5000). В цикле он вводит сумму для снятия. Если сумма больше баланса — выведи "Недостаточно средств" и используй <span class="ic">continue</span>, чтобы попробовать снова. Если введено <span class="ic">0</span> — выход.
+              <strong>Сумма цифр числа:</strong> Пользователь вводит число <span class="ic">n = int(input())</span>. Используя цикл <span class="ic">while n &gt; 0:</span>, взятие последней цифры <span class="ic">n % 10</span> и отбрасывание <span class="ic">n //= 10</span>, найди сумму всех цифр числа.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Гипотеза Сиракуз:</strong> Возьми любое натуральное число <span class="ic">n</span>. Если оно четное — раздели на 2, если нечетное — умножь на 3 и прибавь 1. Повторяй это в цикле, пока не получится <span class="ic">1</span>. Выводи каждое новое число на экран.
+              <strong>Мини-банкомат:</strong> Начальный баланс <span class="ic">balance = 5000</span>. В цикле пользователь вводит сумму для снятия: при <span class="ic">0</span> — выход (<span class="ic">break</span>); если сумма больше баланса — выведи <span class="ic">"Недостаточно средств"</span> и <span class="ic">continue</span>; иначе спиши сумму и выведи остаток.
             </div>
           </li>
         </ul>

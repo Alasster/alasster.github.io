@@ -167,69 +167,64 @@ deleted = tasks.pop(<span class="cn">0</span>) <span class="cc"># Удаляем
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Вставка в начало:</strong> Создай список из 3 имен. Используй метод <span class="ic">.insert()</span>, чтобы добавить новое имя в самое начало списка (на индекс 0).
+              <strong>Добавление в конец (.append):</strong> Создай пустой список <span class="ic">basket = []</span>. Добавь в него по очереди три любых продукта методом <span class="ic">.append()</span> и выведи список.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Поиск индекса:</strong> Дан список <span class="ic">items = ["книга", "ручка", "тетрадь"]</span>. Попроси пользователя ввести название предмета и выведи, на каком месте (индексе) он находится.
+              <strong>Вставка в начало (.insert):</strong> Создай список из 3 имён. Используй метод <span class="ic">.insert(0, ...)</span>, чтобы добавить новое имя в самое начало списка, и выведи результат.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Подсчет повторов:</strong> Создай список, где некоторые элементы повторяются. Выведи, сколько раз в нем встречается конкретное значение, используя <span class="ic">.count()</span>.
+              <strong>Удаление (.remove и .pop):</strong> Дан список <span class="ic">todo = ["Сон", "Игры", "Учёба", "Уборка"]</span>. Удали <span class="ic">"Игры"</span> методом <span class="ic">.remove()</span>, а последнее дело извлеки методом <span class="ic">done = todo.pop()</span> и выведи <span class="ic">f"Выполнено: {done}"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Сортировка по алфавиту:</strong> Создай список из 5 произвольных городов. Отсортируй их по алфавиту и выведи результат.
+              <strong>Минимум, максимум и сумма:</strong> Дан список очков <span class="ic">scores = [45, 92, 18, 76, 100, 64]</span>. Выведи самое маленькое число (<span class="ic">min()</span>), самое большое (<span class="ic">max()</span>) и их сумму (<span class="ic">sum()</span>).
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Удаление последнего:</strong> Создай список дел. Напиши программу, которая "выполняет" последнее дело в списке: удаляет его и выводит на экран фразу: <span class="ic">"Выполнено: [название дела]"</span>.
+              <strong>Поиск индекса и подсчёт повторов:</strong> Дан список <span class="ic">items = ["книга", "ручка", "тетрадь", "ручка"]</span>. Выведи, сколько раз встречается <span class="ic">"ручка"</span> (<span class="ic">.count()</span>) и индекс элемента <span class="ic">"тетрадь"</span> (<span class="ic">.index()</span>).
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Фильтрация чисел:</strong> Дан список <span class="ic">numbers = [1, 15, 8, 22, 5, 40]</span>. Создай новый пустой список и с помощью цикла добавь в него только те числа, которые больше 10.
+              <strong>Сортировка по алфавиту (.sort):</strong> Создай список из 5 произвольных городов. Отсортируй их по алфавиту методом <span class="ic">.sort()</span> и выведи результат.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Склеивание списков:</strong> Создай два списка с разными овощами. Объедини их в один общий список, используя метод <span class="ic">.extend()</span>. В чем его отличие от простого сложения через <span class="ic">+</span>?
+              <strong>Заполнение списка через input():</strong> Спроси у пользователя количество чисел <span class="ic">n = int(input())</span>. В цикле <span class="ic">for</span> считай <span class="ic">n</span> чисел, добавляя каждое в список через <span class="ic">.append()</span>, и выведи список и его сумму.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ (БЕЗ ПОДСКАЗОК) -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Удаление дубликатов:</strong> Дан список с повторяющимися числами. Напиши цикл, который создаст новый список, содержащий только уникальные элементы из исходного (без использования <span class="ic">set</span>).
+              <strong>Фильтрация чисел в новый список:</strong> Дан список <span class="ic">numbers = [1, 15, 8, 22, 5, 40]</span>. Создай пустой список и с помощью цикла <span class="ic">for</span> и условия <span class="ic">if</span> добавь в него только числа больше <span class="ic">10</span>.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Замена элементов:</strong> Дан список чисел. Используя цикл и индексы, замени каждое четное число в списке на строку <span class="ic">"Even"</span>.
+              <strong>Удаление дубликатов циклом:</strong> Дан список с повторами <span class="ic">raw = [1, 3, 2, 3, 1, 5, 2]</span>. С помощью цикла <span class="ic">for</span> и проверки <span class="ic">not in</span> собери новый список <span class="ic">unique</span> только из неповторяющихся чисел.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Сумма индексов:</strong> Дан список чисел. Пройди по нему циклом и выведи сумму каждого числа с его собственным индексом в списке.
+              <strong>Рейтинг игроков (while + sort + срезы):</strong> В цикле <span class="ic">while True:</span> принимай очки игроков до ввода <span class="ic">0</span> и добавляй их в список. Отсортируй список по убыванию (<span class="ic">reverse=True</span>) и выведи топ-3 результата и средний балл.
             </div>
           </li>
         </ul>

@@ -160,69 +160,64 @@ count = <span class="bi">len</span>(bag)
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Разные типы:</strong> Создай список <span class="ic">my_data</span>, в котором первым элементом будет строка, вторым — целое число, а третьим — дробное. Выведи весь список.
+              <strong>Создание списка:</strong> Создай список <span class="ic">my_data</span>, в котором первым элементом будет строка, вторым — целое число, а третьим — дробное. Выведи весь список на экран.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Срезы списков:</strong> Дан список <span class="ic">numbers = [10, 20, 30, 40, 50]</span>. Используя срезы, выведи только три средних элемента: <span class="ic">[20, 30, 40]</span>.
+              <strong>Первый и последний по индексу:</strong> Дан список <span class="ic">cities = ["Алматы", "Астана", "Шымкент", "Актобе"]</span>. Выведи его первый элемент (<span class="ic">cities[0]</span>) и последний элемент (<span class="ic">cities[-1]</span>) в f-строке.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Добавление:</strong> Создай пустой список <span class="ic">basket</span>. Добавь в него по очереди три любых продукта, используя метод <span class="ic">.append()</span>.
+              <strong>Длина списка len():</strong> Создай список <span class="ic">bag = ["тетрадь", "ручка", "пенал", "учебник"]</span> и выведи количество предметов в нём с помощью функции <span class="ic">len(bag)</span>.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Удаление:</strong> У тебя есть список <span class="ic">todo = ["Сон", "Еда", "Учеба", "Игры"]</span>. Удали из него "Игры" двумя способами: по названию и по индексу.
+              <strong>Замена элемента по индексу:</strong> Дан список <span class="ic">cars = ["BMW", "Lada", "Tesla"]</span>. Замени второй элемент (<span class="ic">cars[1]</span>) на марку, введённую пользователем через <span class="ic">input()</span>, и выведи обновлённый список.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Проверка наличия:</strong> Попроси пользователя ввести название фрукта. Проверь, есть ли он в твоем списке <span class="ic">fruits</span>, и выведи <span class="ic">True</span> или <span class="ic">False</span>.
+              <strong>Срезы списка:</strong> Дан список <span class="ic">numbers = [10, 20, 30, 40, 50]</span>. Используя срез <span class="ic">numbers[1:4]</span>, выведи только три средних элемента: <span class="ic">[20, 30, 40]</span>.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Сумма и поиск:</strong> Создай список из 5 чисел. Выведи его сумму, а также самое большое и самое маленькое число в нем.
+              <strong>Разворот списка срезом:</strong> Дан список <span class="ic">alphabet = ["a", "b", "c", "d", "e"]</span>. Выведи его элементы в обратном порядке с помощью среза <span class="ic">alphabet[::-1]</span>.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Разворот:</strong> Дан список <span class="ic">alphabet = ["a", "b", "c", "d"]</span>. Поменяй порядок элементов на обратный, не создавая новый список.
+              <strong>Проверка наличия (in + if):</strong> Дан список <span class="ic">fruits = ["яблоко", "банан", "груша", "манго"]</span>. Попроси пользователя ввести фрукт и с помощью <span class="ic">if item in fruits:</span> выведи <span class="ic">"Есть в списке"</span> или <span class="ic">"Нет в списке"</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Сортировка:</strong> Попроси пользователя ввести 5 чисел через пробел. Преврати их в список целых чисел и отсортируй его от большего к меньшему.
+              <strong>Сумма элементов через цикл for:</strong> Дан список цен <span class="ic">prices = [450, 1200, 300, 850, 200]</span>. Пройди по нему циклом <span class="ic">for</span>, посчитай общую сумму в переменную <span class="ic">total</span> и выведи её.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Вложенные списки:</strong> Создай список <span class="ic">matrix</span>, который содержит внутри три списка (по три числа в каждом). Выведи число, которое находится во втором вложенном списке на третьем месте.
+              <strong>Отбор чётных из списка:</strong> Дан список чисел <span class="ic">nums = [4, 7, 12, 19, 24, 31, 40]</span>. Используя цикл <span class="ic">for</span> и условие <span class="ic">if</span>, выведи только чётные элементы списка в одну строку через <span class="ic">end=" "</span>.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Объединение без дубликатов:</strong> Даны два списка: <span class="ic">[1, 2, 3]</span> и <span class="ic">[3, 4, 5]</span>. Объедини их так, чтобы в итоговом списке не было повторяющихся элементов.
+              <strong>Вложенный список и обновление по индексу:</strong> Дан список оценок <span class="ic">scores = [45, 82, 39, 90, 50]</span>. Пройди по индексам <span class="ic">for i in range(len(scores)):</span> и каждую оценку меньше <span class="ic">50</span> замени на <span class="ic">50</span>. Выведи итоговый список.
             </div>
           </li>
         </ul>

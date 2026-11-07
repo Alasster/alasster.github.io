@@ -172,69 +172,64 @@
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Четыре действия:</strong> Создай две переменные <span class="ic">a = 18</span> и <span class="ic">b = 6</span>. Выведи результат сложения, вычитания, умножения и деления этих чисел.
+              <strong>Четыре действия:</strong> Создай переменные <span class="ic">a = 20</span> и <span class="ic">b = 4</span>. Выведи их сумму, разность, произведение и частное <span class="ic">/</span> через <span class="ic">sep=" | "</span>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Обычное деление:</strong> Выведи результат <span class="ic">12 / 4</span> и объясни в комментарии, почему Python показывает <span class="ic">3.0</span>, а не <span class="ic">3</span>.
+              <strong>Приоритет и скобки:</strong> Выведи на первой строке результат <span class="ic">2 + 3 * 4</span>, а на второй — <span class="ic">(2 + 3) * 4</span>. Подпиши в комментарии <span class="ic">#</span>, почему ответы отличаются.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Цена покупки:</strong> Переменная <span class="ic">price = 250</span>, переменная <span class="ic">count = 4</span>. Посчитай и выведи общую стоимость покупки.
+              <strong>Квадрат и куб числа:</strong> Попроси пользователя ввести целое число <span class="ic">x = int(input())</span> и выведи его квадрат (<span class="ic">x ** 2</span>) и куб (<span class="ic">x ** 3</span>) с помощью f-строки.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Скобки решают:</strong> Выведи два выражения: <span class="ic">2 + 3 * 4</span> и <span class="ic">(2 + 3) * 4</span>. Сравни результаты.
+              <strong>Целочисленное деление //:</strong> В классе <span class="ic">students = int(input())</span> учеников. В одну команду входит <span class="ic">5</span> человек. Посчитай через <span class="ic">//</span>, сколько полных команд получится.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Деление на команды:</strong> В классе <span class="ic">27</span> учеников. В одну команду помещается <span class="ic">5</span> человек. С помощью <span class="ic">//</span> посчитай, сколько полных команд получится.
+              <strong>Остаток от деления %:</strong> Для того же количества учеников <span class="ic">students = int(input())</span> найди с помощью оператора <span class="ic">%</span>, сколько ребят останется без полной команды из <span class="ic">5</span> человек.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Кто остался:</strong> Для тех же <span class="ic">27</span> учеников и команд по <span class="ic">5</span> человек найди с помощью <span class="ic">%</span>, сколько учеников останется без полной команды.
+              <strong>Модуль и округление:</strong> Запроси у пользователя дробное число <span class="ic">n = float(input())</span>. Выведи его модуль <span class="ic">abs(n)</span> и значение, округлённое до 2 знаков через <span class="ic">round(n, 2)</span>.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Четное или нет:</strong> Создай переменную <span class="ic">number = 46</span>. Выведи остаток от деления на <span class="ic">2</span>. Если остаток <span class="ic">0</span>, число четное.
+              <strong>Перевод минут в часы:</strong> Пользователь вводит общее количество минут <span class="ic">total_min = int(input())</span>. Найди количество полных часов (<span class="ic">// 60</span>) и оставшихся минут (<span class="ic">% 60</span>) и выведи <span class="ic">f"{hours} ч. {mins} мин."</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Квадрат и куб:</strong> Создай переменную <span class="ic">x = 7</span>. Выведи <span class="ic">x ** 2</span> и <span class="ic">x ** 3</span>.
+              <strong>Разбор двузначного числа:</strong> Пользователь вводит двузначное число <span class="ic">num = int(input())</span>. Найди его первую цифру (<span class="ic">num // 10</span>) и последнюю цифру (<span class="ic">num % 10</span>), а затем выведи сумму его цифр.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Средний балл:</strong> Даны оценки <span class="ic">5</span>, <span class="ic">4</span>, <span class="ic">5</span>, <span class="ic">3</span>. Посчитай среднее значение и округли его до одного знака с помощью <span class="ic">round()</span>.
+              <strong>Средний балл с round():</strong> Запроси у пользователя три оценки через <span class="ic">int(input())</span>, посчитай их среднее арифметическое, округли до 1 знака после запятой через <span class="ic">round()</span> и выведи в f-строке.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Мини-калькулятор:</strong> Попроси пользователя ввести два числа через <span class="ic">input()</span>, преврати их в <span class="ic">float</span> и выведи сумму, разность, произведение и частное.
+              <strong>Расчёт упаковки товара:</strong> Запроси количество пирожных <span class="ic">cakes = int(input())</span> и цену одной штуки <span class="ic">price = float(input())</span>. В одну коробку входит <span class="ic">6</span> штук. Выведи число полных коробок (<span class="ic">//</span>), остаток (<span class="ic">%</span>) и общую стоимость.
             </div>
           </li>
         </ul>

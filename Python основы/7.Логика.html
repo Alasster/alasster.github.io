@@ -164,70 +164,64 @@
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Проверка равенства:</strong> Создай две переменные с разными именами, но одинаковыми значениями. Выведи результат их сравнения через <span class="ic">==</span>.
+              <strong>Проверка равенства:</strong> Создай переменные <span class="ic">a = 15</span> и <span class="ic">b = 15</span>. Выведи результаты их сравнения <span class="ic">a == b</span> и <span class="ic">a != b</span>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Возраст для входа:</strong> Попроси пользователя ввести возраст. Выведи <span class="ic">True</span>, если ему 18 лет или больше, и <span class="ic">False</span>, если меньше.
+              <strong>Сравнение разных типов:</strong> Выведи на экран результат сравнения числа <span class="ic">5</span> и строки <span class="ic">"5"</span> через <span class="ic">5 == "5"</span>. Объясни результат в комментарии.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Сравнение типов:</strong> Сравни число <span class="ic">5</span> и строку <span class="ic">"5"</span> на равенство. Попробуй предсказать результат перед запуском.
+              <strong>Проверка возраста:</strong> Спроси возраст через <span class="ic">age = int(input())</span>. Сохрани результат проверки <span class="ic">age &gt;= 18</span> в переменную <span class="ic">is_adult</span> и выведи её в f-строке.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Отрицание:</strong> Создай переменную <span class="ic">is_raining = False</span>. Используй оператор <span class="ic">not</span>, чтобы вывести противоположное значение.
+              <strong>Отрицание not:</strong> Создай переменную <span class="ic">is_raining = False</span>. Выведи противоположное ей значение с помощью оператора <span class="ic">not</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Двойная проверка:</strong> Попроси пользователя ввести число. Проверь, является ли оно одновременно <strong>положительным</strong> и <strong>четным</strong>.
+              <strong>Проверка чётности через %:</strong> Спроси целое число <span class="ic">n = int(input())</span>. Выведи <span class="ic">True</span>, если оно чётное (<span class="ic">n % 2 == 0</span>), и <span class="ic">False</span>, если нечётное.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Выходной или отпуск:</strong> Создай две булевы переменные <span class="ic">is_weekend</span> и <span class="ic">is_holiday</span>. Напиши выражение, которое даст <span class="ic">True</span>, если хотя бы одно из условий верно.
+              <strong>Одновременное условие (and):</strong> Пользователь вводит число <span class="ic">x = int(input())</span>. Выведи <span class="ic">True</span>, если число одновременно положительное (<span class="ic">x &gt; 0</span>) и чётное (<span class="ic">x % 2 == 0</span>).
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Проверка наличия:</strong> Проверь, содержит ли введенная пользователем строка символ <span class="ic">"@"</span> и символ <span class="ic">"."</span> (точка). Выведи результат.
+              <strong>Хотя бы одно условие (or):</strong> Создай булевы переменные <span class="ic">is_weekend = False</span> и <span class="ic">is_holiday = True</span>. Напиши выражение с <span class="ic">or</span>, которое даёт <span class="ic">True</span>, если можно отдохнуть.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ (БЕЗ ПОДСКАЗОК) -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Сложный диапазон:</strong> Пользователь вводит число. Проверь, что оно <strong>не</strong> находится в диапазоне от 10 до 20 (включительно). Найди два способа сделать это.
+              <strong>Попадание в диапазон:</strong> Пользователь вводит число <span class="ic">n = int(input())</span>. Проверь с помощью двойного неравенства <span class="ic">10 &lt;= n &lt;= 20</span>, входит ли оно в отрезок от 10 до 20 включительно.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Исключающее условие:</strong> Даны два значения. Напиши логическое выражение, которое вернет <span class="ic">True</span> только тогда, когда <strong>ровно одно</strong> из них истинно, а другое ложно.
+              <strong>Двузначное и кратное 5:</strong> Пользователь вводит число <span class="ic">n = int(input())</span>. Выведи <span class="ic">True</span>, если число двузначное (<span class="ic">10 &lt;= n &lt;= 99</span>) и делится на <span class="ic">5</span> без остатка (<span class="ic">n % 5 == 0</span>).
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Високосный год:</strong> Пользователь вводит год. Напиши сложное логическое выражение, которое определяет, является ли год високосным. 
-              <br><em>(Подсказка: год високосный, если он делится на 4, но не делится на 100, либо если он делится на 400).</em>
+              <strong>Формула високосного года:</strong> Пользователь вводит год <span class="ic">year = int(input())</span>. Выведи <span class="ic">True</span>, если год високосный: делится на 4 и не делится на 100, либо делится на 400 (<span class="ic">(year % 4 == 0 and year % 100 != 0) or year % 400 == 0</span>).
             </div>
           </li>
         </ul>

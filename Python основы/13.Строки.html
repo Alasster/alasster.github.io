@@ -255,69 +255,64 @@ s = <span class="tk-str">"п р и в е т"</span>
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Чистка пробелов:</strong> Пользователь ввел логин: <span class="ic">"  admin_root  "</span>. Удали лишние пробелы по краям и выведи результат.
+              <strong>Чистка пробелов и регистр:</strong> Пользователь ввёл логин <span class="ic">"  Admin_Root  "</span>. Удали лишние пробелы по краям методом <span class="ic">.strip()</span>, переведи в нижний регистр <span class="ic">.lower()</span> и выведи результат.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Проверка расширения:</strong> Дано имя файла <span class="ic">"document.pdf"</span>. Проверь, заканчивается ли оно на <span class="ic">".pdf"</span>.
+              <strong>Заглавные буквы (.title и .swapcase):</strong> Преврати строку <span class="ic">"привет, мир, я учу питон"</span> в заголовок методом <span class="ic">.title()</span>, а для строки <span class="ic">"PyThOn"</span> инвертируй регистр методом <span class="ic">.swapcase()</span>.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Регистр заголовка:</strong> Преврати строку <span class="ic">"привет, мир, я учу питон"</span> в заголовок, где каждое слово начинается с большой буквы.
+              <strong>Проверка расширения файла:</strong> Попроси пользователя ввести имя файла через <span class="ic">input()</span>. С помощью <span class="ic">.endswith(".pdf")</span> и <span class="ic">if / else</span> выведи, является ли документ PDF-файлом.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Поиск индекса:</strong> Найди, на какой позиции в строке <span class="ic">"Программирование"</span> впервые встречается слог <span class="ic">"миро"</span>.
+              <strong>Поиск и подсчёт в строке:</strong> В строке <span class="ic">"Программирование на Python"</span> найди позицию слога <span class="ic">"миро"</span> методом <span class="ic">.find()</span> и посчитай количество букв <span class="ic">"о"</span> методом <span class="ic">.count()</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Валидация возраста:</strong> Попроси пользователя ввести возраст. Используй метод строк, чтобы проверить, состоит ли ввод <strong>только из цифр</strong>.
+              <strong>Замена подстроки (.replace):</strong> Дана строка <span class="ic">"Яблоко, груша, Яблоко"</span>. Замени все слова <span class="ic">"Яблоко"</span> на <span class="ic">"Апельсин"</span> методом <span class="ic">.replace()</span> и выведи результат.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Смена регистра:</strong> Дана строка <span class="ic">"PyThOn"</span>. Сделай так, чтобы маленькие буквы стали большими, а большие — маленькими.
+              <strong>Валидация числового ввода (.isdigit):</strong> Попроси пользователя ввести возраст через <span class="ic">input()</span>. С помощью <span class="ic">.isdigit()</span> и <span class="ic">if / else</span> проверь, состоит ли ввод только из цифр.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Срезы через шаг:</strong> Выведи каждый второй символ строки <span class="ic">"Абракадабра"</span>.
+              <strong>Палиндром через срезы:</strong> Попроси пользователя ввести слово, приведи его к нижнему регистру <span class="ic">.lower()</span> и проверь с помощью среза <span class="ic">[::-1]</span>, читается ли оно одинаково в обоих направлениях.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Палиндром:</strong> Попроси пользователя ввести слово. Проверь, читается ли оно одинаково в обоих направлениях. Выведи <span class="ic">True</span> или <span class="ic">False</span>.
+              <strong>Разбор Email через .split():</strong> Попроси ввести почту (например, <span class="ic">"user@mail.com"</span>). Используя <span class="ic">.split("@")</span>, раздели строку на имя пользователя и домен и выведи их в f-строке.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Парсинг Email:</strong> Дана почта <span class="ic">"user@mail.com"</span>. Используя <span class="ic">split()</span>, достань из неё только доменное имя (<span class="ic">mail.com</span>).
+              <strong>Сумма чисел из строки (.split + for):</strong> Пользователь вводит числа через пробел в одну строку (например, <span class="ic">"15 20 35 10"</span>). Разбей строку через <span class="ic">.split()</span>, в цикле <span class="ic">for</span> переведи элементы в <span class="ic">int()</span> и выведи их сумму.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Цензура:</strong> Дано предложение. Замени в нем все буквы <span class="ic">"а"</span> на символ <span class="ic">"*"</span>, но сделай это только для слов, длина которых больше 3 символов. (Тут придется совместить циклы, условия и методы строк!).
+              <strong>Цензура длинных слов (split + for + if + join):</strong> Дано предложение. Разбей его на слова через <span class="ic">.split()</span>, в словах длиннее <span class="ic">3</span> символов замени букву <span class="ic">"а"</span> на <span class="ic">"*"</span> и собери предложение обратно через <span class="ic">" ".join()</span>.
             </div>
           </li>
         </ul>

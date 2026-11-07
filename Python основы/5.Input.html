@@ -175,69 +175,64 @@ weight = <span class="cf">float</span>(<span class="cf">input</span>(<span class
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Простой ввод:</strong> Спроси у пользователя его город. Выведи фразу: <span class="ic">"Ты живешь в городе: [название]"</span>.
+              <strong>Знакомство:</strong> Спроси имя пользователя через <span class="ic">name = input("Как тебя зовут? ")</span> и выведи <span class="ic">f"Привет, {name}!"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Числовой ввод:</strong> Спроси у пользователя его возраст. Выведи, сколько ему будет через 5 лет (преврати ввод в <span class="ic">int</span>).
+              <strong>Два вопроса подряд:</strong> Спроси у пользователя его имя и город в две переменные, а затем выведи их в одном <span class="ic">print()</span> с параметром <span class="ic">sep=" — "</span>.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Эхо-программа:</strong> Попроси пользователя ввести любое слово и число <span class="ic">n</span>. Выведи это слово <span class="ic">n</span> раз в одну строку.
+              <strong>Ввод целого числа:</strong> Спроси возраст пользователя и сразу преобразуй его в число: <span class="ic">age = int(input("Сколько тебе лет? "))</span>. Выведи через f-строку, сколько ему будет через <span class="ic">5</span> лет.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Дробные числа (float):</strong> Попроси ввести цену товара (например, 99.9). Выведи фразу: <span class="ic">"Новая цена со скидкой: [цена - 10]"</span>.
+              <strong>Проверка типа ввода:</strong> Спроси любое число через обычный <span class="ic">raw = input()</span>, затем создай <span class="ic">num = int(raw)</span>. Выведи <span class="ic">type(raw)</span> и <span class="ic">type(num)</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Площадь прямоугольника:</strong> Запроси по очереди ширину и длину. Выведи площадь прямоугольника.
+              <strong>Эхо-повторитель:</strong> Попроси пользователя ввести слово (<span class="ic">str</span>) и количество повторов (<span class="ic">int</span>). Выведи это слово указанное число раз с помощью оператора <span class="ic">*</span>.
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Верхний регистр:</strong> Попроси пользователя ввести свою фамилию. Выведи её, полностью переведя в заглавные буквы с помощью метода строки <span class="ic">фамилия.upper()</span> (он делает все буквы ЗАГЛАВНЫМИ).
+              <strong>Дробный ввод float():</strong> Спроси цену товара через <span class="ic">float(input())</span> и выведи новую цену со скидкой <span class="ic">15.5</span> в формате f-строки.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Конвертер валют:</strong> Спроси сумму в долларах и текущий курс. Выведи результат в рублях.
+              <strong>Площадь и периметр:</strong> Запроси у пользователя длину и ширину прямоугольника (<span class="ic">float</span>). Сохрани площадь и периметр в переменные и выведи их через f-строку.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Год рождения:</strong> Спроси текущий год и возраст пользователя. Выведи фразу: <span class="ic">"Вы родились в [год] году"</span>.
+              <strong>Конвертер валют:</strong> Запроси сумму в долларах (<span class="ic">float</span>) и курс обмена (<span class="ic">float</span>). Посчитай итоговую сумму и выведи её с параметром <span class="ic">end=" тг\n"</span>.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Смена знака:</strong> Попроси ввести число. Умножь его на <span class="ic">-1</span> и выведи результат с пояснением: <span class="ic">"Противоположное число: ..."</span>.
+              <strong>Год рождения:</strong> Запроси у пользователя текущий год (<span class="ic">int</span>) и его возраст (<span class="ic">int</span>). Вычисли примерный год рождения, сохрани в переменную и выведи в f-строке.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Разделитель:</strong> Попроси пользователя ввести три любимых фрукта через пробел. Используй метод <span class="ic">строка.split()</span> (он разрезает текст по пробелам на отдельные слова) и выведи то, что получилось. (Это первый шаг к изучению списков!).
+              <strong>Кассовый чек с вводом:</strong> Запроси у пользователя название товара (<span class="ic">str</span>), цену за штуку (<span class="ic">float</span>) и количество (<span class="ic">int</span>). Выведи аккуратный чек из трёх строк с разделителями <span class="ic">"----------------"</span> и итоговой суммой.
             </div>
           </li>
         </ul>

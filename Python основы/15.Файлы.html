@@ -151,69 +151,64 @@ f.<span class="tk-bi">close</span>()</pre>
         </div>
 
         <ul class="steps">
-          <!-- УРОВЕНЬ: ЛЕГКИЙ -->
           <li>
             <span class="step-num">1</span>
             <div>
-              <strong>Дозапись (Append):</strong> Открой файл <span class="ic">"notes.txt"</span> в режиме добавления и допиши туда новую строку: <span class="ic">"Новая заметка"</span>. Убедись, что старые данные не удалились.
+              <strong>Безопасное чтение (with open):</strong> Открой файл <span class="ic">"test.txt"</span> с помощью менеджера контекста <span class="ic">with open("test.txt", "r") as f:</span>, прочитай весь текст методом <span class="ic">f.read()</span> и выведи его.
             </div>
           </li>
           <li>
             <span class="step-num">2</span>
             <div>
-              <strong>Безопасное открытие:</strong> Перепиши код создания файла, используя менеджер контекста <span class="ic">with open(...) as ...:</span>. Теперь тебе не нужно вручную вызывать <span class="ic">.close()</span>.
+              <strong>Запись в новый файл ("w"):</strong> Создай файл <span class="ic">"hello.txt"</span> в режиме <span class="ic">"w"</span>, запиши в него две строки текста через <span class="ic">f.write()</span>, а затем прочитай и выведи содержимое файла.
             </div>
           </li>
           <li>
             <span class="step-num">3</span>
             <div>
-              <strong>Чтение по буквам:</strong> Прочитай файл и выведи на экран количество символов, которые в нем содержатся.
+              <strong>Дозапись в конец ("a"):</strong> Открой файл <span class="ic">"notes.txt"</span> в режиме добавления <span class="ic">"a"</span> и допиши туда строку <span class="ic">"Новая заметка\n"</span>. Прочитай файл и убедись, что старые данные сохранились.
             </div>
           </li>
           <li>
             <span class="step-num">4</span>
             <div>
-              <strong>Список строк:</strong> Прочитай файл <span class="ic">"story.txt"</span> так, чтобы каждая его строка стала отдельным элементом списка. Выведи вторую строку этого списка.
+              <strong>Подсчёт символов и слов:</strong> Прочитай файл <span class="ic">"data.txt"</span> и выведи на экран количество символов (<span class="ic">len(text)</span>) и количество слов (<span class="ic">len(text.split())</span>) в нём.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: СРЕДНИЙ -->
           <li>
             <span class="step-num">5</span>
             <div>
-              <strong>Ввод пользователя в файл:</strong> Напиши программу, которая просит пользователя ввести три любимых цвета и записывает каждый цвет в файл на новой строке.
+              <strong>Список строк (.readlines):</strong> Прочитай файл <span class="ic">"story.txt"</span> методом <span class="ic">.readlines()</span> так, чтобы каждая строка стала элементом списка. Выведи общее число строк и вторую строку без лишнего переноса (<span class="ic">.strip()</span>).
             </div>
           </li>
           <li>
             <span class="step-num">6</span>
             <div>
-              <strong>Счетчик строк:</strong> Напиши код, который открывает любой текстовый файл и подсчитывает, сколько в нем всего строк.
+              <strong>Запись ввода пользователя в файл:</strong> Попроси пользователя в цикле <span class="ic">for</span> ввести три любимых цвета через <span class="ic">input()</span> и запиши каждый цвет в файл <span class="ic">"colors.txt"</span> на новой строке.
             </div>
           </li>
           <li>
             <span class="step-num">7</span>
             <div>
-              <strong>Поиск в файле:</strong> Попроси пользователя ввести слово. Проверь, содержится ли это слово в файле <span class="ic">"data.txt"</span>. Выведи <span class="ic">"Найдено"</span> или <span class="ic">"Нет"</span>.
+              <strong>Поиск слова в файле:</strong> Попроси пользователя ввести слово. Прочитай <span class="ic">"data.txt"</span> и с помощью <span class="ic">if</span> проверь (без учёта регистра через <span class="ic">.lower()</span>), есть ли это слово в файле. Выведи <span class="ic">"Найдено"</span> или <span class="ic">"Нет"</span>.
             </div>
           </li>
-
-          <!-- УРОВЕНЬ: ПРОДВИНУТЫЙ (БЕЗ ПОДСКАЗОК) -->
           <li>
             <span class="step-num">8</span>
             <div>
-              <strong>Копирование:</strong> Напиши скрипт, который читает данные из файла <span class="ic">"source.txt"</span> и записывает их в новый файл <span class="ic">"copy.txt"</span>.
+              <strong>Копирование файла:</strong> Напиши программу, которая читает все данные из файла <span class="ic">"source.txt"</span> и записывает их точь-в-точь в новый файл <span class="ic">"copy.txt"</span>, после чего выводит содержимое копии.
             </div>
           </li>
           <li>
             <span class="step-num">9</span>
             <div>
-              <strong>Редактор:</strong> Считай текст из файла, замени все маленькие буквы на большие и сохрани результат в этот же файл (перезапиши его).
+              <strong>Редактор регистра файла:</strong> Считай текст из файла <span class="ic">"notes.txt"</span>, переведи все буквы в верхний регистр методом <span class="ic">.upper()</span>, перезапиши файл и выведи обновлённый текст.
             </div>
           </li>
           <li>
             <span class="step-num">10</span>
             <div>
-              <strong>Логирование:</strong> Создай функцию <span class="ic">log_message(msg)</span>, которая при каждом вызове записывает в файл <span class="ic">"log.txt"</span> переданную строку, добавляя её в конец файла с новой строки.
+              <strong>Функция логирования (def + файлы):</strong> Создай функцию <span class="ic">log_message(msg)</span>, которая при каждом вызове дописывает переданную строку в конец файла <span class="ic">"log.txt"</span> с новой строки. Вызови её 3 раза и выведи весь лог на экран.
             </div>
           </li>
         </ul>
