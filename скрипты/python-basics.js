@@ -286,11 +286,10 @@ function initNavigation() {
     sections.forEach((sec, i) => {
       const titleEl = sec.querySelector(".section-title");
       const rawTitle = titleEl ? titleEl.textContent.trim() : `Тема ${i + 1}`;
-      const shortTitle = rawTitle.length > 26 ? rawTitle.slice(0, 24) + "…" : rawTitle;
       const btn = document.createElement("button");
       btn.className = "subtopic-btn" + (i === 0 ? " active" : "");
       btn.dataset.target = sec.id;
-      btn.textContent = shortTitle;
+      btn.textContent = rawTitle;
       btn.onclick = () => scrollToSection(sec.id);
       nav.appendChild(btn);
     });

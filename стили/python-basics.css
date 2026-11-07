@@ -1773,7 +1773,12 @@ body {
   .layout { flex-direction: column; height: auto; overflow: visible; }
   .left-panel { flex: none !important; width: 100% !important; max-width: 100% !important; min-width: unset; overflow: visible; height: auto; }
   .divider { display: none; }
-  .right-panel { width: 100% !important; min-width: unset; height: 560px; flex-shrink: 0; border-top: 2px solid var(--border); }
+  .subtopic-nav { flex-direction: column; align-items: stretch; gap: 8px; }
+  .subtopic-btn { width: 100%; text-align: left; box-sizing: border-box; padding: 10px 16px; font-size: 13px; }
+  .right-panel { width: 100% !important; min-width: unset; height: auto !important; min-height: 760px; flex-shrink: 0; border-top: 2px solid var(--border); padding: 14px; }
+  .compiler-wrap { overflow: visible; flex: none; }
+  .editor-area { min-height: 320px; height: 320px; flex: none; }
+  .output-area { min-height: 260px; height: 260px; flex: none; }
   .lesson-content { padding: 24px 18px 44px; }
   .compare-grid { grid-template-columns: 1fr; }
   .tools-grid { grid-template-columns: 1fr 1fr; }
