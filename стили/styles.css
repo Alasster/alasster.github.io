@@ -1801,7 +1801,11 @@ body { display: block !important; }
 }
 
 .modal-backdrop[data-class-theme="cextra"] {
+  --lesson-bg: #e7ebf3;
+  --lesson-surface: #f4f7fc;
+  --lesson-soft: #b8c4db;
   --lesson-accent: #4c6ef5;
+  --lesson-deep: #1e293b;
   --lesson-accent-rgb: 76, 110, 245;
   --lesson-accent-soft: rgba(76, 110, 245, 0.12);
 }
