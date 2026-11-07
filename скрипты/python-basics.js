@@ -690,12 +690,16 @@ function initDivider() {
 // ── FONT SIZE ──
 function setFontSize(size) {
   currentFontSize = size;
+  const lineH = Math.round(size * 1.68);
   document.documentElement.style.setProperty("--editor-font-size", size + "px");
-  document.documentElement.style.setProperty("--editor-line-height", (size * 1.65) + "px");
-  const elements = ["codeEditor", "editorHighlight", "output"];
+  document.documentElement.style.setProperty("--editor-line-height", lineH + "px");
+  const elements = ["codeEditor", "editorHighlight", "gutter", "output"];
   elements.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.fontSize = size + "px";
+    if (el) {
+      el.style.fontSize = size + "px";
+      if (id !== "output") el.style.lineHeight = lineH + "px";
+    }
   });
   const label = document.getElementById("fontSizeLabel");
   if (label) label.textContent = `Аа ${size}px ▾`;

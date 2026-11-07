@@ -703,16 +703,19 @@ body {
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0, "calt" 0;
   font-size: var(--editor-font-size, 13px);
-  line-height: 1.65;
+  line-height: var(--editor-line-height, 22px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   color: #748097;
   text-align: right;
-  padding: 14px 8px 14px 0;
+  padding: 14px 8px 48px 0;
   overflow: hidden;
   pointer-events: none;
   user-select: none;
 }
 .editor-gutter div {
-  height: var(--editor-line-height, 21.45px);
+  height: var(--editor-line-height, 22px);
+  line-height: var(--editor-line-height, 22px);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -808,10 +811,15 @@ body {
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0, "calt" 0;
   font-size: var(--editor-font-size, 13px);
-  line-height: 1.65;
+  line-height: var(--editor-line-height, 22px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  letter-spacing: 0px;
   color: #263248;
   background: transparent;
-  padding: 14px 16px;
+  padding: 14px 16px 48px;
+  margin: 0;
+  border: none;
   tab-size: 4;
   white-space: pre;
   overflow: hidden;
@@ -822,7 +830,12 @@ body {
 }
 .editor-highlight .code-line {
   display: block;
-  min-height: var(--editor-line-height, 21.45px);
+  height: var(--editor-line-height, 22px);
+  min-height: var(--editor-line-height, 22px);
+  line-height: var(--editor-line-height, 22px);
+}
+.editor-highlight .code-line span {
+  line-height: var(--editor-line-height, 22px);
 }
 .editor-highlight .code-line.err-line {
   background: rgba(239, 68, 68, 0.15);
@@ -833,14 +846,18 @@ body {
   border: none;
   outline: none;
   resize: none;
+  margin: 0;
   font-family: 'JetBrains Mono', monospace;
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0, "calt" 0;
   font-size: var(--editor-font-size, 13px);
-  line-height: 1.65;
+  line-height: var(--editor-line-height, 22px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  letter-spacing: 0px;
   color: transparent;
   background: transparent;
-  padding: 14px 16px;
+  padding: 14px 16px 48px;
   tab-size: 4;
   white-space: pre;
   overflow: auto;
