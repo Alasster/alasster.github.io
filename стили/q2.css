@@ -5538,6 +5538,24 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.callout
   color: #EA580C !important;
 }
 
+/* Кастомная векторная иконка квадрокоптера/дрона для практики (без зависимости от Pro-шрифтов FA) */
+:is(.fa-drone, .fa-helicopter),
+i:is(.fa-drone, .fa-helicopter) {
+  display: inline-block !important;
+  width: 1.15em !important;
+  height: 1.15em !important;
+  background-color: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23000'/%3E%3Cpath d='m5 5 4.5 4.5'/%3E%3Cpath d='m14.5 9.5 4.5-4.5'/%3E%3Cpath d='m14.5 14.5 4.5 4.5'/%3E%3Cpath d='m9.5 14.5-4.5 4.5'/%3E%3Ccircle cx='4' cy='4' r='2.5'/%3E%3Ccircle cx='20' cy='4' r='2.5'/%3E%3Ccircle cx='20' cy='20' r='2.5'/%3E%3Ccircle cx='4' cy='20' r='2.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23000'/%3E%3Cpath d='m5 5 4.5 4.5'/%3E%3Cpath d='m14.5 9.5 4.5-4.5'/%3E%3Cpath d='m14.5 14.5 4.5 4.5'/%3E%3Cpath d='m9.5 14.5-4.5 4.5'/%3E%3Ccircle cx='4' cy='4' r='2.5'/%3E%3Ccircle cx='20' cy='4' r='2.5'/%3E%3Ccircle cx='20' cy='20' r='2.5'/%3E%3Ccircle cx='4' cy='20' r='2.5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+  vertical-align: -0.16em !important;
+}
+
+:is(.fa-drone, .fa-helicopter)::before,
+i:is(.fa-drone, .fa-helicopter)::before {
+  content: "" !important;
+  display: none !important;
+}
+
 /* Список пингов и путей в практических заданиях 11 класса */
 .q2-ping-list {
   display: flex !important;

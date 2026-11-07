@@ -525,7 +525,7 @@
               {
                 label: 'Задача 1 · Дроны',
                 badge: '3 балла',
-                icon: 'fa-solid fa-helicopter',
+                icon: 'fa-solid fa-drone',
                 blocks: [
                   {
                     t: 'cards',
@@ -533,7 +533,7 @@
                     items: [
                       {
                         badge: '3 балла · Базовый уровень',
-                        icon: 'fa-solid fa-helicopter',
+                        icon: 'fa-solid fa-drone',
                         tone: 'violet',
                         title: 'Задача 1. Логистика курьерских дронов (Орграф)',
                         text: 'Беспилотная доставка между 5 хабами: <b>S</b> (Склад), <b>A</b>, <b>B</b>, <b>C</b>, <b>F</b> (Финиш). Из-за ветровых коридоров движение одностороннее:<br><div class="q2-ping-list"><div class="q2-ping-row"><span class="q2-ping-bullet">•</span> <code>S → A</code> <code>S → B</code> <code>A → B</code> <code>A → C</code> <code>B → C</code> <code>B → F</code> <code>C → F</code></div></div><b>Задания:</b><br>1) Нарисуйте орграф и выпишите для каждой вершины входящую (in) и исходящую (out) степени.<br>2) Определите вершину-источник и вершину-сток. Возможен ли возврат дрона из C обратно в S? Обоснуйте.<br>3) Выпишите <b>все возможные пути</b> доставки из S в F (например, <code>S → A → ... → F</code>) и укажите их общее количество.'
