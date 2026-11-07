@@ -43,15 +43,66 @@
   function codeBlock(block) {
     const source = String(block.code || '').replace(/\s+$/, '');
     const lines = source.split('\n');
-    return `<div class="q2-code${block.compact ? ' is-compact' : ''}">
+    const codeHtml = `<div class="q2-code${block.compact ? ' is-compact' : ''}">
       <div class="q2-code-head">
         <span class="q2-code-dots"><i></i><i></i><i></i></span>
         <span class="q2-code-title">${esc(block.title || 'Python')}</span>
+        ${block.trace ? `<span class="q2-code-live-badge" data-runner-pill><i class="fas fa-circle-play"></i> Трассировка</span>` : ''}
       </div>
       <pre><code>${lines.map((line, index) =>
-        `<span class="q2-code-line" data-line="${index}"><span class="q2-ln">${index + 1}</span>${hl(line) || ' '}</span>`
+        `<span class="q2-code-line" data-line="${index + 1}"><span class="q2-ln">${index + 1}</span>${hl(line) || ' '}</span>`
       ).join('')}</code></pre>
       ${block.caption ? `<p class="q2-caption">${block.caption}</p>` : ''}
+    </div>`;
+
+    if (!block.trace || !Array.isArray(block.trace.steps)) {
+      return codeHtml;
+    }
+
+    const steps = block.trace.steps;
+    const outputs = steps.filter(s => s.out != null);
+    const phaseMeta = {
+      down: { label: '↓ Погружение', cls: 'is-down' },
+      base: { label: '★ База (стоп)', cls: 'is-base' },
+      up:   { label: '↑ Возврат', cls: 'is-up' },
+      out:  { label: '✓ Вывод', cls: 'is-out' }
+    };
+
+    return `<div class="q2-code-runner" data-q2-code-runner>
+      ${codeHtml}
+      <div class="q2-exec-card">
+        <div class="q2-exec-head">
+          <span class="q2-exec-title"><i class="fas fa-bolt"></i> ${esc(block.trace.title || 'Пошаговое выполнение')}</span>
+          <span class="q2-exec-counter" data-runner-counter>Шаг 1 / ${steps.length}</span>
+        </div>
+        <div class="q2-exec-steps">
+          ${steps.map((st, idx) => {
+            const pm = phaseMeta[st.phase || 'down'] || phaseMeta.down;
+            return `<div class="q2-exec-step ${pm.cls}${idx === 0 ? ' is-current' : ' is-pending'}" data-step-idx="${idx}" data-target-line="${st.line || 1}">
+              <span class="q2-exec-step-num">${idx + 1}</span>
+              <div class="q2-exec-step-main">
+                <div class="q2-exec-step-top">
+                  <code class="q2-exec-call">${esc(st.call || '')}</code>
+                  <span class="q2-exec-badge ${pm.cls}">${pm.label}</span>
+                </div>
+                <div class="q2-exec-desc">${st.desc || ''}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="q2-exec-console">
+          <div class="q2-exec-console-head">
+            <span><i class="fas fa-terminal"></i> Результат в консоли (Python Shell)</span>
+          </div>
+          <div class="q2-exec-console-body">
+            ${block.trace.cmd ? `<div class="q2-exec-cmd">&gt;&gt;&gt; ${esc(block.trace.cmd)}</div>` : ''}
+            ${outputs.map(st => {
+              const stepIdx = steps.indexOf(st);
+              return `<div class="q2-exec-out-line" data-out-step="${stepIdx}">${esc(st.out)}</div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
     </div>`;
   }
 
@@ -726,8 +777,63 @@
     initSingleLamp(root);
     initAutoSort(root);
     initFloatGraphs(root);
+    initCodeRunners(root);
     initWidgets(root);
     document.dispatchEvent(new CustomEvent('q2:ready', { detail: { id } }));
+  }
+
+  function initCodeRunners(root) {
+    root.querySelectorAll('[data-q2-code-runner]').forEach(runner => {
+      if (runner.dataset.runnerBound === '1') return;
+      runner.dataset.runnerBound = '1';
+
+      const stepEls = Array.from(runner.querySelectorAll('.q2-exec-step'));
+      const lineEls = Array.from(runner.querySelectorAll('.q2-code-line'));
+      const outEls = Array.from(runner.querySelectorAll('.q2-exec-out-line'));
+      const counterEl = runner.querySelector('[data-runner-counter]');
+      if (!stepEls.length) return;
+
+      let current = 0;
+      const total = stepEls.length;
+
+      const applyStep = (idx) => {
+        current = idx;
+        if (counterEl) counterEl.textContent = `Шаг ${idx + 1} / ${total}`;
+        const activeStep = stepEls[idx];
+        const targetLine = activeStep ? String(activeStep.dataset.targetLine || '1') : '1';
+
+        stepEls.forEach((el, i) => {
+          el.classList.toggle('is-current', i === idx);
+          el.classList.toggle('is-done', i < idx);
+          el.classList.toggle('is-pending', i > idx);
+        });
+
+        lineEls.forEach(lineEl => {
+          lineEl.classList.toggle('is-active', lineEl.dataset.line === targetLine);
+        });
+
+        outEls.forEach(outEl => {
+          const outStep = Number(outEl.dataset.outStep);
+          outEl.classList.toggle('is-visible', outStep <= idx);
+        });
+      };
+
+      stepEls.forEach((el, i) => {
+        el.addEventListener('click', () => {
+          applyStep(i);
+        });
+      });
+
+      applyStep(0);
+
+      setInterval(() => {
+        if (!document.body.contains(runner)) return;
+        const slide = runner.closest('.slide');
+        if (slide && !slide.classList.contains('active')) return;
+        const next = (current + 1) % total;
+        applyStep(next);
+      }, 1350);
+    });
   }
 
   /* ---------------------- запрет копирования и мелкие действия ------------------- */

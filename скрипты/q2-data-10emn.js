@@ -504,7 +504,17 @@
           {
             t: 'code',
             title: 'функция_с_возвратом.py',
-            code: 'def double(x):\n    result = x * 2\n    return result  # возвращаем вычисленный результат\n\na = double(5)      # в переменную a запишется число 10\nprint("Итог:", a)'
+            code: 'def double(x):\n    result = x * 2\n    return result  # возвращаем вычисленный результат\n\na = double(5)      # в переменную a запишется число 10\nprint("Итог:", a)',
+            trace: {
+              title: 'Пошаговое выполнение double(5)',
+              cmd: 'python функция_с_возвратом.py',
+              steps: [
+                { line: 5, phase: 'down', call: 'a = double(5)', desc: 'Вызываем функцию и передаём аргумент x = 5' },
+                { line: 2, phase: 'down', call: 'result = 5 * 2', desc: 'Внутри тела функции вычисляем result = 10' },
+                { line: 3, phase: 'base', call: 'return 10', desc: 'Возвращаем число 10 обратно в переменную a' },
+                { line: 6, phase: 'out', call: 'print("Итог:", a)', desc: 'Выводим полученное значение в консоль', out: 'Итог: 10' }
+              ]
+            }
           },
           {
             t: 'cards',
@@ -966,7 +976,20 @@
           {
             t: 'code',
             title: 'прямой_и_обратный_ход.py',
-            code: 'def trace(n):\n    if n == 0:\n        print("--- База достигнута! ---")\n        return\n\n    print("Вход в стек:", n)   # До вызова: 3, 2, 1\n    trace(n - 1)                # Рекурсивный спуск\n    print("Выход из стека:", n)  # После вызова: 1, 2, 3!\n\ntrace(3)'
+            code: 'def trace(n):\n    if n == 0:\n        print("--- База достигнута! ---")\n        return\n\n    print("Вход в стек:", n)   # До вызова: 3, 2, 1\n    trace(n - 1)                # Рекурсивный спуск\n    print("Выход из стека:", n)  # После вызова: 1, 2, 3!\n\ntrace(3)',
+            trace: {
+              title: 'Пошаговое выполнение trace(3)',
+              cmd: 'trace(3)',
+              steps: [
+                { line: 6, phase: 'down', call: 'trace(3)', desc: 'Прямой ход (n = 3) → печатаем и зовём trace(2)', out: 'Вход в стек: 3' },
+                { line: 6, phase: 'down', call: 'trace(2)', desc: 'Прямой ход (n = 2) → печатаем и зовём trace(1)', out: 'Вход в стек: 2' },
+                { line: 6, phase: 'down', call: 'trace(1)', desc: 'Прямой ход (n = 1) → печатаем и зовём trace(0)', out: 'Вход в стек: 1' },
+                { line: 3, phase: 'base', call: 'trace(0)', desc: 'n == 0 → сработала база! Начинаем возврат LIFO', out: '--- База достигнута! ---' },
+                { line: 8, phase: 'up', call: 'возврат в trace(1)', desc: 'Обратный ход (n = 1) → строка после вызова', out: 'Выход из стека: 1' },
+                { line: 8, phase: 'up', call: 'возврат в trace(2)', desc: 'Обратный ход (n = 2) → строка после вызова', out: 'Выход из стека: 2' },
+                { line: 8, phase: 'up', call: 'возврат в trace(3)', desc: 'Обратный ход (n = 3) → стек полностью пуст!', out: 'Выход из стека: 3' }
+              ]
+            }
           },
           {
             t: 'callout',
@@ -1174,6 +1197,23 @@
         title: 'Ветвящаяся рекурсия: числа Фибоначчи',
         lead: 'Когда функция внутри себя вызывает саму себя <b>дважды</b>, возникает не линейная цепочка, а ветвящееся дерево вызовов.',
         blocks: [
+          {
+            t: 'code',
+            title: 'fib_tree.py',
+            code: 'def fib(n):\n    if n <= 1:\n        return n           # База: fib(0)=0, fib(1)=1\n    left = fib(n - 1)      # Левая ветвь дерева\n    right = fib(n - 2)     # Правая ветвь дерева\n    return left + right\n\nprint("fib(4) =", fib(4))  # 3',
+            trace: {
+              title: 'Пошаговый обход дерева fib(4)',
+              cmd: 'fib(4)',
+              steps: [
+                { line: 4, phase: 'down', call: 'fib(4) → fib(3) + fib(2)', desc: 'Корень дерева делится на две ветви: n=3 и n=2' },
+                { line: 4, phase: 'down', call: 'fib(3) → fib(2) + fib(1)', desc: 'Левая ветвь спускается глубже к fib(2) и fib(1)' },
+                { line: 3, phase: 'base', call: 'fib(1) = 1, fib(0) = 0', desc: 'Листья дерева достигают базы и возвращают 1 и 0' },
+                { line: 6, phase: 'up', call: 'fib(2) = 1 + 0 = 1', desc: 'Собираем сумму для узла fib(2) → возвращает 1' },
+                { line: 6, phase: 'up', call: 'fib(3) = 1 + 1 = 2', desc: 'Левое поддерево посчитано: fib(2) + fib(1) = 2' },
+                { line: 6, phase: 'out', call: 'fib(4) = 2 + 1 = 3', desc: 'Складываем левую (2) и правую (1) ветви корня!', out: 'fib(4) = 3' }
+              ]
+            }
+          },
           { t: 'svg', svg: FIB_TREE_SVG, caption: 'Дерево рекурсивных вызовов fib(4)' },
           {
             t: 'callout',
@@ -1193,7 +1233,18 @@
           {
             t: 'code',
             title: 'fibonacci.py',
-            code: 'def fib(n):\n    # Две базы: для нулевого и первого элементов\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n\n    # Рекурсивный шаг: сумма двух предыдущих\n    return fib(n - 1) + fib(n - 2)\n\nprint(fib(6))  # 8'
+            code: 'def fib(n):\n    # Две базы: для нулевого и первого элементов\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n\n    # Рекурсивный шаг: сумма двух предыдущих\n    return fib(n - 1) + fib(n - 2)\n\nprint(fib(6))  # 8',
+            trace: {
+              title: 'Пошаговое вычисление fib(6)',
+              cmd: 'print(fib(6))',
+              steps: [
+                { line: 4, phase: 'base', call: 'fib(0) = 0, fib(1) = 1', desc: 'Два базовых случая задают старт последовательности' },
+                { line: 9, phase: 'up', call: 'fib(2) = fib(1) + fib(0)', desc: '1 + 0 = 1 (третий элемент ряда)' },
+                { line: 9, phase: 'up', call: 'fib(3) = fib(2) + fib(1)', desc: '1 + 1 = 2 (четвёртый элемент ряда)' },
+                { line: 9, phase: 'up', call: 'fib(4) = 2+1=3, fib(5) = 3+2=5', desc: 'Каждый следующий член равен сумме двух предыдущих' },
+                { line: 11, phase: 'out', call: 'fib(6) = fib(5) + fib(4)', desc: '5 + 3 = 8 → итоговый результат в консоли', out: '8' }
+              ]
+            }
           },
           {
             t: 'table',
@@ -1358,7 +1409,18 @@
           {
             t: 'code',
             title: 'сумма_цифр.py',
-            code: 'def digit_sum(n):\n    # База: если число однозначное, сумма равна самой цифре\n    if n < 10:\n        return n\n\n    # Шаг: последняя цифра + сумма цифр оставшейся части\n    return (n % 10) + digit_sum(n // 10)\n\nprint("Сумма цифр 482:", digit_sum(482))  # 14'
+            code: 'def digit_sum(n):\n    # База: если число однозначное, сумма равна самой цифре\n    if n < 10:\n        return n\n\n    # Шаг: последняя цифра + сумма цифр оставшейся части\n    return (n % 10) + digit_sum(n // 10)\n\nprint("Сумма цифр 482:", digit_sum(482))  # 14',
+            trace: {
+              title: 'Пошаговое выполнение digit_sum(482)',
+              cmd: 'digit_sum(482)',
+              steps: [
+                { line: 7, phase: 'down', call: 'digit_sum(482)', desc: '482 % 10 = 2 (последняя цифра), вызываем digit_sum(48)' },
+                { line: 7, phase: 'down', call: 'digit_sum(48)', desc: '48 % 10 = 8 (последняя цифра), вызываем digit_sum(4)' },
+                { line: 4, phase: 'base', call: 'digit_sum(4) → 4', desc: '4 < 10 → сработала база! Возвращаем 4' },
+                { line: 7, phase: 'up', call: '8 + 4 = 12', desc: 'Возврат в digit_sum(48): складываем 8 + 4 = 12' },
+                { line: 9, phase: 'out', call: '2 + 12 = 14', desc: 'Возврат в digit_sum(482): 2 + 12 = 14', out: 'Сумма цифр 482: 14' }
+              ]
+            }
           },
           {
             t: 'callout',
@@ -1558,7 +1620,17 @@
           {
             t: 'code',
             title: 'палиндром.py',
-            code: 'def is_palindrome(s):\n    # База: строки длины 0 или 1 всегда палиндромы\n    if len(s) <= 1:\n        return True\n\n    # Если крайние буквы не равны — точно не палиндром\n    if s[0] != s[-1]:\n        return False\n\n    # Шаг: проверяем подстроку без крайних букв\n    return is_palindrome(s[1:-1])\n\nprint(is_palindrome("шалаш"))  # True\nprint(is_palindrome("питон"))  # False'
+            code: 'def is_palindrome(s):\n    # База: строки длины 0 или 1 всегда палиндромы\n    if len(s) <= 1:\n        return True\n\n    # Если крайние буквы не равны — точно не палиндром\n    if s[0] != s[-1]:\n        return False\n\n    # Шаг: проверяем подстроку без крайних букв\n    return is_palindrome(s[1:-1])\n\nprint(is_palindrome("шалаш"))  # True\nprint(is_palindrome("питон"))  # False',
+            trace: {
+              title: 'Пошаговая проверка палиндрома',
+              cmd: 'is_palindrome("шалаш") / is_palindrome("питон")',
+              steps: [
+                { line: 7, phase: 'down', call: 'is_palindrome("шалаш")', desc: 'Крайние буквы "ш" == "ш" совпадают → срез s[1:-1] = "ала"' },
+                { line: 11, phase: 'down', call: 'is_palindrome("ала")', desc: 'Крайние буквы "а" == "а" совпадают → срез s[1:-1] = "л"' },
+                { line: 4, phase: 'base', call: 'is_palindrome("л") → True', desc: 'len("л") <= 1 → база достигнута, возвращаем True!', out: 'True' },
+                { line: 8, phase: 'out', call: 'is_palindrome("питон") → False', desc: 'Крайние буквы "п" != "н" не равны → сразу return False', out: 'False' }
+              ]
+            }
           },
           {
             t: 'callout',
@@ -1742,7 +1814,18 @@
           {
             t: 'code',
             title: 'gcd_euclid.py',
-            code: 'def gcd(a, b):\n    # База: если остаток b равен 0, то a и есть НОД\n    if b == 0:\n        return a\n\n    # Рекурсивный шаг Евклида: gcd(b, остаток от a // b)\n    return gcd(b, a % b)\n\nprint("НОД(48, 18):", gcd(48, 18))  # 6\nprint("НОД(100, 25):", gcd(100, 25))  # 25'
+            code: 'def gcd(a, b):\n    # База: если остаток b равен 0, то a и есть НОД\n    if b == 0:\n        return a\n\n    # Рекурсивный шаг Евклида: gcd(b, остаток от a // b)\n    return gcd(b, a % b)\n\nprint("НОД(48, 18):", gcd(48, 18))  # 6\nprint("НОД(100, 25):", gcd(100, 25))  # 25',
+            trace: {
+              title: 'Пошаговое выполнение gcd(48, 18)',
+              cmd: 'gcd(48, 18)',
+              steps: [
+                { line: 7, phase: 'down', call: 'gcd(48, 18)', desc: 'Остаток 48 % 18 = 12 → следующий шаг gcd(18, 12)' },
+                { line: 7, phase: 'down', call: 'gcd(18, 12)', desc: 'Остаток 18 % 12 = 6 → следующий шаг gcd(12, 6)' },
+                { line: 7, phase: 'down', call: 'gcd(12, 6)', desc: 'Остаток 12 % 6 = 0 → следующий шаг gcd(6, 0)' },
+                { line: 4, phase: 'base', call: 'gcd(6, 0) → return 6', desc: 'b == 0 → сработала база! НОД найден и равен 6', out: 'НОД(48, 18): 6' },
+                { line: 10, phase: 'out', call: 'gcd(100, 25) → return 25', desc: '100 % 25 = 0 → gcd(25, 0) сразу возвращает 25', out: 'НОД(100, 25): 25' }
+              ]
+            }
           },
           {
             t: 'callout',
@@ -1942,7 +2025,18 @@
           {
             t: 'code',
             title: 'решение_сор.py',
-            code: 'def F(n):\n    if n == 1:\n        return 1\n    if n % 2 == 0:\n        return n + F(n - 1)      # четное n\n    else:\n        return 2 * F(n - 2)      # нечетное n\n\n# Ручная трассировка:\n# F(1) = 1\n# F(2) = 2 + F(1) = 2 + 1 = 3\n# F(3) = 2 * F(1) = 2 * 1 = 2\n# F(4) = 4 + F(3) = 4 + 2 = 6\n# F(5) = 2 * F(3) = 2 * 2 = 4\nprint("F(5) =", F(5))  # 4'
+            code: 'def F(n):\n    if n == 1:\n        return 1\n    if n % 2 == 0:\n        return n + F(n - 1)      # четное n\n    else:\n        return 2 * F(n - 2)      # нечетное n\n\n# Ручная трассировка:\n# F(1) = 1\n# F(2) = 2 + F(1) = 2 + 1 = 3\n# F(3) = 2 * F(1) = 2 * 1 = 2\n# F(4) = 4 + F(3) = 4 + 2 = 6\n# F(5) = 2 * F(3) = 2 * 2 = 4\nprint("F(5) =", F(5))  # 4',
+            trace: {
+              title: 'Пошаговая трассировка F(5)',
+              cmd: 'print("F(5) =", F(5))',
+              steps: [
+                { line: 7, phase: 'down', call: 'F(5) [нечетное]', desc: 'n = 5 нечетное → вызываем 2 * F(3)' },
+                { line: 7, phase: 'down', call: 'F(3) [нечетное]', desc: 'n = 3 нечетное → вызываем 2 * F(1)' },
+                { line: 3, phase: 'base', call: 'F(1) = 1', desc: 'n == 1 → базовый случай возвращает 1' },
+                { line: 7, phase: 'up', call: 'F(3) = 2 * 1 = 2', desc: 'Возврат в F(3): подставляем F(1)=1 → получаем 2' },
+                { line: 15, phase: 'out', call: 'F(5) = 2 * 2 = 4', desc: 'Возврат в F(5): подставляем F(3)=2 → ответ 4!', out: 'F(5) = 4' }
+              ]
+            }
           },
           {
             t: 'callout',
@@ -1962,7 +2056,17 @@
           {
             t: 'code',
             title: 'счетчик_вызовов.py',
-            code: 'calls = 0  # глобальный счетчик\n\ndef F(n):\n    global calls\n    calls += 1  # учитываем текущий вызов\n    if n <= 1:\n        return 1\n    return F(n - 1) + F(n - 2)\n\ncalls = 0\nres = F(4)\nprint(f"F(4) = {res}, всего вызовов: {calls}")  # 9 вызовов!'
+            code: 'calls = 0  # глобальный счетчик\n\ndef F(n):\n    global calls\n    calls += 1  # учитываем текущий вызов\n    if n <= 1:\n        return 1\n    return F(n - 1) + F(n - 2)\n\ncalls = 0\nres = F(4)\nprint(f"F(4) = {res}, всего вызовов: {calls}")  # 9 вызовов!',
+            trace: {
+              title: 'Пошаговый подсчет вызовов F(4)',
+              cmd: 'res = F(4)',
+              steps: [
+                { line: 5, phase: 'down', call: 'F(4) → calls = 1', desc: 'Старт корневого вызова F(4), запускает F(3) и F(2)' },
+                { line: 5, phase: 'down', call: 'Ветвь F(3) → +5 вызовов', desc: 'F(3) вызывает F(2) (3 вызова) и F(1) (1 вызов) → calls = 6' },
+                { line: 5, phase: 'base', call: 'Ветвь F(2) → +3 вызова', desc: 'Правая ветвь F(2) вызывает F(1) и F(0) → calls = 9' },
+                { line: 12, phase: 'out', call: 'res = 5, calls = 9', desc: 'Все 9 узлов дерева посчитаны, выводим итог', out: 'F(4) = 5, всего вызовов: 9' }
+              ]
+            }
           }
         ]
       },

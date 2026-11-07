@@ -5618,3 +5618,259 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   fill: #C2410C !important;
   font-weight: 800 !important;
 }
+
+/* ==========================================================================
+   2-КОЛОНОЧНЫЙ БЛОК КОДА С АНИМАЦИЕЙ ПОШАГОВОГО ВЫПОЛНЕНИЯ (.q2-code-runner)
+   ========================================================================== */
+.q2-code-runner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  margin: 10px 0 14px;
+}
+
+@media (max-width: 920px) {
+  .q2-code-runner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.q2-code-runner > .q2-code {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
+
+.q2-code-runner > .q2-code pre {
+  flex: 1;
+}
+
+.q2-code-live-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+}
+
+.q2-code-runner .q2-code-line.is-active {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.16), rgba(37, 99, 235, 0.03));
+  border-left-color: #2563eb;
+  font-weight: 700;
+}
+
+.q2-exec-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow: var(--q2-shadow-sm);
+}
+
+.q2-exec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 15px;
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.q2-exec-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.q2-exec-title i {
+  color: #2563eb;
+}
+
+.q2-exec-counter {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.q2-exec-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  flex: 1;
+}
+
+.q2-exec-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: rgba(241, 245, 249, 0.75);
+  border: 1px solid rgba(203, 213, 225, 0.55);
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.q2-exec-step.is-pending {
+  opacity: 0.38;
+}
+
+.q2-exec-step.is-done {
+  opacity: 0.86;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.q2-exec-step.is-current {
+  opacity: 1;
+  transform: translateX(3px);
+  background: #ffffff;
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+
+.q2-exec-step.is-base.is-current {
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.q2-exec-step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.q2-exec-step.is-current .q2-exec-step-num {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.q2-exec-step.is-base.is-current .q2-exec-step-num {
+  background: #059669;
+  color: #ffffff;
+}
+
+.q2-exec-step-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.q2-exec-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.q2-exec-call {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #0f172a;
+  background: none;
+  padding: 0;
+}
+
+.q2-exec-badge {
+  font-size: 0.66rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.q2-exec-badge.is-down {
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.q2-exec-badge.is-base {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.q2-exec-badge.is-up {
+  color: #6d28d9;
+  background: rgba(109, 40, 217, 0.1);
+}
+
+.q2-exec-badge.is-out {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.q2-exec-desc {
+  font-size: 0.76rem;
+  color: #475569;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.q2-exec-console {
+  margin: 0 12px 12px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  overflow: hidden;
+}
+
+.q2-exec-console-head {
+  padding: 5px 11px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #475569;
+  background: rgba(226, 232, 240, 0.7);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.q2-exec-console-body {
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.q2-exec-cmd {
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.q2-exec-out-line {
+  color: #94a3b8;
+  opacity: 0.25;
+  font-weight: 700;
+  transition: opacity 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.q2-exec-out-line.is-visible {
+  opacity: 1;
+  color: #047857;
+}
+
