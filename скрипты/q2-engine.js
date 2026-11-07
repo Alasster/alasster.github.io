@@ -112,6 +112,27 @@
           <div class="q2-split-col q2-split-left">${blocks(item.left)}</div>
           <div class="q2-split-col q2-split-right">${blocks(item.right)}</div>
         </div>`;
+      case 'tabs': {
+        const tabs = item.items || [];
+        return `<div class="q2-tabs-widget${item.cls ? ` ${item.cls}` : ''}">
+          <div class="q2-tabs-nav" role="tablist">
+            ${tabs.map((tab, idx) => `
+              <button type="button" class="q2-tab-btn${idx === 0 ? ' is-active' : ''}" data-tab="${idx}" role="tab" aria-selected="${idx === 0}">
+                ${tab.icon ? `<i class="${tab.icon}"></i>` : ''}
+                <span class="q2-tab-title">${tab.label || tab.title}</span>
+                ${tab.badge ? `<span class="q2-tab-badge">${tab.badge}</span>` : ''}
+              </button>
+            `).join('')}
+          </div>
+          <div class="q2-tabs-content">
+            ${tabs.map((tab, idx) => `
+              <div class="q2-tab-pane${idx === 0 ? ' is-active' : ''}" data-pane="${idx}" role="tabpanel">
+                ${tab.blocks ? blocks(tab.blocks) : (tab.html || (tab.text ? `<p>${tab.text}</p>` : ''))}
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      }
       case 'table':
         return `<div class="q2-table-wrap"><table class="q2-table">
           ${item.caption ? `<caption>${item.caption}</caption>` : ''}
@@ -573,13 +594,25 @@
           }
         }
 
-        // Обновление линий (привязаны к вершинам)
+        // Обновление линий (привязаны к вершинам, не заходят внутрь кружков)
         edges.forEach(e => {
+          const dx = e.to.x - e.from.x;
+          const dy = e.to.y - e.from.y;
+          const dist = Math.hypot(dx, dy) || 1;
+          const ux = dx / dist;
+          const uy = dy / dist;
+          const rFrom = (e.from.r || 24);
+          const rTo = (e.to.r || 24);
+          const x1 = (e.from.x + ux * rFrom).toFixed(1);
+          const y1 = (e.from.y + uy * rFrom).toFixed(1);
+          const x2 = (e.to.x - ux * rTo).toFixed(1);
+          const y2 = (e.to.y - uy * rTo).toFixed(1);
+
           e.lines.forEach(line => {
-            line.setAttribute('x1', e.from.x.toFixed(1));
-            line.setAttribute('y1', e.from.y.toFixed(1));
-            line.setAttribute('x2', e.to.x.toFixed(1));
-            line.setAttribute('y2', e.to.y.toFixed(1));
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
           });
         });
 
@@ -644,7 +677,30 @@
     if (badge) badge.textContent = lesson.title;
     const badgeNum = document.querySelector('.nav-badge-num');
     if (badgeNum) badgeNum.textContent = `Урок ${lesson.num}`;
-    root.innerHTML = (lesson.slides || []).map(renderSlide).join('');
+    const globalSvgDefs = `<svg style="position:absolute;width:0;height:0;pointer-events:none;overflow:hidden" aria-hidden="true">
+      <defs>
+        <filter id="q2-node-inset" x="-40%" y="-40%" width="180%" height="180%">
+          <feOffset dx="2" dy="2.5" in="SourceAlpha" result="offsetDark"/>
+          <feGaussianBlur stdDeviation="2.2" in="offsetDark" result="blurDark"/>
+          <feComposite operator="out" in="SourceAlpha" in2="blurDark" result="inverseDark"/>
+          <feFlood flood-color="#334155" flood-opacity="0.36" result="colorDark"/>
+          <feComposite operator="in" in="colorDark" in2="inverseDark" result="shadowDark"/>
+
+          <feOffset dx="-2" dy="-2" in="SourceAlpha" result="offsetLight"/>
+          <feGaussianBlur stdDeviation="1.8" in="offsetLight" result="blurLight"/>
+          <feComposite operator="out" in="SourceAlpha" in2="blurLight" result="inverseLight"/>
+          <feFlood flood-color="#ffffff" flood-opacity="0.95" result="colorLight"/>
+          <feComposite operator="in" in="colorLight" in2="inverseLight" result="shadowLight"/>
+
+          <feMerge>
+            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="shadowDark"/>
+            <feMergeNode in="shadowLight"/>
+          </feMerge>
+        </filter>
+      </defs>
+    </svg>`;
+    root.innerHTML = globalSvgDefs + (lesson.slides || []).map(renderSlide).join('');
     initSingleLamp(root);
     initAutoSort(root);
     initFloatGraphs(root);
@@ -663,6 +719,22 @@
   });
 
   document.addEventListener('click', event => {
+    const tabBtn = event.target.closest('.q2-tab-btn');
+    if (tabBtn) {
+      const widget = tabBtn.closest('.q2-tabs-widget');
+      if (widget) {
+        const targetIdx = tabBtn.dataset.tab;
+        widget.querySelectorAll('.q2-tab-btn').forEach(b => {
+          const active = b.dataset.tab === targetIdx;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-selected', String(active));
+        });
+        widget.querySelectorAll('.q2-tab-pane').forEach(p => {
+          p.classList.toggle('is-active', p.dataset.pane === targetIdx);
+        });
+      }
+    }
+
     const reveal = event.target.closest('[data-q2-reveal]');
     if (reveal) {
       const target = document.getElementById(reveal.dataset.q2Reveal);

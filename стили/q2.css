@@ -3522,9 +3522,10 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-scene-row:nth-of-type(4) { anim
 }
 .q2-scene-node circle,
 circle.q2-scene-node {
-  fill: rgba(255, 255, 255, 0.96);
-  stroke: rgba(148, 163, 184, 0.6);
+  fill: #f8fafc;
+  stroke: rgba(148, 163, 184, 0.7);
   stroke-width: 2.5;
+  filter: url(#q2-node-inset);
   animation: q2-scene-pop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-box: fill-box;
   transform-origin: center;
@@ -3536,16 +3537,18 @@ circle.q2-scene-node {
   font-family: var(--font-main);
   font-size: 14px;
   font-weight: 800;
-  fill: #475569;
+  fill: #334155;
+  pointer-events: none;
+  user-select: none;
 }
-.q2-scene-node.is-start circle, circle.q2-scene-node.is-start { fill: rgba(79, 70, 229, 0.16); stroke: rgba(79, 70, 229, 0.65); }
+.q2-scene-node.is-start circle, circle.q2-scene-node.is-start { fill: #eef2ff; stroke: #6366f1; }
 .q2-scene-node.is-start text { fill: #3730a3; }
-.q2-scene-node.is-level circle, circle.q2-scene-node.is-level { fill: rgba(217, 119, 6, 0.12); stroke: rgba(217, 119, 6, 0.5); }
+.q2-scene-node.is-level circle, circle.q2-scene-node.is-level { fill: #fffbeb; stroke: #f59e0b; }
 .q2-scene-node.is-level text { fill: #b45309; }
-.q2-scene-node.is-level-2 circle, circle.q2-scene-node.is-level-2 { fill: rgba(5, 150, 105, 0.1); stroke: rgba(5, 150, 105, 0.45); }
+.q2-scene-node.is-level-2 circle, circle.q2-scene-node.is-level-2 { fill: #ecfdf5; stroke: #10b981; }
 .q2-scene-node.is-level-2 text { fill: #047857; }
-.q2-scene-node.is-deep circle, circle.q2-scene-node.is-deep { fill: rgba(79, 70, 229, 0.13); stroke: rgba(79, 70, 229, 0.55); }
-.q2-scene-node.is-deep text { fill: #3730a3; }
+.q2-scene-node.is-deep circle, circle.q2-scene-node.is-deep { fill: #f5f3ff; stroke: #8b5cf6; }
+.q2-scene-node.is-deep text { fill: #4c1d95; }
 
 .q2-scene-ring { fill: none; stroke: rgba(79, 70, 229, 0.2); stroke-width: 1.5; stroke-dasharray: 4 6; }
 .q2-scene-ring.is-mid { stroke: rgba(217, 119, 6, 0.24); }
@@ -5213,4 +5216,196 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
 [data-q2-float-graph] .q2-scene-weight,
 [data-q2-float-graph] .q2-float-edge {
   pointer-events: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   ВЫРАВНИВАНИЕ ВЫСОТЫ КОЛОНОК (q2-split-equal), ТАБЛИЦА И ВКЛАДКИ
+   -------------------------------------------------------------------------- */
+.q2-split-equal {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 22px !important;
+  align-items: stretch !important;
+}
+
+.q2-split-equal > .q2-split-col {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-width: 0 !important;
+}
+
+.q2-split-equal > .q2-split-col > .q2-svg-wrap,
+.q2-split-equal > .q2-split-col > .q2-table-wrap {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  margin-bottom: 0 !important;
+}
+
+.q2-split-equal .q2-svg-wrap svg {
+  margin: auto auto !important;
+}
+
+.q2-split-equal .q2-table-wrap .q2-table {
+  height: 100% !important;
+}
+
+/* Современное оформление таблицы степеней */
+.q2-table-wrap {
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: var(--q2-shadow-sm) !important;
+  backdrop-filter: blur(8px) !important;
+  overflow: hidden !important;
+}
+
+.q2-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.q2-table caption {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 14px 18px !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  color: #1e293b !important;
+  background: rgba(248, 250, 252, 0.9) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+  text-align: left !important;
+}
+
+.q2-table caption::before {
+  content: '\f0ca';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  color: var(--q2-indigo, #4f46e5);
+  font-size: 0.95rem;
+}
+
+.q2-table th {
+  padding: 12px 16px !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #64748b !important;
+  background: rgba(241, 245, 249, 0.6) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+}
+
+.q2-table td {
+  padding: 12px 16px !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.9) !important;
+  vertical-align: middle !important;
+}
+
+.q2-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+.q2-table tr.is-highlight td {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #312e81 !important;
+}
+
+/* Вкладки (Tabs Widget) для практики */
+.q2-tabs-widget {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  width: 100% !important;
+  margin-bottom: 20px !important;
+}
+
+.q2-tabs-nav {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  padding: 6px !important;
+  background: rgba(226, 232, 240, 0.5) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 2px 2px 5px rgba(148, 163, 184, 0.25), inset -2px -2px 5px rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+.q2-tab-btn {
+  flex: 1 1 auto !important;
+  min-width: 160px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  border-radius: 12px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: #475569 !important;
+  font-family: var(--font-main, inherit) !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none !important;
+}
+
+.q2-tab-btn:hover {
+  color: #1e293b !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.q2-tab-btn.is-active {
+  background: #ffffff !important;
+  color: var(--q2-indigo, #4f46e5) !important;
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.22), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.q2-tab-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  background: rgba(79, 70, 229, 0.1) !important;
+  color: var(--q2-indigo, #4f46e5) !important;
+}
+
+.q2-tab-btn.is-active .q2-tab-badge {
+  background: var(--q2-indigo, #4f46e5) !important;
+  color: #ffffff !important;
+}
+
+.q2-tabs-content {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.q2-tab-pane {
+  display: none !important;
+  animation: q2-tab-fade 0.25s ease-out !important;
+}
+
+.q2-tab-pane.is-active {
+  display: block !important;
+}
+
+@keyframes q2-tab-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

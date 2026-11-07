@@ -354,20 +354,20 @@
     return `<svg viewBox="0 0 460 340" role="img" aria-label="Взвешенный граф с двумя маршрутами" data-q2-float-graph="weighted">
       <!-- Edges -->
       <g class="q2-float-edge" data-from="A" data-to="B">
-        <line class="q2-scene-edge" x1="70" y1="170" x2="210" y2="84"></line>
-        <line class="q2-scene-edge-flow" x1="70" y1="170" x2="210" y2="84"></line>
+        <line class="q2-scene-edge" x1="90" y1="157" x2="190" y2="97"></line>
+        <line class="q2-scene-edge-flow" x1="90" y1="157" x2="190" y2="97"></line>
       </g>
       <g class="q2-float-edge" data-from="B" data-to="D">
-        <line class="q2-scene-edge" x1="210" y1="84" x2="372" y2="170"></line>
-        <line class="q2-scene-edge-flow" x1="210" y1="84" x2="372" y2="170"></line>
+        <line class="q2-scene-edge" x1="231" y1="95" x2="351" y2="159"></line>
+        <line class="q2-scene-edge-flow" x1="231" y1="95" x2="351" y2="159"></line>
       </g>
       <g class="q2-float-edge" data-from="A" data-to="C">
-        <line class="q2-scene-edge is-short" x1="70" y1="170" x2="210" y2="256"></line>
-        <line class="q2-scene-edge-flow" x1="70" y1="170" x2="210" y2="256"></line>
+        <line class="q2-scene-edge is-short" x1="90" y1="183" x2="190" y2="243"></line>
+        <line class="q2-scene-edge-flow" x1="90" y1="183" x2="190" y2="243"></line>
       </g>
       <g class="q2-float-edge" data-from="C" data-to="D">
-        <line class="q2-scene-edge is-short" x1="210" y1="256" x2="372" y2="170"></line>
-        <line class="q2-scene-edge-flow" x1="210" y1="256" x2="372" y2="170"></line>
+        <line class="q2-scene-edge is-short" x1="231" y1="245" x2="351" y2="181"></line>
+        <line class="q2-scene-edge-flow" x1="231" y1="245" x2="351" y2="181"></line>
       </g>
 
       <!-- Weights -->
