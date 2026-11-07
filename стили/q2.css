@@ -3521,34 +3521,33 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-scene-row:nth-of-type(4) { anim
   animation: q2-scene-flow 1.8s linear infinite;
 }
 .q2-scene-node circle,
-circle.q2-scene-node {
-  fill: #f8fafc;
-  stroke: rgba(148, 163, 184, 0.7);
-  stroke-width: 2.5;
-  filter: url(#q2-node-inset);
+circle.q2-scene-node,
+.q2-scene-node.is-start circle,
+.q2-scene-node.is-level circle,
+.q2-scene-node.is-level-2 circle,
+.q2-scene-node.is-deep circle {
+  fill: #e8ecf4 !important;
+  stroke: rgba(148, 163, 184, 0.55) !important;
+  stroke-width: 1.5px !important;
   animation: q2-scene-pop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-box: fill-box;
   transform-origin: center;
 }
 @keyframes q2-scene-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
 .q2-scene-node text,
-.q2-scene-node-text {
-  text-anchor: middle;
-  font-family: var(--font-main);
-  font-size: 14px;
-  font-weight: 800;
-  fill: #334155;
-  pointer-events: none;
-  user-select: none;
+.q2-scene-node-text,
+.q2-scene-node.is-start text,
+.q2-scene-node.is-level text,
+.q2-scene-node.is-level-2 text,
+.q2-scene-node.is-deep text {
+  text-anchor: middle !important;
+  font-family: var(--font-main) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  fill: #1e293b !important;
+  pointer-events: none !important;
+  user-select: none !important;
 }
-.q2-scene-node.is-start circle, circle.q2-scene-node.is-start { fill: #eef2ff; stroke: #6366f1; }
-.q2-scene-node.is-start text { fill: #3730a3; }
-.q2-scene-node.is-level circle, circle.q2-scene-node.is-level { fill: #fffbeb; stroke: #f59e0b; }
-.q2-scene-node.is-level text { fill: #b45309; }
-.q2-scene-node.is-level-2 circle, circle.q2-scene-node.is-level-2 { fill: #ecfdf5; stroke: #10b981; }
-.q2-scene-node.is-level-2 text { fill: #047857; }
-.q2-scene-node.is-deep circle, circle.q2-scene-node.is-deep { fill: #f5f3ff; stroke: #8b5cf6; }
-.q2-scene-node.is-deep text { fill: #4c1d95; }
 
 .q2-scene-ring { fill: none; stroke: rgba(79, 70, 229, 0.2); stroke-width: 1.5; stroke-dasharray: 4 6; }
 .q2-scene-ring.is-mid { stroke: rgba(217, 119, 6, 0.24); }
@@ -5235,24 +5234,37 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
   min-width: 0 !important;
 }
 
-.q2-split-equal > .q2-split-col > .q2-svg-wrap,
+.q2-split-equal > .q2-split-col > .q2-svg-wrap {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 24px !important;
+  margin-bottom: 0 !important;
+}
+
 .q2-split-equal > .q2-split-col > .q2-table-wrap {
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
+  justify-content: center !important;
   margin-bottom: 0 !important;
 }
 
 .q2-split-equal .q2-svg-wrap svg {
   margin: auto auto !important;
+  display: block !important;
+  max-width: 100% !important;
 }
 
-.q2-split-equal .q2-table-wrap .q2-table {
-  height: 100% !important;
+.q2-split-equal .q2-svg-wrap .q2-caption {
+  margin-top: 14px !important;
+  text-align: center !important;
+  width: 100% !important;
 }
 
-/* Современное оформление таблицы степеней */
+/* Оформление таблицы степеней */
 .q2-table-wrap {
   border-radius: 20px !important;
   border: 1px solid rgba(255, 255, 255, 0.95) !important;
@@ -5268,24 +5280,11 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
 }
 
 .q2-table caption {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 14px 18px !important;
+  padding: 14px 18px 8px !important;
   font-size: 0.88rem !important;
-  font-weight: 800 !important;
-  color: #1e293b !important;
-  background: rgba(248, 250, 252, 0.9) !important;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
   text-align: left !important;
-}
-
-.q2-table caption::before {
-  content: '\f0ca';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  color: var(--q2-indigo, #4f46e5);
-  font-size: 0.95rem;
 }
 
 .q2-table th {

@@ -352,6 +352,27 @@
 
   S.weighted = function () {
     return `<svg viewBox="0 0 460 340" role="img" aria-label="Взвешенный граф с двумя маршрутами" data-q2-float-graph="weighted">
+      <defs>
+        <filter id="q2-node-inset-sw" x="-30%" y="-30%" width="160%" height="160%">
+          <feOffset dx="2.5" dy="2.5"/>
+          <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
+          <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+          <feFlood flood-color="#475569" flood-opacity="0.45" result="color"/>
+          <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+
+          <feOffset dx="-2" dy="-2"/>
+          <feGaussianBlur stdDeviation="1.8" result="offset-blur-light"/>
+          <feComposite operator="out" in="SourceGraphic" in2="offset-blur-light" result="inverse-light"/>
+          <feFlood flood-color="#ffffff" flood-opacity="0.95" result="color-light"/>
+          <feComposite operator="in" in="color-light" in2="inverse-light" result="highlight"/>
+
+          <feMerge>
+            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="shadow"/>
+            <feMergeNode in="highlight"/>
+          </feMerge>
+        </filter>
+      </defs>
       <!-- Edges -->
       <g class="q2-float-edge" data-from="A" data-to="B">
         <line class="q2-scene-edge" x1="90" y1="157" x2="190" y2="97"></line>
@@ -388,22 +409,22 @@
         <text x="291" y="217">8</text>
       </g>
 
-      <!-- Nodes -->
-      <g class="q2-scene-node is-start" data-node="A">
-        <circle cx="70" cy="170" r="24"></circle>
-        <text x="70" y="175">A</text>
+      <!-- Nodes (clean recessed without rainbow colors) -->
+      <g class="q2-scene-node" data-node="A">
+        <circle cx="70" cy="170" r="24" filter="url(#q2-node-inset-sw)"></circle>
+        <text x="70" y="176">A</text>
       </g>
-      <g class="q2-scene-node is-level" data-node="B">
-        <circle cx="210" cy="84" r="24"></circle>
-        <text x="210" y="89">B</text>
+      <g class="q2-scene-node" data-node="B">
+        <circle cx="210" cy="84" r="24" filter="url(#q2-node-inset-sw)"></circle>
+        <text x="210" y="90">B</text>
       </g>
-      <g class="q2-scene-node is-level-2" data-node="C">
-        <circle cx="210" cy="256" r="24"></circle>
-        <text x="210" y="261">C</text>
+      <g class="q2-scene-node" data-node="C">
+        <circle cx="210" cy="256" r="24" filter="url(#q2-node-inset-sw)"></circle>
+        <text x="210" y="262">C</text>
       </g>
-      <g class="q2-scene-node is-deep" data-node="D">
-        <circle cx="372" cy="170" r="24"></circle>
-        <text x="372" y="175">D</text>
+      <g class="q2-scene-node" data-node="D">
+        <circle cx="372" cy="170" r="24" filter="url(#q2-node-inset-sw)"></circle>
+        <text x="372" y="176">D</text>
       </g>
     </svg>`;
   };

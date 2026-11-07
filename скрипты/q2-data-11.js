@@ -24,19 +24,61 @@
   </svg>`;
 
   const DIRECTED_SVG = `<svg viewBox="0 0 520 250" role="img" aria-label="Ориентированный граф со стрелками на рёбрах">
-    <defs><marker id="q11-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c8aa5"/></marker></defs>
+    <defs>
+      <marker id="q11-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c8aa5"/></marker>
+      <filter id="q2-node-inset-d" x="-30%" y="-30%" width="160%" height="160%">
+        <feOffset dx="2.5" dy="2.5"/>
+        <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
+        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+        <feFlood flood-color="#475569" flood-opacity="0.45" result="color"/>
+        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+
+        <feOffset dx="-2" dy="-2"/>
+        <feGaussianBlur stdDeviation="1.8" result="offset-blur-light"/>
+        <feComposite operator="out" in="SourceGraphic" in2="offset-blur-light" result="inverse-light"/>
+        <feFlood flood-color="#ffffff" flood-opacity="0.95" result="color-light"/>
+        <feComposite operator="in" in="color-light" in2="inverse-light" result="highlight"/>
+
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="shadow"/>
+          <feMergeNode in="highlight"/>
+        </feMerge>
+      </filter>
+    </defs>
     <line class="q2-scene-edge" x1="113" y1="78" x2="236" y2="65" marker-end="url(#q11-arrow)"/>
     <line class="q2-scene-edge" x1="104" y1="100" x2="166" y2="190" marker-end="url(#q11-arrow)"/>
     <line class="q2-scene-edge" x1="249" y1="83" x2="191" y2="189" marker-end="url(#q11-arrow)"/>
     <line class="q2-scene-edge" x1="203" y1="204" x2="377" y2="156" marker-end="url(#q11-arrow)"/>
     <line class="q2-scene-edge is-short" x1="380" y1="137" x2="280" y2="75" marker-end="url(#q11-arrow)"/>
-    <g class="q2-scene-node is-start"><circle cx="90" cy="80" r="23"/><text x="90" y="85">A</text></g>
-    <g class="q2-scene-node is-level"><circle cx="260" cy="62" r="23"/><text x="260" y="67">B</text></g>
-    <g class="q2-scene-node is-level-2"><circle cx="180" cy="210" r="23"/><text x="180" y="215">C</text></g>
-    <g class="q2-scene-node is-deep"><circle cx="400" cy="150" r="23"/><text x="400" y="155">D</text></g>
+    <g class="q2-scene-node"><circle cx="90" cy="80" r="23" filter="url(#q2-node-inset-d)"/><text x="90" y="86">A</text></g>
+    <g class="q2-scene-node"><circle cx="260" cy="62" r="23" filter="url(#q2-node-inset-d)"/><text x="260" y="68">B</text></g>
+    <g class="q2-scene-node"><circle cx="180" cy="210" r="23" filter="url(#q2-node-inset-d)"/><text x="180" y="216">C</text></g>
+    <g class="q2-scene-node"><circle cx="400" cy="150" r="23" filter="url(#q2-node-inset-d)"/><text x="400" y="156">D</text></g>
   </svg>`;
 
   const WEIGHT_SVG = `<svg viewBox="0 0 520 260" role="img" aria-label="Взвешенный граф с числами на рёбрах" data-q2-float-graph="weighted-concept">
+    <defs>
+      <filter id="q2-node-inset-w" x="-30%" y="-30%" width="160%" height="160%">
+        <feOffset dx="2.5" dy="2.5"/>
+        <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
+        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+        <feFlood flood-color="#475569" flood-opacity="0.45" result="color"/>
+        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+
+        <feOffset dx="-2" dy="-2"/>
+        <feGaussianBlur stdDeviation="1.8" result="offset-blur-light"/>
+        <feComposite operator="out" in="SourceGraphic" in2="offset-blur-light" result="inverse-light"/>
+        <feFlood flood-color="#ffffff" flood-opacity="0.95" result="color-light"/>
+        <feComposite operator="in" in="color-light" in2="inverse-light" result="highlight"/>
+
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="shadow"/>
+          <feMergeNode in="highlight"/>
+        </feMerge>
+      </filter>
+    </defs>
     <g class="q2-float-edge" data-from="A" data-to="B">
       <line class="q2-scene-edge" x1="113" y1="78" x2="236" y2="65"/>
       <line class="q2-scene-edge-flow" x1="113" y1="78" x2="236" y2="65"/>
@@ -57,10 +99,10 @@
     <g class="q2-scene-weight" data-edge="A-C"><rect x="121" y="134" width="28" height="22" rx="8"/><text x="135" y="150">7</text></g>
     <g class="q2-scene-weight" data-edge="B-C"><rect x="206" y="125" width="28" height="22" rx="8"/><text x="220" y="141">8</text></g>
     <g class="q2-scene-weight" data-edge="C-D"><rect x="276" y="169" width="28" height="22" rx="8"/><text x="290" y="185">10</text></g>
-    <g class="q2-scene-node is-start" data-node="A"><circle cx="90" cy="80" r="23"/><text x="90" y="85">A</text></g>
-    <g class="q2-scene-node is-level" data-node="B"><circle cx="260" cy="62" r="23"/><text x="260" y="67">B</text></g>
-    <g class="q2-scene-node is-level-2" data-node="C"><circle cx="180" cy="210" r="23"/><text x="180" y="215">C</text></g>
-    <g class="q2-scene-node is-deep" data-node="D"><circle cx="400" cy="150" r="23"/><text x="400" y="155">D</text></g>
+    <g class="q2-scene-node" data-node="A"><circle cx="90" cy="80" r="23" filter="url(#q2-node-inset-w)"/><text x="90" y="86">A</text></g>
+    <g class="q2-scene-node" data-node="B"><circle cx="260" cy="62" r="23" filter="url(#q2-node-inset-w)"/><text x="260" y="68">B</text></g>
+    <g class="q2-scene-node" data-node="C"><circle cx="180" cy="210" r="23" filter="url(#q2-node-inset-w)"/><text x="180" y="216">C</text></g>
+    <g class="q2-scene-node" data-node="D"><circle cx="400" cy="150" r="23" filter="url(#q2-node-inset-w)"/><text x="400" y="156">D</text></g>
   </svg>`;
 
   const BFS_SVG = `<svg viewBox="0 0 560 280" role="img" aria-label="Слои обхода в ширину">
@@ -391,13 +433,13 @@
             right: [
               {
                 t: 'table',
-                caption: 'Степени в ориентированном графе (in / out)',
+                caption: 'Степени вершин графа',
                 head: ['Вершина', 'Входящая (in)', 'Исходящая (out)'],
                 rows: [
-                  ['<b>A</b> (источник)', '0', '2'],
-                  ['<b>B</b>', '2', '1'],
-                  ['<b>C</b>', '2', '1'],
-                  ['<b>D</b>', '1', '1']
+                  ['A (источник)', '0', '2'],
+                  ['B', '2', '1'],
+                  ['C', '2', '1'],
+                  ['D', '1', '1']
                 ],
                 highlight: 0
               }
@@ -578,25 +620,15 @@
                     ]
                   }
                 ]
-              },
-              {
-                label: 'Дескриптор',
-                badge: '10 баллов',
-                icon: 'fas fa-list-check',
-                blocks: [
-                  {
-                    t: 'rubric',
-                    title: 'Дескриптор оценивания (10 баллов)',
-                    items: [
-                      { mark: '3 балла', text: 'Задача 1 (Орграф): аккуратно построен граф, вычислены степени (S: in 0 / out 2, A: 1/2, B: 2/2, C: 2/1, F: 2/0), обоснован статус источника/стока и невозможность возврата, верно выписаны все 5 путей из S в F.' },
-                      { mark: '3 балла', text: 'Задача 2 (Взвешенный граф): вычислены задержки путей (1→5 = 45 мс, 1→3→5 = 46 мс), найден оптимальный маршрут (1 → 2 → 3 → 4 → 5 с задержкой 32 мс) и объяснен сетевой парадокс «больше рёбер — меньше вес».' },
-                      { mark: '4 балла', text: 'Задача 3 (Узкие места): вычислена пропускная способность путей (α = 2 Гбит/с, β = 4 Гбит/с, γ = 2 Гбит/с), доказана пригодность пути β для 3.5 Гбит/с, определено узкое горлышко (канал R1 → R3) и математически обоснован эффект его модернизации.' }
-                    ]
-                  }
-                ]
               }
             ]
           }
+        ],
+        criteriaTitle: 'Дескриптор оценивания (10 баллов)',
+        criteria: [
+          { mark: '3 балла', text: 'Задача 1 (Орграф): аккуратно построен граф, вычислены степени (S: in 0 / out 2, A: 1/2, B: 2/2, C: 2/1, F: 2/0), обоснован статус источника/стока и невозможность возврата, верно выписаны все 5 путей из S в F.' },
+          { mark: '3 балла', text: 'Задача 2 (Взвешенный граф): вычислены задержки путей (1→5 = 45 мс, 1→3→5 = 46 мс), найден оптимальный маршрут (1 → 2 → 3 → 4 → 5 с задержкой 32 мс) и объяснен сетевой парадокс «больше рёбер — меньше вес».' },
+          { mark: '4 балла', text: 'Задача 3 (Узкие места): вычислена пропускная способность путей (α = 2 Гбит/с, β = 4 Гбит/с, γ = 2 Гбит/с), доказана пригодность пути β для 3.5 Гбит/с, определено узкое горлышко (канал R1 → R3) и математически обоснован эффект его модернизации.' }
         ]
       },
       {
