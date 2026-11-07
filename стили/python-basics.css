@@ -1213,33 +1213,33 @@ body {
 .ce { color: var(--code-red); }
 .cn { color: #b45309; font-weight: 600; }
 
-/* Inline code badges */
-.ic, .ic-green, .ic-orange, .ic-bool {
+/* Inline code badges (вдавленные неоморфные элементы) */
+.ic, .ic-green, .ic-orange, .ic-bool, .lesson-content :not(pre) > code {
+  display: inline-block;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12.5px;
-  padding: 2px 7px;
-  border-radius: 6px;
+  line-height: 1.35;
+  padding: 2px 9px;
+  margin: 0 1px;
+  border-radius: 8px;
   font-weight: 600;
+  background: #e1e6f0;
+  border: none;
+  box-shadow:
+    inset 2.5px 2.5px 5px rgba(151, 164, 190, 0.58),
+    inset -2.5px -2.5px 5px rgba(255, 255, 255, 0.92);
 }
-.ic {
-  background: #3d7fff18;
+.ic, .lesson-content :not(pre) > code {
   color: var(--accent);
-  border: 1px solid #3d7fff26;
 }
 .ic-green {
-  background: #10b98118;
   color: #059669;
-  border: 1px solid #10b98128;
 }
 .ic-orange {
-  background: #ff6b3518;
   color: #d94e1f;
-  border: 1px solid #ff6b3528;
 }
 .ic-bool {
-  background: #8b5cf618;
   color: #7c3aed;
-  border: 1px solid #8b5cf628;
 }
 
 /* Output preview block */
