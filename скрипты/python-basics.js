@@ -177,18 +177,13 @@ let pyodide = null;
 
 // Virtual File System for Lesson 15 (and any open() calls in Skulpt)
 const DEFAULT_VFS = {
-  "notes.txt": "Купить молоко\nВыучить Python\n",
-  "test.txt": "Привет, мир!\nЭто тестовый файл.",
-  "story.txt": "Первая строка истории\nВторая строка истории\nТретья строка истории\n",
-  "data.txt": "Python — отличный язык программирования для начинающих и профи.",
-  "source.txt": "Секретные данные для копирования в другой файл.\nСтрока 2.",
-  "log.txt": "[INFO] Система запущена\n"
+  "notes.txt": "Купить молоко\nВыучить Python\n"
 };
 let vfsFiles = { ...DEFAULT_VFS };
 
 function loadVfsFromStorage() {
   try {
-    const saved = localStorage.getItem("py_basics_vfs");
+    const saved = localStorage.getItem("py_basics_vfs_v2");
     if (saved) {
       vfsFiles = { ...DEFAULT_VFS, ...JSON.parse(saved) };
     }
@@ -196,7 +191,7 @@ function loadVfsFromStorage() {
 }
 function saveVfsToStorage() {
   try {
-    localStorage.setItem("py_basics_vfs", JSON.stringify(vfsFiles));
+    localStorage.setItem("py_basics_vfs_v2", JSON.stringify(vfsFiles));
   } catch (e) {}
   renderVfsBar();
 }
