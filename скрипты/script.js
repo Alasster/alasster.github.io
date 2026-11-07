@@ -220,15 +220,15 @@ const LESSONS_DATABASE = {
   },
   cextra: {
     name: "Python основы",
-    title: "Дополнительно • Python Практикум",
+    title: "Python основы • Интерактивный практикум",
     quarters: {
       "1 четверть": [
         { num: "1", title: "Введение в Python", path: "Python основы/1.Основа.html", file: "Python основы/1.Основа.html", quarter: "1 четверть" },
         { num: "2", title: "Функция print()", path: "Python основы/2.print.html", file: "Python основы/2.print.html", quarter: "1 четверть" },
         { num: "3", title: "Переменные", path: "Python основы/3.Переменные.html", file: "Python основы/3.Переменные.html", quarter: "1 четверть" },
-        { num: "4", title: "4. Типы данных", path: "Python основы/4.Типы.html", file: "Python основы/4.Типы.html", quarter: "1 четверть" },
+        { num: "4", title: "Типы данных", path: "Python основы/4.Типы.html", file: "Python основы/4.Типы.html", quarter: "1 четверть" },
         { num: "5", title: "Ввод данных", path: "Python основы/5.Input.html", file: "Python основы/5.Input.html", quarter: "1 четверть" },
-        { num: "6", title: "6. Математические операции", path: "Python основы/6.Математика.html", file: "Python основы/6.Математика.html", quarter: "1 четверть" },
+        { num: "6", title: "Математические операции", path: "Python основы/6.Математика.html", file: "Python основы/6.Математика.html", quarter: "1 четверть" },
         { num: "7", title: "Логические выражения", path: "Python основы/7.Логика.html", file: "Python основы/7.Логика.html", quarter: "1 четверть" },
         { num: "8", title: "Условные операторы", path: "Python основы/8.Условия.html", file: "Python основы/8.Условия.html", quarter: "1 четверть" },
         { num: "9", title: "Цикл for", path: "Python основы/9.For.html", file: "Python основы/9.For.html", quarter: "1 четверть" },
@@ -238,15 +238,16 @@ const LESSONS_DATABASE = {
         { num: "13", title: "Работа со строками", path: "Python основы/13.Строки.html", file: "Python основы/13.Строки.html", quarter: "1 четверть" },
         { num: "14", title: "Создание функций", path: "Python основы/14.Функции.html", file: "Python основы/14.Функции.html", quarter: "1 четверть" },
         { num: "15", title: "Работа с файлами", path: "Python основы/15.Файлы.html", file: "Python основы/15.Файлы.html", quarter: "1 четверть" },
+        { num: "16", title: "Рекурсия", path: "Python основы/16.Рекурсия.html", file: "Python основы/16.Рекурсия.html", quarter: "1 четверть" },
       ],
     },
     lessons: [
       { num: "1", title: "Введение в Python", path: "Python основы/1.Основа.html", file: "Python основы/1.Основа.html", quarter: "1 четверть" },
       { num: "2", title: "Функция print()", path: "Python основы/2.print.html", file: "Python основы/2.print.html", quarter: "1 четверть" },
       { num: "3", title: "Переменные", path: "Python основы/3.Переменные.html", file: "Python основы/3.Переменные.html", quarter: "1 четверть" },
-      { num: "4", title: "4. Типы данных", path: "Python основы/4.Типы.html", file: "Python основы/4.Типы.html", quarter: "1 четверть" },
+      { num: "4", title: "Типы данных", path: "Python основы/4.Типы.html", file: "Python основы/4.Типы.html", quarter: "1 четверть" },
       { num: "5", title: "Ввод данных", path: "Python основы/5.Input.html", file: "Python основы/5.Input.html", quarter: "1 четверть" },
-      { num: "6", title: "6. Математические операции", path: "Python основы/6.Математика.html", file: "Python основы/6.Математика.html", quarter: "1 четверть" },
+      { num: "6", title: "Математические операции", path: "Python основы/6.Математика.html", file: "Python основы/6.Математика.html", quarter: "1 четверть" },
       { num: "7", title: "Логические выражения", path: "Python основы/7.Логика.html", file: "Python основы/7.Логика.html", quarter: "1 четверть" },
       { num: "8", title: "Условные операторы", path: "Python основы/8.Условия.html", file: "Python основы/8.Условия.html", quarter: "1 четверть" },
       { num: "9", title: "Цикл for", path: "Python основы/9.For.html", file: "Python основы/9.For.html", quarter: "1 четверть" },
@@ -256,6 +257,7 @@ const LESSONS_DATABASE = {
       { num: "13", title: "Работа со строками", path: "Python основы/13.Строки.html", file: "Python основы/13.Строки.html", quarter: "1 четверть" },
       { num: "14", title: "Создание функций", path: "Python основы/14.Функции.html", file: "Python основы/14.Функции.html", quarter: "1 четверть" },
       { num: "15", title: "Работа с файлами", path: "Python основы/15.Файлы.html", file: "Python основы/15.Файлы.html", quarter: "1 четверть" },
+      { num: "16", title: "Рекурсия", path: "Python основы/16.Рекурсия.html", file: "Python основы/16.Рекурсия.html", quarter: "1 четверть" },
     ]
   },
 };
@@ -409,7 +411,8 @@ function showClassModal(id) {
         });
       } else {
         const lessons = data.lessons || [];
-        const visibleLessons = newestLessonsFirst(lessons.filter(l => lessonIsPublic(l.path || l.file)));
+        const filtered = lessons.filter(l => lessonIsPublic(l.path || l.file));
+        const visibleLessons = id === 'cextra' ? filtered : newestLessonsFirst(filtered);
         visibleLessons.forEach(renderLessonCard);
       }
 
