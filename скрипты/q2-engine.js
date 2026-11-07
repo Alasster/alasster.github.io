@@ -183,11 +183,32 @@
   }
 
   /* ------------------------------- слайды -------------------------------- */
-  function heroSlide(slide) {
+  function heroEyebrow(slide, lesson) {
+    const raw = (slide && slide.eyebrow ? String(slide.eyebrow).trim() : '');
+    if (raw && !/^0?1\s*·\s*введение$/i.test(raw)) {
+      return raw;
+    }
+    if (lesson && lesson.cls && lesson.num != null) {
+      return `${String(lesson.cls).toUpperCase()} · 2 ЧЕТВЕРТЬ · УРОК ${lesson.num}`;
+    }
+    return raw || '01 · ВВЕДЕНИЕ';
+  }
+
+  function formatEyebrow(rawEyebrow, index) {
+    const raw = (rawEyebrow ? String(rawEyebrow).trim() : '');
+    if (!raw) return '';
+    if (typeof index === 'number' && index > 0 && !/четверть/i.test(raw)) {
+      const clean = raw.replace(/^\d+\s*·\s*/, '').trim();
+      return `${String(index + 1).padStart(2, '0')} · ${clean}`;
+    }
+    return raw;
+  }
+
+  function heroSlide(slide, lesson) {
     return `<section class="slide q2-slide q2-hero-slide active">
       <div class="container q2-hero">
         <div class="q2-hero-copy">
-          <span class="eyebrow">${slide.eyebrow || '01 · ВВЕДЕНИЕ'}</span>
+          <span class="eyebrow">${heroEyebrow(slide, lesson)}</span>
           <h1>${slide.title}</h1>
           <p class="lead">${slide.lead || ''}</p>
           ${slide.goal ? `<div class="q2-goal"><div class="q2-goal-header"><span class="q2-goal-code"><i class="fa-solid fa-crosshairs"></i> ${slide.goalCode || 'Цель'}</span><span class="q2-goal-title">ЦЕЛЬ ОБУЧЕНИЯ</span></div><p>${slide.goal}</p></div>` : ''}
@@ -205,30 +226,31 @@
     </section>`;
   }
 
-  function head(slide) {
-    return `${slide.eyebrow ? `<span class="eyebrow">${slide.eyebrow}</span>` : ''}
+  function head(slide, index) {
+    const eb = formatEyebrow(slide.eyebrow, index);
+    return `${eb ? `<span class="eyebrow">${eb}</span>` : ''}
       ${slide.title ? `<h2>${slide.title}</h2>` : ''}
       ${slide.lead ? `<p class="lead">${slide.lead}</p>` : ''}`;
   }
 
-  function renderSlide(slide, index) {
-    if ((slide.k || 'concept') === 'hero') return heroSlide(slide);
+  function renderSlide(slide, index, lesson) {
+    if ((slide.k || 'concept') === 'hero') return heroSlide(slide, lesson);
     const kind = slide.k || 'concept';
     let body = '';
     if (kind === 'concept') {
-      body = `${head(slide)}${blocks(slide.blocks)}`;
+      body = `${head(slide, index)}${blocks(slide.blocks)}`;
     } else if (kind === 'lab') {
-      body = `${head(slide)}${blocks(slide.before)}${widget(slide.widget.kind, slide.widget.config || {})}${blocks(slide.after)}`;
+      body = `${head(slide, index)}${blocks(slide.before)}${widget(slide.widget.kind, slide.widget.config || {})}${blocks(slide.after)}`;
     } else if (kind === 'practice') {
       const tasks = slide.tasks ? widget('mini', { tasks: slide.tasks }) : '';
-      body = `${head(slide)}${blocks(slide.before)}${tasks}${blocks(slide.after)}
+      body = `${head(slide, index)}${blocks(slide.before)}${tasks}${blocks(slide.after)}
         ${slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Дескриптор', items: slide.criteria }) : ''}`;
     } else if (kind === 'review') {
-      body = `${head({ eyebrow: slide.eyebrow || '02 · ПОВТОРЕНИЕ', title: slide.title || 'Повторение предыдущей темы', lead: slide.lead || 'Ответьте на 5 вопросов — они помогут вспомнить главное перед новой темой.' })}${widget('quiz', { questions: slide.questions, variant: 'review', shuffleOptions: slide.shuffleOptions })}`;
+      body = `${head({ eyebrow: slide.eyebrow || '02 · ПОВТОРЕНИЕ', title: slide.title || 'Повторение предыдущей темы', lead: slide.lead || 'Ответьте на 5 вопросов — они помогут вспомнить главное перед новой темой.' }, index)}${widget('quiz', { questions: slide.questions, variant: 'review', shuffleOptions: slide.shuffleOptions })}`;
     } else if (kind === 'quiz') {
-      body = `${head({ eyebrow: slide.eyebrow || 'ПРОВЕРКА', title: slide.title || 'Мини-проверка', lead: slide.lead || 'Пять вопросов по теме урока. Выберите один ответ в каждом.' })}${widget('quiz', { questions: slide.questions })}`;
+      body = `${head({ eyebrow: slide.eyebrow || 'ПРОВЕРКА', title: slide.title || 'Мини-проверка', lead: slide.lead || 'Пять вопросов по теме урока. Выберите один ответ в каждом.' }, index)}${widget('quiz', { questions: slide.questions })}`;
     } else if (kind === 'summary') {
-      body = `${head({ eyebrow: slide.eyebrow || 'ИТОГИ', title: slide.title || 'Итоги урока', lead: slide.lead || '' })}
+      body = `${head({ eyebrow: slide.eyebrow || 'ИТОГИ УРОКА', title: slide.title || 'Итоги урока', lead: slide.lead || '' }, index)}
         <div class="q2-summary-grid">
           <div class="q2-panel q2-summary-points"><h3><i class="fas fa-check-double"></i> Главное</h3>
             <ul class="clean-list">${(slide.points || []).map(point => `<li class="check-line"><i class="fas fa-check"></i><span>${point}</span></li>`).join('')}</ul>
@@ -241,7 +263,7 @@
         </div>
         ${slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Дескриптор', items: slide.criteria }) : ''}`;
     } else {
-      body = `${head(slide)}${blocks(slide.blocks)}`;
+      body = `${head(slide, index)}${blocks(slide.blocks)}`;
     }
     return `<section class="slide q2-slide q2-slide-${kind}">
       <div class="container">${body}</div>
@@ -700,7 +722,7 @@
         </filter>
       </defs>
     </svg>`;
-    root.innerHTML = globalSvgDefs + (lesson.slides || []).map(renderSlide).join('');
+    root.innerHTML = globalSvgDefs + (lesson.slides || []).map((slide, idx) => renderSlide(slide, idx, lesson)).join('');
     initSingleLamp(root);
     initAutoSort(root);
     initFloatGraphs(root);

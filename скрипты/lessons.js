@@ -1441,7 +1441,7 @@
             ebText = parts[parts.length - 1].trim();
           }
           ebText = ebText.replace(/^[\d\s\.\/\-—–:🧠🌐💻🔍🧩🎯⚙️🏠✉️🖼️✅📜]+/i, '').trim();
-          if (!/^(9|10|11)\s*(класс|огн|емн)/i.test(ebText) && !/^(\d+\s*урок|урок\s*\d+)/i.test(ebText) && ebText.length > 0) {
+          if (!/^(9|10|11)\s*(класс|огн|емн)/i.test(ebText) && !/^([\d–-]+\s*урок|урок\s*[\d–-]+|урок)$/i.test(ebText) && !/четверть/i.test(ebText) && ebText.length > 0) {
             title = ebText;
           }
         }
