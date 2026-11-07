@@ -1983,23 +1983,70 @@ body { display: block !important; }
   }
   .python-course-actions {
     width: 100%;
+    flex-direction: row;
   }
-  .python-btn {
+  .python-btn-primary {
     flex: 1;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .python-course-left {
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    column-gap: 12px;
+    row-gap: 10px;
+    align-items: center;
   }
   .python-course-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.6rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.65rem;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .python-course-info {
+    display: contents;
+  }
+  .python-course-badges {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 0;
+    gap: 6px;
+    align-content: center;
+  }
+  .python-chip {
+    font-size: 0.66rem;
+    padding: 3px 8px;
+  }
+  .python-course-title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-bottom: 2px;
+  }
+  .python-course-desc {
+    grid-column: 1 / -1;
+    grid-row: 3;
   }
   .python-course-actions {
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  .python-btn-primary {
+    flex: 1;
+    min-height: 44px;
+  }
+  .python-btn-secondary {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 12px;
+  }
+  .python-btn-list-label {
+    display: none;
   }
 }
