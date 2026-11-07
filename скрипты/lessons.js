@@ -1308,17 +1308,29 @@
 
   function resolveSlideIcon(slide, index, total, title) {
 
+    const eyebrowText = slide.querySelector('.eyebrow')?.textContent || '';
+
+    const raw = `${title || ''} ${eyebrowText} ${slide.getAttribute('aria-label') || ''} ${slide.querySelector('h1, h2, h3')?.textContent || ''}`.toLowerCase();
+
+    if (index === 0) {
+      const mapped0 = window.AlassterLessonIcons.stage(document.body.dataset.lessonId, 0);
+      return mapped0 ? mapped0.icon : 'home';
+    }
+
+    if (
+      slide.classList.contains('q2-slide-review') ||
+      slide.classList.contains('q2-slide-quiz') ||
+      slide.querySelector('.q2-quiz, .quizbox, #quizOptions, #recallOptions') ||
+      /повтор|вспомн|тест|проверк|квиз/.test(raw)
+    ) {
+      return 'check';
+    }
+
     const mapped = window.AlassterLessonIcons.stage(document.body.dataset.lessonId, index);
 
     if (mapped) return mapped.icon;
 
-    const raw = `${title || ''} ${slide.getAttribute('aria-label') || ''} ${slide.querySelector('h1, h2, h3')?.textContent || ''}`.toLowerCase();
-
-    if (index === 0) return 'home';
-
     if (/практик|мастерск/.test(raw)) return 'computer';
-
-    if (/тест|проверк|квиз/.test(raw)) return 'check';
 
     if (/итог|рефлек|вывод|выходной билет/.test(raw)) return 'flag';
 

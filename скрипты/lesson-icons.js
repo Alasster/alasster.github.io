@@ -8,10 +8,80 @@
       { "icon": "home", "title": "Рекурсия" },
       { "icon": "binary", "title": "Вспоминаем Python: def" },
       { "icon": "refresh", "title": "Функция вызывает саму себя" },
-      { "icon": "code", "title": "Примеры рекурсивного кода" },
+      { "icon": "binary", "title": "Примеры рекурсивного кода" },
       { "icon": "edit", "title": "Открываем Python IDLE" },
       { "icon": "computer", "title": "Практика: пишем рекурсивный код" },
       { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-2": [
+      { "icon": "home", "title": "Рекурсия · База и шаг" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "layers", "title": "База и шаг" },
+      { "icon": "settings-sliders", "title": "Интерактив: факториал" },
+      { "icon": "shield-check", "title": "Проверка корректности" },
+      { "icon": "computer", "title": "Практика в Python" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-3": [
+      { "icon": "home", "title": "Рекурсия · Стек вызовов" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "layers", "title": "Принцип LIFO и стек" },
+      { "icon": "binary", "title": "Прямой и обратный ход" },
+      { "icon": "shield-check", "title": "Лимит глубины рекурсии" },
+      { "icon": "computer", "title": "Практика в Python IDLE" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-4": [
+      { "icon": "home", "title": "Рекурсия · Факториал и степени" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "calculator", "title": "Математическая индукция" },
+      { "icon": "sitemap", "title": "Дерево ветвления Фибоначчи" },
+      { "icon": "binary", "title": "Двойная база Фибоначчи" },
+      { "icon": "computer", "title": "Практика в Python IDLE" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-5": [
+      { "icon": "home", "title": "Рекурсия · Разбор чисел" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "calculator", "title": "Прием декомпозиции числа" },
+      { "icon": "binary", "title": "Разбор кода суммы цифр" },
+      { "icon": "layers", "title": "Перевод в двоичную систему" },
+      { "icon": "computer", "title": "Практика в Python IDLE" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-6": [
+      { "icon": "home", "title": "Рекурсия · Строки и списки" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "text", "title": "Прием «Голова и хвост»" },
+      { "icon": "binary", "title": "Проверка палиндромов" },
+      { "icon": "list", "title": "Рекурсия по спискам" },
+      { "icon": "computer", "title": "Практика в Python IDLE" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-7": [
+      { "icon": "home", "title": "Рекурсия · Рекурсия или цикл" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "memory", "title": "Память и скорость: O(1) vs O(N)" },
+      { "icon": "binary", "title": "Алгоритм Евклида (НОД)" },
+      { "icon": "scale", "title": "Правила выбора подхода" },
+      { "icon": "computer", "title": "Практика в Python IDLE" },
+      { "icon": "check", "title": "Мини-проверка" },
+      { "icon": "flag", "title": "Итоги и дескриптор" }
+    ],
+    "10emn-q2-8": [
+      { "icon": "home", "title": "Рекурсия · Практикум СОР" },
+      { "icon": "check", "title": "Повторение предыдущей темы" },
+      { "icon": "graduation-cap", "title": "План подготовки к СОР" },
+      { "icon": "binary", "title": "Разбор задачи СОР" },
+      { "icon": "time-fast", "title": "Подсчет числа вызовов" },
+      { "icon": "computer", "title": "Практикум СОР в IDLE" },
+      { "icon": "check", "title": "Мини-проверка к СОР" },
       { "icon": "flag", "title": "Итоги и дескриптор" }
     ],
     "10ogn-q2-1": [
