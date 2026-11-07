@@ -163,6 +163,16 @@ const PY_LESSONS = [
     examples: {
       default: `# Три примера рекурсии:\n\n# 1. Обратный отсчёт\ndef countdown(n):\n    if n == 0:\n        print("Старт!")\n        return\n    print(n, end="... ")\n    countdown(n - 1)\n\ncountdown(4)\n\n# 2. Сумма цифр числа\ndef sum_digits(n):\n    if n < 10:\n        return n\n    return (n % 10) + sum_digits(n // 10)\n\nprint("Сумма цифр числа 2025:", sum_digits(2025))\n`
     }
+  },
+  {
+    num: 17,
+    file: "17.Олимпиада.html",
+    title: "Олимпиадные задачи РК",
+    module: "Модуль 4 · Олимпиада",
+    starter: `# Урок 17: Олимпиадные задачи РК (100 задач)\n# Задача 1: Делёж курта\nn = int(input("Количество курта n: "))\nk = int(input("Количество друзей k: "))\nprint(n // k, n % k)\n`,
+    examples: {
+      default: `# Олимпиадный шаблон: чтение нескольких чисел в одной строке\n# Например: a, b = map(int, input().split())\na, b = 23, 5\nprint(a // b, a % b)\n`
+    }
   }
 ];
 
@@ -389,7 +399,9 @@ function initContentWidgets() {
     const tag = (sec.querySelector(".section-tag")?.textContent || "").toLowerCase();
     const title = (sec.querySelector(".section-title")?.textContent || "").toLowerCase();
     return id.includes("practice") || id.includes("extra") || id.includes("advanced") ||
-           tag.includes("практик") || title.includes("задани") || title.includes("задач");
+           tag.includes("практик") || tag.includes("задач") ||
+           title.includes("задани") || title.includes("задач") ||
+           Boolean(sec.querySelector("ul.steps"));
   });
 
   const savedDone = JSON.parse(localStorage.getItem(`py_done_L${currentLesson.num}`) || "[]");
@@ -397,7 +409,8 @@ function initContentWidgets() {
   practiceSections.forEach(sec => {
     const items = sec.querySelectorAll("ul.steps > li");
     items.forEach((li, idx) => {
-      const taskNum = idx + 1;
+      const stepNumText = li.querySelector(".step-num")?.textContent?.trim();
+      const taskNum = stepNumText && /^\d+$/.test(stepNumText) ? parseInt(stepNumText, 10) : (idx + 1);
       const contentDiv = li.querySelector("div") || li;
       const rawText = contentDiv.textContent.replace(/\s+/g, " ").trim();
 

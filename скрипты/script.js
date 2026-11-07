@@ -239,6 +239,7 @@ const LESSONS_DATABASE = {
         { num: "14", title: "Создание функций", path: "Python основы/14.Функции.html", file: "Python основы/14.Функции.html", quarter: "1 четверть" },
         { num: "15", title: "Работа с файлами", path: "Python основы/15.Файлы.html", file: "Python основы/15.Файлы.html", quarter: "1 четверть" },
         { num: "16", title: "Рекурсия", path: "Python основы/16.Рекурсия.html", file: "Python основы/16.Рекурсия.html", quarter: "1 четверть" },
+        { num: "17", title: "Олимпиадные задачи РК (100)", path: "Python основы/17.Олимпиада.html", file: "Python основы/17.Олимпиада.html", quarter: "1 четверть" },
       ],
     },
     lessons: [
@@ -258,6 +259,7 @@ const LESSONS_DATABASE = {
       { num: "14", title: "Создание функций", path: "Python основы/14.Функции.html", file: "Python основы/14.Функции.html", quarter: "1 четверть" },
       { num: "15", title: "Работа с файлами", path: "Python основы/15.Файлы.html", file: "Python основы/15.Файлы.html", quarter: "1 четверть" },
       { num: "16", title: "Рекурсия", path: "Python основы/16.Рекурсия.html", file: "Python основы/16.Рекурсия.html", quarter: "1 четверть" },
+      { num: "17", title: "Олимпиадные задачи РК (100)", path: "Python основы/17.Олимпиада.html", file: "Python основы/17.Олимпиада.html", quarter: "1 четверть" },
     ]
   },
 };
