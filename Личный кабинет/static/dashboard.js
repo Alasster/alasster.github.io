@@ -2061,11 +2061,13 @@ function renderLessonsCatalog(classes) {
         row.append(link, lessonToggle);
 
         if (item.name !== 'Python основы') {
+          const baseLessonPath = lesson.file_path || decodeURIComponent(lessonKey);
 
           const kspButton = document.createElement('button');
           kspButton.className = 'button button-ghost lesson-ksp-button';
           kspButton.type = 'button';
-          kspButton.dataset.lessonPath = lesson.file_path || decodeURIComponent(lessonKey);
+          kspButton.dataset.lessonPath = baseLessonPath;
+          kspButton.dataset.kspLabel = 'КСП';
           kspButton.textContent = 'КСП';
           kspButton.title = 'Создать КСП по этому уроку';
           kspButton.setAttribute('aria-label', `КСП: ${lesson.title}`);
@@ -2075,6 +2077,23 @@ function renderLessonsCatalog(classes) {
           }
 
           row.append(kspButton);
+
+          if (item.name === '10 ОГН' || String(baseLessonPath).startsWith('10 ОГН/')) {
+            const dopButton = document.createElement('button');
+            dopButton.className = 'button button-ghost lesson-ksp-button lesson-ksp-dop-button';
+            dopButton.type = 'button';
+            dopButton.dataset.lessonPath = `доп|${baseLessonPath}`;
+            dopButton.dataset.kspLabel = 'Доп';
+            dopButton.textContent = 'Доп';
+            dopButton.title = 'Создать вариативный КСП для 10А (вторник)';
+            dopButton.setAttribute('aria-label', `Доп КСП (10А): ${lesson.title}`);
+
+            if (window.currentCabinetUser?.role !== 'superadmin' && window.currentCabinetUser?.role !== 'teacher') {
+              dopButton.hidden = true;
+            }
+
+            row.append(dopButton);
+          }
 
         }
 

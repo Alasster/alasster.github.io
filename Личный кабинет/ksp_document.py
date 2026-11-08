@@ -44,14 +44,21 @@ def cleanup_ksp_temp_files(slide_shots: dict | None = None):
                 pass
 
 
+def _normalize_lesson_rel_path(lesson_relative_path: str) -> str:
+    rel = str(lesson_relative_path or '').strip()
+    if rel.startswith('доп|'):
+        rel = rel[len('доп|'):]
+    return rel.lstrip('/')
+
 
 def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
     """Extract section titles and metadata for all slides in the lesson."""
-    lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
+    lesson_relative_path = _normalize_lesson_rel_path(lesson_relative_path)
+    lesson_path = (ROOT / lesson_relative_path).resolve()
     if not lesson_path.is_file():
         return []
 
-    parts_rel = Path(lesson_relative_path.lstrip('/')).parts
+    parts_rel = Path(lesson_relative_path).parts
     if len(parts_rel) >= 3 and parts_rel[1] == '2 четверть':
         m_num = re.search(r'\d+', parts_rel[2])
         num_str = m_num.group(0) if m_num else '1'
@@ -79,18 +86,19 @@ def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
 
 def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False) -> dict[any, str]:
     """Capture and cache crisp, fully-rendered screenshots of all slides in the lesson."""
+    lesson_relative_path = _normalize_lesson_rel_path(lesson_relative_path)
     browser = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
     if not os.path.exists(browser):
         browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
     if not os.path.exists(browser):
         browser = None
 
-    lesson_path = (ROOT / lesson_relative_path.lstrip('/')).resolve()
+    lesson_path = (ROOT / lesson_relative_path).resolve()
     if not lesson_path.is_file():
         return {}
 
     h_hash = hashlib.md5(lesson_relative_path.encode('utf-8')).hexdigest()[:10]
-    parts_rel = Path(lesson_relative_path.lstrip('/')).parts
+    parts_rel = Path(lesson_relative_path).parts
     is_q2 = len(parts_rel) >= 3 and parts_rel[1] == '2 четверть'
 
     results = {}
@@ -239,16 +247,17 @@ SEMANTIC_MARKERS = [
     r'Фронтальный опрос', r'Опрос',
     r'Вопрос учителя', r'Вопрос \d+', r'Вопрос',
     r'Ожидаемый ответ \d+', r'Ожидаемый ответ', r'Ожидаемые ответы',
-    r'Подводка к новой теме', r'Подводка к теме', r'Подводка',
+    r'Подводка к углубленной практике', r'Подводка к новой теме', r'Подводка к теме', r'Подводка',
     r'Объяснение темы', r'Объяснение нового материала', r'Объяснение',
-    r'Теоретический блок', r'Теория', r'Ключевые понятия', r'Ключевые тезисы',
+    r'Теоретический блок\b[^\n:—–]*', r'Теория', r'Ключевые понятия и алгоритмические приёмы', r'Ключевые понятия', r'Ключевые тезисы',
     r'Терминология и правила', r'Терминология', r'Термины и определения', r'Термины', r'Термин', r'Определение',
-    r'Разбор конкретного примера \d+', r'Разбор конкретного примера', r'Разбор примера \d+', r'Разбор примера',
+    r'Разбор ключевого примера\b[^\n:—–]*', r'Разбор конкретного примера \d+', r'Разбор конкретного примера', r'Разбор примера \d+', r'Разбор примера',
     r'Пример \d+', r'Пример', r'Случай \d+',
-    r'Контрольные вопросы', r'Контрольный вопрос', r'Проверка понимания',
+    r'Контрольный вопрос перед практикой', r'Контрольные вопросы', r'Контрольный вопрос', r'Проверка понимания',
     r'Инструктаж по технике безопасности', r'Инструктаж по ТБ', r'Инструктаж',
     r'Практическая работа', r'Постановка задачи',
-    r'Задание 1\b[^\n:—–]*', r'Задание 2\b[^\n:—–]*', r'Задание 3\b[^\n:—–]*', r'Задание \d+', r'Задание',
+    r'Дополнительное задание \d+\b[^\n:—–]*', r'Дополнительное задание\b[^\n:—–]*',
+    r'Задание 1\b[^\n:—–]*', r'Задание 2\b[^\n:—–]*', r'Задание 3\b[^\n:—–]*', r'Задание \d+\b[^\n:—–]*', r'Задание',
     r'Условие задачи', r'Условие', r'Пошаговый алгоритм', r'Алгоритм решения', r'Алгоритм',
     r'Решение и ответ', r'Решение', r'Правильный ответ', r'Ответ для учителя', r'Ответ',
     r'Дескриптор', r'Дескрипторы',
@@ -265,7 +274,7 @@ MARKER_SPLIT_REGEX = re.compile(
 )
 
 LABEL_MATCH_REGEX = re.compile(
-    r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?\s*[:—–-](?:\*{1,2})?)\s*(.*)$',
+    r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,75}?\s*[:—–-](?:\*{1,2})?)\s*(.*)$',
     re.S
 )
 
@@ -562,13 +571,15 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
 
     header = plan.get('header', {})
 
-    class_label = source.get('class_name', '')
-    if not class_label.endswith('ы') and not class_label.endswith('класс'):
+    class_label = source.get('grade_label') or source.get('class_name', '')
+    if not class_label.endswith('ы') and not class_label.endswith('класс') and 'класс' not in class_label.lower():
         class_label += ' класс'
 
     theme_text = source.get('title', '')
     if source.get('number'):
         theme_text += f". Урок {source.get('number')}"
+    if source.get('is_variative'):
+        theme_text += " (Вариативный курс)"
 
     goals_text = '\n'.join(source.get('goals', []))
     if not goals_text and header.get('curriculum_goal'):
@@ -577,7 +588,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     meta_mapping = {
         'Раздел': source.get('section') or header.get('section', ''),
         'ФИО педагога': os.environ.get('KSP_TEACHER', 'Кадыржанов Ж.К.'),
-        'Предмет': 'Информатика',
+        'Предмет': source.get('subject') or 'Информатика',
         'Дата': source.get('date') or header.get('date', '________________'),
         'Класс': class_label,
         'Тема урока': theme_text,
@@ -630,9 +641,10 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
                     r.bold = True
 
     # Capture screenshots of lesson sections for interactive stages
-    slides_meta = get_lesson_slides_meta(source.get('key', ''))
+    lesson_rel_path = source.get('lesson_path') or _normalize_lesson_rel_path(source.get('key', ''))
+    slides_meta = get_lesson_slides_meta(lesson_rel_path)
     total_s = len(slides_meta)
-    slide_shots = capture_lesson_slides(source.get('key', ''))
+    slide_shots = capture_lesson_slides(lesson_rel_path)
 
     if total_s >= 9:
         stage_slide_indices = {
@@ -772,7 +784,7 @@ def docx_to_html(doc_path: Path | str) -> str:
                 for p in cell.paragraphs:
                     p_text = p.text.strip()
                     if p_text:
-                        p_html = re.sub(r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,60}?\s*[:—–-](?:\*{1,2})?)\s*', r'<strong>\1 </strong>', p_text)
+                        p_html = re.sub(r'^(\s*(?:[•\-*]|\d+\.|\d+\))?\s*(?:\*{1,2})?[А-ЯЁ][A-Za-zА-Яа-яЁё0-9—–\s().,/«»"\'\-]{1,75}?\s*[:—–-](?:\*{1,2})?)\s*', r'<strong>\1 </strong>', p_text)
                         html_parts.append(f'<p>{p_html}</p>')
                 for blip in blips:
                     embed_id = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')

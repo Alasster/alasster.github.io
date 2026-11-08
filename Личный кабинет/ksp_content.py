@@ -85,11 +85,11 @@ def get_q2_slides_meta(class_name: str, lesson_num: int | str) -> list[dict]:
     for chunk in slide_chunks[1:]:
         kind_m = re.match(r"^(\w+)", chunk)
         kind = kind_m.group(1) if kind_m else 'slide'
-        title_m = re.search(r"title:\s*['\"`](.*?)['\"`]", chunk)
-        eyebrow_m = re.search(r"eyebrow:\s*['\"`](.*?)['\"`]", chunk)
+        title_m = re.search(r"title:\s*(['\"`])((?:\\.|(?!\1).)*)\1", chunk, re.S)
+        eyebrow_m = re.search(r"eyebrow:\s*(['\"`])((?:\\.|(?!\1).)*)\1", chunk, re.S)
 
-        title = _clean_str(title_m.group(1)) if title_m else ''
-        eyebrow = _clean_str(eyebrow_m.group(1)) if eyebrow_m else ''
+        title = _clean_str(title_m.group(2)) if title_m else ''
+        eyebrow = _clean_str(eyebrow_m.group(2)) if eyebrow_m else ''
 
         if kind == 'hero':
             label = f"Введение: {title}" if title else "Введение"
@@ -115,13 +115,13 @@ def get_q2_lesson_text(class_name: str, lesson_num: int | str) -> dict:
     if not raw_js:
         return {}
 
-    t_match = re.search(r"title:\s*['\"`](.*?)['\"`]", raw_js)
-    title = _clean_str(t_match.group(1)) if t_match else ''
+    t_match = re.search(r"title:\s*(['\"`])((?:\\.|(?!\1).)*)\1", raw_js, re.S)
+    title = _clean_str(t_match.group(2)) if t_match else ''
 
-    g_match = re.search(r"goal:\s*['\"`](.*?)['\"`]", raw_js)
-    gc_match = re.search(r"goalCode:\s*['\"`](.*?)['\"`]", raw_js)
-    goal = _clean_str(g_match.group(1)) if g_match else ''
-    goal_code = _clean_str(gc_match.group(1)) if gc_match else ''
+    g_match = re.search(r"goal:\s*(['\"`])((?:\\.|(?!\1).)*)\1", raw_js, re.S)
+    gc_match = re.search(r"goalCode:\s*(['\"`])((?:\\.|(?!\1).)*)\1", raw_js, re.S)
+    goal = _clean_str(g_match.group(2)) if g_match else ''
+    goal_code = _clean_str(gc_match.group(2)) if gc_match else ''
 
     full_goal = f"{goal_code} {goal}".strip() if goal else ''
 
@@ -156,21 +156,21 @@ def get_q2_lesson_text(class_name: str, lesson_num: int | str) -> dict:
     lines.append("\n=======================================================")
     lines.append("РАЗДЕЛ: ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (ТЕОРИЯ С ПЛАТФОРМЫ)")
     lines.append("=======================================================")
-    for cm in re.finditer(r"title:\s*['\"`](.*?)['\"`].*?lead:\s*['\"`](.*?)['\"`]", raw_js, re.S):
-        c_title = _clean_str(cm.group(1))
-        c_lead = _clean_str(cm.group(2))
+    for cm in re.finditer(r"title:\s*(['\"`])((?:\\.|(?!\1).)*)\1.*?lead:\s*(['\"`])((?:\\.|(?!\3).)*)\3", raw_js, re.S):
+        c_title = _clean_str(cm.group(2))
+        c_lead = _clean_str(cm.group(4))
         if c_title and c_title != title:
             lines.append(f"\nТеоретический блок: {c_title}\nГлавная мысль: {c_lead}")
 
-    for sm in re.finditer(r"title:\s*['\"`](.*?)['\"`]\s*,\s*text:\s*['\"`](.*?)['\"`]", raw_js):
-        t_sub = _clean_str(sm.group(1))
-        tx = _clean_str(sm.group(2))
+    for sm in re.finditer(r"title:\s*(['\"`])((?:\\.|(?!\1).)*)\1\s*,\s*text:\s*(['\"`])((?:\\.|(?!\3).)*)\3", raw_js):
+        t_sub = _clean_str(sm.group(2))
+        tx = _clean_str(sm.group(4))
         if t_sub and tx:
             lines.append(f"  • {t_sub}: {tx}")
 
-    for com in re.finditer(r"t:\s*['\"]callout['\"].*?title:\s*['\"`](.*?)['\"`].*?text:\s*['\"`](.*?)['\"`]", raw_js, re.S):
-        co_title = _clean_str(com.group(1))
-        co_text = _clean_str(com.group(2))
+    for com in re.finditer(r"t:\s*['\"]callout['\"].*?title:\s*(['\"`])((?:\\.|(?!\1).)*)\1.*?text:\s*(['\"`])((?:\\.|(?!\3).)*)\3", raw_js, re.S):
+        co_title = _clean_str(com.group(2))
+        co_text = _clean_str(com.group(4))
         lines.append(f"\nВажное правило («{co_title}»): {co_text}")
 
     # Code / Tables
@@ -184,14 +184,14 @@ def get_q2_lesson_text(class_name: str, lesson_num: int | str) -> dict:
     lines.append("=======================================================")
     
     # Lead instructions
-    prac_m = re.search(r"k:\s*['\"]practice['\"].*?lead:\s*['\"`](.*?)['\"`]", raw_js, re.S)
+    prac_m = re.search(r"k:\s*['\"]practice['\"].*?lead:\s*(['\"`])((?:\\.|(?!\1).)*)\1", raw_js, re.S)
     if prac_m:
-        lines.append(f"Инструктаж к практической работе: {_clean_str(prac_m.group(1))}\n")
+        lines.append(f"Инструктаж к практической работе: {_clean_str(prac_m.group(2))}\n")
 
     # Before callout (конспект и условия)
-    bef_m = re.search(r"k:\s*['\"]practice['\"].*?before:\s*\[.*?text:\s*['\"`](.*?)['\"`]", raw_js, re.S)
+    bef_m = re.search(r"k:\s*['\"]practice['\"].*?before:\s*\[.*?text:\s*(['\"`])((?:\\.|(?!\1).)*)\1", raw_js, re.S)
     if bef_m:
-        lines.append(f"Задание в тетради / конспект: {_clean_str(bef_m.group(1))}\n")
+        lines.append(f"Задание в тетради / конспект: {_clean_str(bef_m.group(2))}\n")
 
     # Tasks
     tasks_block_m = re.search(r"k:\s*['\"]practice['\"].*?tasks:\s*\[(.*?)(?:\]\s*,\s*criteria|\]\s*\})", raw_js, re.S)

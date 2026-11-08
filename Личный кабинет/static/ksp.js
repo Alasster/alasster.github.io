@@ -13,10 +13,31 @@
   let refreshing = false;
   const starting = new Set();
 
+  function getUserRole() {
+    if (window.currentCabinetUser?.role) return window.currentCabinetUser.role;
+    if (window.currentUserRole) return window.currentUserRole;
+    try {
+      const stored = JSON.parse(localStorage.getItem('alasster_auth_user') || '{}');
+      return stored.role;
+    } catch (_) {
+      return null;
+    }
+  }
+
   function paint() {
+    const role = getUserRole();
+    const canUseKsp = role === 'superadmin' || role === 'teacher';
+
     grid.querySelectorAll('.lesson-ksp-button').forEach(button => {
       const key = button.dataset.lessonPath;
       if (!key) return;
+
+      if (canUseKsp) {
+        button.hidden = false;
+      }
+
+      const isDop = button.classList.contains('lesson-ksp-dop-button') || key.startsWith('доп|');
+      const label = button.dataset.kspLabel || (isDop ? 'Доп' : 'КСП');
 
       const job = jobs[key];
       const busy = starting.has(key) || active.has(job?.status);
@@ -29,31 +50,22 @@
       button.disabled = busy;
       button.setAttribute('aria-busy', String(busy));
 
-      // Always keep clean button label "КСП" without bloating button dimensions
-      button.textContent = 'КСП';
+      // Always keep clean button label ("КСП" or "Доп") without bloating button dimensions
+      button.textContent = label;
 
       if (busy) {
-        button.title = 'Создание КСП…';
+        button.title = isDop ? 'Создание вариативного КСП (10А)…' : 'Создание КСП…';
       } else if (ready) {
-        button.title = 'Открыть в Google Документах (Shift + клик для повторного создания)';
+        button.title = isDop
+          ? 'Открыть вариативный КСП (10А) в Google Документах (Shift + клик для повторного создания)'
+          : 'Открыть в Google Документах (Shift + клик для повторного создания)';
       } else if (isError) {
-        button.title = (job && job.message) ? job.message : 'Ошибка создания КСП. Нажмите для повтора';
+        button.title = (job && job.message) ? job.message : (isDop ? 'Ошибка создания Доп КСП. Нажмите для повтора' : 'Ошибка создания КСП. Нажмите для повтора');
       } else {
-        button.title = 'Создать КСП';
+        button.title = isDop ? 'Создать вариативный КСП для 10А (вторник)' : 'Создать КСП';
       }
       button.setAttribute('aria-label', button.title);
     });
-  }
-
-  function getUserRole() {
-    if (window.currentCabinetUser?.role) return window.currentCabinetUser.role;
-    if (window.currentUserRole) return window.currentUserRole;
-    try {
-      const stored = JSON.parse(localStorage.getItem('alasster_auth_user') || '{}');
-      return stored.role;
-    } catch (_) {
-      return null;
-    }
   }
 
   async function refresh() {
