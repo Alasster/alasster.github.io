@@ -258,6 +258,7 @@ def lesson_source(key: str) -> dict:
         lesson_path=clean_key,
         is_variative=is_variative,
         class_name=class_name,
+        folder_name='10 ДОП' if is_variative else class_name,
         grade_label='10 «А» класс (ОГН)' if is_variative else class_name,
         subject='Информатика и искусственный интеллект (вариативный компонент)' if is_variative else 'Информатика',
         quarter=quarter,
@@ -278,12 +279,13 @@ def safe_name(value: str) -> str:
 
 
 def output_path(source: dict, output_root: Path) -> Path:
+    folder_class = source.get('folder_name') or ('10 ДОП' if source.get('is_variative') else source['class_name'])
     if source.get('is_variative'):
         filename = f"Урок {int(source['number']):02d} Доп КСП (10А) — {safe_name(source['title'])}.docx"
     else:
         filename = f"Урок {int(source['number']):02d} КСП — {safe_name(source['title'])}.docx"
     return (
-        output_root / '2026–2027' / source['class_name'] / source['quarter'] / filename
+        output_root / '2026–2027' / folder_class / source['quarter'] / filename
     )
 
 
@@ -647,8 +649,14 @@ class KspService:
                         src = lesson_source(key)
                     except Exception:
                         continue
+                    folder_class = src.get('folder_name') or ('10 ДОП' if src.get('is_variative') else src['class_name'])
                     title = output_path(src, self.output_root).stem
-                    doc_id = index.get((src['class_name'], src['quarter'], title)) or index.get((src['class_name'], src['quarter'], f'{title}.docx'))
+                    doc_id = (
+                        index.get((folder_class, src['quarter'], title))
+                        or index.get((folder_class, src['quarter'], f'{title}.docx'))
+                        or (index.get((src['class_name'], src['quarter'], title)) if src.get('is_variative') else None)
+                        or (index.get((src['class_name'], src['quarter'], f'{title}.docx')) if src.get('is_variative') else None)
+                    )
                     row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                     if doc_id:
                         if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
@@ -762,13 +770,14 @@ class KspService:
                 try:
                     build_docx(self.template, tmp, source, plan)
                     self.update(key, 'saving', 'Загрузка в Google Диск…')
+                    folder_class = source.get('folder_name') or ('10 ДОП' if source.get('is_variative') else source['class_name'])
                     title = output_path(source, self.output_root).stem
-                    doc_id = self.drive.upload_docx_as_gdoc(tmp, [source['class_name'], source['quarter']], title)
+                    doc_id = self.drive.upload_docx_as_gdoc(tmp, [folder_class, source['quarter']], title)
                     import time
                     self._last_upload_ts = time.time()
                     self._index_ts = time.time()
-                    self._index[(source['class_name'], source['quarter'], title)] = doc_id
-                    self._index[(source['class_name'], source['quarter'], f'{title}.docx')] = doc_id
+                    self._index[(folder_class, source['quarter'], title)] = doc_id
+                    self._index[(folder_class, source['quarter'], f'{title}.docx')] = doc_id
                     self.update(key, 'ready', 'КСП сохранён в Google Диске', f'gdrive:{doc_id}')
                     return
                 finally:
@@ -813,7 +822,13 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
             try:
                 from server import get_user_from_request
                 user = get_user_from_request(request)
-                if user and user.get("role") in {"teacher", "admin", "superadmin"}:
+                user_role = None
+                if user:
+                    try:
+                        user_role = user["role"]
+                    except Exception:
+                        user_role = getattr(user, "role", None)
+                if user and user_role in {"teacher", "admin", "superadmin"}:
                     return None
             except Exception:
                 pass
