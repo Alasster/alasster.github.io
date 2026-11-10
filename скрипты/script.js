@@ -294,7 +294,21 @@ fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store'
   })
   .catch(() => {});
 
-let publicVisibility = {};
+const VISIBILITY_STORAGE_KEY = 'alasster_public_visibility';
+
+function loadCachedVisibility() {
+  try {
+    const raw = localStorage.getItem(VISIBILITY_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch (e) {}
+  return {};
+}
+
+let publicVisibility = loadCachedVisibility();
+let homeVisibilityLoaded = Object.keys(publicVisibility).length > 0;
 let homeVisibilityRequest = null;
 let refreshHomeLessonList = null;
 
@@ -325,6 +339,10 @@ const applyHomeVisibility = (payload) => {
   Object.entries(payload.lessons).forEach(([key, isVisible]) => {
     publicVisibility[normalizeVisibilityKey(key)] = isVisible;
   });
+  homeVisibilityLoaded = true;
+  try {
+    localStorage.setItem(VISIBILITY_STORAGE_KEY, JSON.stringify(publicVisibility));
+  } catch (e) {}
   const backdrop = document.getElementById('modal-backdrop-el');
   if (backdrop?.classList.contains('active')) refreshHomeLessonList?.();
 };
@@ -375,6 +393,9 @@ function showClassModal(id) {
   if (headingEl) headingEl.textContent = className;
   if (subtitleEl) subtitleEl.textContent = topic;
 
+  const backdrop = document.getElementById('modal-backdrop-el');
+  if (!backdrop) return;
+
   const list = document.getElementById('modal-lessons-list');
   if (list) {
     const renderLessonList = () => {
@@ -421,16 +442,28 @@ function showClassModal(id) {
       list.scrollTop = scrollTop;
     };
 
-    renderLessonList();
     refreshHomeLessonList = () => {
-      if (backdrop?.classList.contains('active') && backdrop.dataset.classTheme === id) {
+      if (backdrop.classList.contains('active') && backdrop.dataset.classTheme === id) {
         renderLessonList();
       }
     };
-  }
 
-  const backdrop = document.getElementById('modal-backdrop-el');
-  if (!backdrop) return;
+    if (!homeVisibilityLoaded && Object.keys(publicVisibility).length === 0) {
+      list.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;padding:40px 16px;color:rgba(255,255,255,0.6);gap:10px;font-size:14px;">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Загрузка уроков...</span>
+        </div>
+      `;
+      (homeVisibilityRequest || refreshHomeVisibility()).then(() => {
+        if (backdrop.classList.contains('active') && backdrop.dataset.classTheme === id) {
+          renderLessonList();
+        }
+      });
+    } else {
+      renderLessonList();
+    }
+  }
 
   backdrop.dataset.classTheme = id;
   backdrop.removeAttribute('inert');

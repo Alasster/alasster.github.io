@@ -338,9 +338,22 @@
 
   let activeTabId = detectCurrentClass();
 
-  let publicVisibility = {};
+  const VISIBILITY_STORAGE_KEY = 'alasster_public_visibility';
+
+  function loadCachedVisibility() {
+    try {
+      const raw = localStorage.getItem(VISIBILITY_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (e) {}
+    return {};
+  }
+
+  let publicVisibility = loadCachedVisibility();
   let visibilityRefreshRequest = null;
-  let localVisibilityLoaded = false;
+  let localVisibilityLoaded = Object.keys(publicVisibility).length > 0;
   let remoteVisibilityLoaded = false;
 
   const normalizeVisibilityKey = key => {
@@ -349,35 +362,20 @@
   };
 
   const lessonIsPublic = (file) => {
-
     if (!file) return true;
-
     const normalized = file.replace(/\\/g, '/').replace(/^\/+/, '');
-
     const decoded = normalizeVisibilityKey(normalized);
 
-
-
     const parts = decoded.split('/');
-
     if (parts.length >= 2) {
-
       const quarterKey = `__quarter__|${parts[0]}|${parts[1]}`;
-
       if (publicVisibility[quarterKey] === false) return false;
-
     }
-
-
 
     if (publicVisibility[decoded] === false || publicVisibility[normalized] === false) {
-
       return false;
-
     }
-
     return true;
-
   };
 
   function applyPublicVisibility(payload) {
@@ -386,6 +384,10 @@
     Object.entries(payload.lessons).forEach(([key, isVisible]) => {
       publicVisibility[normalizeVisibilityKey(key)] = isVisible;
     });
+
+    try {
+      localStorage.setItem(VISIBILITY_STORAGE_KEY, JSON.stringify(publicVisibility));
+    } catch (e) {}
 
     updateLessonVisibilityUI();
   }
@@ -402,20 +404,27 @@
 
     visibilityRefreshRequest = (async () => {
       try {
+        const isRoot = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || !window.location.pathname.includes('/четверть/');
+        const visPath = isRoot ? 'скрипты/lesson-visibility.json' : '../../скрипты/lesson-visibility.json';
+        const cfgPath = isRoot ? 'скрипты/backend-config.json' : '../../скрипты/backend-config.json';
+
         if (!localVisibilityLoaded) {
-          const localResponse = await fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' });
+          const localResponse = await fetch(visPath + '?t=' + Date.now(), { cache: 'no-store' });
           if (localResponse.ok) {
             const payload = await localResponse.json();
             if (payload?.lessons) {
               Object.entries(payload.lessons).forEach(([key, isVisible]) => {
                 publicVisibility[normalizeVisibilityKey(key)] = isVisible;
               });
+              try {
+                localStorage.setItem(VISIBILITY_STORAGE_KEY, JSON.stringify(publicVisibility));
+              } catch (e) {}
             }
             localVisibilityLoaded = true;
           }
         }
 
-        const configResponse = await fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' });
+        const configResponse = await fetch(cfgPath + '?t=' + Date.now(), { cache: 'no-store' });
         if (configResponse.ok) {
           const config = await configResponse.json();
           if (config?.url) {
@@ -640,18 +649,31 @@
   }
 
   function openClassesModal() {
-
     const backdrop = document.getElementById('modal-backdrop-el');
-
     if (!backdrop) return;
 
     backdrop.classList.add('active');
-
     document.body.classList.add('modal-open');
 
-    renderModalLessons(activeTabId);
-    refreshPublicLessonVisibility();
-
+    if (!localVisibilityLoaded && !remoteVisibilityLoaded && Object.keys(publicVisibility).length === 0) {
+      const listEl = document.getElementById('modal-lessons-list');
+      if (listEl) {
+        listEl.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;padding:40px 16px;color:rgba(255,255,255,0.6);gap:10px;font-size:14px;">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Загрузка уроков...</span>
+          </div>
+        `;
+      }
+      refreshPublicLessonVisibility().then(() => {
+        if (backdrop.classList.contains('active')) {
+          renderModalLessons(activeTabId);
+        }
+      });
+    } else {
+      renderModalLessons(activeTabId);
+      refreshPublicLessonVisibility();
+    }
   }
 
 
