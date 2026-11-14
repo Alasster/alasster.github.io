@@ -6229,6 +6229,7 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   color: #1e293b;
   cursor: grab;
   z-index: 2;
+  transition: none !important;
 }
 .q2-cb-node.is-fixed {
   cursor: default;
@@ -6257,7 +6258,10 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   cursor: pointer;
   padding: 0;
   z-index: 3;
+  transition: none !important;
 }
+.q2-cb-port:hover,
+.q2-cb-del:hover { transform: none !important; }
 .q2-cb-port.is-active { background: #4f46e5; border-color: #312e81; }
 .q2-cb-port.is-connected { background: #6366f1; border-color: #4338ca; }
 .q2-cb-port-out { right: -7px; top: 50%; margin-top: -7px; }
