@@ -148,7 +148,14 @@
     <text x="230" y="310" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">три переменные → 2³ = 8 наборов; заполняем столбцы A → B → C</text>
   </svg>`;
 
-  const makeLockSvg = (p) => `<svg viewBox="0 0 340 128" role="img" aria-label="3D кодовый замок из трёх барабанов: перебор от 000 до 111">
+  const makeLockSvg = (p, cols = 3) => {
+    const reels = [
+      { label: 'A', x: 20, cls: 'q2-lock-a', clip: `${p}-lock-clip-0` },
+      { label: 'B', x: 128, cls: 'q2-lock-b', clip: `${p}-lock-clip-1` },
+      { label: 'C', x: 236, cls: 'q2-lock-c', clip: `${p}-lock-clip-2` }
+    ].slice(0, cols);
+    const vbW = cols === 2 ? 232 : 340;
+    return `<svg viewBox="0 0 ${vbW} 128" role="img" aria-label="3D кодовый замок из ${cols === 2 ? 'двух' : 'трёх'} барабанов">
     <defs>
       <linearGradient id="${p}-lock-drum" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="rgba(100,116,139,.44)"/>
@@ -162,20 +169,10 @@
         <stop offset="55%" stop-color="#f1f5f9"/>
         <stop offset="100%" stop-color="#e2e8f0"/>
       </linearGradient>
-      <clipPath id="${p}-lock-clip-0"><rect x="20" y="26" width="84" height="90" rx="8"/></clipPath>
-      <clipPath id="${p}-lock-clip-1"><rect x="128" y="26" width="84" height="90" rx="8"/></clipPath>
-      <clipPath id="${p}-lock-clip-2"><rect x="236" y="26" width="84" height="90" rx="8"/></clipPath>
+      ${reels.map(d => `<clipPath id="${d.clip}"><rect x="${d.x}" y="26" width="84" height="90" rx="8"/></clipPath>`).join('')}
     </defs>
-    <!-- Метки A B C -->
-    <text x="62" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">A</text>
-    <text x="170" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">B</text>
-    <text x="278" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">C</text>
-    <!-- 3 широких вертикальных барабана -->
-    ${[
-      { x: 20, cls: 'q2-lock-a', clip: `${p}-lock-clip-0` },
-      { x: 128, cls: 'q2-lock-b', clip: `${p}-lock-clip-1` },
-      { x: 236, cls: 'q2-lock-c', clip: `${p}-lock-clip-2` }
-    ].map(d => `<rect x="${d.x - 4}" y="23" width="92" height="96" rx="10" fill="#d8e0ee" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>
+    ${reels.map(d => `<text x="${d.x + 42}" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">${d.label}</text>`).join('')}
+    ${reels.map(d => `<rect x="${d.x - 4}" y="23" width="92" height="96" rx="10" fill="#d8e0ee" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>
       <g clip-path="url(#${d.clip})">
         <g class="q2-lock-reel ${d.cls}">
           ${[1, 0, 1, 0].map((val, idx) => {
@@ -188,6 +185,8 @@
       </g>
       <rect x="${d.x}" y="26" width="84" height="90" rx="8" fill="url(#${p}-lock-drum)" pointer-events="none"/>`).join('')}
   </svg>`;
+  };
+  const LOCK2_HERO_SVG = makeLockSvg('hero2', 2);
   const LOCK3_HERO_SVG = makeLockSvg('hero');
   const LOCK3_SVG = makeLockSvg('s3');
 
@@ -421,7 +420,7 @@
           { icon: 'fas fa-list-ol', text: 'Порядок строк' },
           { icon: 'fas fa-calculator', text: 'Промежуточные столбцы' }
         ],
-        visual: LOCK3_HERO_SVG,
+        visual: LOCK2_HERO_SVG,
         visualCaption: 'Четыре строки — четыре возможных состояния двух выключателей',
         cta: 'Построить первую таблицу'
       },
