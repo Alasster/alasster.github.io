@@ -268,8 +268,21 @@ function initNavigation() {
       <div class="topbar-progress" id="topbarProgress">
         <span class="progress-label" id="progressLabel">Прогресс</span>
         <div class="progress-dots" id="progressDots"></div>
+        <a class="brand-icon-box python-account-link" id="pythonAccountLink" href="https://cabinet.alasster.site/" aria-label="Войти или открыть личный кабинет" title="Войти или открыть личный кабинет">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
+          </svg>
+        </a>
       </div>
     `;
+    const updateAccountLink = () => {
+      const link = document.getElementById('pythonAccountLink');
+      const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+      const base = window.AlassterBackend?.url || window.ALASSTER_CABINET_URL || (local ? 'http://127.0.0.1:8010' : 'https://cabinet.alasster.site');
+      if (link) link.href = new URL('/', base).href;
+    };
+    updateAccountLink();
+    window.addEventListener('alasster-backend-state', updateAccountLink);
   }
 
   // Update module label in hero
