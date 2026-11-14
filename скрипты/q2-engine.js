@@ -1814,9 +1814,9 @@
       return node;
     });
     try { localStorage.setItem(storageKey, JSON.stringify(tasks.map(logicText))); } catch (_) { /* storage is optional */ }
-    const taskColumns = tasks.map(node => ['A', 'B', ...logicColumns(node)]);
-    const answers = taskColumns.map(columns => Array.from({ length: 4 }, () => columns.map(() => '?')));
-    const orderPool = taskColumns[2].slice(2, -1);
+    const taskColumns = tasks.map(node => (varsCount === 3 ? ['A', 'B', 'C', ...logicColumns(node)] : ['A', 'B', ...logicColumns(node)]));
+    const answers = taskColumns.map(columns => Array.from({ length: inputRows.length }, () => columns.map(() => '?')));
+    const orderPool = taskColumns[2].slice(varsCount, -1);
     const orderChoices = shuffledCopy(orderPool.map((_, index) => index));
     const selectedOrder = orderPool.map(() => '');
     el.classList.add('q2-notebook');
@@ -1828,18 +1828,18 @@
       const panel = el.querySelector('[data-notebook-panel]');
       panel.setAttribute('aria-labelledby', tabs[index].id);
       const columns = taskColumns[index];
-      const columnNode = col => index === 2 && col >= 2 && col < columns.length - 1
-        ? (selectedOrder[col - 2] === '' ? null : orderPool[Number(selectedOrder[col - 2])])
+      const columnNode = col => index === 2 && col >= varsCount && col < columns.length - 1
+        ? (selectedOrder[col - varsCount] === '' ? null : orderPool[Number(selectedOrder[col - varsCount])])
         : columns[col];
-      const columnLabel = col => col === columns.length - 1 ? 'Y' : columnNode(col) ? logicText(columnNode(col)) : `Промежуточное выражение ${col - 1}`;
+      const columnLabel = col => col === columns.length - 1 ? 'Y' : columnNode(col) ? logicText(columnNode(col)) : `Промежуточное выражение ${col - varsCount + 1}`;
       const header = (node, col) => {
         if (col === columns.length - 1) return '<th>Y</th>';
-        if (index !== 2 || col < 2) return `<th>${logicHTML(node)}</th>`;
-        const position = col - 2;
+        if (index !== 2 || col < varsCount) return `<th>${logicHTML(node)}</th>`;
+        const position = col - varsCount;
         return `<th class="q2-order-column"><span class="q2-order-column-title" id="q2-order-title-${position}">Действие ${position + 1}</span><button type="button" class="q2-order-picker" data-notebook-order="${position}" value="${selectedOrder[position]}" aria-label="Выражение для действия ${position + 1}" aria-haspopup="listbox" aria-expanded="false" aria-controls="q2-order-menu-${position}"><span data-order-preview="${position}">${columnNode(col) ? logicHTML(columnNode(col)) : 'Выберите выражение'}</span><i aria-hidden="true"></i></button><div class="q2-order-menu" id="q2-order-menu-${position}" popover="auto" role="listbox" aria-labelledby="q2-order-title-${position}">${orderChoices.map(choice => `<button type="button" role="option" class="q2-order-choice" data-order-choice="${choice}" aria-label="${attr(logicText(orderPool[choice]))}" aria-selected="${selectedOrder[position] === String(choice)}">${logicHTML(orderPool[choice])}</button>`).join('')}</div></th>`;
       };
       panel.innerHTML = `<div class="q2-notebook-formula"><div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[index]))}">${logicHTML(tasks[index])}</div></div>
-        <p class="q2-notebook-instruction">Выполните работу в тетради. Таблицу на экране тоже можно заполнить: нажимайте на ячейки — ? → 0 → 1. ${index === 2 ? 'Самостоятельно выберите порядок промежуточных выражений в заголовках столбцов. Затем заполните A, B, промежуточные значения и Y.' : 'Сначала заполните A и B, затем промежуточные столбцы и Y.'}</p>
+        <p class="q2-notebook-instruction">Выполните работу в тетради. Таблицу на экране тоже можно заполнить: нажимайте на ячейки — ? → 0 → 1. ${index === 2 ? `Самостоятельно выберите порядок промежуточных выражений в заголовках столбцов. Затем заполните ${varsCount === 3 ? 'A, B, C' : 'A, B'}, промежуточные значения и Y.` : `Сначала заполните ${varsCount === 3 ? 'A, B и C' : 'A и B'}, затем промежуточные столбцы и Y.`}</p>
         <div class="q2-table-wrap"><table class="q2-table q2-notebook-template"><caption>Заполните все ячейки самостоятельно</caption><thead><tr>${columns.map(header).join('')}</tr></thead><tbody>${answers[index].map((row, rowIndex) => `<tr>${row.map((value, col) => `<td><button type="button" class="q2-cell" data-notebook-row="${rowIndex}" data-notebook-col="${col}" aria-label="${attr(columnLabel(col))}, строка ${rowIndex + 1}">${value}</button></td>`).join('')}</tr>`).join('')}</tbody></table></div>
         <div class="q2-notebook-check"><p class="q2-feedback" data-notebook-feedback role="status" aria-live="polite">Заполните таблицу и нажмите «Проверить».</p><button type="button" class="q2-btn" data-notebook-check>Проверить</button></div>`;
       const feedback = panel.querySelector('[data-notebook-feedback]');
