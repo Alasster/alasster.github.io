@@ -751,35 +751,33 @@
   </svg>`;
 
   const CIRCUIT_TWO_EXAMPLES_SVG = `<svg viewBox="0 0 560 250" role="img" aria-label="Два примера схем по двум высказываниям">
-    <rect x="10" y="8" width="540" height="110" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-    <text x="280" y="29" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 1: A + B  —  сначала ИЛИ, затем НЕ</text>
-    <line x1="185" y1="16" x2="219" y2="16" stroke="#334155" stroke-width="1.8"/>
+    <rect x="10" y="8" width="540" height="110" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card)"/>
+    <text x="280" y="29" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 1: <tspan style="text-decoration:overline">A + B</tspan> — сначала ИЛИ, затем НЕ</text>
     <rect x="32" y="42" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="59" text-anchor="middle" font-size="12" font-weight="800">A</text>
     <rect x="32" y="78" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="95" text-anchor="middle" font-size="12" font-weight="800">B</text>
-    <path d="M72 55 C110 55, 120 63, 162 63" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <path d="M72 91 C110 91, 120 79, 162 79" fill="none" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M72 55 C110 55, 120 63, 162 63" fill="none" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <path d="M72 91 C110 91, 120 79, 162 79" fill="none" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
     <path d="M158 52 Q168 71 158 90 Q186 90 202 71 Q186 52 158 52 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
-    <line x1="202" y1="71" x2="305" y2="71" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="202" y1="71" x2="305" y2="71" stroke="#f59e0b" stroke-width="2" class="q2-hero-wire-anim"/>
     <polygon points="305,53 305,89 337,71" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
     <circle cx="342" cy="71" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
-    <line x1="347" y1="71" x2="476" y2="71" stroke="#6366f1" stroke-width="2"/>
+    <line x1="347" y1="71" x2="476" y2="71" stroke="#6366f1" stroke-width="2" class="q2-hero-wire-anim"/>
     <rect x="476" y="58" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="496" y="75" text-anchor="middle" font-size="12" font-weight="800">Y</text>
 
-    <rect x="10" y="130" width="540" height="112" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-    <text x="280" y="151" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 2: (A + B)A  —  параллельно ИЛИ и НЕ, затем И</text>
-    <line x1="190" y1="138" x2="201" y2="138" stroke="#334155" stroke-width="1.8"/>
+    <rect x="10" y="130" width="540" height="112" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card)"/>
+    <text x="280" y="151" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 2: (A + B)<tspan style="text-decoration:overline">A</tspan> — параллельно ИЛИ и НЕ, затем И</text>
     <rect x="32" y="164" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="181" text-anchor="middle" font-size="12" font-weight="800">A</text>
     <rect x="32" y="200" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="217" text-anchor="middle" font-size="12" font-weight="800">B</text>
-    <path d="M72 177 C110 177, 120 169, 162 169" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <path d="M72 213 C110 213, 120 185, 162 185" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <path d="M72 177 C115 177, 120 215, 166 215" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <path d="M72 177 C110 177, 120 169, 162 169" fill="none" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <path d="M72 213 C110 213, 120 185, 162 185" fill="none" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <path d="M72 177 C115 177, 120 215, 166 215" fill="none" stroke="#f59e0b" stroke-width="2" class="q2-hero-wire-anim"/>
     <path d="M158 158 Q168 177 158 196 Q186 196 202 177 Q186 158 158 158 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
     <polygon points="166,199 166,231 194,215" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
     <circle cx="199" cy="215" r="4.2" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
-    <path d="M202 177 C260 177, 275 186, 314 186" fill="none" stroke="#6366f1" stroke-width="2"/>
-    <path d="M204 215 C260 215, 275 202, 314 202" fill="none" stroke="#6366f1" stroke-width="2"/>
+    <path d="M202 177 C260 177, 275 186, 314 186" fill="none" stroke="#6366f1" stroke-width="2" class="q2-hero-wire-anim"/>
+    <path d="M204 215 C260 215, 275 202, 314 202" fill="none" stroke="#6366f1" stroke-width="2" class="q2-hero-wire-anim"/>
     <path d="M314 174 H338 A20 20 0 0 1 338 214 H314 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-    <line x1="358" y1="194" x2="476" y2="194" stroke="#6366f1" stroke-width="2"/>
+    <line x1="358" y1="194" x2="476" y2="194" stroke="#6366f1" stroke-width="2" class="q2-hero-wire-anim"/>
     <rect x="476" y="181" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="496" y="198" text-anchor="middle" font-size="12" font-weight="800">Y</text>
   </svg>`;
 
