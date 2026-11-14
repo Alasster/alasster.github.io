@@ -733,20 +733,19 @@
   </svg>`;
 
   const CIRCUIT_EXAMPLE_SVG = `<svg viewBox="0 0 560 150" role="img" aria-label="Пример построения схемы для выражения A и не B">
-    <rect x="10" y="10" width="540" height="130" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-    <text x="272" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A B  →  сначала НЕ для B, затем И</text>
-    <line x1="230" y1="21" x2="241" y2="21" stroke="#334155" stroke-width="1.8"/>
+    <rect x="10" y="10" width="540" height="130" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card)"/>
+    <text x="280" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A<tspan style="text-decoration:overline">B</tspan> → сначала НЕ для B, затем И</text>
     <rect x="34" y="50" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
     <text x="56" y="70" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">A</text>
     <rect x="34" y="96" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
     <text x="56" y="116" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">B</text>
-    <line x1="78" y1="65" x2="314" y2="65" stroke="#6366f1" stroke-width="2.2"/>
-    <line x1="78" y1="111" x2="162" y2="111" stroke="#f59e0b" stroke-width="2.2"/>
+    <line x1="78" y1="65" x2="314" y2="65" stroke="#6366f1" stroke-width="2.2" class="q2-hero-wire-anim"/>
+    <line x1="78" y1="111" x2="162" y2="111" stroke="#f59e0b" stroke-width="2.2" class="q2-hero-wire-anim"/>
     <polygon points="162,93 162,129 194,111" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
     <circle cx="199" cy="111" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
-    <path d="M204 111 C250 111, 270 84, 314 84" fill="none" stroke="#6366f1" stroke-width="2.2"/>
+    <path d="M204 111 C250 111, 270 84, 314 84" fill="none" stroke="#6366f1" stroke-width="2.2" class="q2-hero-wire-anim"/>
     <path d="M314 54 H338 A20 20 0 0 1 338 94 H314 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-    <line x1="358" y1="74" x2="470" y2="74" stroke="#6366f1" stroke-width="2.2"/>
+    <line x1="358" y1="74" x2="470" y2="74" stroke="#6366f1" stroke-width="2.2" class="q2-hero-wire-anim"/>
     <rect x="470" y="59" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
     <text x="492" y="79" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">Y</text>
   </svg>`;
