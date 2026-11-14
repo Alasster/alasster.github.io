@@ -2013,7 +2013,7 @@
       logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), logicBinary('and', 'A', 'B'))
     ];
     const tasks = [pick(tier1), pick(tier2), pick(tier3)];
-    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, height: 360 }));
+    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, zoom: 1 }));
     const solved = tasks.map(() => false);
     let current = 0;
     let pendingFrom = null;
@@ -2080,12 +2080,13 @@
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">+ НЕ</button>
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
           <span style="margin-left:auto;display:inline-flex;gap:6px;">
-            <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-70" aria-label="Уменьшить область">−</button>
-            <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="70" aria-label="Увеличить область">+</button>
+            <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-0.15" aria-label="Уменьшить масштаб">−</button>
+            <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="0.15" aria-label="Увеличить масштаб">+</button>
           </span>
         </div>
         <div class="q2-cb-layout">
-          <div class="q2-cb-canvas" data-cb-canvas style="height:${st.height}px;">
+          <div class="q2-cb-canvas" data-cb-canvas>
+            <div data-cb-stage style="position:absolute;inset:0;transform:scale(${st.zoom});transform-origin:0 0;width:${100 / st.zoom}%;height:${100 / st.zoom}%;">
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
@@ -2099,6 +2100,7 @@
                 : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
               return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${gateShape(g.op)}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
             }).join('')}
+            </div>
           </div>
           <div class="q2-cb-table-box">
             <h4>Таблица истинности</h4>
@@ -2180,7 +2182,7 @@
 
       panel.querySelectorAll('[data-cb-size]').forEach(btn => {
         btn.addEventListener('click', () => {
-          st.height = Math.max(260, Math.min(640, st.height + Number(btn.dataset.cbSize)));
+          st.zoom = Math.max(0.6, Math.min(1.5, Number((st.zoom + Number(btn.dataset.cbSize)).toFixed(2))));
           render(idx);
         });
       });
