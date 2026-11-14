@@ -1957,9 +1957,9 @@ body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .q2-feedback-s
 .q2-overline {
   display: inline-block;
   border-top: 2px solid currentColor;
-  padding: .09em .12em 0;
-  margin: .15em .04em 0;
-  line-height: 1.35;
+  padding: .06em .1em 0;
+  margin: 0 .04em;
+  line-height: 1.05;
   white-space: nowrap;
   vertical-align: baseline;
 }
