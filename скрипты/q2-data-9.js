@@ -703,7 +703,7 @@
         <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
       </filter>
     </defs>
-    <rect x="8" y="8" width="174" height="96" rx="14" fill="#f3f4fa" stroke="#e2e8f0" stroke-width="1" filter="url(#q2-inset-card)"/>
+    <rect x="8" y="8" width="174" height="96" rx="14" fill="#eceef8" stroke="none" filter="url(#q2-inset-card)"/>
     <text x="95" y="27" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5b21b6">И (AND)</text>
     <line x1="26" y1="46" x2="54" y2="46" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
     <line x1="26" y1="62" x2="54" y2="62" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
@@ -712,7 +712,7 @@
     <text x="148" y="58" font-size="11" font-weight="700" fill="#64748b">AB</text>
     <text x="95" y="92" text-anchor="middle" font-size="9.5" font-weight="600" fill="#475569">D-образная · 1 только при двух 1</text>
 
-    <rect x="193" y="8" width="174" height="96" rx="14" fill="#f3f4fa" stroke="#e2e8f0" stroke-width="1" filter="url(#q2-inset-card)"/>
+    <rect x="193" y="8" width="174" height="96" rx="14" fill="#eceef8" stroke="none" filter="url(#q2-inset-card)"/>
     <text x="280" y="27" text-anchor="middle" font-size="11.5" font-weight="800" fill="#0e7490">ИЛИ (OR)</text>
     <line x1="211" y1="46" x2="241" y2="46" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
     <line x1="211" y1="62" x2="241" y2="62" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
@@ -721,7 +721,7 @@
     <text x="336" y="58" font-size="11" font-weight="700" fill="#64748b">A+B</text>
     <text x="280" y="92" text-anchor="middle" font-size="9.5" font-weight="600" fill="#475569">Щитовидная · 1 при любой 1</text>
 
-    <rect x="378" y="8" width="174" height="96" rx="14" fill="#f3f4fa" stroke="#e2e8f0" stroke-width="1" filter="url(#q2-inset-card)"/>
+    <rect x="378" y="8" width="174" height="96" rx="14" fill="#eceef8" stroke="none" filter="url(#q2-inset-card)"/>
     <text x="465" y="27" text-anchor="middle" font-size="11.5" font-weight="800" fill="#b45309">НЕ (NOT)</text>
     <line x1="398" y1="54" x2="428" y2="54" stroke="#f59e0b" stroke-width="2" class="q2-hero-wire-anim"/>
     <polygon points="428,38 428,70 458,54" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
