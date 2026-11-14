@@ -148,7 +148,7 @@
     <text x="230" y="310" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">три переменные → 2³ = 8 наборов; заполняем столбцы A → B → C</text>
   </svg>`;
 
-  const LOCK3_SVG = `<svg viewBox="0 0 210 128" role="img" aria-label="3D кодовый замок из трёх барабанов: перебор от 000 до 111">
+  const LOCK3_SVG = `<svg viewBox="0 0 340 128" role="img" aria-label="3D кодовый замок из трёх барабанов: перебор от 000 до 111">
     <defs>
       <linearGradient id="lock-drum" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="rgba(100,116,139,.44)"/>
@@ -162,31 +162,31 @@
         <stop offset="55%" stop-color="#f1f5f9"/>
         <stop offset="100%" stop-color="#e2e8f0"/>
       </linearGradient>
-      <clipPath id="lock-clip-0"><rect x="26" y="26" width="44" height="90" rx="6"/></clipPath>
-      <clipPath id="lock-clip-1"><rect x="83" y="26" width="44" height="90" rx="6"/></clipPath>
-      <clipPath id="lock-clip-2"><rect x="140" y="26" width="44" height="90" rx="6"/></clipPath>
+      <clipPath id="lock-clip-0"><rect x="20" y="26" width="84" height="90" rx="8"/></clipPath>
+      <clipPath id="lock-clip-1"><rect x="128" y="26" width="84" height="90" rx="8"/></clipPath>
+      <clipPath id="lock-clip-2"><rect x="236" y="26" width="84" height="90" rx="8"/></clipPath>
     </defs>
     <!-- Метки A B C -->
-    <text x="48" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">A</text>
-    <text x="105" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">B</text>
-    <text x="162" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">C</text>
-    <!-- 3 вертикальных барабана с 3 видимыми гранями -->
+    <text x="62" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">A</text>
+    <text x="170" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">B</text>
+    <text x="278" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">C</text>
+    <!-- 3 широких вертикальных барабана -->
     ${[
-      { x: 26, cls: 'q2-lock-a', clip: 'lock-clip-0' },
-      { x: 83, cls: 'q2-lock-b', clip: 'lock-clip-1' },
-      { x: 140, cls: 'q2-lock-c', clip: 'lock-clip-2' }
-    ].map(d => `<rect x="${d.x - 3}" y="23" width="50" height="96" rx="9" fill="#d8e0ee" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>
+      { x: 20, cls: 'q2-lock-a', clip: 'lock-clip-0' },
+      { x: 128, cls: 'q2-lock-b', clip: 'lock-clip-1' },
+      { x: 236, cls: 'q2-lock-c', clip: 'lock-clip-2' }
+    ].map(d => `<rect x="${d.x - 4}" y="23" width="92" height="96" rx="10" fill="#d8e0ee" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>
       <g clip-path="url(#${d.clip})">
         <g class="q2-lock-reel ${d.cls}">
           ${[1, 0, 1, 0].map((val, idx) => {
             const ty = 26 + idx * 30;
-            return `<rect x="${d.x}" y="${ty}" width="44" height="29" fill="url(#lock-tile)"/>
-              <line x1="${d.x}" y1="${ty + 29}" x2="${d.x + 44}" y2="${ty + 29}" stroke="#cbd5e1" stroke-width="1"/>
-              <text x="${d.x + 22}" y="${ty + 21}" text-anchor="middle" font-size="19" font-weight="800" fill="${val ? '#3e55d8' : '#334155'}">${val}</text>`;
+            return `<rect x="${d.x}" y="${ty}" width="84" height="29" fill="url(#lock-tile)"/>
+              <line x1="${d.x}" y1="${ty + 29}" x2="${d.x + 84}" y2="${ty + 29}" stroke="#cbd5e1" stroke-width="1"/>
+              <text x="${d.x + 42}" y="${ty + 21}" text-anchor="middle" font-size="20" font-weight="800" fill="${val ? '#3e55d8' : '#334155'}">${val}</text>`;
           }).join('')}
         </g>
       </g>
-      <rect x="${d.x}" y="26" width="44" height="90" rx="6" fill="url(#lock-drum)" pointer-events="none"/>`).join('')}
+      <rect x="${d.x}" y="26" width="84" height="90" rx="8" fill="url(#lock-drum)" pointer-events="none"/>`).join('')}
   </svg>`;
 
   const GATES_SVG = `<svg viewBox="0 0 470 250" role="img" aria-label="Три базовых логических элемента">
