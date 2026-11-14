@@ -276,7 +276,8 @@ body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
   border: none !important;
 }
 
-.q2-teaching-table {
+.q2-teaching-table,
+.q2-teaching-table .q2-table-wrap {
   background: transparent !important;
   box-shadow: none !important;
   padding: 0 !important;
