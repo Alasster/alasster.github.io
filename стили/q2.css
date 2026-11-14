@@ -245,14 +245,14 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
   height: 32px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.72);
-  color: #6366f1;
+  background: transparent;
+  color: #475569;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: inset 3px 3px 6px rgba(148, 163, 184, 0.38), inset -3px -3px 6px rgba(255, 255, 255, 0.92);
+  box-shadow: inset 2px 2px 5px rgba(15, 23, 42, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
   transition: transform 0.16s ease, color 0.16s ease;
 }
 
@@ -544,10 +544,10 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.72);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  color: #6366f1;
-  box-shadow: inset 3px 3px 6px rgba(148, 163, 184, 0.38), inset -3px -3px 6px rgba(255, 255, 255, 0.92);
+  color: #475569;
+  box-shadow: inset 2px 2px 5px rgba(15, 23, 42, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
   font-size: 0.82rem;
   font-weight: 800;
 }
