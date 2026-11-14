@@ -163,6 +163,8 @@ body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
   width: 100%;
   height: auto;
   overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .q2-visual-caption {
@@ -186,6 +188,8 @@ body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
   display: block;
   width: 100%;
   height: auto;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .q2-tt3-anim {
