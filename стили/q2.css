@@ -6320,3 +6320,122 @@ body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .q2-rubric-pan
   box-shadow: 0 4px 12px rgba(99, 102, 241, .14), 0 1px 3px rgba(15, 23, 42, .06);
   justify-self: start;
 }
+
+/* Lesson 9-q2-4: recessed surfaces match the lavender page background. */
+html body.lesson-page[data-lesson-id="9-q2-4"] :is(
+  .q2-cb-formula,
+  .q2-notebook-formula,
+  .q2-notebook-tabs,
+  .q2-rubric-panel .rubric-row
+) {
+  background: #EEEBF8 !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-notebook-tab.is-active {
+  background: #FFFFFF !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-hero-slide .q2-visual {
+  background: var(--lesson-card-surface, #FCFAFF) !important;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 8px 8px 22px rgba(185, 175, 215, 0.7),
+    3px 3px 8px rgba(185, 175, 215, 0.45),
+    -8px -8px 22px rgba(255, 255, 255, 0.98),
+    -3px -3px 8px rgba(255, 255, 255, 0.98) !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-hero-slide .q2-visual svg > rect {
+  stroke: none;
+  fill: none;
+}
+
+/* Keep circuit zoom stable in every pointer state, including after rendering. */
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-circuit-builder .q2-cb-node,
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-circuit-builder .q2-cb-node:hover {
+  transition: none !important;
+  animation: none !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-canvas {
+  background-color: #EEEBF8;
+  background-image: radial-gradient(rgba(185, 175, 215, .5) 1px, transparent 1px);
+  border: none;
+  box-shadow: inset 4px 4px 9px rgba(185, 175, 215, .45),
+    inset -4px -4px 9px rgba(255, 255, 255, .95);
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-table-box {
+  background: #FCFAFF;
+  border: none;
+  box-shadow: 6px 6px 14px rgba(185, 175, 215, .5),
+    -6px -6px 14px rgba(255, 255, 255, .95);
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-node.is-fixed {
+  transform-origin: left center;
+  background: #FCFAFF;
+  border: none;
+  box-shadow: 3px 3px 7px rgba(185, 175, 215, .55),
+    -3px -3px 7px rgba(255, 255, 255, .95);
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-node[data-cb-node="Y"] {
+  transform-origin: right center;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-toolbar .q2-btn {
+  background: #FCFAFF !important;
+  border: none !important;
+  box-shadow: 3px 3px 7px rgba(185, 175, 215, .5),
+    -3px -3px 7px rgba(255, 255, 255, .95) !important;
+  transform: none !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-toolbar .q2-btn:active {
+  background: #EEEBF8 !important;
+  box-shadow: inset 2px 2px 5px rgba(185, 175, 215, .5),
+    inset -2px -2px 5px rgba(255, 255, 255, .95) !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-tt th {
+  background: #EEEBF8 !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] #q2-root .q2-rubric-panel .rubric-row,
+html body.lesson-page[data-lesson-id="9-q2-4"] #q2-root .q2-rubric-panel .rubric-row:hover {
+  background: #EEEBF8 !important;
+  border: none !important;
+  box-shadow: inset 4px 4px 9px rgba(185, 175, 215, .5),
+    inset -4px -4px 9px rgba(255, 255, 255, .95) !important;
+}
+
+/* The truth table itself fills the editor height, without an outer card. */
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-layout {
+  align-items: stretch;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] #q2-root .q2-cb-table-box {
+  display: flex;
+  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-table-box h4 {
+  display: none;
+}
+
+html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-tt {
+  height: 330px;
+  margin: 0 !important;
+  box-sizing: border-box;
+  align-self: stretch;
+}
+
+@media (max-width: 780px) {
+  html body.lesson-page[data-lesson-id="9-q2-4"] .q2-cb-table-box {
+    min-height: 330px;
+  }
+}

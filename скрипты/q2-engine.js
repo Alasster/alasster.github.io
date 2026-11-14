@@ -2102,15 +2102,15 @@
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
-            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:${Math.round(68 / st.zoom)}px;cursor:pointer;transform:scale(${st.zoom});" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
-            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:${Math.round(210 / st.zoom)}px;cursor:pointer;transform:scale(${st.zoom});" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
-            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:${Math.round(139 / st.zoom)}px;transform:scale(${st.zoom});">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:68px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:210px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;transform:scale(${st.zoom}) !important;">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
             ${st.gates.map(g => {
               const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : 'НЕ';
               const inPorts = g.op === 'not'
                 ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
                 : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
-              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;transform:scale(${st.zoom});">${inPorts}${gateShape(g.op)}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
+              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;transform:scale(${st.zoom}) !important;">${inPorts}${gateShape(g.op)}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
             }).join('')}
             </div>
           </div>
@@ -2312,43 +2312,27 @@
 
       panel.querySelector('[data-cb-check]').addEventListener('click', () => {
         const yWire = st.wires.find(w => w.to === 'Y:0');
-        if (!yWire) {
-          feedback.className = 'q2-feedback is-bad';
-          feedback.textContent = 'Выход Y ещё не подключён. Проведите стрелку к Y.';
-          return;
-        }
-        const evalSource = (src, A, B, visiting) => {
-          if (src === 'A') return A;
-          if (src === 'B') return B;
-          if (visiting.has(src)) return null;
-          const gate = st.gates.find(g => g.id === src);
-          if (!gate) return null;
-          visiting.add(src);
-          const w0 = st.wires.find(w => w.to === `${src}:0`);
-          if (!w0) return null;
-          const v0 = evalSource(w0.from, A, B, new Set(visiting));
-          if (v0 === null) return null;
-          if (gate.op === 'not') return 1 - v0;
-          const w1 = st.wires.find(w => w.to === `${src}:1`);
-          if (!w1) return null;
-          const v1 = evalSource(w1.from, A, B, new Set(visiting));
-          if (v1 === null) return null;
-          return gate.op === 'and' ? (v0 & v1) : (v0 | v1);
-        };
-        const rows = [[0, 0], [0, 1], [1, 0], [1, 1]];
-        for (const [A, B] of rows) {
-          const got = evalSource(yWire.from, A, B, new Set());
-          if (got === null) {
-            feedback.className = 'q2-feedback is-bad';
-            feedback.textContent = 'Не все входы элементов подключены или в схеме есть петля.';
-            return;
-          }
+        const results = ttRows.map(([A, B]) => {
+          const got = yWire ? evalSource(yWire.from, A, B, new Set()) : null;
           const expected = logicValue(tasks[idx], A, B, 0);
-          if (got !== expected) {
-            feedback.className = 'q2-feedback is-bad';
-            feedback.textContent = `На наборе A=${A}, B=${B} схема даёт ${got}, а должно быть ${expected}.`;
-            return;
-          }
+          return { A, B, got, expected, ok: got !== null && got === expected };
+        });
+        panel.querySelectorAll('.q2-cb-tt tbody tr').forEach((row, i) => {
+          row.classList.toggle('is-match', results[i].ok);
+          row.classList.toggle('is-mismatch', !results[i].ok);
+          row.setAttribute('aria-label', `A=${results[i].A}, B=${results[i].B}: ${results[i].ok ? 'верно' : 'ошибка'}`);
+        });
+        solved[idx] = results.every(r => r.ok);
+        tabs[idx].classList.toggle('is-done', solved[idx]);
+        const failed = results.find(r => !r.ok);
+        if (failed) {
+          feedback.className = 'q2-feedback is-bad';
+          feedback.textContent = !yWire
+            ? 'Выход Y ещё не подключён. Проведите стрелку к Y.'
+            : failed.got === null
+              ? 'Не все входы элементов подключены или в схеме есть петля.'
+              : `На наборе A=${failed.A}, B=${failed.B} схема даёт ${failed.got}, а должно быть ${failed.expected}.`;
+          return;
         }
         solved[idx] = true;
         tabs[idx].classList.add('is-done');
