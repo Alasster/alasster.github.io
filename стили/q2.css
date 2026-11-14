@@ -6139,8 +6139,9 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   text-align: center;
   padding: 12px 16px;
   border-radius: 14px;
-  background: var(--bg-soft, #f5f3ff);
-  border: 1px solid var(--border, #e2e8f0);
+  background: #eceef8;
+  border: none;
+  box-shadow: inset 3px 4px 10px rgba(148, 163, 184, .45), inset -3px -3px 8px rgba(255, 255, 255, .9);
   margin-bottom: 12px;
 }
 .q2-cb-layout {
