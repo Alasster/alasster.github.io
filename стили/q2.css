@@ -226,6 +226,10 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
   height: auto;
 }
 
+.q2-slide .lead {
+  max-width: none;
+}
+
 .q2-svg-wrap svg[aria-label*="кодовый замок"] {
   max-height: 115px;
   width: 100%;
