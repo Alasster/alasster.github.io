@@ -1748,12 +1748,13 @@
     if (node.op === 'not') return `НЕ (${logicText(node.child)})`;
     return `(${logicText(node.left)} ${logicSign[node.op]} ${logicText(node.right)})`;
   }
-  function logicValue(node, A, B) {
+  function logicValue(node, A, B, C) {
     if (node === 'A') return A;
     if (node === 'B') return B;
-    if (node.op === 'not') return 1 - logicValue(node.child, A, B);
-    const left = logicValue(node.left, A, B);
-    const right = logicValue(node.right, A, B);
+    if (node === 'C') return C;
+    if (node.op === 'not') return 1 - logicValue(node.child, A, B, C);
+    const left = logicValue(node.left, A, B, C);
+    const right = logicValue(node.right, A, B, C);
     return node.op === 'and' ? left & right : left | right;
   }
   function logicColumns(node, result = []) {
