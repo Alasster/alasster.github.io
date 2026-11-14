@@ -2085,8 +2085,8 @@
           </span>
         </div>
         <div class="q2-cb-layout">
-          <div class="q2-cb-canvas" data-cb-canvas style="height:${Math.round(310 * st.zoom)}px;">
-            <div data-cb-stage style="position:absolute;inset:0;transform:scale(${st.zoom});transform-origin:0 0;width:${100 / st.zoom}%;height:310px;">
+          <div class="q2-cb-canvas" data-cb-canvas>
+            <div data-cb-stage style="position:absolute;inset:0;">
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
@@ -2098,7 +2098,7 @@
               const inPorts = g.op === 'not'
                 ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
                 : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
-              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${gateShape(g.op)}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
+              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;transform:scale(${st.zoom});">${inPorts}${gateShape(g.op)}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
             }).join('')}
             </div>
           </div>
@@ -2128,12 +2128,9 @@
       const feedback = panel.querySelector('[data-cb-feedback]');
 
       const drawWires = () => {
-        const stage = panel.querySelector('[data-cb-stage]');
-        const rect = stage.getBoundingClientRect();
+        const rect = canvas.getBoundingClientRect();
         if (!rect.width || !rect.height) return;
-        const w = rect.width / st.zoom;
-        const h = rect.height / st.zoom;
-        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
         svg.querySelectorAll('path[data-wire]').forEach(p => p.remove());
         panel.querySelectorAll('.q2-cb-port').forEach(p => p.classList.remove('is-connected'));
         st.wires.forEach(wire => {
@@ -2142,10 +2139,8 @@
           if (!fromEl || !toEl) return;
           fromEl.classList.add('is-connected');
           toEl.classList.add('is-connected');
-          const aRaw = portPos(rect, fromEl);
-          const bRaw = portPos(rect, toEl);
-          const a = { x: aRaw.x / st.zoom, y: aRaw.y / st.zoom };
-          const b = { x: bRaw.x / st.zoom, y: bRaw.y / st.zoom };
+          const a = portPos(rect, fromEl);
+          const b = portPos(rect, toEl);
           const dx = Math.max(36, Math.abs(b.x - a.x) * 0.45);
           const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
           path.setAttribute('data-wire', '1');
