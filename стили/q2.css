@@ -6129,6 +6129,9 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   gap: 6px;
   margin-bottom: 12px;
 }
+.q2-circuit-builder .q2-notebook-tabs {
+  margin-bottom: 14px;
+}
 .q2-cb-formula {
   display: flex;
   align-items: center;
