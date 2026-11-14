@@ -740,9 +740,9 @@ function renderUsersRows(users) {
 
     const avatar = document.createElement('span');
 
-    avatar.style.cssText = 'color: var(--primary); font-size: 0.85rem;';
+    avatar.style.cssText = 'color: var(--primary); display: inline-flex; flex: 0 0 16px;';
 
-    avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
+    avatar.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';
 
     const nameText = document.createElement('span');
 
@@ -984,7 +984,7 @@ function renderUsersRows(users) {
 
     passBtn.type = 'button';
 
-    passBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-6 6 6-6m-6 6a5.5 5.5 0 1 0-7.78 7.78 5.5 5.5 0 0 0 7.78-7.78ZM8.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg> <span>Пароль</span>';
+    passBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1"/><path d="M12 16v2"/></svg> <span>Пароль</span>';
 
     passBtn.title = 'Задать новый пароль';
 
