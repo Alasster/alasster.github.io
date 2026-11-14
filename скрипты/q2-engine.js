@@ -2085,8 +2085,8 @@
           </span>
         </div>
         <div class="q2-cb-layout">
-          <div class="q2-cb-canvas" data-cb-canvas>
-            <div data-cb-stage style="position:absolute;inset:0;transform:scale(${st.zoom});transform-origin:0 0;width:${100 / st.zoom}%;height:${100 / st.zoom}%;">
+          <div class="q2-cb-canvas" data-cb-canvas style="height:${Math.round(310 * st.zoom)}px;">
+            <div data-cb-stage style="position:absolute;inset:0;transform:scale(${st.zoom});transform-origin:0 0;width:${100 / st.zoom}%;height:310px;">
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
@@ -2128,19 +2128,24 @@
       const feedback = panel.querySelector('[data-cb-feedback]');
 
       const drawWires = () => {
-        const rect = canvas.getBoundingClientRect();
+        const stage = panel.querySelector('[data-cb-stage]');
+        const rect = stage.getBoundingClientRect();
         if (!rect.width || !rect.height) return;
-        svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+        const w = rect.width / st.zoom;
+        const h = rect.height / st.zoom;
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
         svg.querySelectorAll('path[data-wire]').forEach(p => p.remove());
         panel.querySelectorAll('.q2-cb-port').forEach(p => p.classList.remove('is-connected'));
-        st.wires.forEach(w => {
-          const fromEl = canvas.querySelector(`[data-port-out="${w.from}"]`);
-          const toEl = canvas.querySelector(`[data-port-in="${w.to}"]`);
+        st.wires.forEach(wire => {
+          const fromEl = canvas.querySelector(`[data-port-out="${wire.from}"]`);
+          const toEl = canvas.querySelector(`[data-port-in="${wire.to}"]`);
           if (!fromEl || !toEl) return;
           fromEl.classList.add('is-connected');
           toEl.classList.add('is-connected');
-          const a = portPos(rect, fromEl);
-          const b = portPos(rect, toEl);
+          const aRaw = portPos(rect, fromEl);
+          const bRaw = portPos(rect, toEl);
+          const a = { x: aRaw.x / st.zoom, y: aRaw.y / st.zoom };
+          const b = { x: bRaw.x / st.zoom, y: bRaw.y / st.zoom };
           const dx = Math.max(36, Math.abs(b.x - a.x) * 0.45);
           const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
           path.setAttribute('data-wire', '1');

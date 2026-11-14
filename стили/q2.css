@@ -6257,10 +6257,9 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   cursor: pointer;
   padding: 0;
   z-index: 3;
-  transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
 }
-.q2-cb-port:hover { transform: scale(1.22); border-color: #4f46e5; }
-.q2-cb-port.is-active { background: #4f46e5; border-color: #312e81; transform: scale(1.25); }
+.q2-cb-port:hover { border-color: #4f46e5; background: #eef2ff; }
+.q2-cb-port.is-active { background: #4f46e5; border-color: #312e81; }
 .q2-cb-port.is-connected { background: #6366f1; border-color: #4338ca; }
 .q2-cb-port-out { right: -7px; top: 50%; margin-top: -7px; }
 .q2-cb-port-in0 { left: -7px; top: 50%; margin-top: -7px; }
