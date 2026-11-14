@@ -276,6 +276,12 @@ body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
   border: none !important;
 }
 
+.q2-teaching-table {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
 .q2-svg-wrap svg[aria-label*="кодовый замок"] {
   max-height: 115px;
   width: 100%;
