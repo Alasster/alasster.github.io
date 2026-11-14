@@ -148,60 +148,54 @@
     <text x="230" y="310" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">три переменные → 2³ = 8 наборов; заполняем столбцы A → B → C</text>
   </svg>`;
 
-  const LOCK3_SVG = `<svg viewBox="0 0 210 142" role="img" aria-label="3D кодовый замок из трёх отсеков: перебор от 000 до 111">
+  const LOCK3_SVG = `<svg viewBox="0 0 210 132" role="img" aria-label="3D кодовый замок из трёх барабанов: перебор от 000 до 111">
     <defs>
-      <linearGradient id="lock-shackle" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#94a3b8"/>
-        <stop offset="35%" stop-color="#f8fafc"/>
-        <stop offset="70%" stop-color="#cbd5e1"/>
-        <stop offset="100%" stop-color="#64748b"/>
-      </linearGradient>
       <linearGradient id="lock-body" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="100%" stop-color="#e0e7ff"/>
-      </linearGradient>
-      <linearGradient id="lock-depth" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#c7d2fe"/>
-        <stop offset="100%" stop-color="#818cf8"/>
+        <stop offset="0%" stop-color="#2b313c"/>
+        <stop offset="100%" stop-color="#1e232b"/>
       </linearGradient>
       <linearGradient id="lock-drum" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="rgba(15,23,42,.20)"/>
-        <stop offset="22%" stop-color="rgba(255,255,255,.0)"/>
-        <stop offset="50%" stop-color="rgba(255,255,255,.35)"/>
-        <stop offset="78%" stop-color="rgba(255,255,255,.0)"/>
-        <stop offset="100%" stop-color="rgba(15,23,42,.22)"/>
+        <stop offset="0%" stop-color="rgba(10,14,22,.68)"/>
+        <stop offset="28%" stop-color="rgba(10,14,22,.16)"/>
+        <stop offset="50%" stop-color="rgba(255,255,255,.12)"/>
+        <stop offset="72%" stop-color="rgba(10,14,22,.16)"/>
+        <stop offset="100%" stop-color="rgba(10,14,22,.72)"/>
+      </linearGradient>
+      <linearGradient id="lock-tile" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f8fafc"/>
+        <stop offset="50%" stop-color="#e2e8f0"/>
+        <stop offset="100%" stop-color="#cbd5e1"/>
       </linearGradient>
       <filter id="lock-shadow" x="-15%" y="-15%" width="130%" height="140%">
-        <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#3e55d8" flood-opacity="0.16"/>
+        <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#1e293b" flood-opacity="0.22"/>
       </filter>
-      <clipPath id="lock-clip-0"><rect x="34" y="66" width="38" height="38" rx="8"/></clipPath>
-      <clipPath id="lock-clip-1"><rect x="86" y="66" width="38" height="38" rx="8"/></clipPath>
-      <clipPath id="lock-clip-2"><rect x="138" y="66" width="38" height="38" rx="8"/></clipPath>
+      <clipPath id="lock-clip-0"><rect x="26" y="28" width="44" height="90" rx="6"/></clipPath>
+      <clipPath id="lock-clip-1"><rect x="83" y="28" width="44" height="90" rx="6"/></clipPath>
+      <clipPath id="lock-clip-2"><rect x="140" y="28" width="44" height="90" rx="6"/></clipPath>
     </defs>
-    <!-- Дужка замка -->
-    <path d="M68 48 V32 C68 15 142 15 142 32 V48" fill="none" stroke="url(#lock-shackle)" stroke-width="11" stroke-linecap="round"/>
-    <path d="M71 46 V32 C71 20 139 20 139 32 V46" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- 3D глубина корпуса -->
-    <rect x="20" y="48" width="174" height="82" rx="18" fill="url(#lock-depth)" filter="url(#lock-shadow)"/>
-    <!-- Лицевая панель корпуса -->
-    <rect x="16" y="42" width="174" height="82" rx="18" fill="url(#lock-body)" stroke="rgba(255,255,255,.95)" stroke-width="1.5"/>
+    <!-- Корпус без дужки -->
+    <rect x="12" y="6" width="186" height="120" rx="16" fill="url(#lock-body)" stroke="rgba(255,255,255,.14)" stroke-width="1.5" filter="url(#lock-shadow)"/>
     <!-- Метки A B C -->
-    <text x="53" y="59" text-anchor="middle" font-size="10.5" font-weight="800" fill="#6366f1" letter-spacing="0.06em">A</text>
-    <text x="105" y="59" text-anchor="middle" font-size="10.5" font-weight="800" fill="#6366f1" letter-spacing="0.06em">B</text>
-    <text x="157" y="59" text-anchor="middle" font-size="10.5" font-weight="800" fill="#6366f1" letter-spacing="0.06em">C</text>
-    <!-- 3 барабана -->
+    <text x="48" y="21" text-anchor="middle" font-size="10.5" font-weight="800" fill="#94a3b8" letter-spacing="0.08em">A</text>
+    <text x="105" y="21" text-anchor="middle" font-size="10.5" font-weight="800" fill="#94a3b8" letter-spacing="0.08em">B</text>
+    <text x="162" y="21" text-anchor="middle" font-size="10.5" font-weight="800" fill="#94a3b8" letter-spacing="0.08em">C</text>
+    <!-- 3 вертикальных барабана с 3 видимыми гранями -->
     ${[
-      { x: 34, cls: 'q2-lock-a', clip: 'lock-clip-0' },
-      { x: 86, cls: 'q2-lock-b', clip: 'lock-clip-1' },
-      { x: 138, cls: 'q2-lock-c', clip: 'lock-clip-2' }
-    ].map(d => `<rect x="${d.x}" y="66" width="38" height="38" rx="8" fill="#f8fafc" stroke="rgba(99,102,241,.25)" stroke-width="1.2"/>
+      { x: 26, cls: 'q2-lock-a', clip: 'lock-clip-0' },
+      { x: 83, cls: 'q2-lock-b', clip: 'lock-clip-1' },
+      { x: 140, cls: 'q2-lock-c', clip: 'lock-clip-2' }
+    ].map(d => `<rect x="${d.x - 3}" y="25" width="50" height="96" rx="8" fill="#0f172a" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
       <g clip-path="url(#${d.clip})">
         <g class="q2-lock-reel ${d.cls}">
-          <text x="${d.x + 19}" y="92" text-anchor="middle" font-size="21" font-weight="800" fill="#334155">0</text>
-          <text x="${d.x + 19}" y="130" text-anchor="middle" font-size="21" font-weight="800" fill="#3e55d8">1</text>
+          ${[1, 0, 1, 0].map((val, idx) => {
+            const ty = 28 + idx * 30;
+            return `<rect x="${d.x}" y="${ty}" width="44" height="29" fill="url(#lock-tile)"/>
+              <line x1="${d.x}" y1="${ty + 29}" x2="${d.x + 44}" y2="${ty + 29}" stroke="#64748b" stroke-width="1"/>
+              <text x="${d.x + 22}" y="${ty + 21}" text-anchor="middle" font-size="19" font-weight="800" fill="${val ? '#3e55d8' : '#1e293b'}">${val}</text>`;
+          }).join('')}
         </g>
       </g>
-      <rect x="${d.x}" y="66" width="38" height="38" rx="8" fill="url(#lock-drum)" pointer-events="none"/>`).join('')}
+      <rect x="${d.x}" y="28" width="44" height="90" rx="6" fill="url(#lock-drum)" pointer-events="none"/>`).join('')}
   </svg>`;
 
   const GATES_SVG = `<svg viewBox="0 0 470 250" role="img" aria-label="Три базовых логических элемента">

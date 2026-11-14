@@ -239,17 +239,17 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
 
 @keyframes q2-lock-a {
   0%, 46%, 100% { transform: translateY(0); }
-  50%, 96% { transform: translateY(-38px); }
+  50%, 96% { transform: translateY(-30px); }
 }
 
 @keyframes q2-lock-b {
   0%, 21%, 50%, 71%, 100% { transform: translateY(0); }
-  25%, 46%, 75%, 96% { transform: translateY(-38px); }
+  25%, 46%, 75%, 96% { transform: translateY(-30px); }
 }
 
 @keyframes q2-lock-c {
   0%, 8.5%, 25%, 33.5%, 50%, 58.5%, 75%, 83.5%, 100% { transform: translateY(0); }
-  12.5%, 21%, 37.5%, 46%, 62.5%, 71%, 87.5%, 96% { transform: translateY(-38px); }
+  12.5%, 21%, 37.5%, 46%, 62.5%, 71%, 87.5%, 96% { transform: translateY(-30px); }
 }
 
 @media (max-width: 720px) {
