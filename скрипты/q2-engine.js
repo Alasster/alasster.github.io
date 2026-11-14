@@ -2058,6 +2058,12 @@
       const yWireNow = st.wires.find(w => w.to === 'Y:0');
       const liveY = yWireNow ? evalSource(yWireNow.from, st.a, st.b, new Set()) : null;
       const ttRows = [[0, 0], [0, 1], [1, 0], [1, 1]];
+      const ttCols = logicColumns(tasks[idx]);
+      const gateShape = op => {
+        if (op === 'and') return '<svg width="54" height="40" viewBox="0 0 54 40" aria-hidden="true"><path d="M8 4 H28 A16 16 0 0 1 28 36 H8 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.2"/><text x="23" y="24" text-anchor="middle" font-size="11" font-weight="800" fill="#5b21b6">И</text></svg>';
+        if (op === 'or') return '<svg width="54" height="40" viewBox="0 0 54 40" aria-hidden="true"><path d="M8 4 Q18 20 8 36 Q34 36 48 20 Q34 4 8 4 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2.2"/><text x="26" y="24" text-anchor="middle" font-size="10.5" font-weight="800" fill="#0e7490">ИЛИ</text></svg>';
+        return '<svg width="54" height="40" viewBox="0 0 54 40" aria-hidden="true"><polygon points="8,4 8,36 38,20" fill="#fffbeb" stroke="#d97706" stroke-width="2.2"/><circle cx="43" cy="20" r="4" fill="#fffbeb" stroke="#d97706" stroke-width="2.2"/><text x="19" y="24" text-anchor="middle" font-size="10" font-weight="800" fill="#b45309">НЕ</text></svg>';
+      };
       panel.innerHTML = `
         <div class="q2-cb-formula">
           <div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[idx], true))}">${logicHTML(tasks[idx], true)}</div>
@@ -2081,19 +2087,19 @@
               const inPorts = g.op === 'not'
                 ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
                 : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
-              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${label}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
+              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${gateShape(g.op)}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
             }).join('')}
           </div>
           <div class="q2-cb-table-box">
             <h4>Таблица истинности</h4>
             <table class="q2-cb-tt">
-              <thead><tr><th>A</th><th>B</th><th>Y</th></tr></thead>
+              <thead><tr><th>A</th><th>B</th>${ttCols.map((c, ci) => `<th>${ci === ttCols.length - 1 ? 'Y' : logicHTML(c, true)}</th>`).join('')}</tr></thead>
               <tbody>
                 ${ttRows.map(([A, B]) => {
                   const exp = logicValue(tasks[idx], A, B, 0);
                   const isCur = A === st.a && B === st.b;
                   const cls = isCur && liveY !== null ? (liveY === exp ? 'is-match' : 'is-mismatch') : '';
-                  return `<tr class="${cls}"><td>${A}</td><td>${B}</td><td>${exp}</td></tr>`;
+                  return `<tr class="${cls}"><td>${A}</td><td>${B}</td>${ttCols.map(c => `<td>${logicValue(c, A, B, 0)}</td>`).join('')}</tr>`;
                 }).join('')}
               </tbody>
             </table>
@@ -2173,6 +2179,43 @@
       });
 
       panel.querySelectorAll('[data-port-out]').forEach(port => {
+        port.addEventListener('pointerdown', e => {
+          e.stopPropagation();
+          const fromId = port.dataset.portOut;
+          const rect = canvas.getBoundingClientRect();
+          const start = portPos(rect, port);
+          let moved = false;
+          const preview = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          preview.setAttribute('class', 'q2-cb-wire');
+          preview.setAttribute('stroke-dasharray', '5 4');
+          svg.appendChild(preview);
+          const onMove = ev => {
+            moved = true;
+            const mx = ev.clientX - rect.left;
+            const my = ev.clientY - rect.top;
+            const dx = Math.max(30, Math.abs(mx - start.x) * 0.45);
+            preview.setAttribute('d', `M ${start.x} ${start.y} C ${start.x + dx} ${start.y}, ${mx - dx} ${my}, ${mx} ${my}`);
+          };
+          const onUp = ev => {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            preview.remove();
+            if (!moved) return;
+            const targetEl = document.elementFromPoint(ev.clientX, ev.clientY);
+            const inPort = targetEl && targetEl.closest('[data-port-in]');
+            if (inPort) {
+              const target = inPort.dataset.portIn;
+              if (fromId !== target.split(':')[0]) {
+                st.wires = st.wires.filter(w => w.to !== target);
+                st.wires.push({ from: fromId, to: target });
+                pendingFrom = null;
+                render(idx);
+              }
+            }
+          };
+          window.addEventListener('pointermove', onMove);
+          window.addEventListener('pointerup', onUp);
+        });
         port.addEventListener('click', e => {
           e.stopPropagation();
           const id = port.dataset.portOut;

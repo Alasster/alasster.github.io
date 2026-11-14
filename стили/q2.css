@@ -6213,9 +6213,9 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 72px;
-  height: 48px;
-  padding: 0 12px;
+  min-width: 92px;
+  height: 64px;
+  padding: 4px 10px;
   border-radius: 12px;
   background: #ffffff;
   border: 2px solid #cbd5e1;
@@ -6228,7 +6228,8 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
 }
 .q2-cb-node.is-fixed {
   cursor: default;
-  min-width: 52px;
+  min-width: 60px;
+  height: 46px;
   background: #f8fafc;
   border-color: #94a3b8;
 }
