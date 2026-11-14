@@ -692,52 +692,56 @@
     <text x="215" y="160" font-size="11" font-weight="700" fill="#64748b">¬A</text>
   </svg>`;
 
-  const CIRCUIT_EXAMPLE_SVG = `<svg viewBox="0 0 560 150" role="img" aria-label="Пример построения схемы для выражения A ∧ ¬B">
+  const CIRCUIT_EXAMPLE_SVG = `<svg viewBox="0 0 560 150" role="img" aria-label="Пример построения схемы для выражения A и не B">
     <rect x="10" y="10" width="540" height="130" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-    <text x="280" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A ∧ ¬B → сначала НЕ для B, затем И</text>
+    <text x="272" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A B  →  сначала НЕ для B, затем И</text>
+    <line x1="230" y1="21" x2="241" y2="21" stroke="#334155" stroke-width="1.8"/>
     <rect x="34" y="50" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
     <text x="56" y="70" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">A</text>
     <rect x="34" y="96" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
     <text x="56" y="116" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">B</text>
-    <line x1="78" y1="65" x2="310" y2="65" stroke="#6366f1" stroke-width="2.2"/>
-    <line x1="78" y1="111" x2="154" y2="111" stroke="#f59e0b" stroke-width="2.2"/>
-    <rect x="154" y="92" width="66" height="36" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
-    <text x="187" y="115" text-anchor="middle" font-size="13" font-weight="800" fill="#b45309">НЕ</text>
-    <path d="M220 110 C260 110, 270 84, 310 84" fill="none" stroke="#6366f1" stroke-width="2.2"/>
-    <rect x="310" y="54" width="74" height="42" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
-    <text x="347" y="80" text-anchor="middle" font-size="13" font-weight="800" fill="#5b21b6">И</text>
-    <line x1="384" y1="75" x2="470" y2="75" stroke="#6366f1" stroke-width="2.2"/>
-    <rect x="470" y="60" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-    <text x="492" y="80" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">Y</text>
+    <line x1="78" y1="65" x2="314" y2="65" stroke="#6366f1" stroke-width="2.2"/>
+    <line x1="78" y1="111" x2="162" y2="111" stroke="#f59e0b" stroke-width="2.2"/>
+    <polygon points="162,93 162,129 194,111" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <circle cx="199" cy="111" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <path d="M204 111 C250 111, 270 84, 314 84" fill="none" stroke="#6366f1" stroke-width="2.2"/>
+    <path d="M314 54 H338 A20 20 0 0 1 338 94 H314 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    <line x1="358" y1="74" x2="470" y2="74" stroke="#6366f1" stroke-width="2.2"/>
+    <rect x="470" y="59" width="44" height="30" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="492" y="79" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">Y</text>
   </svg>`;
 
   const CIRCUIT_TWO_EXAMPLES_SVG = `<svg viewBox="0 0 560 250" role="img" aria-label="Два примера схем по двум высказываниям">
     <rect x="10" y="8" width="540" height="110" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-    <text x="280" y="28" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 1: ¬(A ∨ B) — сначала ИЛИ, затем НЕ</text>
+    <text x="280" y="29" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 1: A + B  —  сначала ИЛИ, затем НЕ</text>
+    <line x1="185" y1="16" x2="219" y2="16" stroke="#334155" stroke-width="1.8"/>
     <rect x="32" y="42" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="59" text-anchor="middle" font-size="12" font-weight="800">A</text>
     <rect x="32" y="78" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="95" text-anchor="middle" font-size="12" font-weight="800">B</text>
-    <path d="M72 55 C110 55, 115 64, 155 64" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <path d="M72 91 C110 91, 115 80, 155 80" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <rect x="155" y="52" width="72" height="38" rx="9" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/><text x="191" y="76" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0e7490">ИЛИ</text>
-    <line x1="227" y1="71" x2="305" y2="71" stroke="#f59e0b" stroke-width="2"/>
-    <rect x="305" y="52" width="66" height="38" rx="9" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/><text x="338" y="76" text-anchor="middle" font-size="12.5" font-weight="800" fill="#b45309">НЕ</text>
-    <line x1="371" y1="71" x2="476" y2="71" stroke="#6366f1" stroke-width="2"/>
+    <path d="M72 55 C110 55, 120 63, 162 63" fill="none" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M72 91 C110 91, 120 79, 162 79" fill="none" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M158 52 Q168 71 158 90 Q186 90 202 71 Q186 52 158 52 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+    <line x1="202" y1="71" x2="305" y2="71" stroke="#f59e0b" stroke-width="2"/>
+    <polygon points="305,53 305,89 337,71" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <circle cx="342" cy="71" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <line x1="347" y1="71" x2="476" y2="71" stroke="#6366f1" stroke-width="2"/>
     <rect x="476" y="58" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="496" y="75" text-anchor="middle" font-size="12" font-weight="800">Y</text>
 
     <rect x="10" y="130" width="540" height="112" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-    <text x="280" y="150" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 2: (A ∨ B) ∧ ¬A — параллельно ИЛИ и НЕ, затем И</text>
+    <text x="280" y="151" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 2: (A + B)A  —  параллельно ИЛИ и НЕ, затем И</text>
+    <line x1="190" y1="138" x2="201" y2="138" stroke="#334155" stroke-width="1.8"/>
     <rect x="32" y="164" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="181" text-anchor="middle" font-size="12" font-weight="800">A</text>
     <rect x="32" y="200" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="52" y="217" text-anchor="middle" font-size="12" font-weight="800">B</text>
-    <path d="M72 177 C110 177, 115 170, 155 170" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <path d="M72 213 C110 213, 115 186, 155 186" fill="none" stroke="#06b6d4" stroke-width="2"/>
-    <path d="M72 177 C115 177, 120 215, 165 215" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <rect x="155" y="158" width="72" height="36" rx="9" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/><text x="191" y="181" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0e7490">ИЛИ</text>
-    <rect x="165" y="198" width="62" height="34" rx="9" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/><text x="196" y="220" text-anchor="middle" font-size="12.5" font-weight="800" fill="#b45309">НЕ</text>
-    <path d="M227 176 C265 176, 275 186, 310 186" fill="none" stroke="#6366f1" stroke-width="2"/>
-    <path d="M227 215 C265 215, 275 202, 310 202" fill="none" stroke="#6366f1" stroke-width="2"/>
-    <rect x="310" y="174" width="72" height="38" rx="9" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/><text x="346" y="198" text-anchor="middle" font-size="12.5" font-weight="800" fill="#5b21b6">И</text>
-    <line x1="382" y1="193" x2="476" y2="193" stroke="#6366f1" stroke-width="2"/>
-    <rect x="476" y="180" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="496" y="197" text-anchor="middle" font-size="12" font-weight="800">Y</text>
+    <path d="M72 177 C110 177, 120 169, 162 169" fill="none" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M72 213 C110 213, 120 185, 162 185" fill="none" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M72 177 C115 177, 120 215, 166 215" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <path d="M158 158 Q168 177 158 196 Q186 196 202 177 Q186 158 158 158 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+    <polygon points="166,199 166,231 194,215" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <circle cx="199" cy="215" r="4.2" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <path d="M202 177 C260 177, 275 186, 314 186" fill="none" stroke="#6366f1" stroke-width="2"/>
+    <path d="M204 215 C260 215, 275 202, 314 202" fill="none" stroke="#6366f1" stroke-width="2"/>
+    <path d="M314 174 H338 A20 20 0 0 1 338 214 H314 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    <line x1="358" y1="194" x2="476" y2="194" stroke="#6366f1" stroke-width="2"/>
+    <rect x="476" y="181" width="40" height="26" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="496" y="198" text-anchor="middle" font-size="12" font-weight="800">Y</text>
   </svg>`;
 
   const CIRCUIT_CRITERIA = [
@@ -781,20 +785,19 @@
       },
       {
         k: 'concept',
-        eyebrow: '03 · СХЕМА ВМЕСТО ТАБЛИЦЫ',
-        title: 'Как выражение превращается в схему',
-        lead: 'Вместо таблицы истинности логическое выражение можно нарисовать в виде схемы: слева входы A и B, посередине элементы в порядке действий, справа выход Y.',
+        eyebrow: '03 · ЭЛЕМЕНТЫ И СХЕМА',
+        title: 'Зачем нужны логические элементы',
+        lead: 'Логические элементы заменяют громоздкие таблицы истинности наглядной схемой: вместо перебора строк мы сразу видим, как сигналы A и B преобразуются в результат Y.',
         blocks: [
-          { t: 'svg', svg: CIRCUIT_EXAMPLE_SVG },
+          { t: 'svg', svg: GATES3_HERO_SVG },
           {
-            t: 'cards',
-            cols: 3,
-            items: [
-              { badge: 'Шаг 1', title: 'Входы A и B', text: 'Размещаем слева. От них идут стрелки к элементам.', tone: 'violet' },
-              { badge: 'Шаг 2', title: 'Элементы по порядку', text: 'Сначала строим действие с более высоким приоритетом (скобки или НЕ), затем следующее.', tone: 'cyan' },
-              { badge: 'Шаг 3', title: 'Выход Y', text: 'Выход последнего элемента соединяем с Y справа.', tone: 'green' }
-            ]
-          }
+            t: 'callout',
+            tone: 'info',
+            icon: 'fas fa-microchip',
+            title: 'Три базовые фигуры',
+            text: 'И (D-образная) даёт 1 только при двух 1. ИЛИ (щитовидная) даёт 1 при любой 1. НЕ (треугольник с кружком) переворачивает сигнал. Соединяя их слева направо, можно изобразить любое выражение.'
+          },
+          { t: 'svg', svg: CIRCUIT_EXAMPLE_SVG }
         ]
       },
       {
