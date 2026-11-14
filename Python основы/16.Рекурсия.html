@@ -276,61 +276,61 @@ broken(<span class="cn">3</span>)</pre>
         </div>
 
         <ul class="steps">
-          <li>
+          <li data-python-task-id="task-001">
             <span class="step-num">1</span>
             <div>
               <strong>Обратный отсчёт:</strong> Напиши рекурсивную функцию <span class="ic">countdown(n)</span>, которая выводит числа от <span class="ic">n</span> до <span class="ic">1</span>, а при <span class="ic">n == 0</span> выводит <span class="ic">"Поехали!"</span> и завершает работу (<span class="ic">return</span>). Вызови <span class="ic">countdown(5)</span>.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-002">
             <span class="step-num">2</span>
             <div>
               <strong>Эхо-повторитель (строки + рекурсия):</strong> Создай рекурсивную функцию <span class="ic">repeat_word(word, times)</span>, которая выводит строку <span class="ic">word</span> на экран ровно <span class="ic">times</span> раз (базовый случай: <span class="ic">if times == 0: return</span>).
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-003">
             <span class="step-num">3</span>
             <div>
               <strong>От 1 до N по возрастанию:</strong> Напиши рекурсивную функцию <span class="ic">print_up(n)</span>, которая выводит числа от <span class="ic">1</span> до <span class="ic">n</span>. Подсказка: если вызвать <span class="ic">print_up(n - 1)</span> <strong>перед</strong> <span class="ic">print(n)</span>, числа напечатаются на обратном ходу по возрастанию!
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-004">
             <span class="step-num">4</span>
             <div>
               <strong>Сумма от 1 до N (input + return):</strong> Попроси пользователя ввести число <span class="ic">n = int(input())</span>. Напиши рекурсивную функцию <span class="ic">sum_to(n)</span>, которая возвращает сумму чисел от <span class="ic">1</span> до <span class="ic">n</span>, и выведи ответ в f-строке.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-005">
             <span class="step-num">5</span>
             <div>
               <strong>Факториал числа:</strong> Напиши рекурсивную функцию <span class="ic">factorial(n)</span>, которая возвращает произведение чисел от <span class="ic">1</span> до <span class="ic">n</span> (при <span class="ic">n &lt;= 1</span> возвращает <span class="ic">1</span>). Выведи факториал для числа из <span class="ic">int(input())</span>.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-006">
             <span class="step-num">6</span>
             <div>
               <strong>Возведение в степень:</strong> Напиши рекурсивную функцию <span class="ic">power(a, b)</span>, которая возвращает число <span class="ic">a</span> в целой степени <span class="ic">b</span> без использования <span class="ic">**</span> (база: при <span class="ic">b == 0</span> вернуть <span class="ic">1</span>, шаг: <span class="ic">a * power(a, b - 1)</span>).
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-007">
             <span class="step-num">7</span>
             <div>
               <strong>Количество цифр в числе (// 10):</strong> Напиши рекурсивную функцию <span class="ic">count_digits(n)</span>, которая считает, сколько цифр в положительном целом числе <span class="ic">n</span> (база: если <span class="ic">n &lt; 10</span>, вернуть <span class="ic">1</span>, иначе <span class="ic">1 + count_digits(n // 10)</span>).
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-008">
             <span class="step-num">8</span>
             <div>
               <strong>Сумма цифр числа (% 10 и // 10):</strong> Пользователь вводит число <span class="ic">n = int(input())</span>. Напиши рекурсивную функцию <span class="ic">sum_digits(n)</span>, которая складывает последнюю цифру <span class="ic">n % 10</span> с результатом <span class="ic">sum_digits(n // 10)</span>.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-009">
             <span class="step-num">9</span>
             <div>
               <strong>Сумма элементов списка (срезы + рекурсия):</strong> Дан список чисел <span class="ic">nums = [12, 5, 8, 20, 15]</span>. Напиши рекурсивную функцию <span class="ic">list_sum(arr)</span>, которая возвращает сумму элементов через <span class="ic">arr[0] + list_sum(arr[1:])</span> (база: пустой список возвращает <span class="ic">0</span>).
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-010">
             <span class="step-num">10</span>
             <div>
               <strong>Числа Фибоначчи и разворот строки:</strong> Напиши рекурсивную функцию <span class="ic">fib(n)</span>, которая возвращает <span class="ic">n</span>-е число Фибоначчи (при <span class="ic">n &lt;= 1</span> возвращает <span class="ic">n</span>, иначе <span class="ic">fib(n - 1) + fib(n - 2)</span>). С помощью цикла <span class="ic">for</span> выведи первые 8 чисел Фибоначчи в одну строку через <span class="ic">end=" "</span>.
@@ -401,7 +401,8 @@ print("5! =", factorial(5))
 
 <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
 <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
-<script src="../скрипты/python-basics.js?v=2026-11-07-v12"></script>
+<script src="../скрипты/python-progress.js?v=2026-11-15-v1"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-15-v13"></script>
 </body>
 </html>
 

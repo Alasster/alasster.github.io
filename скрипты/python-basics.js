@@ -414,7 +414,8 @@ function initContentWidgets() {
       const contentDiv = li.querySelector("div") || li;
       const rawText = contentDiv.textContent.replace(/\s+/g, " ").trim();
 
-      if (savedDone.includes(taskNum)) {
+      const taskId = li.dataset.pythonTaskId;
+      if (window.PythonProgress ? PythonProgress.isDone(taskId, taskNum) : savedDone.includes(taskNum)) {
         li.classList.add("task-done");
       }
 
@@ -426,10 +427,12 @@ function initContentWidgets() {
           <button class="task-check-btn" type="button">${savedDone.includes(taskNum) ? '<i class="pb-icon" data-flaticon="check"></i> Выполнено' : '○ Отметить выполненным'}</button>
         `;
         const solveBtn = actions.querySelector(".task-solve-btn");
-        solveBtn.onclick = () => startTaskInEditor(taskNum, rawText);
+        solveBtn.onclick = () => startTaskInEditor(taskNum, rawText, taskId);
 
         const checkBtn = actions.querySelector(".task-check-btn");
-        checkBtn.onclick = () => toggleTaskDone(li, checkBtn, taskNum);
+        checkBtn.onclick = () => window.PythonProgress
+          ? PythonProgress.setDone(taskId, taskNum) : toggleTaskDone(li, checkBtn, taskNum);
+        window.PythonProgress?.bind(taskId, li, checkBtn, taskNum);
 
         contentDiv.appendChild(actions);
       }
@@ -453,7 +456,7 @@ function toggleTaskDone(li, btn, taskNum) {
   try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) {}
 }
 
-function startTaskInEditor(taskNum, taskText) {
+function startTaskInEditor(taskNum, taskText, taskId) {
   const ta = document.getElementById("codeEditor");
   if (!ta) return;
   // Wrap long task description into neat Python comments
@@ -470,7 +473,8 @@ function startTaskInEditor(taskNum, taskText) {
   }
   if (cur) lines.push(cur);
 
-  ta.value = lines.join("\n") + "\n\n# Напиши своё решение ниже:\n\n";
+  const starter = lines.join("\n") + "\n\n# Напиши своё решение ниже:\n\n";
+  ta.value = window.PythonProgress ? PythonProgress.open(taskId, starter) : starter;
   clearErrorHighlight();
   onEditorInput();
   ta.focus();
@@ -496,6 +500,7 @@ function runCodeFromBlock(preId, autoRun = true) {
   const pre = document.getElementById(preId);
   const ta = document.getElementById("codeEditor");
   if (!pre || !ta) return;
+  window.PythonProgress?.detach();
   const text = (pre.innerText || pre.textContent).replace(/\u00a0/g, " ");
   ta.value = text + "\n";
   clearErrorHighlight();
@@ -510,6 +515,7 @@ function runCodeFromBlock(preId, autoRun = true) {
 function loadLessonExample() {
   const ta = document.getElementById("codeEditor");
   if (!ta) return;
+  window.PythonProgress?.detach();
   const code = currentLesson.examples?.default || currentLesson.starter;
   ta.value = code;
   clearErrorHighlight();
@@ -590,7 +596,7 @@ function initCompilerPanel() {
   // Load saved code for this lesson or lesson starter code
   const ta = document.getElementById("codeEditor");
   if (ta) {
-    const savedCode = localStorage.getItem(`py_code_L${currentLesson.num}`);
+    const savedCode = window.PythonProgress ? PythonProgress.lessonDraft() : localStorage.getItem(`py_code_L${currentLesson.num}`);
     if (savedCode && savedCode.trim().length > 0) {
       ta.value = savedCode;
     } else {
@@ -645,6 +651,7 @@ window.resetVfsFiles = resetVfsFiles;
 function resetStarterCode() {
   const ta = document.getElementById("codeEditor");
   if (!ta) return;
+  window.PythonProgress?.detach();
   ta.value = currentLesson.starter;
   clearErrorHighlight();
   onEditorInput();
@@ -854,7 +861,8 @@ function onEditorInput() {
   syncScroll();
   const ta = document.getElementById("codeEditor");
   if (ta && currentLesson) {
-    try { localStorage.setItem(`py_code_L${currentLesson.num}`, ta.value); } catch (e) {}
+    if (window.PythonProgress) PythonProgress.edit(ta.value);
+    else { try { localStorage.setItem(`py_code_L${currentLesson.num}`, ta.value); } catch (e) {} }
   }
 }
 
@@ -1151,6 +1159,7 @@ function stopCodeExecution() {
 }
 
 async function runCode() {
+  window.PythonProgress?.flush();
   const ta = document.getElementById("codeEditor");
   const outEl = document.getElementById("output");
   const status = document.getElementById("outputStatus");
@@ -1346,6 +1355,7 @@ window.quiz = quiz;
 // ── INITIALIZATION ──
 function initPythonBasicsApp() {
   initNavigation();
+  window.PythonProgress?.init(currentLesson.num);
   initContentWidgets();
   initCompilerPanel();
   initDivider();

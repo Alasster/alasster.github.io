@@ -158,61 +158,61 @@ f.<span class="tk-bi">close</span>()</pre>
         </div>
 
         <ul class="steps">
-          <li>
+          <li data-python-task-id="task-001">
             <span class="step-num">1</span>
             <div>
               <strong>Безопасное чтение (with open):</strong> Открой файл <span class="ic">"test.txt"</span> с помощью менеджера контекста <span class="ic">with open("test.txt", "r") as f:</span>, прочитай весь текст методом <span class="ic">f.read()</span> и выведи его.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-002">
             <span class="step-num">2</span>
             <div>
               <strong>Запись в новый файл ("w"):</strong> Создай файл <span class="ic">"hello.txt"</span> в режиме <span class="ic">"w"</span>, запиши в него две строки текста через <span class="ic">f.write()</span>, а затем прочитай и выведи содержимое файла.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-003">
             <span class="step-num">3</span>
             <div>
               <strong>Дозапись в конец ("a"):</strong> Открой файл <span class="ic">"notes.txt"</span> в режиме добавления <span class="ic">"a"</span> и допиши туда строку <span class="ic">"Новая заметка\n"</span>. Прочитай файл и убедись, что старые данные сохранились.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-004">
             <span class="step-num">4</span>
             <div>
               <strong>Подсчёт символов и слов:</strong> Прочитай файл <span class="ic">"data.txt"</span> и выведи на экран количество символов (<span class="ic">len(text)</span>) и количество слов (<span class="ic">len(text.split())</span>) в нём.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-005">
             <span class="step-num">5</span>
             <div>
               <strong>Список строк (.readlines):</strong> Прочитай файл <span class="ic">"story.txt"</span> методом <span class="ic">.readlines()</span> так, чтобы каждая строка стала элементом списка. Выведи общее число строк и вторую строку без лишнего переноса (<span class="ic">.strip()</span>).
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-006">
             <span class="step-num">6</span>
             <div>
               <strong>Запись ввода пользователя в файл:</strong> Попроси пользователя в цикле <span class="ic">for</span> ввести три любимых цвета через <span class="ic">input()</span> и запиши каждый цвет в файл <span class="ic">"colors.txt"</span> на новой строке.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-007">
             <span class="step-num">7</span>
             <div>
               <strong>Поиск слова в файле:</strong> Попроси пользователя ввести слово. Прочитай <span class="ic">"data.txt"</span> и с помощью <span class="ic">if</span> проверь (без учёта регистра через <span class="ic">.lower()</span>), есть ли это слово в файле. Выведи <span class="ic">"Найдено"</span> или <span class="ic">"Нет"</span>.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-008">
             <span class="step-num">8</span>
             <div>
               <strong>Копирование файла:</strong> Напиши программу, которая читает все данные из файла <span class="ic">"source.txt"</span> и записывает их точь-в-точь в новый файл <span class="ic">"copy.txt"</span>, после чего выводит содержимое копии.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-009">
             <span class="step-num">9</span>
             <div>
               <strong>Редактор регистра файла:</strong> Считай текст из файла <span class="ic">"notes.txt"</span>, переведи все буквы в верхний регистр методом <span class="ic">.upper()</span>, перезапиши файл и выведи обновлённый текст.
             </div>
           </li>
-          <li>
+          <li data-python-task-id="task-010">
             <span class="step-num">10</span>
             <div>
               <strong>Функция логирования (def + файлы):</strong> Создай функцию <span class="ic">log_message(msg)</span>, которая при каждом вызове дописывает переданную строку в конец файла <span class="ic">"log.txt"</span> с новой строки. Вызови её 3 раза и выведи весь лог на экран.
@@ -279,6 +279,7 @@ print("Hello, World!")
 
 <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
 <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
-<script src="../скрипты/python-basics.js?v=2026-11-07-v12"></script>
+<script src="../скрипты/python-progress.js?v=2026-11-15-v1"></script>
+<script src="../скрипты/python-basics.js?v=2026-11-15-v13"></script>
 </body>
 </html>

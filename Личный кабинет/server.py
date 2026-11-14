@@ -633,6 +633,9 @@ def init_db() -> None:
 
         )
 
+        from python_progress import init_progress_schema
+        init_progress_schema(db)
+
         session_columns = {row["name"] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
 
         if "last_seen" not in session_columns:
@@ -2177,6 +2180,9 @@ def reset_password_page(request: Request):
     return page("auth.html")
 
 
+from python_progress import install_progress_routes
+install_progress_routes(app, open_db, get_user_from_request)
+
 @app.get("/api/me")
 
 def current_user(request: Request):
@@ -3112,6 +3118,7 @@ def delete_user(user_id: int, request: Request):
     with closing(open_db()) as db:
 
         db.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        db.execute("DELETE FROM python_task_progress WHERE user_id = ?", (user_id,))
 
         cursor = db.execute("DELETE FROM users WHERE id = ?", (user_id,))
 
