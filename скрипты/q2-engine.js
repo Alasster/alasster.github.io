@@ -253,9 +253,13 @@
 
   function head(slide, index) {
     const eb = formatEyebrow(slide.eyebrow, index);
-    return `${eb ? `<span class="eyebrow">${eb}</span>` : ''}
+    const main = `${eb ? `<span class="eyebrow">${eb}</span>` : ''}
       ${slide.title ? `<h2>${slide.title}</h2>` : ''}
       ${slide.lead ? `<p class="lead">${slide.lead}</p>` : ''}`;
+    if (slide.headAside) {
+      return `<div class="q2-head-split"><div class="q2-head-main">${main}</div><div class="q2-head-aside">${slide.headAside}</div></div>`;
+    }
+    return main;
   }
 
   function renderSlide(slide, index, lesson) {
