@@ -6237,9 +6237,16 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   background: #f8fafc;
   border-color: #94a3b8;
 }
-.q2-cb-node.is-gate-and { border-color: #8b5cf6; background: #f5f3ff; color: #5b21b6; }
-.q2-cb-node.is-gate-or { border-color: #06b6d4; background: #ecfeff; color: #0e7490; }
-.q2-cb-node.is-gate-not { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+.q2-cb-node.is-gate-and,
+.q2-cb-node.is-gate-or,
+.q2-cb-node.is-gate-not {
+  width: 108px;
+  height: 74px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
 .q2-cb-port {
   position: absolute;
   width: 14px;

@@ -2013,7 +2013,7 @@
       logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), logicBinary('and', 'A', 'B'))
     ];
     const tasks = [pick(tier1), pick(tier2), pick(tier3)];
-    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0 }));
+    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, height: 360 }));
     const solved = tasks.map(() => false);
     let current = 0;
     let pendingFrom = null;
@@ -2066,9 +2066,9 @@
       const ttRows = [[0, 0], [0, 1], [1, 0], [1, 1]];
       const ttCols = logicColumns(tasks[idx]);
       const gateShape = op => {
-        if (op === 'and') return '<svg width="54" height="40" viewBox="0 0 54 40" aria-hidden="true"><path d="M8 4 H28 A16 16 0 0 1 28 36 H8 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.2"/><text x="23" y="24" text-anchor="middle" font-size="11" font-weight="800" fill="#5b21b6">И</text></svg>';
-        if (op === 'or') return '<svg width="54" height="40" viewBox="0 0 54 40" aria-hidden="true"><path d="M8 4 Q18 20 8 36 Q34 36 48 20 Q34 4 8 4 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2.2"/><text x="26" y="24" text-anchor="middle" font-size="10.5" font-weight="800" fill="#0e7490">ИЛИ</text></svg>';
-        return '<svg width="54" height="40" viewBox="0 0 54 40" aria-hidden="true"><polygon points="8,4 8,36 38,20" fill="#fffbeb" stroke="#d97706" stroke-width="2.2"/><circle cx="43" cy="20" r="4" fill="#fffbeb" stroke="#d97706" stroke-width="2.2"/><text x="19" y="24" text-anchor="middle" font-size="10" font-weight="800" fill="#b45309">НЕ</text></svg>';
+        if (op === 'and') return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><path d="M10 6 H56 A31 31 0 0 1 56 68 H10 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.5"/><text x="45" y="42" text-anchor="middle" font-size="16" font-weight="800" fill="#5b21b6">И</text></svg>';
+        if (op === 'or') return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><path d="M10 6 Q28 37 10 68 Q62 68 96 37 Q62 6 10 6 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2.5"/><text x="50" y="42" text-anchor="middle" font-size="15" font-weight="800" fill="#0e7490">ИЛИ</text></svg>';
+        return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><polygon points="10,6 10,68 78,37" fill="#fffbeb" stroke="#d97706" stroke-width="2.5"/><circle cx="86" cy="37" r="6" fill="#fffbeb" stroke="#d97706" stroke-width="2.5"/><text x="34" y="42" text-anchor="middle" font-size="14" font-weight="800" fill="#b45309">НЕ</text></svg>';
       };
       panel.innerHTML = `
         <div class="q2-cb-formula">
@@ -2079,9 +2079,13 @@
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">+ ИЛИ</button>
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">+ НЕ</button>
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
+          <span style="margin-left:auto;display:inline-flex;gap:6px;">
+            <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-70" aria-label="Уменьшить область">−</button>
+            <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="70" aria-label="Увеличить область">+</button>
+          </span>
         </div>
         <div class="q2-cb-layout">
-          <div class="q2-cb-canvas" data-cb-canvas>
+          <div class="q2-cb-canvas" data-cb-canvas style="height:${st.height}px;">
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
@@ -2172,6 +2176,13 @@
         st.wires = [];
         solved[idx] = false;
         render(idx);
+      });
+
+      panel.querySelectorAll('[data-cb-size]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          st.height = Math.max(260, Math.min(640, st.height + Number(btn.dataset.cbSize)));
+          render(idx);
+        });
       });
 
       panel.querySelectorAll('[data-cb-del]').forEach(btn => {
