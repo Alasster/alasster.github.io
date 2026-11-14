@@ -150,7 +150,7 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
 body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
   background: #ececf4;
   border: 1px solid rgba(255, 255, 255, 0.78);
-  box-shadow: 8px 8px 18px rgba(15, 23, 42, 0.10), -8px -8px 18px rgba(255, 255, 255, 0.92);
+  box-shadow: 12px 14px 28px rgba(15, 23, 42, 0.16), -10px -10px 24px rgba(255, 255, 255, 1), inset 1px 1px 2px rgba(255, 255, 255, 0.9);
   padding: 32px 26px;
   align-self: stretch;
   display: flex;
