@@ -242,8 +242,8 @@ body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
 }
 
 .q2-slide code {
-  background: #ececf4 !important;
-  box-shadow: inset 2px 2px 4px rgba(15, 23, 42, 0.10), inset -2px -2px 4px rgba(255, 255, 255, 0.9) !important;
+  background: #efedf8 !important;
+  box-shadow: inset 3px 3px 6px rgba(178, 174, 212, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.92) !important;
 }
 
 .q2-svg-wrap svg[aria-label*="кодовый замок"] {
@@ -261,14 +261,14 @@ body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
   height: 32px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  background: #ececf4;
+  background: #efedf8;
   color: #475569;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   cursor: pointer;
-  box-shadow: inset 2px 2px 5px rgba(15, 23, 42, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+  box-shadow: inset 3px 3px 6px rgba(178, 174, 212, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.92);
   transition: transform 0.16s ease, color 0.16s ease;
 }
 
@@ -560,10 +560,10 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: #ececf4;
+  background: #efedf8;
   border: 1px solid rgba(255, 255, 255, 0.7);
   color: #475569;
-  box-shadow: inset 2px 2px 5px rgba(15, 23, 42, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+  box-shadow: inset 3px 3px 6px rgba(178, 174, 212, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.92);
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -3865,8 +3865,8 @@ circle.q2-scene-node,
   place-items: center !important;
   flex-shrink: 0 !important;
   border-radius: 11px !important;
-  background: #ececf4 !important;
-  box-shadow: inset 2px 2px 5px rgba(15, 23, 42, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.9) !important;
+  background: #efedf8 !important;
+  box-shadow: inset 3px 3px 6px rgba(178, 174, 212, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.92) !important;
   filter: none !important;
   color: var(--q2-indigo) !important;
 }
