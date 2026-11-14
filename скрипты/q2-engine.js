@@ -1937,23 +1937,41 @@
         }
         let missing = 0;
         let wrong = 0;
-        panel.querySelectorAll('[data-notebook-row]').forEach(cell => {
+        const cells = Array.from(panel.querySelectorAll('[data-notebook-row]'));
+        const results = cells.map(cell => {
           const row = Number(cell.dataset.notebookRow);
           const col = Number(cell.dataset.notebookCol);
           const value = answers[index][row][col];
-          const A = Math.floor(row / 2);
-          const B = row % 2;
-          const correct = value !== '?' && Number(value) === logicValue(columnNode(col), A, B);
+          const [A, B, C] = inputRows[row];
+          const correct = value !== '?' && Number(value) === logicValue(columnNode(col), A, B, C);
           if (value === '?') missing += 1;
           else if (!correct) wrong += 1;
-          cell.classList.toggle('is-correct', correct);
-          cell.classList.toggle('is-wrong', !correct);
-          cell.setAttribute('aria-invalid', String(!correct));
+          return { cell, col, correct };
         });
-        feedback.className = 'q2-feedback ' + (missing || wrong ? 'is-bad' : 'is-good');
+        const allValid = missing === 0 && wrong === 0;
+        const lastCol = columns.length - 1;
+        results.forEach(({ cell, col, correct }) => {
+          if (varsCount === 3) {
+            if (allValid) {
+              cell.classList.add('is-correct');
+              cell.classList.remove('is-wrong');
+              cell.setAttribute('aria-invalid', 'false');
+            } else {
+              cell.classList.remove('is-correct');
+              const showWrong = col === lastCol && !correct;
+              cell.classList.toggle('is-wrong', showWrong);
+              cell.setAttribute('aria-invalid', String(showWrong));
+            }
+          } else {
+            cell.classList.toggle('is-correct', correct);
+            cell.classList.toggle('is-wrong', !correct);
+            cell.setAttribute('aria-invalid', String(!correct));
+          }
+        });
+        feedback.className = 'q2-feedback ' + (allValid ? 'is-good' : 'is-bad');
         feedback.textContent = missing
-          ? `Не заполнено ячеек: ${missing}.${wrong ? ` Ошибок в заполненных ячейках: ${wrong}.` : ''} Заполните «?» и проверьте таблицу ещё раз.`
-          : wrong ? `Ошибок: ${wrong}. Исправьте выделенные ячейки. Проверьте наборы A и B и порядок действий.`
+          ? `Не заполнено ячеек: ${missing}.${wrong ? ` Ошибок: ${wrong}.` : ''} Заполните все столбцы и проверьте таблицу ещё раз.`
+          : wrong ? `Есть ошибки (${wrong}). Проверьте входы, промежуточные столбцы и итоговый столбец Y.`
             : 'Верно! Все значения таблицы заполнены правильно.';
       });
     };
