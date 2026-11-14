@@ -2246,7 +2246,7 @@
       const y = a & notB;
       const wireCls = active => active ? 'q2-hero-wire-anim' : '';
       const wireCol = (active, onColor) => active ? onColor : '#cbd5e1';
-      el.innerHTML = `<div style="border-radius:16px;padding:12px 14px;background:var(--bg,#f4f5fc);box-shadow:inset 2px 3px 8px rgba(148,163,184,.35),inset -2px -2px 6px rgba(255,255,255,.85);">
+      el.innerHTML = `<div style="user-select:none;-webkit-user-select:none;border-radius:16px;padding:12px 14px;background:var(--bg,#f4f5fc);box-shadow:inset 2px 3px 8px rgba(148,163,184,.35),inset -2px -2px 6px rgba(255,255,255,.85);">
         <svg viewBox="0 0 560 156" role="img" aria-label="Интерактивный пример схемы A и не B" style="width:100%;height:auto;display:block;">
           <text x="280" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A<tspan style="text-decoration:overline">B</tspan> → сначала НЕ для B, затем И</text>
           <text x="56" y="44" text-anchor="middle" font-size="12" font-weight="800" fill="#475569">A</text>
