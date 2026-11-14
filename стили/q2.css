@@ -163,6 +163,7 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
 }
 
 .q2-svg-wrap {
+  position: relative;
   padding: 16px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.66);
@@ -229,6 +230,35 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
   max-height: 115px;
   width: 100%;
   margin: 0 auto;
+}
+
+.q2-svg-reset {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(244, 247, 252, 0.92);
+  color: #6366f1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 3px 4px 8px rgba(148, 163, 184, 0.25), -2px -2px 6px rgba(255, 255, 255, 0.9);
+  transition: transform 0.16s ease, color 0.16s ease;
+}
+
+.q2-svg-reset:hover {
+  transform: scale(1.06);
+  color: #3e55d8;
+}
+
+.q2-svg-reset:active {
+  transform: scale(0.95);
 }
 
 .q2-lock-a {

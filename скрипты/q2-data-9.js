@@ -553,7 +553,7 @@
               { t: 'svg', svg: TT3_SVG }
             ],
             right: [
-              { t: 'svg', svg: LOCK3_SVG, compact: true },
+              { t: 'svg', svg: LOCK3_SVG, compact: true, resettable: true },
               {
                 t: 'steps',
                 items: [

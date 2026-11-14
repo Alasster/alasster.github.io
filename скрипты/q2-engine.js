@@ -179,7 +179,7 @@
           <div class="q2-ref-body">${item.html || ''}</div>
         </details>`;
       case 'svg':
-        return `<div class="q2-svg-wrap${item.compact ? ' q2-svg-compact' : ''}${item.cls ? ` ${item.cls}` : ''}">${item.svg}${item.caption ? `<p class="q2-caption">${item.caption}</p>` : ''}</div>`;
+        return `<div class="q2-svg-wrap${item.compact ? ' q2-svg-compact' : ''}${item.cls ? ` ${item.cls}` : ''}">${item.resettable ? '<button type="button" class="q2-svg-reset" title="Сбросить на 0 0 0" aria-label="Сбросить на 0 0 0"><i class="fas fa-rotate-left"></i></button>' : ''}${item.svg}${item.caption ? `<p class="q2-caption">${item.caption}</p>` : ''}</div>`;
       case 'rubric':
         return `<div class="q2-panel q2-rubric-panel"><h3><i class="fas fa-list-check"></i> ${item.title || 'Критерии успеха'}</h3>
           <div class="rubric">${(item.items || []).map(row => `<div class="rubric-row"><strong>${row.mark || '✓'}</strong><span>${row.text}</span></div>`).join('')}</div></div>`;
@@ -301,6 +301,17 @@
 
   /* ---------------------------- инициализация ---------------------------- */
   function initWidgets(root) {
+    root.querySelectorAll('.q2-svg-reset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wrap = btn.closest('.q2-svg-wrap');
+        if (!wrap) return;
+        wrap.querySelectorAll('.q2-lock-reel, .q2-tt3-anim').forEach(el => {
+          el.style.animation = 'none';
+          void el.getBoundingClientRect();
+          el.style.animation = '';
+        });
+      });
+    });
     root.querySelectorAll('[data-q2-w]').forEach(node => {
       const record = widgetStore.get(node.dataset.q2W);
       if (!record) return;
