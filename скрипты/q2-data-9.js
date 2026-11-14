@@ -692,6 +692,33 @@
     <text x="215" y="160" font-size="11" font-weight="700" fill="#64748b">¬A</text>
   </svg>`;
 
+  const GATES3_ROW_SVG = `<svg viewBox="0 0 560 96" role="img" aria-label="Три базовых логических элемента: И, ИЛИ, НЕ">
+    <rect x="8" y="8" width="174" height="80" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="95" y="27" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5b21b6">И (AND)</text>
+    <line x1="26" y1="46" x2="54" y2="46" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="26" y1="62" x2="54" y2="62" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
+    <path d="M54 37 H74 A17 17 0 0 1 74 71 H54 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    <line x1="91" y1="54" x2="132" y2="54" stroke="#7c3aed" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="148" y="58" font-size="11" font-weight="700" fill="#64748b">AB</text>
+
+    <rect x="193" y="8" width="174" height="80" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="280" y="27" text-anchor="middle" font-size="11.5" font-weight="800" fill="#0e7490">ИЛИ (OR)</text>
+    <line x1="211" y1="46" x2="241" y2="46" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="211" y1="62" x2="241" y2="62" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <path d="M237 37 Q246 54 237 71 Q263 71 278 54 Q263 37 237 37 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+    <line x1="278" y1="54" x2="316" y2="54" stroke="#0891b2" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="336" y="58" font-size="11" font-weight="700" fill="#64748b">A+B</text>
+
+    <rect x="378" y="8" width="174" height="80" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="465" y="27" text-anchor="middle" font-size="11.5" font-weight="800" fill="#b45309">НЕ (NOT)</text>
+    <line x1="398" y1="54" x2="428" y2="54" stroke="#f59e0b" stroke-width="2" class="q2-hero-wire-anim"/>
+    <polygon points="428,38 428,70 458,54" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <circle cx="463" cy="54" r="4" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <line x1="467" y1="54" x2="504" y2="54" stroke="#d97706" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="516" y="58" font-size="11" font-weight="700" fill="#64748b">A</text>
+    <line x1="515" y1="46" x2="525" y2="46" stroke="#64748b" stroke-width="1.6"/>
+  </svg>`;
+
   const CIRCUIT_EXAMPLE_SVG = `<svg viewBox="0 0 560 150" role="img" aria-label="Пример построения схемы для выражения A и не B">
     <rect x="10" y="10" width="540" height="130" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
     <text x="272" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A B  →  сначала НЕ для B, затем И</text>
@@ -786,16 +813,16 @@
       {
         k: 'concept',
         eyebrow: '03 · ЭЛЕМЕНТЫ И СХЕМА',
-        title: 'Зачем нужны логические элементы',
-        lead: 'Логические элементы заменяют громоздкие таблицы истинности наглядной схемой: вместо перебора строк мы сразу видим, как сигналы A и B преобразуются в результат Y.',
+        title: 'Логические элементы',
+        lead: 'Логический элемент — это базовый блок схемы, который принимает входные сигналы (0 или 1) и выдаёт результат по своему правилу. Логические элементы заменяют громоздкие таблицы истинности наглядной схемой: вместо перебора строк мы сразу видим, как сигналы A и B преобразуются в результат Y.',
         blocks: [
-          { t: 'svg', svg: GATES3_HERO_SVG },
+          { t: 'svg', svg: GATES3_ROW_SVG },
           {
             t: 'callout',
             tone: 'info',
             icon: 'fas fa-microchip',
             title: 'Три базовые фигуры',
-            text: 'И (D-образная) даёт 1 только при двух 1. ИЛИ (щитовидная) даёт 1 при любой 1. НЕ (треугольник с кружком) переворачивает сигнал. Соединяя их слева направо, можно изобразить любое выражение.'
+            text: 'И (D-образная) даёт 1 только при двух 1. ИЛИ (щитовидная) даёт 1 при любой 1. НЕ (треугольник с кружком) переворачивает сигнал.'
           },
           { t: 'svg', svg: CIRCUIT_EXAMPLE_SVG }
         ]
