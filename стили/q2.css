@@ -6132,15 +6132,50 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
 .q2-cb-formula {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
   padding: 12px 16px;
   border-radius: 14px;
   background: var(--bg-soft, #f5f3ff);
   border: 1px solid var(--border, #e2e8f0);
   margin-bottom: 12px;
 }
+.q2-cb-layout {
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 780px) {
+  .q2-cb-layout { grid-template-columns: 1fr; }
+}
+.q2-cb-table-box {
+  border-radius: 14px;
+  border: 1px solid var(--border, #e2e8f0);
+  background: #ffffff;
+  padding: 10px;
+}
+.q2-cb-table-box h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #475569;
+  text-align: center;
+}
+.q2-cb-tt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: center;
+}
+.q2-cb-tt th, .q2-cb-tt td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 700;
+}
+.q2-cb-tt th { color: #64748b; font-size: 12px; }
+.q2-cb-tt tr.is-match td { background: #ecfdf5; color: #047857; }
+.q2-cb-tt tr.is-mismatch td { background: #fef2f2; color: #b91c1c; }
 .q2-cb-toolbar {
   display: flex;
   flex-wrap: wrap;

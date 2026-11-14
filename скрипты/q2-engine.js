@@ -2008,13 +2008,13 @@
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
     const tasks = pool.slice(0, 3);
-    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1 }));
+    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0 }));
     const solved = tasks.map(() => false);
     let current = 0;
     let pendingFrom = null;
 
     el.innerHTML = `
-      <div class="q2-cb-tabs" role="tablist" aria-label="Задания по схемам">
+      <div class="q2-notebook-tabs" role="tablist" aria-label="Задания по схемам">
         ${tasks.map((_, i) => `<button type="button" role="tab" class="q2-notebook-tab" data-cb-tab="${i}" aria-selected="${i === 0}">Задание ${i + 1}</button>`).join('')}
       </div>
       <div data-cb-panel></div>
@@ -2037,10 +2037,30 @@
         t.setAttribute('aria-selected', String(i === idx));
       });
       const st = states[idx];
+      const evalSource = (src, A, B, visiting) => {
+        if (src === 'A') return A;
+        if (src === 'B') return B;
+        if (visiting.has(src)) return null;
+        const gate = st.gates.find(g => g.id === src);
+        if (!gate) return null;
+        visiting.add(src);
+        const w0 = st.wires.find(w => w.to === `${src}:0`);
+        if (!w0) return null;
+        const v0 = evalSource(w0.from, A, B, new Set(visiting));
+        if (v0 === null) return null;
+        if (gate.op === 'not') return 1 - v0;
+        const w1 = st.wires.find(w => w.to === `${src}:1`);
+        if (!w1) return null;
+        const v1 = evalSource(w1.from, A, B, new Set(visiting));
+        if (v1 === null) return null;
+        return gate.op === 'and' ? (v0 & v1) : (v0 | v1);
+      };
+      const yWireNow = st.wires.find(w => w.to === 'Y:0');
+      const liveY = yWireNow ? evalSource(yWireNow.from, st.a, st.b, new Set()) : null;
+      const ttRows = [[0, 0], [0, 1], [1, 0], [1, 1]];
       panel.innerHTML = `
         <div class="q2-cb-formula">
-          <div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[idx]))}">${logicHTML(tasks[idx])}</div>
-          <span class="q2-pill">Соедините выход с входом</span>
+          <div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[idx], true))}">${logicHTML(tasks[idx], true)}</div>
         </div>
         <div class="q2-cb-toolbar">
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="and">+ И</button>
@@ -2048,23 +2068,39 @@
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">+ НЕ</button>
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
         </div>
-        <div class="q2-cb-canvas" data-cb-canvas>
-          <svg class="q2-cb-wires" data-cb-wires>
-            <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
-          </svg>
-          <div class="q2-cb-node is-fixed" data-cb-node="A" style="left:16px;top:68px;">A<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
-          <div class="q2-cb-node is-fixed" data-cb-node="B" style="left:16px;top:210px;">B<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
-          <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;">Y<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
-          ${st.gates.map(g => {
-            const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : 'НЕ';
-            const inPorts = g.op === 'not'
-              ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
-              : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
-            return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${label}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
-          }).join('')}
+        <div class="q2-cb-layout">
+          <div class="q2-cb-canvas" data-cb-canvas>
+            <svg class="q2-cb-wires" data-cb-wires>
+              <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
+            </svg>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:68px;cursor:pointer;" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:210px;cursor:pointer;" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
+            ${st.gates.map(g => {
+              const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : 'НЕ';
+              const inPorts = g.op === 'not'
+                ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
+                : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
+              return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${label}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
+            }).join('')}
+          </div>
+          <div class="q2-cb-table-box">
+            <h4>Таблица истинности</h4>
+            <table class="q2-cb-tt">
+              <thead><tr><th>A</th><th>B</th><th>Y</th></tr></thead>
+              <tbody>
+                ${ttRows.map(([A, B]) => {
+                  const exp = logicValue(tasks[idx], A, B, 0);
+                  const isCur = A === st.a && B === st.b;
+                  const cls = isCur && liveY !== null ? (liveY === exp ? 'is-match' : 'is-mismatch') : '';
+                  return `<tr class="${cls}"><td>${A}</td><td>${B}</td><td>${exp}</td></tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="q2-cb-actions">
-          <p class="q2-feedback" data-cb-feedback role="status" aria-live="polite">Добавьте элементы и соедините их стрелками от A и B к Y.</p>
+          <p class="q2-feedback" data-cb-feedback role="status" aria-live="polite">Добавьте элементы и соедините их стрелками от A и B к Y. Нажимайте на A и B, чтобы проверить наборы.</p>
           <button type="button" class="q2-btn" data-cb-check>Проверить</button>
         </div>
       `;
@@ -2075,6 +2111,8 @@
 
       const drawWires = () => {
         const rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
         svg.querySelectorAll('path[data-wire]').forEach(p => p.remove());
         panel.querySelectorAll('.q2-cb-port').forEach(p => p.classList.remove('is-connected'));
         st.wires.forEach(w => {
@@ -2096,6 +2134,17 @@
       };
 
       requestAnimationFrame(drawWires);
+
+      panel.querySelector('[data-cb-toggle="a"]').addEventListener('click', e => {
+        if (e.target.closest('button')) return;
+        st.a = 1 - st.a;
+        render(idx);
+      });
+      panel.querySelector('[data-cb-toggle="b"]').addEventListener('click', e => {
+        if (e.target.closest('button')) return;
+        st.b = 1 - st.b;
+        render(idx);
+      });
 
       panel.querySelectorAll('[data-cb-add]').forEach(btn => {
         btn.addEventListener('click', () => {
