@@ -836,7 +836,7 @@
         title: 'Два примера схем по двум высказываниям',
         lead: 'Посмотрите, как порядок действий в выражении определяет порядок соединения элементов на схеме.',
         blocks: [
-          { t: 'svg', svg: CIRCUIT_TWO_EXAMPLES_SVG },
+          { t: 'widget', kind: 'circuitDemo', config: { mode: 'twoExamples' } },
           {
             t: 'callout',
             tone: 'info',

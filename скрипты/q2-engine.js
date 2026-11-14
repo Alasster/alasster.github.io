@@ -2238,7 +2238,64 @@
     render(0);
   };
 
-  WIDGETS.circuitDemo = function (el) {
+  WIDGETS.circuitDemo = function (el, cfg) {
+    if (cfg && cfg.mode === 'twoExamples') {
+      let a1 = 0, b1 = 0, a2 = 0, b2 = 1;
+      const renderTwo = () => {
+        const or1 = a1 | b1, y1 = 1 - or1;
+        const or2 = a2 | b2, notA2 = 1 - a2, y2 = or2 & notA2;
+        const wc = act => act ? 'q2-hero-wire-anim' : '';
+        const col = (act, c) => act ? c : '#cbd5e1';
+        const box = 'user-select:none;-webkit-user-select:none;border-radius:16px;padding:12px 14px;background:var(--bg,#f4f5fc);box-shadow:inset 2px 3px 8px rgba(148,163,184,.35),inset -2px -2px 6px rgba(255,255,255,.85);';
+        el.innerHTML = `<div style="display:grid;gap:14px;">
+          <div style="${box}">
+            <svg viewBox="0 0 560 124" role="img" aria-label="Пример 1" style="width:100%;height:auto;display:block;">
+              <text x="280" y="18" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 1: <tspan style="text-decoration:overline">A + B</tspan> — сначала ИЛИ, затем НЕ</text>
+              <text x="52" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#475569">A</text>
+              <g data-ex="a1" style="cursor:pointer;"><rect x="32" y="38" width="40" height="26" rx="7" fill="${a1 ? '#eef2ff' : '#fff'}" stroke="${a1 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="52" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="${a1 ? '#4338ca' : '#1e293b'}">${a1}</text></g>
+              <text x="52" y="80" text-anchor="middle" font-size="11" font-weight="800" fill="#475569">B</text>
+              <g data-ex="b1" style="cursor:pointer;"><rect x="32" y="84" width="40" height="26" rx="7" fill="${b1 ? '#eef2ff' : '#fff'}" stroke="${b1 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="52" y="101" text-anchor="middle" font-size="13" font-weight="800" fill="${b1 ? '#4338ca' : '#1e293b'}">${b1}</text></g>
+              <path d="M72 51 C110 51, 120 63, 162 63" fill="none" stroke="${col(a1, '#06b6d4')}" stroke-width="2.2" class="${wc(a1)}"/>
+              <path d="M72 97 C110 97, 120 79, 162 79" fill="none" stroke="${col(b1, '#06b6d4')}" stroke-width="2.2" class="${wc(b1)}"/>
+              <path d="M158 52 Q168 71 158 90 Q186 90 202 71 Q186 52 158 52 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+              <line x1="202" y1="71" x2="305" y2="71" stroke="${col(or1, '#f59e0b')}" stroke-width="2.2" class="${wc(or1)}"/>
+              <polygon points="305,53 305,89 337,71" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+              <circle cx="342" cy="71" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+              <line x1="347" y1="71" x2="476" y2="71" stroke="${col(y1, '#10b981')}" stroke-width="2.4" class="${wc(y1)}"/>
+              <text x="496" y="52" text-anchor="middle" font-size="11" font-weight="800" fill="#475569">Y</text>
+              <rect x="476" y="58" width="40" height="26" rx="7" fill="${y1 ? '#ecfdf5' : '#fff'}" stroke="${y1 ? '#10b981' : '#94a3b8'}" stroke-width="1.6"/><text x="496" y="75" text-anchor="middle" font-size="13" font-weight="800" fill="${y1 ? '#047857' : '#1e293b'}">${y1}</text>
+            </svg>
+          </div>
+          <div style="${box}">
+            <svg viewBox="0 0 560 128" role="img" aria-label="Пример 2" style="width:100%;height:auto;display:block;">
+              <text x="280" y="18" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 2: (A + B)<tspan style="text-decoration:overline">A</tspan> — параллельно ИЛИ и НЕ, затем И</text>
+              <text x="52" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#475569">A</text>
+              <g data-ex="a2" style="cursor:pointer;"><rect x="32" y="38" width="40" height="26" rx="7" fill="${a2 ? '#eef2ff' : '#fff'}" stroke="${a2 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="52" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="${a2 ? '#4338ca' : '#1e293b'}">${a2}</text></g>
+              <text x="52" y="82" text-anchor="middle" font-size="11" font-weight="800" fill="#475569">B</text>
+              <g data-ex="b2" style="cursor:pointer;"><rect x="32" y="86" width="40" height="26" rx="7" fill="${b2 ? '#eef2ff' : '#fff'}" stroke="${b2 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="52" y="103" text-anchor="middle" font-size="13" font-weight="800" fill="${b2 ? '#4338ca' : '#1e293b'}">${b2}</text></g>
+              <path d="M72 51 C110 51, 120 45, 162 45" fill="none" stroke="${col(a2, '#06b6d4')}" stroke-width="2.2" class="${wc(a2)}"/>
+              <path d="M72 99 C110 99, 120 61, 162 61" fill="none" stroke="${col(b2, '#06b6d4')}" stroke-width="2.2" class="${wc(b2)}"/>
+              <path d="M72 51 C115 51, 120 96, 166 96" fill="none" stroke="${col(a2, '#f59e0b')}" stroke-width="2.2" class="${wc(a2)}"/>
+              <path d="M158 34 Q168 53 158 72 Q186 72 202 53 Q186 34 158 34 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+              <polygon points="166,80 166,112 194,96" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+              <circle cx="199" cy="96" r="4.2" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+              <path d="M202 53 C260 53, 275 63, 314 63" fill="none" stroke="${col(or2, '#6366f1')}" stroke-width="2.2" class="${wc(or2)}"/>
+              <path d="M204 96 C260 96, 275 79, 314 79" fill="none" stroke="${col(notA2, '#6366f1')}" stroke-width="2.2" class="${wc(notA2)}"/>
+              <path d="M314 51 H338 A20 20 0 0 1 338 91 H314 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+              <line x1="358" y1="71" x2="476" y2="71" stroke="${col(y2, '#10b981')}" stroke-width="2.4" class="${wc(y2)}"/>
+              <text x="496" y="52" text-anchor="middle" font-size="11" font-weight="800" fill="#475569">Y</text>
+              <rect x="476" y="58" width="40" height="26" rx="7" fill="${y2 ? '#ecfdf5' : '#fff'}" stroke="${y2 ? '#10b981' : '#94a3b8'}" stroke-width="1.6"/><text x="496" y="75" text-anchor="middle" font-size="13" font-weight="800" fill="${y2 ? '#047857' : '#1e293b'}">${y2}</text>
+            </svg>
+          </div>
+        </div>`;
+        el.querySelector('[data-ex="a1"]').addEventListener('click', () => { a1 = 1 - a1; renderTwo(); });
+        el.querySelector('[data-ex="b1"]').addEventListener('click', () => { b1 = 1 - b1; renderTwo(); });
+        el.querySelector('[data-ex="a2"]').addEventListener('click', () => { a2 = 1 - a2; renderTwo(); });
+        el.querySelector('[data-ex="b2"]').addEventListener('click', () => { b2 = 1 - b2; renderTwo(); });
+      };
+      renderTwo();
+      return;
+    }
     let a = 1;
     let b = 0;
     const render = () => {
