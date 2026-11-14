@@ -1996,21 +1996,33 @@
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const tier1 = [
       logicBinary('and', logicNot('A'), 'B'),
+      logicBinary('and', 'A', logicNot('B')),
       logicBinary('or', 'A', logicNot('B')),
+      logicBinary('or', logicNot('A'), 'B'),
       logicNot(logicBinary('and', 'A', 'B')),
-      logicNot(logicBinary('or', 'A', 'B'))
+      logicNot(logicBinary('or', 'A', 'B')),
+      logicBinary('and', logicNot('A'), logicNot('B')),
+      logicBinary('or', logicNot('A'), logicNot('B'))
     ];
     const tier2 = [
       logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('A')),
+      logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('B')),
       logicBinary('or', logicBinary('and', 'A', 'B'), logicNot('B')),
-      logicBinary('and', logicNot('A'), logicNot('B')),
-      logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), 'A')
+      logicBinary('or', logicBinary('and', 'A', 'B'), logicNot('A')),
+      logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), 'A'),
+      logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), 'B'),
+      logicBinary('and', logicNot(logicBinary('and', 'A', 'B')), 'A'),
+      logicBinary('and', logicNot(logicBinary('and', 'A', 'B')), 'B')
     ];
     const tier3 = [
       logicBinary('and', logicBinary('or', 'A', logicNot('B')), logicBinary('or', logicNot('A'), 'B')),
+      logicBinary('or', logicBinary('and', 'A', logicNot('B')), logicBinary('and', logicNot('A'), 'B')),
       logicBinary('or', logicNot(logicBinary('and', 'A', 'B')), logicBinary('and', logicNot('A'), 'B')),
+      logicBinary('or', logicNot(logicBinary('and', 'A', 'B')), logicBinary('and', 'A', logicNot('B'))),
       logicBinary('and', logicBinary('or', logicNot('A'), 'B'), logicNot(logicBinary('and', 'A', 'B'))),
-      logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), logicBinary('and', 'A', 'B'))
+      logicBinary('and', logicBinary('or', 'A', logicNot('B')), logicNot(logicBinary('and', 'A', 'B'))),
+      logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), logicBinary('and', 'A', 'B')),
+      logicBinary('and', logicNot(logicBinary('or', 'A', 'B')), logicBinary('or', 'A', logicNot('B')))
     ];
     const tasks = [pick(tier1), pick(tier2), pick(tier3)];
     const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, zoom: 1 }));
