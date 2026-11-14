@@ -1892,7 +1892,7 @@
         select.addEventListener('change', () => {
           const position = Number(select.dataset.notebookOrder);
           selectedOrder[position] = select.value;
-          panel.querySelector(`[data-order-preview="${position}"]`).innerHTML = columnNode(position + 2) ? logicHTML(columnNode(position + 2)) : 'Выберите выражение';
+          panel.querySelector(`[data-order-preview="${position}"]`).innerHTML = columnNode(position + varsCount) ? logicHTML(columnNode(position + varsCount)) : 'Выберите выражение';
           panel.querySelectorAll('[data-notebook-row]').forEach(cell => {
             cell.classList.remove('is-correct', 'is-wrong');
             cell.removeAttribute('aria-invalid');
