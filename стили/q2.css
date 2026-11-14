@@ -6289,3 +6289,24 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   flex-wrap: wrap;
   margin-top: 12px;
 }
+
+/* 9 класс: вдавленные строки дескрипторов и выдавленные бейджи баллов */
+body.lesson-page[data-lesson-id^="9-"] .q2-rubric-panel .rubric-row {
+  background: var(--bg, #f4f5fc);
+  border: none;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  box-shadow: inset 2px 3px 8px rgba(148, 163, 184, .35), inset -2px -2px 6px rgba(255, 255, 255, .85);
+}
+body.lesson-page[data-lesson-id^="9-"] .q2-rubric-panel .rubric-row:last-child {
+  margin-bottom: 0;
+}
+body.lesson-page[data-lesson-id^="9-"] .q2-rubric-panel .rubric-row strong {
+  background: #ffffff;
+  color: #5b21b6;
+  border-radius: 999px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, .14), 0 1px 3px rgba(15, 23, 42, .06);
+  justify-self: start;
+}
