@@ -1959,11 +1959,12 @@
     render(0);
   };
 
-  WIDGETS.expressionOrder = function (el) {
+  WIDGETS.expressionOrder = function (el, cfg) {
+    const is3 = cfg && cfg.vars === 3;
     el.classList.add('q2-expression-order');
     el.innerHTML = `<div class="q2-expression-map">
         <span class="q2-formula-kicker">ЛОГИЧЕСКОЕ ВЫРАЖЕНИЕ</span>
-        <div class="q2-expression-main"><span class="q2-overline">A ∧ B</span> <em>∨</em> (A ∧ <span class="q2-overline">B</span>)</div>
+        <div class="q2-expression-main">${is3 ? '(A ∧ B) <em>∨</em> C' : '<span class="q2-overline">A ∧ B</span> <em>∨</em> (A ∧ <span class="q2-overline">B</span>)'}</div>
       </div>
       <div class="q2-order-card">
         <span class="q2-formula-kicker">ПОРЯДОК ДЕЙСТВИЙ</span>
@@ -1982,12 +1983,17 @@
     const leftNot = logicNot(leftAnd);
     const rightNot = logicNot('B');
     const rightAnd = logicBinary('and', 'A', rightNot);
-    const result = logicBinary('or', leftNot, rightAnd);
-    const columns = [leftAnd, leftNot, rightNot, rightAnd, result];
-    const descriptions = ['Записываем все наборы: 00, 01, 10, 11.', 'И: единица только при A = 1 и B = 1.', 'НЕ: меняем каждое значение предыдущего столбца на противоположное.', 'Отрицаем только B: 0 → 1, 1 → 0.', 'И: соединяем A и отрицание B.', 'ИЛИ: соединяем обе ветви. Единица, если хотя бы одна из них равна 1.'];
+    const result = is3 ? logicBinary('or', leftAnd, 'C') : logicBinary('or', leftNot, rightAnd);
+    const columns = is3 ? [leftAnd, result] : [leftAnd, leftNot, rightNot, rightAnd, result];
+    const descriptions = is3
+      ? ['Записываем все 8 наборов для A, B и C.', '1. Скобки (A ∧ B): единица только при A = 1 и B = 1.', '2. Итог (A ∧ B) ∨ C: единица, если хотя бы одна часть равна 1.']
+      : ['Записываем все наборы: 00, 01, 10, 11.', 'И: единица только при A = 1 и B = 1.', 'НЕ: меняем каждое значение предыдущего столбца на противоположное.', 'Отрицаем только B: 0 → 1, 1 → 0.', 'И: соединяем A и отрицание B.', 'ИЛИ: соединяем обе ветви. Единица, если хотя бы одна из них равна 1.'];
+    const inputRows = is3
+      ? [[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
+      : [[0,0],[0,1],[1,0],[1,1]];
     let step = 0;
     const table = el.querySelector('[data-teaching-table]');
-    table.innerHTML = `<div class="q2-teaching-head"><h3>Как заполняется таблица</h3><span data-teaching-count></span></div><div class="q2-table-wrap"><table class="q2-table q2-teaching-grid"><thead><tr><th>A</th><th>B</th>${columns.map((node, index) => `<th data-teaching-col="${index}"><small>${index + 1}</small><span role="math" aria-label="${attr(logicText(node))}">${index === columns.length - 1 ? 'Y' : logicHTML(node)}</span></th>`).join('')}</tr></thead><tbody>${[[0,0],[0,1],[1,0],[1,1]].map(([A,B]) => `<tr><td>${A}</td><td>${B}</td>${columns.map((node, index) => `<td data-teaching-col="${index}"><span data-teaching-value="${logicValue(node,A,B)}">—</span></td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="q2-teaching-controls"><p data-teaching-explanation aria-live="polite"></p><div class="q2-truth-actions"><button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-teaching-back>Назад</button><button type="button" class="q2-btn q2-btn-sm" data-teaching-next>Первое действие</button></div></div>`;
+    table.innerHTML = `<div class="q2-teaching-head"><h3>Как заполняется таблица</h3><span data-teaching-count></span></div><div class="q2-table-wrap"><table class="q2-table q2-teaching-grid"><thead><tr><th>A</th><th>B</th>${is3 ? '<th>C</th>' : ''}${columns.map((node, index) => `<th data-teaching-col="${index}"><small>${index + 1}</small><span role="math" aria-label="${attr(logicText(node))}">${index === columns.length - 1 ? 'Y' : logicHTML(node)}</span></th>`).join('')}</tr></thead><tbody>${inputRows.map(([A,B,C]) => `<tr><td>${A}</td><td>${B}</td>${is3 ? `<td>${C}</td>` : ''}${columns.map((node, index) => `<td data-teaching-col="${index}"><span data-teaching-value="${logicValue(node,A,B,C)}">—</span></td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="q2-teaching-controls"><p data-teaching-explanation aria-live="polite"></p><div class="q2-truth-actions"><button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-teaching-back>Назад</button><button type="button" class="q2-btn q2-btn-sm" data-teaching-next>Первое действие</button></div></div>`;
     const render = () => {
       table.querySelectorAll('[data-teaching-col]').forEach(cell => {
         const index = Number(cell.dataset.teachingCol);
