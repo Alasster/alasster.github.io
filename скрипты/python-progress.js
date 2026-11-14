@@ -91,6 +91,7 @@
       const response = await request('/api/me');
       if (!response.ok && response.status !== 401) throw Error('offline');
       const user = response.ok ? await response.json() : null;
+      window.PythonProgress.onAccountChange?.(user);
       if (user) {
         try { localStorage.setItem('alasster_auth_user', JSON.stringify(user)); } catch (_) {}
       }

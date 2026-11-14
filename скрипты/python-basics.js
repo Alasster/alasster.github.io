@@ -283,6 +283,26 @@ function initNavigation() {
     };
     updateAccountLink();
     window.addEventListener('alasster-backend-state', updateAccountLink);
+    const accountLink = document.getElementById('pythonAccountLink');
+    const guestIcon = accountLink.innerHTML;
+    const updateAccountIdentity = user => {
+      if (!user) {
+        accountLink.innerHTML = guestIcon;
+        accountLink.title = 'Войти в личный кабинет';
+        accountLink.setAttribute('aria-label', accountLink.title);
+        return;
+      }
+      const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.display_name || user.username || '';
+      const parts = fullName.trim().split(/\s+/).filter(Boolean);
+      const initials = parts.length > 1
+        ? parts.slice(0, 2).map(part => Array.from(part)[0]).join('')
+        : Array.from((parts[0] || '').split('@')[0]).slice(0, 2).join('');
+      accountLink.textContent = initials.toLocaleUpperCase('ru') || 'ЛК';
+      accountLink.title = `Личный кабинет — ${fullName}`;
+      accountLink.setAttribute('aria-label', accountLink.title);
+    };
+    try { updateAccountIdentity(JSON.parse(localStorage.getItem('alasster_auth_user') || 'null')); } catch (_) {}
+    if (window.PythonProgress) PythonProgress.onAccountChange = updateAccountIdentity;
   }
 
   // Update module label in hero
