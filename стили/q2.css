@@ -6175,6 +6175,7 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   padding: 7px 6px;
   border-bottom: 1px solid #f1f5f9;
   font-weight: 700;
+  text-align: center;
 }
 .q2-cb-tt th { color: #64748b; font-size: 12px; }
 .q2-cb-tt tr.is-match td { background: #ecfdf5; color: #047857; }
