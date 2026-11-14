@@ -2102,9 +2102,9 @@
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
-            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:68px;cursor:pointer;zoom:${st.zoom};" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
-            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:210px;cursor:pointer;zoom:${st.zoom};" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
-            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;zoom:${st.zoom};">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:${Math.round(68 / st.zoom)}px;cursor:pointer;zoom:${st.zoom};" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:${Math.round(210 / st.zoom)}px;cursor:pointer;zoom:${st.zoom};" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:${Math.round(139 / st.zoom)}px;zoom:${st.zoom};">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
             ${st.gates.map(g => {
               const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : 'НЕ';
               const inPorts = g.op === 'not'
