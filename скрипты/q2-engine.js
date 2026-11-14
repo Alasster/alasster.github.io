@@ -1735,18 +1735,20 @@
   /* --------------------- порядок логических действий ------------------- */
   const logicNot = child => ({ op: 'not', child });
   const logicBinary = (op, left, right) => ({ op, left, right });
-  const logicSign = { and: '∧', or: '∨' };
+  const logicSign = { and: '', or: '+' };
   function logicHTML(node) {
     if (typeof node === 'string') return node;
     if (node.op === 'not') return `<span class="q2-overline">${logicHTML(node.child)}</span>`;
     const operand = child => typeof child !== 'string' && child.op !== 'not'
       ? `(${logicHTML(child)})` : logicHTML(child);
-    return `${operand(node.left)} <span class="q2-logic-sign">${logicSign[node.op]}</span> ${operand(node.right)}`;
+    if (node.op === 'and') return `${operand(node.left)}${operand(node.right)}`;
+    return `${operand(node.left)} <span class="q2-logic-sign">+</span> ${operand(node.right)}`;
   }
   function logicText(node) {
     if (typeof node === 'string') return node;
     if (node.op === 'not') return `НЕ (${logicText(node.child)})`;
-    return `(${logicText(node.left)} ${logicSign[node.op]} ${logicText(node.right)})`;
+    if (node.op === 'and') return `(${logicText(node.left)}${logicText(node.right)})`;
+    return `(${logicText(node.left)} + ${logicText(node.right)})`;
   }
   function logicValue(node, A, B, C) {
     if (node === 'A') return A;
