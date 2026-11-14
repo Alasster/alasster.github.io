@@ -117,18 +117,35 @@
     <text x="210" y="264" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">две переменные → 2² = 4 набора значений</text>
   </svg>`;
 
-  const TT3_SVG = `<svg viewBox="0 0 460 300" role="img" aria-label="Восемь наборов значений для трёх переменных">
-    <rect x="28" y="30" width="404" height="238" rx="18" fill="rgba(255,255,255,.8)" stroke="rgba(255,255,255,.95)" stroke-width="1.5"/>
-    <text x="230" y="56" text-anchor="middle" font-size="12" font-weight="800" fill="#748097" letter-spacing="0.08em">A  B  C   ·   A  B  C</text>
-    ${[[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1]].map((row, i) => {
-      const col = i < 4 ? 0 : 1;
-      const line = i % 4;
-      const x = 56 + col * 196;
-      const y = 76 + line * 42;
-      return `<g><rect x="${x}" y="${y}" width="168" height="32" rx="9" fill="${row[0] === 1 ? 'rgba(83,109,254,.08)' : 'rgba(148,163,184,.07)'}"/>
-        <text x="${x + 84}" y="${y + 21}" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">${row.join('  ')}</text></g>`;
+  const TT3_SVG = `<svg viewBox="0 0 460 322" role="img" aria-label="Восемь наборов значений для трёх переменных в трёх столбцах">
+    <rect x="24" y="14" width="412" height="278" rx="18" fill="rgba(255,255,255,.84)" stroke="rgba(255,255,255,.96)" stroke-width="1.5"/>
+    ${[
+      { label: 'A', hint: 'по 4', x: 76, delay: 0 },
+      { label: 'B', hint: 'по 2', x: 190, delay: 0.95 },
+      { label: 'C', hint: 'по 1', x: 304, delay: 1.85 }
+    ].map(col => `<g class="q2-tt3-anim" style="animation-delay:${col.delay}s">
+      <rect x="${col.x}" y="26" width="96" height="28" rx="9" fill="rgba(83,109,254,.08)"/>
+      <text x="${col.x + 34}" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#3e55d8">${col.label}</text>
+      <text x="${col.x + 68}" y="44" text-anchor="middle" font-size="10.5" font-weight="700" fill="#748097">${col.hint}</text>
+    </g>`).join('')}
+    ${[0, 1, 2, 3, 4, 5, 6, 7].map(i => {
+      const y = 64 + i * 27;
+      const a = i < 4 ? 0 : 1;
+      const b = Math.floor(i / 2) % 2;
+      const c = i % 2;
+      const delayA = (i < 4 ? 0.10 + i * 0.09 : 0.52 + (i - 4) * 0.09).toFixed(2);
+      const delayB = (1.05 + Math.floor(i / 2) * 0.20 + (i % 2) * 0.08).toFixed(2);
+      const delayC = (1.95 + i * 0.07).toFixed(2);
+      const cell = (x, val, delay) => `<g class="q2-tt3-anim" style="animation-delay:${delay}s">
+        <rect x="${x}" y="${y}" width="96" height="22" rx="7" fill="${val ? 'rgba(83,109,254,.13)' : 'rgba(148,163,184,.10)'}"/>
+        <text x="${x + 48}" y="${y + 15.5}" text-anchor="middle" font-size="13" font-weight="${val ? '800' : '700'}" fill="${val ? '#3e55d8' : '#475569'}">${val}</text>
+      </g>`;
+      return `<text x="50" y="${y + 15}" text-anchor="middle" font-size="11" font-weight="700" fill="#94a3b8">${i + 1}</text>
+        ${cell(76, a, delayA)}
+        ${cell(190, b, delayB)}
+        ${cell(304, c, delayC)}`;
     }).join('')}
-    <text x="230" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">три переменные → 2³ = 8 наборов; A меняется половиной блока</text>
+    <text x="230" y="310" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">три переменные → 2³ = 8 наборов; заполняем столбцы A → B → C</text>
   </svg>`;
 
   const GATES_SVG = `<svg viewBox="0 0 470 250" role="img" aria-label="Три базовых логических элемента">

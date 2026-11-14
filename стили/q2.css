@@ -176,6 +176,33 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
   height: auto;
 }
 
+.q2-tt3-anim {
+  animation: q2-tt3-step 9s cubic-bezier(0.22, 1, 0.36, 1) infinite both;
+}
+
+@keyframes q2-tt3-step {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  7%, 65% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  72%, 100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .q2-tt3-anim {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* --------------------------------------------------------------------------
    3. БЛОКИ КОНТЕНТА
    -------------------------------------------------------------------------- */
