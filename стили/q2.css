@@ -353,6 +353,22 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   gap: 14px;
 }
 
+.q2-steps-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.q2-steps-2x2 .q2-step {
+  padding: 10px 12px;
+}
+
+@media (max-width: 720px) {
+  .q2-steps-2x2 {
+    grid-template-columns: 1fr;
+  }
+}
+
 .lesson-9-q2-1 .q2-slide:nth-of-type(2) .q2-grid {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 22px;
