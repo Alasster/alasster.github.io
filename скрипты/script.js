@@ -391,7 +391,11 @@ function showClassModal(id) {
   const headingEl = document.getElementById('modal-heading-el');
   const subtitleEl = document.getElementById('modal-subtitle-el');
   if (headingEl) headingEl.textContent = className;
-  if (subtitleEl) subtitleEl.textContent = topic;
+  if (subtitleEl) {
+    const hasQuarterSections = Object.keys(data.quarters || {}).length > 1;
+    subtitleEl.textContent = hasQuarterSections ? '' : topic;
+    subtitleEl.hidden = hasQuarterSections;
+  }
 
   const backdrop = document.getElementById('modal-backdrop-el');
   if (!backdrop) return;
@@ -427,7 +431,10 @@ function showClassModal(id) {
 
           const qDivider = document.createElement('div');
           qDivider.className = 'modal-quarter-divider';
-          qDivider.innerHTML = `<span>${qName}</span>`;
+          const section = qName === '2 четверть'
+            ? ({ c9: 'Логические основы компьютера', c10ogn: 'Алгоритмизация и программирование (Python)', c10emn: 'Алгоритмизация и программирование (Python)', c11: 'Алгоритмы на графах (Python)' }[id] || '')
+            : topic;
+          qDivider.innerHTML = `<span class="quarter-label">${qName}</span><strong class="quarter-section-title">${section}</strong>`;
           list.appendChild(qDivider);
 
           visibleLessons.forEach(renderLessonCard);

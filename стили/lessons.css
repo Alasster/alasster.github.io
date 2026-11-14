@@ -10,6 +10,34 @@
 /* ==========================================================================
    1. DESIGN TOKENS & NEUMORPHIC VARIABLES
    ========================================================================== */
+.modal-quarter-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 10px; padding: 4px 6px; color: var(--lesson-accent, var(--primary, #4f46e5)); }
+.modal-quarter-divider .quarter-label { flex: 0 0 auto; white-space: nowrap; font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+.modal-quarter-divider .quarter-section-title { flex: 1 1 0; min-width: 0; margin-left: auto; text-align: right; font-size: .8rem; font-weight: 500; line-height: 1.4; text-transform: none; letter-spacing: normal; overflow-wrap: anywhere; }
+.modal-quarter-divider::after { content: none; }
+@media (max-width: 480px) {
+  .modal-quarter-divider { gap: 8px; padding-inline: 0; }
+  .modal-quarter-divider .quarter-label { font-size: .68rem; }
+  .modal-quarter-divider .quarter-section-title { font-size: .72rem; }
+}
+.modal-quarter-divider .quarter-label,
+.modal-quarter-divider .quarter-section-title {
+  font-family: inherit;
+  font-size: .8rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.modal-quarter-divider .quarter-section-title { flex: 0 1 auto; max-width: 65%; margin-left: 0; }
+.modal-quarter-divider .quarter-label { order: 0; }
+.modal-quarter-divider::after { content: ''; order: 1; flex: 1 1 16px; min-width: 12px; height: 1px; background: var(--border, rgba(0,0,0,.12)); }
+.modal-quarter-divider .quarter-section-title { order: 2; }
+.modal-backdrop[data-class-theme] .modal-quarter-divider .quarter-label,
+.modal-quarter-divider .quarter-label { background: none; border: 0; border-radius: 0; padding: 0; }
+@media (max-width: 480px) {
+  .modal-quarter-divider .quarter-label,
+  .modal-quarter-divider .quarter-section-title { font-size: .72rem; }
+}
 :root {
   --page: #e7ebf3;
   --surface: #e7ebf3;

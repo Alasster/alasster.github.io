@@ -1956,7 +1956,22 @@ function renderLessonsCatalog(classes) {
 
       const heading = document.createElement('h3');
 
-      heading.textContent = group.name;
+      const quarterTitle = document.createElement('span');
+      quarterTitle.className = 'catalog-quarter-title';
+      quarterTitle.textContent = group.name;
+      const sectionTitle = document.createElement('span');
+      sectionTitle.className = 'catalog-section-title';
+      const sections = {
+        '9 класс': 'Логические основы компьютера',
+        '10 ОГН': 'Алгоритмизация и программирование (Python)',
+        '10 ЕМН': 'Алгоритмизация и программирование (Python)',
+        '11 класс': 'Алгоритмы на графах (Python)'
+      };
+      sectionTitle.textContent = group.name === '2 четверть' ? (sections[item.name] || '') : '';
+      const quarterLine = document.createElement('div');
+      quarterLine.className = 'catalog-quarter-line';
+      quarterLine.append(quarterTitle, sectionTitle);
+      heading.append(quarterLine);
 
       const quarterKey = visibilityKeyForQuarter(item.name, group.name);
       const isQuarterVisible = lessonVisibility[quarterKey] !== false;

@@ -615,7 +615,10 @@
         const visibleLessons = newestLessonsFirst(qLessons.filter(lesson => lessonIsPublic(lesson.file || lesson.path)));
         if (visibleLessons.length === 0) return;
 
-        html += `<div class="modal-quarter-divider"><span>${qName}</span></div>`;
+        const section = qName === '2 четверть'
+          ? ({ c9: 'Логические основы компьютера', c10ogn: 'Алгоритмизация и программирование (Python)', c10emn: 'Алгоритмизация и программирование (Python)', c11: 'Алгоритмы на графах (Python)' }[classId] || '')
+          : (data.title || '').split(/[•·]/).slice(1).join('·').trim();
+        html += `<div class="modal-quarter-divider"><span class="quarter-label">${qName}</span><strong class="quarter-section-title">${section}</strong></div>`;
         visibleLessons.forEach(lesson => {
           const filePath = lesson.file || lesson.path;
           const isCurrent = currentPath.endsWith(filePath);

@@ -414,6 +414,16 @@ select.profile-select {
   flex-wrap: wrap;
 }
 
+.lesson-topic-group h3 .catalog-quarter-line { display: flex; align-items: center; gap: 12px; flex: 1 1 100%; min-width: 0; }
+.catalog-quarter-line::after { content: ''; order: 1; flex: 1 1 16px; min-width: 12px; height: 1px; background: var(--border, rgba(0,0,0,.12)); }
+.catalog-quarter-line .catalog-quarter-title,
+.catalog-quarter-line .catalog-section-title { font-family: inherit; font-size: .8rem; font-weight: 500; line-height: 1.4; letter-spacing: normal; text-transform: none; background: none; border: 0; padding: 0; }
+.catalog-quarter-title { order: 0; flex: 0 0 auto; white-space: nowrap; }
+.catalog-section-title { order: 2; flex: 0 1 auto; max-width: 65%; text-align: right; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  .catalog-quarter-line .catalog-quarter-title,
+  .catalog-quarter-line .catalog-section-title { font-size: .72rem; }
+}
 .quarter-toggle-wrap {
   display: inline-flex;
   align-items: center;

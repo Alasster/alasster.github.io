@@ -2091,7 +2091,7 @@
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">+ ИЛИ</button>
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">+ НЕ</button>
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
-          <span style="margin-left:auto;display:inline-flex;gap:6px;">
+          <span style="display:inline-flex;gap:6px;">
             <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-0.15" aria-label="Уменьшить масштаб">−</button>
             <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="0.15" aria-label="Увеличить масштаб">+</button>
           </span>
