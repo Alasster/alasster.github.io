@@ -2238,6 +2238,45 @@
     render(0);
   };
 
+  WIDGETS.circuitDemo = function (el) {
+    let a = 1;
+    let b = 0;
+    const render = () => {
+      const notB = 1 - b;
+      const y = a & notB;
+      const wireCls = active => active ? 'q2-hero-wire-anim' : '';
+      const wireCol = (active, onColor) => active ? onColor : '#cbd5e1';
+      el.innerHTML = `<div style="border-radius:16px;padding:12px 14px;background:var(--bg,#f4f5fc);box-shadow:inset 2px 3px 8px rgba(148,163,184,.35),inset -2px -2px 6px rgba(255,255,255,.85);">
+        <svg viewBox="0 0 560 156" role="img" aria-label="Интерактивный пример схемы A и не B" style="width:100%;height:auto;display:block;">
+          <text x="280" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: A<tspan style="text-decoration:overline">B</tspan> → сначала НЕ для B, затем И</text>
+          <text x="56" y="44" text-anchor="middle" font-size="12" font-weight="800" fill="#475569">A</text>
+          <g data-demo-toggle="a" style="cursor:pointer;">
+            <rect x="34" y="50" width="44" height="30" rx="8" fill="${a ? '#eef2ff' : '#ffffff'}" stroke="${a ? '#6366f1' : '#94a3b8'}" stroke-width="1.8"/>
+            <text x="56" y="70" text-anchor="middle" font-size="14" font-weight="800" fill="${a ? '#4338ca' : '#1e293b'}">${a}</text>
+          </g>
+          <text x="56" y="96" text-anchor="middle" font-size="12" font-weight="800" fill="#475569">B</text>
+          <g data-demo-toggle="b" style="cursor:pointer;">
+            <rect x="34" y="102" width="44" height="30" rx="8" fill="${b ? '#fffbeb' : '#ffffff'}" stroke="${b ? '#d97706' : '#94a3b8'}" stroke-width="1.8"/>
+            <text x="56" y="122" text-anchor="middle" font-size="14" font-weight="800" fill="${b ? '#b45309' : '#1e293b'}">${b}</text>
+          </g>
+          <line x1="78" y1="65" x2="314" y2="65" stroke="${wireCol(a, '#6366f1')}" stroke-width="2.4" class="${wireCls(a)}"/>
+          <line x1="78" y1="117" x2="162" y2="117" stroke="${wireCol(b, '#f59e0b')}" stroke-width="2.4" class="${wireCls(b)}"/>
+          <polygon points="162,99 162,135 194,117" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+          <circle cx="199" cy="117" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+          <path d="M204 117 C250 117, 270 84, 314 84" fill="none" stroke="${wireCol(notB, '#6366f1')}" stroke-width="2.4" class="${wireCls(notB)}"/>
+          <path d="M314 54 H338 A20 20 0 0 1 338 94 H314 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+          <line x1="358" y1="74" x2="470" y2="74" stroke="${wireCol(y, '#10b981')}" stroke-width="2.6" class="${wireCls(y)}"/>
+          <text x="492" y="52" text-anchor="middle" font-size="12" font-weight="800" fill="#475569">Y</text>
+          <rect x="470" y="59" width="44" height="30" rx="8" fill="${y ? '#ecfdf5' : '#ffffff'}" stroke="${y ? '#10b981' : '#94a3b8'}" stroke-width="1.8"/>
+          <text x="492" y="79" text-anchor="middle" font-size="14" font-weight="800" fill="${y ? '#047857' : '#1e293b'}">${y}</text>
+        </svg>
+      </div>`;
+      el.querySelector('[data-demo-toggle="a"]').addEventListener('click', () => { a = 1 - a; render(); });
+      el.querySelector('[data-demo-toggle="b"]').addEventListener('click', () => { b = 1 - b; render(); });
+    };
+    render();
+  };
+
   WIDGETS.expressionOrder = function (el, cfg) {
     const is3 = cfg && cfg.vars === 3;
     el.classList.add('q2-expression-order');
