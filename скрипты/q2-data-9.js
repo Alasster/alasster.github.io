@@ -151,41 +151,54 @@
   const makeLockSvg = (p) => `<svg viewBox="0 0 340 128" role="img" aria-label="3D кодовый замок из трёх барабанов: перебор от 000 до 111">
     <defs>
       <linearGradient id="${p}-lock-drum" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="rgba(100,116,139,.44)"/>
-        <stop offset="26%" stop-color="rgba(148,163,184,.10)"/>
-        <stop offset="50%" stop-color="rgba(255,255,255,.32)"/>
-        <stop offset="74%" stop-color="rgba(148,163,184,.10)"/>
-        <stop offset="100%" stop-color="rgba(100,116,139,.46)"/>
+        <stop offset="0%" stop-color="rgba(15,23,42,.22)"/>
+        <stop offset="18%" stop-color="rgba(15,23,42,.04)"/>
+        <stop offset="50%" stop-color="rgba(255,255,255,.28)"/>
+        <stop offset="82%" stop-color="rgba(15,23,42,.04)"/>
+        <stop offset="100%" stop-color="rgba(15,23,42,.24)"/>
+      </linearGradient>
+      <linearGradient id="${p}-lock-sides" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="rgba(15,23,42,.12)"/>
+        <stop offset="14%" stop-color="rgba(255,255,255,0)"/>
+        <stop offset="86%" stop-color="rgba(255,255,255,0)"/>
+        <stop offset="100%" stop-color="rgba(15,23,42,.12)"/>
       </linearGradient>
       <linearGradient id="${p}-lock-tile" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="55%" stop-color="#f1f5f9"/>
-        <stop offset="100%" stop-color="#e2e8f0"/>
+        <stop offset="65%" stop-color="#f8fafc"/>
+        <stop offset="100%" stop-color="#e9eef5"/>
       </linearGradient>
+      <filter id="${p}-lock-frame" x="-15%" y="-15%" width="130%" height="135%">
+        <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#94a3b8" flood-opacity="0.28"/>
+        <feDropShadow dx="-2" dy="-2" stdDeviation="2.5" flood-color="#ffffff" flood-opacity="0.95"/>
+      </filter>
       <clipPath id="${p}-lock-clip-0"><rect x="20" y="26" width="84" height="90" rx="8"/></clipPath>
       <clipPath id="${p}-lock-clip-1"><rect x="128" y="26" width="84" height="90" rx="8"/></clipPath>
       <clipPath id="${p}-lock-clip-2"><rect x="236" y="26" width="84" height="90" rx="8"/></clipPath>
     </defs>
     <!-- Метки A B C -->
-    <text x="62" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">A</text>
-    <text x="170" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">B</text>
-    <text x="278" y="18" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">C</text>
-    <!-- 3 широких вертикальных барабана -->
+    <text x="62" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">A</text>
+    <text x="170" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">B</text>
+    <text x="278" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#6366f1" letter-spacing="0.08em">C</text>
+    <!-- 3 светлых неоморфных барабана -->
     ${[
       { x: 20, cls: 'q2-lock-a', clip: `${p}-lock-clip-0` },
       { x: 128, cls: 'q2-lock-b', clip: `${p}-lock-clip-1` },
       { x: 236, cls: 'q2-lock-c', clip: `${p}-lock-clip-2` }
-    ].map(d => `<rect x="${d.x - 4}" y="23" width="92" height="96" rx="10" fill="#d8e0ee" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>
+    ].map(d => `<rect x="${d.x - 5}" y="22" width="94" height="98" rx="12" fill="#f1f5f9" stroke="#ffffff" stroke-width="1.5" filter="url(#${p}-lock-frame)"/>
+      <rect x="${d.x - 1}" y="25" width="86" height="92" rx="9" fill="#cbd5e1" opacity="0.45"/>
       <g clip-path="url(#${d.clip})">
         <g class="q2-lock-reel ${d.cls}">
           ${[1, 0, 1, 0].map((val, idx) => {
             const ty = 26 + idx * 30;
-            return `<rect x="${d.x}" y="${ty}" width="84" height="29" fill="url(#${p}-lock-tile)"/>
-              <line x1="${d.x}" y1="${ty + 29}" x2="${d.x + 84}" y2="${ty + 29}" stroke="#cbd5e1" stroke-width="1"/>
+            return `<rect x="${d.x}" y="${ty}" width="84" height="28.5" rx="2" fill="url(#${p}-lock-tile)"/>
+              <line x1="${d.x + 2}" y1="${ty + 0.5}" x2="${d.x + 82}" y2="${ty + 0.5}" stroke="#ffffff" stroke-width="1"/>
+              <line x1="${d.x}" y1="${ty + 29}" x2="${d.x + 84}" y2="${ty + 29}" stroke="rgba(148,163,184,0.45)" stroke-width="1.2"/>
               <text x="${d.x + 42}" y="${ty + 21}" text-anchor="middle" font-size="20" font-weight="800" fill="${val ? '#3e55d8' : '#334155'}">${val}</text>`;
           }).join('')}
         </g>
       </g>
+      <rect x="${d.x}" y="26" width="84" height="90" rx="8" fill="url(#${p}-lock-sides)" pointer-events="none"/>
       <rect x="${d.x}" y="26" width="84" height="90" rx="8" fill="url(#${p}-lock-drum)" pointer-events="none"/>`).join('')}
   </svg>`;
   const LOCK3_HERO_SVG = makeLockSvg('hero');
