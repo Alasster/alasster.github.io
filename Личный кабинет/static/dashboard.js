@@ -2007,6 +2007,37 @@ function renderLessonsCatalog(classes) {
 
       links.className = 'lesson-topic-list';
 
+      const localTopicsKey = `cabinet-topics-collapsed:${quarterKey}`;
+      let topicsExpanded = true;
+      try { topicsExpanded = localStorage.getItem(localTopicsKey) !== '1'; } catch (_) {}
+      const topicsWrap = document.createElement('div');
+      topicsWrap.className = 'quarter-toggle-wrap';
+      const topicsLabel = document.createElement('span');
+      topicsLabel.className = 'quarter-toggle-label';
+      const topicsToggle = document.createElement('button');
+      topicsToggle.type = 'button';
+      topicsToggle.className = 'neu-switch cabinet-topics-toggle';
+      topicsToggle.setAttribute('role', 'switch');
+      topicsToggle.setAttribute('aria-label', `Темы в кабинете: ${item.name}, ${group.name}`);
+      const topicsThumb = document.createElement('span');
+      topicsThumb.className = 'neu-switch-thumb';
+      topicsToggle.append(topicsThumb);
+      const updateLocalTopics = () => {
+        links.hidden = !topicsExpanded;
+        topicsToggle.setAttribute('aria-checked', String(topicsExpanded));
+        topicsToggle.setAttribute('aria-pressed', String(topicsExpanded));
+        topicsLabel.textContent = topicsExpanded ? 'Темы в кабинете показаны' : 'Темы в кабинете скрыты';
+        topicsToggle.title = topicsExpanded ? 'Скрыть темы только в кабинете' : 'Показать темы в кабинете';
+      };
+      topicsToggle.addEventListener('click', () => {
+        topicsExpanded = !topicsExpanded;
+        updateLocalTopics();
+        try { localStorage.setItem(localTopicsKey, topicsExpanded ? '0' : '1'); } catch (_) {}
+      });
+      updateLocalTopics();
+      topicsWrap.append(topicsLabel, topicsToggle);
+      heading.append(topicsWrap);
+
       group.lessons.forEach((lesson) => {
 
         const row = document.createElement('div');
