@@ -147,6 +147,17 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
   box-shadow: var(--shadow-soft);
 }
 
+body[data-lesson-id="9-q2-3"] .q2-hero-slide .q2-visual {
+  background: #ececf4;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 8px 8px 18px rgba(15, 23, 42, 0.10), -8px -8px 18px rgba(255, 255, 255, 0.92);
+  padding: 32px 26px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .q2-visual svg {
   display: block;
   width: 100%;
