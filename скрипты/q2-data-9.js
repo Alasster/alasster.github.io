@@ -412,7 +412,7 @@
           { icon: 'fas fa-list-ol', text: 'Порядок строк' },
           { icon: 'fas fa-calculator', text: 'Промежуточные столбцы' }
         ],
-        visual: 'truth',
+        visual: LOCK3_SVG,
         visualCaption: 'Четыре строки — четыре возможных состояния двух выключателей',
         cta: 'Построить первую таблицу'
       },
@@ -502,7 +502,7 @@
           { icon: 'fas fa-layer-group', text: 'Блоки по четыре' },
           { icon: 'fas fa-scale-balanced', text: 'Закон де Моргана' }
         ],
-        visual: 'truth',
+        visual: LOCK3_SVG,
         visualCaption: 'Три переменные дают 2³ = 8 строк',
         cta: 'Разложить по блокам'
       },

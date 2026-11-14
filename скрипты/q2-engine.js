@@ -244,7 +244,7 @@
           </div>
         </div>
         <div class="q2-visual">
-          ${svgScene(slide.visual || 'lamp', slide.visualConfig)}
+          ${slide.visual && slide.visual.trim().startsWith('<svg') ? slide.visual : svgScene(slide.visual || 'lamp', slide.visualConfig)}
           ${slide.visualCaption ? `<p class="q2-visual-caption">${slide.visualCaption}</p>` : ''}
         </div>
       </div>
