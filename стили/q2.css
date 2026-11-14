@@ -245,7 +245,7 @@ body[data-lesson-id="9-q2-2"] .q2-hero-slide .q2-visual {
   height: 32px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  background: transparent;
+  background: var(--bg, #eef2ff);
   color: #475569;
   display: inline-flex;
   align-items: center;
@@ -544,7 +544,7 @@ body.lesson-page.q2-lesson .slide .q2-card .q2-card-icon {
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: transparent;
+  background: var(--bg, #eef2ff);
   border: 1px solid rgba(255, 255, 255, 0.7);
   color: #475569;
   box-shadow: inset 2px 2px 5px rgba(15, 23, 42, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
