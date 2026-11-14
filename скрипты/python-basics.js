@@ -268,15 +268,26 @@ function initNavigation() {
       <div class="topbar-progress" id="topbarProgress">
         <span class="progress-label" id="progressLabel">Прогресс</span>
         <div class="progress-dots" id="progressDots"></div>
-        <a class="brand-icon-box python-account-link" id="pythonAccountLink" href="https://cabinet.alasster.site/" aria-label="Войти или открыть личный кабинет" title="Войти или открыть личный кабинет">
+        <div class="python-account">
+        <button type="button" class="brand-icon-box python-account-link" id="pythonAccountLink" aria-controls="pythonAccountMenu" aria-expanded="false" aria-label="Войти в личный кабинет" title="Войти в личный кабинет">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
           </svg>
-        </a>
+        </button>
+        <div class="python-account-menu" id="pythonAccountMenu" hidden>
+          <div class="python-account-heading"><strong id="pythonAccountName"></strong><span id="pythonAccountRole"></span></div>
+          <a id="pythonCabinetLink" class="python-account-action" href="https://cabinet.alasster.site/">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>Личный кабинет
+          </a>
+          <button type="button" class="python-account-action" id="pythonLogoutButton">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M14 8l4 4-4 4M8 12h13"/></svg>Выйти из аккаунта
+          </button>
+        </div>
+        </div>
       </div>
     `;
     const updateAccountLink = () => {
-      const link = document.getElementById('pythonAccountLink');
+      const link = document.getElementById('pythonCabinetLink');
       const local = ['localhost', '127.0.0.1'].includes(location.hostname);
       const base = window.AlassterBackend?.url || window.ALASSTER_CABINET_URL || (local ? 'http://127.0.0.1:8010' : 'https://cabinet.alasster.site');
       if (link) link.href = new URL('/', base).href;
@@ -284,9 +295,14 @@ function initNavigation() {
     updateAccountLink();
     window.addEventListener('alasster-backend-state', updateAccountLink);
     const accountLink = document.getElementById('pythonAccountLink');
+    const accountMenu = document.getElementById('pythonAccountMenu');
+    let accountUser = null;
+    const closeAccountMenu = () => { accountMenu.hidden = true; accountLink.setAttribute('aria-expanded', 'false'); };
     const guestIcon = accountLink.innerHTML;
     const updateAccountIdentity = user => {
+      accountUser = user;
       if (!user) {
+        closeAccountMenu();
         accountLink.innerHTML = guestIcon;
         accountLink.title = 'Войти в личный кабинет';
         accountLink.setAttribute('aria-label', accountLink.title);
@@ -300,9 +316,30 @@ function initNavigation() {
       accountLink.textContent = initials.toLocaleUpperCase('ru') || 'ЛК';
       accountLink.title = `Личный кабинет — ${fullName}`;
       accountLink.setAttribute('aria-label', accountLink.title);
+      document.getElementById('pythonAccountName').textContent = fullName;
+      document.getElementById('pythonAccountRole').textContent = ({ superadmin: 'Супер-администратор', admin: 'Администратор', teacher: 'Учитель', user: 'Ученик' })[user.role] || '';
     };
-    try { updateAccountIdentity(JSON.parse(localStorage.getItem('alasster_auth_user') || 'null')); } catch (_) {}
+    // Initials are shown only after the server confirms the current session.
+    updateAccountIdentity(null);
     if (window.PythonProgress) PythonProgress.onAccountChange = updateAccountIdentity;
+    accountLink.addEventListener('click', () => {
+      updateAccountLink();
+      if (!accountUser) {
+        location.assign(new URL(`/login?return_to=${encodeURIComponent(location.href)}`, document.getElementById('pythonCabinetLink').href).href);
+        return;
+      }
+      accountMenu.hidden = !accountMenu.hidden;
+      accountLink.setAttribute('aria-expanded', String(!accountMenu.hidden));
+      window.PythonProgress?.refreshAccount();
+    });
+    document.getElementById('pythonLogoutButton').addEventListener('click', () => {
+      closeAccountMenu();
+      window.PythonProgress?.logout();
+    });
+    document.addEventListener('click', event => { if (!event.target.closest('.python-account')) closeAccountMenu(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !accountMenu.hidden) { closeAccountMenu(); accountLink.focus(); }
+    });
   }
 
   // Update module label in hero

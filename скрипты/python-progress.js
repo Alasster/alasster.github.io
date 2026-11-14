@@ -1,7 +1,7 @@
 /* Account-scoped drafts. No polling and no write for an unchanged editor. */
 (() => {
   const MAX_BYTES = 32768;
-  let lesson, owner = 'guest', verified = false, base = '', active = null;
+  let lesson, owner = 'guest', verified = false, base = '', active = null, authGeneration = 0;
   let tasks = {}, timer, busy = false, connecting = false, lastWrite = 0, status, message, controls, loginButton;
   const bindings = new Map();
   const encoder = new TextEncoder();
@@ -77,6 +77,7 @@
   async function connect() {
     if (connecting || busy) return;
     connecting = true;
+    const generation = authGeneration;
     verified = false;
     try {
       if (!window.AlassterBackend) {
@@ -91,9 +92,15 @@
       const response = await request('/api/me');
       if (!response.ok && response.status !== 401) throw Error('offline');
       const user = response.ok ? await response.json() : null;
+      if (generation !== authGeneration) return;
       window.PythonProgress.onAccountChange?.(user);
       if (user) {
         try { localStorage.setItem('alasster_auth_user', JSON.stringify(user)); } catch (_) {}
+      } else {
+        try {
+          localStorage.removeItem('alasster_auth_user');
+          localStorage.removeItem('alasster_logged_in');
+        } catch (_) {}
       }
       const nextOwner = user ? String(user.id) : 'guest';
       if (owner !== nextOwner) {
@@ -110,6 +117,7 @@
         const result = await request(`/api/python-progress/${lesson}`);
         if (!result.ok) throw Error('offline');
         const payload = await result.json();
+        if (generation !== authGeneration) return;
         if (String(payload.user_id) !== owner) throw Error('account changed');
         payload.tasks.forEach(remote => {
           const local = tasks[remote.task_id];
@@ -157,6 +165,11 @@
       if (owner !== currentOwner) return;
       if (response.status === 401 || response.status === 403) {
         verified = false; retry = false;
+        window.PythonProgress.onAccountChange?.(null);
+        try {
+          localStorage.removeItem('alasster_auth_user');
+          localStorage.removeItem('alasster_logged_in');
+        } catch (_) {}
         throw Error('account');
       }
       if (response.status === 409 && payload.current) row.conflict = payload.current;
@@ -208,6 +221,13 @@
         paint(); connect();
       });
       window.addEventListener('online', connect);
+      window.addEventListener('focus', connect);
+      window.addEventListener('storage', event => {
+        if (event.key === 'alasster_auth_user' || event.key === 'alasster_logged_in') {
+          if (event.newValue === null) window.PythonProgress.onAccountChange?.(null);
+          connect();
+        }
+      });
       window.addEventListener('pageshow', event => { if (event.persisted) connect(); });
       window.addEventListener('pagehide', () => { persist(); flush(); });
       document.addEventListener('visibilitychange', () => { if (document.hidden) { persist(); flush(); } else connect(); });
@@ -253,6 +273,21 @@
       persist(); paint();
       if (row.tooLarge) show('Код больше 32 КБ: сохранён только в этом браузере.');
       else schedule();
+    },
+    refreshAccount: connect,
+    logout() {
+      ++authGeneration;
+      verified = false; clearTimeout(timer); persist();
+      try {
+        localStorage.removeItem('alasster_auth_user');
+        localStorage.removeItem('alasster_logged_in');
+      } catch (_) {}
+      owner = 'guest'; tasks = readCache(); active = null;
+      const editor = document.getElementById('codeEditor');
+      if (editor) { editor.value = ''; updateGutter(); highlight(); }
+      window.PythonProgress.onAccountChange?.(null);
+      paint();
+      if (base) location.assign(`${base}/logout?return_to=${encodeURIComponent(location.href)}`);
     },
     flush
   };

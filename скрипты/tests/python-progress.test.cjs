@@ -18,8 +18,8 @@ function harness({ user = 1, remote = [], storage = new Map(), offline = false }
   const context = { console, TextEncoder, URL, AbortSignal, queueMicrotask,
     setTimeout(fn, delay) { timers.push({ fn, delay }); return timers.length; }, clearTimeout() {},
     updateGutter() {}, highlight() {},
-    location: { href: 'https://alasster.site/Python/1.html', assign() {} },
-    localStorage: { getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v) },
+    location: { href: 'https://alasster.site/Python/1.html', assign(url) { state.navigation = url; } },
+    localStorage: { getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v), removeItem: k => storage.delete(k) },
     document: { hidden: false, createElement: element, querySelector: () => compiler,
       getElementById: () => editor, addEventListener: (name, fn) => { listeners[name] = fn; } },
     fetch: async (url, options) => {
@@ -99,4 +99,57 @@ test('oversized code stays local and guest progress is never uploaded', async ()
   guest.api.setDone('task-001', 1); await guest.api.flush();
   assert.equal(guest.state.writes, 0);
   assert.equal(guest.api.isDone('task-001', 1), true);
+});
+
+test('logout in another tab clears stale identity on focus', async () => {
+  const storage = new Map([['alasster_auth_user', '{"id":1}'], ['alasster_logged_in', '1']]);
+  const h = harness({ storage }); await settle();
+  let identity = 'stale';
+  h.api.onAccountChange = user => { identity = user; };
+  h.state.user = null;
+  h.listeners.focus(); await settle();
+  assert.equal(identity, null);
+  assert.equal(storage.has('alasster_auth_user'), false);
+  assert.equal(storage.has('alasster_logged_in'), false);
+});
+
+test('local logout clears identity immediately, keeps drafts, and uses server logout', async () => {
+  const storage = new Map([['alasster_auth_user', '{"id":1}']]);
+  const h = harness({ storage }); await settle();
+  h.api.open('task-001', ''); h.api.edit('keep this draft');
+  let identity = 'stale'; h.api.onAccountChange = user => { identity = user; };
+  h.api.logout();
+  assert.equal(identity, null);
+  assert.equal(storage.has('alasster_auth_user'), false);
+  assert.match(h.state.navigation, /^https:\/\/cabinet\.alasster\.site\/logout\?return_to=/);
+  assert.equal(JSON.parse(storage.get('py-progress-v1:1:L1'))['task-001'].code, 'keep this draft');
+  await h.api.flush(); assert.equal(h.state.writes, 0);
+});
+
+test('account dropdown opens, closes, exposes cabinet and logout, and never trusts cached initials', () => {
+  const engine = fs.readFileSync(path.join(__dirname, '../python-basics.js'), 'utf8');
+  const start = engine.indexOf('    const updateAccountLink = () => {');
+  const end = engine.indexOf('\n  }\n\n  // Update module label', start);
+  assert.ok(start > 0 && end > start);
+  const elements = new Map();
+  const make = id => ({ innerHTML: '<svg></svg>', hidden: true, attrs: {}, events: {},
+    setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(k, fn) { this.events[k] = fn; }, focus() { this.focused = true; } });
+  const get = id => { if (!elements.has(id)) elements.set(id, make(id)); return elements.get(id); };
+  const events = {}; let refreshed = 0, loggedOut = 0;
+  const progress = { refreshAccount() { refreshed++; }, logout() { loggedOut++; } };
+  const context = { URL, PythonProgress: progress,
+    location: { hostname: 'alasster.site', href: 'https://alasster.site/lesson', assign() {} },
+    window: { PythonProgress: progress, addEventListener() {} },
+    document: { getElementById: get, addEventListener: (type, fn) => { events[type] = fn; } } };
+  vm.runInNewContext(engine.slice(start, end), context);
+  const trigger = get('pythonAccountLink'), menu = get('pythonAccountMenu');
+  assert.equal(trigger.innerHTML, '<svg></svg>');
+  progress.onAccountChange({ first_name: 'Alice', last_name: 'Smith', role: 'user' });
+  assert.equal(trigger.textContent, 'AS');
+  trigger.events.click(); assert.equal(menu.hidden, false); assert.equal(refreshed, 1);
+  assert.equal(get('pythonCabinetLink').href, 'https://cabinet.alasster.site/');
+  events.keydown({ key: 'Escape' }); assert.equal(menu.hidden, true); assert.equal(trigger.focused, true);
+  trigger.events.click(); events.click({ target: { closest() { return null; } } }); assert.equal(menu.hidden, true);
+  trigger.events.click(); get('pythonLogoutButton').events.click(); assert.equal(menu.hidden, true); assert.equal(loggedOut, 1);
+  progress.onAccountChange(null); assert.equal(trigger.innerHTML, '<svg></svg>');
 });
