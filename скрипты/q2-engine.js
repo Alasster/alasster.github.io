@@ -1965,9 +1965,9 @@
     el.classList.add('q2-expression-order');
     el.innerHTML = `<div class="q2-expression-map">
         <span class="q2-formula-kicker">ЛОГИЧЕСКОЕ ВЫРАЖЕНИЕ</span>
-        <div class="q2-expression-main">${is3 ? '(A ∧ B) <em>∨</em> C' : '<span class="q2-overline">A ∧ B</span> <em>∨</em> (A ∧ <span class="q2-overline">B</span>)'}</div>
+        <div class="q2-expression-main">${is3 ? '(A ∧ B) <em>∨</em> (<span class="q2-overline">B</span> ∧ C)' : '<span class="q2-overline">A ∧ B</span> <em>∨</em> (A ∧ <span class="q2-overline">B</span>)'}</div>
       </div>
-      <div class="q2-order-card">
+      ${is3 ? '' : `<div class="q2-order-card">
         <span class="q2-formula-kicker">ПОРЯДОК ДЕЙСТВИЙ</span>
         <div class="q2-order-scheme" aria-label="Схема порядка действий: скобки, НЕ, И, ИЛИ">
           <span>Скобки</span><i class="fas fa-arrow-right"></i><span>НЕ</span><i class="fas fa-arrow-right"></i><span>И</span><i class="fas fa-arrow-right"></i><span>ИЛИ</span>
@@ -1978,16 +1978,16 @@
           <p><b>И</b>Получится 1, только если обе части равны 1.</p>
           <p><b>ИЛИ</b>Получится 1, если хотя бы одна часть равна 1.</p>
         </div>
-      </div>
+      </div>`}
       <div class="q2-teaching-table" data-teaching-table></div>`;
     const leftAnd = logicBinary('and', 'A', 'B');
     const leftNot = logicNot(leftAnd);
     const rightNot = logicNot('B');
-    const rightAnd = logicBinary('and', 'A', rightNot);
-    const result = is3 ? logicBinary('or', leftAnd, 'C') : logicBinary('or', leftNot, rightAnd);
-    const columns = is3 ? [leftAnd, result] : [leftAnd, leftNot, rightNot, rightAnd, result];
+    const rightAnd = is3 ? logicBinary('and', rightNot, 'C') : logicBinary('and', 'A', rightNot);
+    const result = is3 ? logicBinary('or', leftAnd, rightAnd) : logicBinary('or', leftNot, rightAnd);
+    const columns = is3 ? [leftAnd, rightNot, rightAnd, result] : [leftAnd, leftNot, rightNot, rightAnd, result];
     const descriptions = is3
-      ? ['Записываем все 8 наборов для A, B и C.', '1. Скобки (A ∧ B): единица только при A = 1 и B = 1.', '2. Итог (A ∧ B) ∨ C: единица, если хотя бы одна часть равна 1.']
+      ? ['Записываем все 8 наборов для A, B и C.', '1. И (A ∧ B): единица только при A = 1 и B = 1.', '2. НЕ (¬B): меняем значения столбца B на противоположные.', '3. И (¬B ∧ C): соединяем ¬B и C через И.', '4. ИЛИ: соединяем (A ∧ B) и (¬B ∧ C). Единица, если хотя бы одна часть равна 1.']
       : ['Записываем все наборы: 00, 01, 10, 11.', 'И: единица только при A = 1 и B = 1.', 'НЕ: меняем каждое значение предыдущего столбца на противоположное.', 'Отрицаем только B: 0 → 1, 1 → 0.', 'И: соединяем A и отрицание B.', 'ИЛИ: соединяем обе ветви. Единица, если хотя бы одна из них равна 1.'];
     const inputRows = is3
       ? [[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
