@@ -6139,7 +6139,7 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   text-align: center;
   padding: 12px 16px;
   border-radius: 14px;
-  background: transparent !important;
+  background: #f0f2fb !important;
   border: none;
   box-shadow: inset 3px 4px 10px rgba(148, 163, 184, .45), inset -3px -3px 8px rgba(255, 255, 255, .9);
   margin-bottom: 12px;
@@ -6302,7 +6302,7 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
 
 /* 9 класс: вдавленные строки дескрипторов и выдавленные бейджи баллов */
 body.lesson-page:is([class*="lesson-9-"], [data-lesson-id^="9-"]) .q2-rubric-panel .rubric-row {
-  background: transparent !important;
+  background: #f0f2fb !important;
   border: none !important;
   border-radius: 14px;
   padding: 12px 16px;
