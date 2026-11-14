@@ -1765,14 +1765,16 @@
     return result;
   }
 
-  WIDGETS.truthNotebook = function (el) {
+  WIDGETS.truthNotebook = function (el, cfg) {
+    const varsCount = cfg && cfg.vars === 3 ? 3 : 2;
+    const storageKey = varsCount === 3 ? 'q2-9-3-notebook' : 'q2-9-2-notebook';
     const random = max => {
       const values = new Uint32Array(1);
       window.crypto.getRandomValues(values);
       return values[0] % max;
     };
     const makeTree = count => {
-      if (count === 0) return random(2) ? 'A' : 'B';
+      if (count === 0) return varsCount === 3 ? ['A', 'B', 'C'][random(3)] : (random(2) ? 'A' : 'B');
       if (random(4) === 0) return logicNot(makeTree(count - 1));
       const leftCount = random(count);
       return logicBinary(random(2) ? 'and' : 'or', makeTree(leftCount), makeTree(count - 1 - leftCount));
@@ -1788,23 +1790,30 @@
       return suitable(node.left, depth + 1) && suitable(node.right, depth + 1);
     };
     let previous = [];
-    try { previous = JSON.parse(localStorage.getItem('q2-9-2-notebook') || '[]'); } catch (_) { /* storage is optional */ }
+    try { previous = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch (_) { /* storage is optional */ }
     const operationCounts = [3, 4, 4];
+    const inputRows = varsCount === 3
+      ? [[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
+      : [[0,0],[0,1],[1,0],[1,1]];
     const tasks = operationCounts.map((operations, index) => {
       let node;
       while (true) {
         node = makeTree(operations);
         const signature = logicText(node);
-        const values = [[0,0],[0,1],[1,0],[1,1]].map(row => logicValue(node, ...row));
-        const usesBoth = /A/.test(signature) && /B/.test(signature);
-        const dependsBoth = (values[0] !== values[2] || values[1] !== values[3])
-          && (values[0] !== values[1] || values[2] !== values[3]);
+        const values = inputRows.map(row => logicValue(node, ...row));
+        const usesAll = /A/.test(signature) && /B/.test(signature) && (varsCount === 2 || /C/.test(signature));
+        const dependsAll = varsCount === 3
+          ? ([0,1,2,3].some(i => values[i] !== values[i + 4])
+            && [0,1,4,5].some(i => values[i] !== values[i + 2])
+            && [0,2,4,6].some(i => values[i] !== values[i + 1]))
+          : ((values[0] !== values[2] || values[1] !== values[3])
+            && (values[0] !== values[1] || values[2] !== values[3]));
         const mixedOperations = signature.includes('НЕ') && (operations === 2 || (signature.includes('∧') && signature.includes('∨')));
-        if (usesBoth && dependsBoth && mixedOperations && suitable(node) && signature !== previous[index] && logicColumns(node).length === operations) break;
+        if (usesAll && dependsAll && mixedOperations && suitable(node) && signature !== previous[index] && logicColumns(node).length === operations) break;
       }
       return node;
     });
-    try { localStorage.setItem('q2-9-2-notebook', JSON.stringify(tasks.map(logicText))); } catch (_) { /* storage is optional */ }
+    try { localStorage.setItem(storageKey, JSON.stringify(tasks.map(logicText))); } catch (_) { /* storage is optional */ }
     const taskColumns = tasks.map(node => ['A', 'B', ...logicColumns(node)]);
     const answers = taskColumns.map(columns => Array.from({ length: 4 }, () => columns.map(() => '?')));
     const orderPool = taskColumns[2].slice(2, -1);
