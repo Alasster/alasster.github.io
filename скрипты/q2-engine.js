@@ -1991,6 +1991,253 @@
     render(0);
   };
 
+  WIDGETS.circuitBuilder = function (el) {
+    el.classList.add('q2-circuit-builder');
+    const pool = [
+      logicBinary('and', logicNot('A'), 'B'),
+      logicBinary('or', 'A', logicNot('B')),
+      logicNot(logicBinary('and', 'A', 'B')),
+      logicNot(logicBinary('or', 'A', 'B')),
+      logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('A')),
+      logicBinary('or', logicBinary('and', 'A', 'B'), logicNot('B')),
+      logicBinary('and', logicNot('A'), logicNot('B')),
+      logicBinary('or', logicNot('A'), logicNot('B'))
+    ];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const tasks = pool.slice(0, 3);
+    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1 }));
+    const solved = tasks.map(() => false);
+    let current = 0;
+    let pendingFrom = null;
+
+    el.innerHTML = `
+      <div class="q2-cb-tabs" role="tablist" aria-label="Задания по схемам">
+        ${tasks.map((_, i) => `<button type="button" role="tab" class="q2-notebook-tab" data-cb-tab="${i}" aria-selected="${i === 0}">Задание ${i + 1}</button>`).join('')}
+      </div>
+      <div data-cb-panel></div>
+    `;
+
+    const tabs = [...el.querySelectorAll('[data-cb-tab]')];
+    const panel = el.querySelector('[data-cb-panel]');
+
+    const portPos = (canvasRect, portEl) => {
+      const r = portEl.getBoundingClientRect();
+      return { x: r.left - canvasRect.left + r.width / 2, y: r.top - canvasRect.top + r.height / 2 };
+    };
+
+    const render = idx => {
+      current = idx;
+      pendingFrom = null;
+      tabs.forEach((t, i) => {
+        t.classList.toggle('is-active', i === idx);
+        t.classList.toggle('is-done', solved[i]);
+        t.setAttribute('aria-selected', String(i === idx));
+      });
+      const st = states[idx];
+      panel.innerHTML = `
+        <div class="q2-cb-formula">
+          <div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[idx]))}">${logicHTML(tasks[idx])}</div>
+          <span class="q2-pill">Соедините выход с входом</span>
+        </div>
+        <div class="q2-cb-toolbar">
+          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="and">+ И</button>
+          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">+ ИЛИ</button>
+          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">+ НЕ</button>
+          <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
+        </div>
+        <div class="q2-cb-canvas" data-cb-canvas>
+          <svg class="q2-cb-wires" data-cb-wires>
+            <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
+          </svg>
+          <div class="q2-cb-node is-fixed" data-cb-node="A" style="left:16px;top:68px;">A<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
+          <div class="q2-cb-node is-fixed" data-cb-node="B" style="left:16px;top:210px;">B<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
+          <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;">Y<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
+          ${st.gates.map(g => {
+            const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : 'НЕ';
+            const inPorts = g.op === 'not'
+              ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
+              : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
+            return `<div class="q2-cb-node is-gate-${g.op}" data-cb-gate="${g.id}" style="left:${g.x}px;top:${g.y}px;">${inPorts}${label}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="${g.id}" aria-label="Выход ${label}"></button><button type="button" class="q2-cb-del" data-cb-del="${g.id}" aria-label="Удалить ${label}">×</button></div>`;
+          }).join('')}
+        </div>
+        <div class="q2-cb-actions">
+          <p class="q2-feedback" data-cb-feedback role="status" aria-live="polite">Добавьте элементы и соедините их стрелками от A и B к Y.</p>
+          <button type="button" class="q2-btn" data-cb-check>Проверить</button>
+        </div>
+      `;
+
+      const canvas = panel.querySelector('[data-cb-canvas]');
+      const svg = panel.querySelector('[data-cb-wires]');
+      const feedback = panel.querySelector('[data-cb-feedback]');
+
+      const drawWires = () => {
+        const rect = canvas.getBoundingClientRect();
+        svg.querySelectorAll('path[data-wire]').forEach(p => p.remove());
+        panel.querySelectorAll('.q2-cb-port').forEach(p => p.classList.remove('is-connected'));
+        st.wires.forEach(w => {
+          const fromEl = canvas.querySelector(`[data-port-out="${w.from}"]`);
+          const toEl = canvas.querySelector(`[data-port-in="${w.to}"]`);
+          if (!fromEl || !toEl) return;
+          fromEl.classList.add('is-connected');
+          toEl.classList.add('is-connected');
+          const a = portPos(rect, fromEl);
+          const b = portPos(rect, toEl);
+          const dx = Math.max(36, Math.abs(b.x - a.x) * 0.45);
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('data-wire', '1');
+          path.setAttribute('class', 'q2-cb-wire');
+          path.setAttribute('marker-end', 'url(#q2-cb-arrow)');
+          path.setAttribute('d', `M ${a.x} ${a.y} C ${a.x + dx} ${a.y}, ${b.x - dx} ${b.y}, ${b.x} ${b.y}`);
+          svg.appendChild(path);
+        });
+      };
+
+      requestAnimationFrame(drawWires);
+
+      panel.querySelectorAll('[data-cb-add]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const op = btn.dataset.cbAdd;
+          const offset = (st.gates.length % 4) * 26;
+          st.gates.push({ id: `g${st.nextId++}`, op, x: 160 + offset, y: 80 + offset });
+          render(idx);
+        });
+      });
+
+      panel.querySelector('[data-cb-clear]').addEventListener('click', () => {
+        st.gates = [];
+        st.wires = [];
+        solved[idx] = false;
+        render(idx);
+      });
+
+      panel.querySelectorAll('[data-cb-del]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const gid = btn.dataset.cbDel;
+          st.gates = st.gates.filter(g => g.id !== gid);
+          st.wires = st.wires.filter(w => w.from !== gid && !w.to.startsWith(`${gid}:`));
+          render(idx);
+        });
+      });
+
+      panel.querySelectorAll('[data-port-out]').forEach(port => {
+        port.addEventListener('click', e => {
+          e.stopPropagation();
+          const id = port.dataset.portOut;
+          panel.querySelectorAll('[data-port-out]').forEach(p => p.classList.remove('is-active'));
+          if (pendingFrom === id) { pendingFrom = null; return; }
+          pendingFrom = id;
+          port.classList.add('is-active');
+          feedback.className = 'q2-feedback';
+          feedback.textContent = 'Теперь нажмите на вход элемента или Y, чтобы провести стрелку.';
+        });
+      });
+
+      panel.querySelectorAll('[data-port-in]').forEach(port => {
+        port.addEventListener('click', e => {
+          e.stopPropagation();
+          const target = port.dataset.portIn;
+          if (!pendingFrom) {
+            const had = st.wires.some(w => w.to === target);
+            if (had) {
+              st.wires = st.wires.filter(w => w.to !== target);
+              drawWires();
+              feedback.className = 'q2-feedback';
+              feedback.textContent = 'Связь удалена.';
+            }
+            return;
+          }
+          if (pendingFrom === target.split(':')[0]) return;
+          st.wires = st.wires.filter(w => w.to !== target);
+          st.wires.push({ from: pendingFrom, to: target });
+          pendingFrom = null;
+          panel.querySelectorAll('[data-port-out]').forEach(p => p.classList.remove('is-active'));
+          drawWires();
+          feedback.className = 'q2-feedback';
+          feedback.textContent = 'Стрелка добавлена. Когда схема готова, нажмите «Проверить».';
+        });
+      });
+
+      panel.querySelectorAll('[data-cb-gate]').forEach(node => {
+        node.addEventListener('pointerdown', e => {
+          if (e.target.closest('button')) return;
+          const gid = node.dataset.cbGate;
+          const gate = st.gates.find(g => g.id === gid);
+          if (!gate) return;
+          const startX = e.clientX - gate.x;
+          const startY = e.clientY - gate.y;
+          node.setPointerCapture(e.pointerId);
+          const onMove = ev => {
+            const rect = canvas.getBoundingClientRect();
+            gate.x = Math.max(76, Math.min(rect.width - 150, ev.clientX - startX));
+            gate.y = Math.max(12, Math.min(rect.height - 60, ev.clientY - startY));
+            node.style.left = `${gate.x}px`;
+            node.style.top = `${gate.y}px`;
+            drawWires();
+          };
+          const onUp = () => {
+            node.removeEventListener('pointermove', onMove);
+            node.removeEventListener('pointerup', onUp);
+          };
+          node.addEventListener('pointermove', onMove);
+          node.addEventListener('pointerup', onUp);
+        });
+      });
+
+      panel.querySelector('[data-cb-check]').addEventListener('click', () => {
+        const yWire = st.wires.find(w => w.to === 'Y:0');
+        if (!yWire) {
+          feedback.className = 'q2-feedback is-bad';
+          feedback.textContent = 'Выход Y ещё не подключён. Проведите стрелку к Y.';
+          return;
+        }
+        const evalSource = (src, A, B, visiting) => {
+          if (src === 'A') return A;
+          if (src === 'B') return B;
+          if (visiting.has(src)) return null;
+          const gate = st.gates.find(g => g.id === src);
+          if (!gate) return null;
+          visiting.add(src);
+          const w0 = st.wires.find(w => w.to === `${src}:0`);
+          if (!w0) return null;
+          const v0 = evalSource(w0.from, A, B, new Set(visiting));
+          if (v0 === null) return null;
+          if (gate.op === 'not') return 1 - v0;
+          const w1 = st.wires.find(w => w.to === `${src}:1`);
+          if (!w1) return null;
+          const v1 = evalSource(w1.from, A, B, new Set(visiting));
+          if (v1 === null) return null;
+          return gate.op === 'and' ? (v0 & v1) : (v0 | v1);
+        };
+        const rows = [[0, 0], [0, 1], [1, 0], [1, 1]];
+        for (const [A, B] of rows) {
+          const got = evalSource(yWire.from, A, B, new Set());
+          if (got === null) {
+            feedback.className = 'q2-feedback is-bad';
+            feedback.textContent = 'Не все входы элементов подключены или в схеме есть петля.';
+            return;
+          }
+          const expected = logicValue(tasks[idx], A, B, 0);
+          if (got !== expected) {
+            feedback.className = 'q2-feedback is-bad';
+            feedback.textContent = `На наборе A=${A}, B=${B} схема даёт ${got}, а должно быть ${expected}.`;
+            return;
+          }
+        }
+        solved[idx] = true;
+        tabs[idx].classList.add('is-done');
+        feedback.className = 'q2-feedback is-good';
+        feedback.textContent = 'Верно! Схема работает правильно на всех четырёх наборах.';
+      });
+    };
+
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => render(i)));
+    render(0);
+  };
+
   WIDGETS.expressionOrder = function (el, cfg) {
     const is3 = cfg && cfg.vars === 3;
     el.classList.add('q2-expression-order');

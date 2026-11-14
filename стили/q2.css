@@ -6114,3 +6114,133 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
   border-left-color: #2563eb;
 }
 
+
+/* 9 класс, урок 4: анимированная схема 3 элементов и редактор схем */
+@keyframes q2-wire-flow {
+  to { stroke-dashoffset: -24; }
+}
+.q2-hero-wire-anim {
+  stroke-dasharray: 6 6;
+  animation: q2-wire-flow 1.2s linear infinite;
+}
+.q2-cb-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.q2-cb-formula {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--bg-soft, #f5f3ff);
+  border: 1px solid var(--border, #e2e8f0);
+  margin-bottom: 12px;
+}
+.q2-cb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.q2-cb-canvas {
+  position: relative;
+  height: 330px;
+  border-radius: 16px;
+  border: 1.5px solid var(--border, #cbd5e1);
+  background: #ffffff;
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 18px 18px;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+}
+.q2-cb-wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.q2-cb-wire {
+  fill: none;
+  stroke: #6366f1;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.q2-cb-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 48px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
+  font-weight: 800;
+  font-size: 14px;
+  color: #1e293b;
+  cursor: grab;
+  z-index: 2;
+}
+.q2-cb-node.is-fixed {
+  cursor: default;
+  min-width: 52px;
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+.q2-cb-node.is-gate-and { border-color: #8b5cf6; background: #f5f3ff; color: #5b21b6; }
+.q2-cb-node.is-gate-or { border-color: #06b6d4; background: #ecfeff; color: #0e7490; }
+.q2-cb-node.is-gate-not { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+.q2-cb-port {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid #475569;
+  background: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  z-index: 3;
+  transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
+}
+.q2-cb-port:hover { transform: scale(1.22); border-color: #4f46e5; }
+.q2-cb-port.is-active { background: #4f46e5; border-color: #312e81; transform: scale(1.25); }
+.q2-cb-port.is-connected { background: #6366f1; border-color: #4338ca; }
+.q2-cb-port-out { right: -7px; top: 50%; margin-top: -7px; }
+.q2-cb-port-in0 { left: -7px; top: 50%; margin-top: -7px; }
+.q2-cb-port-in1 { left: -7px; top: 28%; margin-top: -7px; }
+.q2-cb-port-in2 { left: -7px; top: 72%; margin-top: -7px; }
+.q2-cb-del {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.q2-cb-del:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+.q2-cb-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
