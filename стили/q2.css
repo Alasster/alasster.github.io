@@ -3689,6 +3689,17 @@ circle.q2-scene-node,
   min-width: 0;
 }
 
+.q2-split:has(> .q2-split-col > .q2-svg-wrap:only-child) {
+  align-items: stretch;
+}
+
+.q2-split-col > .q2-svg-wrap:only-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .q2-svg-compact {
   padding: 14px 16px;
 }
