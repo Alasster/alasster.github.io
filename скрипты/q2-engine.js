@@ -2013,9 +2013,10 @@
     let current = 0;
     let pendingFrom = null;
 
+    const tabMarks = ['2 балла', '3 балла', '4 балла'];
     el.innerHTML = `
       <div class="q2-notebook-tabs" role="tablist" aria-label="Задания по схемам">
-        ${tasks.map((_, i) => `<button type="button" role="tab" class="q2-notebook-tab" data-cb-tab="${i}" aria-selected="${i === 0}">Задание ${i + 1}</button>`).join('')}
+        ${tasks.map((_, i) => `<button type="button" role="tab" class="q2-notebook-tab" data-cb-tab="${i}" aria-selected="${i === 0}">Задание ${i + 1} · ${tabMarks[i]}</button>`).join('')}
       </div>
       <div data-cb-panel></div>
     `;
