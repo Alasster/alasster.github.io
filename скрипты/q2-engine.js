@@ -1736,17 +1736,21 @@
   const logicNot = child => ({ op: 'not', child });
   const logicBinary = (op, left, right) => ({ op, left, right });
   const logicSign = { and: '∧', or: '∨' };
-  function logicHTML(node) {
+  function logicHTML(node, algebraic = false) {
     if (typeof node === 'string') return node;
-    if (node.op === 'not') return `<span class="q2-overline">${logicHTML(node.child)}</span>`;
+    if (node.op === 'not') return `<span class="q2-overline">${logicHTML(node.child, algebraic)}</span>`;
     const operand = child => typeof child !== 'string' && child.op !== 'not'
-      ? `(${logicHTML(child)})` : logicHTML(child);
-    return `${operand(node.left)} <span class="q2-logic-sign">${logicSign[node.op]}</span> ${operand(node.right)}`;
+      ? `(${logicHTML(child, algebraic)})` : logicHTML(child, algebraic);
+    if (algebraic && node.op === 'and') return `${operand(node.left)}${operand(node.right)}`;
+    const sign = algebraic && node.op === 'or' ? '+' : logicSign[node.op];
+    return `${operand(node.left)} <span class="q2-logic-sign">${sign}</span> ${operand(node.right)}`;
   }
-  function logicText(node) {
+  function logicText(node, algebraic = false) {
     if (typeof node === 'string') return node;
-    if (node.op === 'not') return `НЕ (${logicText(node.child)})`;
-    return `(${logicText(node.left)} ${logicSign[node.op]} ${logicText(node.right)})`;
+    if (node.op === 'not') return `НЕ (${logicText(node.child, algebraic)})`;
+    if (algebraic && node.op === 'and') return `(${logicText(node.left, algebraic)}${logicText(node.right, algebraic)})`;
+    const sign = algebraic && node.op === 'or' ? '+' : logicSign[node.op];
+    return `(${logicText(node.left, algebraic)} ${sign} ${logicText(node.right, algebraic)})`;
   }
   function logicValue(node, A, B, C) {
     if (node === 'A') return A;
@@ -1892,7 +1896,7 @@
         select.addEventListener('change', () => {
           const position = Number(select.dataset.notebookOrder);
           selectedOrder[position] = select.value;
-          panel.querySelector(`[data-order-preview="${position}"]`).innerHTML = columnNode(position + varsCount) ? logicHTML(columnNode(position + varsCount)) : 'Выберите выражение';
+          panel.querySelector(`[data-order-preview="${position}"]`).innerHTML = columnNode(position + varsCount) ? logicHTML(columnNode(position + varsCount), varsCount === 3) : 'Выберите выражение';
           panel.querySelectorAll('[data-notebook-row]').forEach(cell => {
             cell.classList.remove('is-correct', 'is-wrong');
             cell.removeAttribute('aria-invalid');
