@@ -80,11 +80,9 @@
       { "icon": "flag", "title": "Итоги и дескриптор" }
     ],
     "10emn-q2-8": [
-      { "icon": "home", "title": "Рекурсия · Практикум СОР" },
+      { "icon": "home", "title": "Рекурсия · Практикум" },
       { "icon": "check", "title": "Повторение предыдущей темы" },
-      { "icon": "graduation-cap", "title": "План подготовки к СОР" },
-      { "icon": "binary", "title": "Разбор задачи СОР" },
-      { "icon": "time-fast", "title": "Подсчет числа вызовов" },
+      { "icon": "layers", "title": "Рекурсия: что это, как работает и зачем нужна" },
       { "icon": "computer", "title": "Практикум СОР в IDLE" },
       { "icon": "check", "title": "Мини-проверка к СОР" },
       { "icon": "flag", "title": "Итоги и дескриптор" }
@@ -1319,7 +1317,9 @@
     "arrows-split-up-and-left": "arrow-comparison",
     "stopwatch-20": "time-fast",
     "pen-ruler": "edit",
-    "lock": "lock"
+    "lock": "lock",
+    "compass": "sitemap",
+    "hashtag": "calculator"
   };
   const emoji = {
     "💻": "computer",
