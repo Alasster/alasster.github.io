@@ -240,22 +240,24 @@
     <!-- Left: Loop -->
     <rect x="30" y="25" width="250" height="190" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
     <text x="155" y="52" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#1e293b" text-anchor="middle">Итерация (Цикл for/while)</text>
-    <rect x="50" y="65" width="210" height="50" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
-    <text x="155" y="88" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="middle">res = 1</text>
-    <text x="155" y="105" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="middle">for i in range(1, n+1):</text>
-    <text x="155" y="142" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#059669" text-anchor="middle">Память: O(1) (константа)</text>
-    <text x="155" y="162" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Переменные перезаписываются</text>
-    <text x="155" y="182" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#059669" text-anchor="middle">✓ Нет риска RecursionError</text>
+    <rect x="50" y="65" width="210" height="70" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="62" y="85" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="start">res = 1</text>
+    <text x="62" y="104" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="start">for i in range(1, n+1):</text>
+    <text x="91" y="123" font-family="'JetBrains Mono', monospace" font-size="12" fill="#334155" text-anchor="start">res *= i</text>
+    <text x="155" y="155" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#059669" text-anchor="middle">Память: O(1) (константа)</text>
+    <text x="155" y="175" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Переменные перезаписываются</text>
+    <text x="155" y="195" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#059669" text-anchor="middle">✓ Нет риска RecursionError</text>
 
     <!-- Right: Recursion -->
     <rect x="320" y="25" width="250" height="190" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
     <text x="445" y="52" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#1e40af" text-anchor="middle">Рекурсия (Стек вызовов)</text>
-    <rect x="340" y="65" width="210" height="50" rx="8" fill="#ffffff" stroke="#bfdbfe"/>
-    <text x="445" y="88" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="middle">if n == 1: return 1</text>
-    <text x="445" y="105" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="middle">return n * fact(n - 1)</text>
-    <text x="445" y="142" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#dc2626" text-anchor="middle">Память: O(N) (линейная)</text>
-    <text x="445" y="162" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">N фреймов хранятся в стеке</text>
-    <text x="445" y="182" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#2563eb" text-anchor="middle">✓ Идеально для деревьев и графов</text>
+    <rect x="340" y="65" width="210" height="70" rx="8" fill="#ffffff" stroke="#bfdbfe"/>
+    <text x="352" y="85" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="start">if n &lt;= 1:</text>
+    <text x="381" y="104" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="start">return 1</text>
+    <text x="352" y="123" font-family="'JetBrains Mono', monospace" font-size="12" fill="#1d4ed8" text-anchor="start">return n * fact(n - 1)</text>
+    <text x="445" y="155" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#dc2626" text-anchor="middle">Память: O(N) (линейная)</text>
+    <text x="445" y="175" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">N фреймов хранятся в стеке</text>
+    <text x="445" y="195" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#2563eb" text-anchor="middle">✓ Идеально для деревьев и графов</text>
   </svg>`;
 
   const EXAM_SUMMARY_SVG = `<svg viewBox="0 0 600 230" role="img" aria-label="План решения рекуррентных задач СОР">
@@ -1789,13 +1791,63 @@
         cta: 'Сравнить подходы'
       },
       {
-        k: 'review',
-        questions: [
-          { q: 'Сколько оперативной памяти расходует обычный цикл for при миллионе итераций?', options: ['Константный объем O(1) — только для переменной счетчика', 'Один гигабайт', 'Память переполняется сразу', 'Стек вызовов заполняется до предела'], answer: 0, explain: 'Цикл не создает новых фреймов, а лишь перезаписывает значение переменной.' },
-          { q: 'Что происходит с памятью при глубокой рекурсии без оптимизации?', options: ['Память освобождается', 'Каждый вызов занимает фрейм в стеке O(N)', 'Компьютер переключается на жесткий диск', 'Ничего не меняется'], answer: 1, explain: 'Каждый шаг рекурсии сохраняет параметры в отдельном фрейме стека вызовов.' },
-          { q: 'Для каких структур данных рекурсия подходит лучше всего?', options: ['Только для простых чисел', 'Для иерархических структур: деревьев, вложенных папок, графов', 'Только для коротких строк', 'Для пустых файлов'], answer: 1, explain: 'Иерархические и древовидные структуры естественно обходятся рекурсивными вызовами.' },
-          { q: 'Какой алгоритм находит наибольший общий делитель (НОД) двух чисел?', options: ['Алгоритм Евклида', 'Сортировка пузырьком', 'Бинарный поиск', 'Шифр Цезаря'], answer: 0, explain: 'Алгоритм Евклида — классический и один из самых быстрых методов нахождения НОД.' },
-          { q: 'Что делает оператор % в алгоритме Евклида?', options: ['Вычисляет процент от числа', 'Находит остаток от деления большего числа на меньшее', 'Возводит число в степень', 'Округляет до целого'], answer: 1, explain: 'Остаток от деления a % b является основой шага алгоритма Евклида.' }
+        "k": "review",
+        "questions": [
+          {
+            "q": "Что вернёт срез \"школа\"[1:]?",
+            "options": [
+              "\"кола\"",
+              "\"ш\"",
+              "\"школ\"",
+              "\"школа\""
+            ],
+            "answer": 0,
+            "explain": "Срез [1:] возвращает хвост строки — все символы после первого."
+          },
+          {
+            "q": "Какой шаг рекурсивно разворачивает строку s?",
+            "options": [
+              "reverse_str(s[1:]) + s[0]",
+              "s[0] + reverse_str(s[1:])",
+              "reverse_str(s)",
+              "s[1:] + s[0]"
+            ],
+            "answer": 0,
+            "explain": "Сначала разворачиваем хвост, затем приписываем первый символ в конец."
+          },
+          {
+            "q": "Какая база подходит для рекурсивного реверса строки?",
+            "options": [
+              "Если len(s) <= 1, вернуть s",
+              "Если len(s) > 1, вернуть s",
+              "Всегда вернуть пустую строку",
+              "Вызвать функцию с той же строкой"
+            ],
+            "answer": 0,
+            "explain": "Пустая строка и один символ уже совпадают со своим реверсом."
+          },
+          {
+            "q": "Сколько гласных вернёт count_vowels(\"машина\")?",
+            "options": [
+              "3",
+              "2",
+              "4",
+              "6"
+            ],
+            "answer": 0,
+            "explain": "Гласные: а, и, а — всего три. При рекурсии проверяем первый символ и обрабатываем хвост."
+          },
+          {
+            "q": "Что делать при рекурсивной проверке палиндрома, если крайние символы совпали и длина строки больше 1?",
+            "options": [
+              "Проверить s[1:-1]",
+              "Сразу вернуть True",
+              "Сразу вернуть False",
+              "Проверить ту же строку s"
+            ],
+            "answer": 0,
+            "explain": "Продолжаем проверять середину, исключив первый и последний символы. При несовпадении краёв возвращаем False."
+          }
         ]
       },
       {
@@ -1895,6 +1947,7 @@
                 text: 'Напиши две функции: <code>fact_loop(n)</code> (через цикл <code>for</code>) и <code>fact_rec(n)</code> (через рекурсию). Сравни результаты их вызова для <code>n = 6</code>.<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
                       'В цикле используй накопитель <code>res = 1</code> и умножай в диапазоне. В рекурсии — базу <code>n <= 1</code> и шаг <code>n * fact_rec(n - 1)</code>.',
+                footer: '<table class="q2-test-cases"><caption>Проверка обеих функций</caption><thead><tr><th scope="col">Ввод n</th><th scope="col">Результат каждой</th></tr></thead><tbody><tr><td>4</td><td>24</td></tr><tr><td>5</td><td>120</td></tr><tr><td>6</td><td>720</td></tr></tbody></table>',
                 tone: 'violet'
               },
               {
@@ -1904,15 +1957,20 @@
                 text: 'Напиши рекурсивную функцию <code>gcd_rec(a, b)</code>, вычисляющую наибольший общий делитель чисел <code>a</code> и <code>b</code> по алгоритму Евклида.<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
                       'База: если <code>b == 0</code>, вернуть <code>a</code>. Шаг: вернуть результат вызова <code>gcd_rec(b, a % b)</code>.',
+                footer: '<table class="q2-test-cases"><caption>Проверка функции</caption><thead><tr><th scope="col">Ввод a, b</th><th scope="col">Ожидаемый вывод</th></tr></thead><tbody><tr><td>48, 18</td><td>6</td></tr><tr><td>17, 5</td><td>1</td></tr><tr><td>25, 0</td><td>25</td></tr></tbody></table>',
                 tone: 'cyan'
               },
               {
                 badge: 'Задачка 3 · 4 балла ★',
                 icon: 'fas fa-star',
-                title: 'Вложенный список: deep_sum(lst)',
-                text: 'Напиши функцию <code>deep_sum(lst)</code>, находящую сумму всех чисел во вложенном списке любой глубины (например, для <code>[1, [2, [3, 4]], 5]</code> вернет 15).<br><br>' +
+                title: 'Наименьшее общее кратное: lcm(a, b)',
+                text: 'Напиши функцию <code>lcm(a, b)</code> для вычисления НОК двух целых неотрицательных чисел. Если хотя бы одно число равно 0, верни 0.<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
-                      'Проходи циклом по элементам: если элемент число — прибавляй его к сумме, а если элемент список — рекурсивно вызывай <code>deep_sum(x)</code>.',
+                      '<b>1)</b> Если <code>a == 0 or b == 0</code>, верни <code>0</code>.<br>' +
+                      '<b>2)</b> Иначе найди НОД функцией из задания 2: <code>d = gcd_rec(a, b)</code>.<br>' +
+                      '<b>3)</b> Раздели произведение чисел на найденный НОД: <code>return (a * b) // d</code>.<br>' +
+                      'Обе функции — <code>gcd_rec</code> и <code>lcm</code> — должны быть в одном файле.',
+                footer: '<table class="q2-test-cases"><caption>Проверка функции</caption><thead><tr><th scope="col">Ввод a, b</th><th scope="col">Ожидаемый вывод</th></tr></thead><tbody><tr><td>12, 18</td><td>36</td></tr><tr><td>7, 5</td><td>35</td></tr><tr><td>0, 5</td><td>0</td></tr></tbody></table>',
                 tone: 'amber'
               }
             ]
@@ -1951,10 +2009,10 @@
           { mark: '1 балл', text: 'Задание 2: Реализована база алгоритма Евклида при b == 0.' },
           { mark: '1 балл', text: 'Задание 2: Оформлен рекурсивный шаг с остатком от деления a % b.' },
           { mark: '1 балл', text: 'Задание 2: Функция возвращает точный наибольший общий делитель чисел.' },
-          { mark: '1 балл', text: 'Задание 3: Реализована проверка типа элемента (число или вложенный список).' },
-          { mark: '1 балл', text: 'Задание 3: Оформлен рекурсивный вызов для каждого вложенного списка.' },
-          { mark: '1 балл', text: 'Задание 3: Функция возвращает полную сумму элементов глубокого списка.' },
-          { mark: '1 балл', text: 'Задание 3: Программа успешно протестирована в среде IDLE без падений стека.' }
+          { mark: '1 балл', text: 'Задание 3: Нулевые аргументы обработаны до деления; возвращается 0.' },
+          { mark: '1 балл', text: 'Задание 3: Использована рекурсивная функция gcd_rec из задания 2.' },
+          { mark: '1 балл', text: 'Задание 3: НОК вычисляется по формуле с целочисленным делением.' },
+          { mark: '1 балл', text: 'Задание 3: Пройдены три теста, включая нулевые аргументы.' }
         ],
         ticketTitle: 'Выходной билет',
         ticketLead: 'Ответь устно или в тетради:',
