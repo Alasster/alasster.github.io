@@ -379,6 +379,8 @@
       const nodes = Array.from(svg.querySelectorAll('.q2-autosort-item'));
       const statusNode = svg.querySelector('[data-sort-status]');
       if (!nodes.length) return;
+      const selection = document.body.dataset.lessonId === '10ogn-q2-3';
+      if (selection) svg.setAttribute('aria-label', 'Сортировка выбором: поиск минимума и обмен с началом неотсортированной части');
 
       const baseX = 58;
       const stepX = 56;
@@ -404,7 +406,9 @@
           item.node.setAttribute('transform', `translate(${x} ${liftY})`);
           item.node.style.transform = `translate(${x}px, ${liftY}px)`;
           item.node.classList.toggle('is-compare', isCmp);
-          item.node.classList.toggle('is-sorted', allSorted || item.slot >= sortedFromSlot);
+          item.node.classList.toggle('is-sorted', allSorted || (selection
+            ? item.slot < items.length - sortedFromSlot
+            : item.slot >= sortedFromSlot));
         });
       };
 
@@ -412,6 +416,18 @@
         const sim = items.slice().sort((a, b) => a.slot - b.slot).map(it => it.val);
         const n = sim.length;
         const steps = [];
+        if (selection) {
+          for (let i = 0; i < n - 1; i++) {
+            let min = i;
+            for (let j = i + 1; j < n; j++) {
+              steps.push({ type: 'compare', a: min, b: j, sortedFrom: n - i, aVal: sim[min], bVal: sim[j] });
+              if (sim[j] < sim[min]) min = j;
+            }
+            steps.push({ type: 'place', a: i, b: min, sortedFrom: n - i, aVal: sim[i], bVal: sim[min] });
+            [sim[i], sim[min]] = [sim[min], sim[i]];
+          }
+          return steps;
+        }
         for (let pass = 0; pass < n - 1; pass++) {
           let swapped = false;
           for (let j = 0; j < n - 1 - pass; j++) {
@@ -436,16 +452,20 @@
           const steps = buildSteps();
           for (const st of steps) {
             if (!document.body.contains(svg)) return;
-            if (statusNode) statusNode.textContent = `сравниваем ${st.aVal} и ${st.bVal} → меняем местами`;
+            if (statusNode) statusNode.textContent = st.type === 'compare'
+              ? `ищем минимум: сравниваем ${st.aVal} и ${st.bVal}`
+              : selection
+                ? st.a === st.b ? `минимум ${st.bVal} уже на своём месте` : `минимум ${st.bVal} → на место ${st.a + 1}`
+                : `сравниваем ${st.aVal} и ${st.bVal} → меняем местами`;
             applyPositions([st.a, st.b], st.sortedFrom, false);
             await wait(240);
             const leftItem = items.find(it => it.slot === st.a);
             const rightItem = items.find(it => it.slot === st.b);
-            if (leftItem && rightItem) {
+            if (st.type !== 'compare' && leftItem && rightItem) {
               leftItem.slot = st.b;
               rightItem.slot = st.a;
             }
-            applyPositions([st.a, st.b], st.sortedFrom, false);
+            applyPositions([st.a, st.b], selection && st.type === 'place' ? st.sortedFrom - 1 : st.sortedFrom, false);
             await wait(520);
           }
 
