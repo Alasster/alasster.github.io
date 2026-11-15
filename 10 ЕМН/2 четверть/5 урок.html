@@ -10,8 +10,62 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-11-02-v69">
-  <link rel="stylesheet" href="../../стили/q2.css?v=q2-2026-11-07-v5">
+  <link rel="stylesheet" href="../../стили/q2.css?v=q2-2026-11-15-scroll-1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .lesson-10emn-q2-5 .q2-card:has(.q2-test-cases) { display: flex; flex-direction: column; }
+    .lesson-10emn-q2-5 .q2-card:has(.q2-test-cases) .q2-card-footer { margin-top: auto; padding-top: 18px; }
+    .lesson-10emn-q2-5 .q2-test-cases { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.85rem; }
+    .lesson-10emn-q2-5 .q2-test-cases caption {
+      text-align: left;
+      font-weight: 700;
+      margin: 0;
+      padding: 4px 8px 12px;
+      line-height: 1.5;
+      white-space: normal;
+      overflow: visible;
+      text-indent: 0;
+    }
+    .lesson-10emn-q2-5 .q2-test-cases caption::before,
+    .lesson-10emn-q2-5 .q2-test-cases caption::after { content: none !important; }
+    .lesson-10emn-q2-5 .q2-test-cases :is(th, td) { padding: 9px 6px; text-align: center; border-bottom: 1px solid var(--line, #B2CEDF); }
+    .lesson-10emn-q2-5 .q2-test-cases th { background: var(--surface-recess, #EAF4FC); }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      align-items: center;
+    }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns .q2-svg-wrap { padding: 14px; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns svg { width: 100%; height: auto; max-height: 280px; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns svg text[font-size="24"] { font-size: 28px; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns svg text[font-size="12"] { font-size: 17px; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns svg text[font-size="18"] { font-size: 22px; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns svg text[font-size="13"] { font-size: 16px; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns .q2-table { min-width: 0; font-size: 0.85rem; }
+    .lesson-10emn-q2-5 .q2-digit-parse-columns .q2-table :is(th, td) { padding: 12px 9px; }
+    @media (max-width: 900px) {
+      .lesson-10emn-q2-5 .q2-digit-parse-columns { grid-template-columns: 1fr; }
+    }
+    .lesson-10emn-q2-5 .q2-hero-slide .q2-visual svg > rect[fill="#e8f1fa"] {
+      display: none;
+    }
+    html body.lesson-10emn-q2-5 .q2-hero-slide .q2-visual {
+      background: var(--surface, #F6FBFF) !important;
+      background-image: none !important;
+      border: none !important;
+      box-shadow: var(--shadow-soft) !important;
+    }
+    .lesson-10emn-q2-5 .q2-hero-slide .q2-visual svg rect {
+      fill: var(--surface-recess, #EAF4FC);
+      stroke: var(--line, #B2CEDF);
+    }
+    .lesson-10emn-q2-5 .q2-hero-slide .q2-visual svg text { fill: var(--ink, #244761); }
+    .lesson-10emn-q2-5 .q2-hero-slide .q2-visual svg path { stroke: var(--primary, #3289CE); }
+    .lesson-10emn-q2-5 .q2-hero-slide .q2-visual::before,
+    .lesson-10emn-q2-5 .q2-hero-slide .q2-visual::after {
+      display: none !important;
+    }
+  </style>
 </head>
 <body class="lesson-page q2-lesson lesson-10emn-q2-5" data-lesson-id="10emn-q2-5">
 
@@ -86,7 +140,7 @@
 
   <script src="../../скрипты/q2-scenes.js?v=q2-2026-11-07-v2"></script>
   <script src="../../скрипты/q2-engine.js?v=q2-2026-11-15-v4"></script>
-  <script src="../../скрипты/q2-data-10emn.js?v=q2-2026-11-07-v7"></script>
+  <script src="../../скрипты/q2-data-10emn.js?v=q2-2026-11-15-v2"></script>
   <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-07-v5"></script>
   <script src="../../скрипты/lessons.js?v=auth-cloud-20261107-v9"></script>
 </body>

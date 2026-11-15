@@ -5417,7 +5417,7 @@ html body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) :is(.q2
   -ms-user-select: none !important;
   user-select: none !important;
   -webkit-touch-callout: none !important;
-  pointer-events: none !important;
+  pointer-events: auto !important;
 }
 
 /* 50 / 50 раскладка для практики */

@@ -1386,17 +1386,25 @@
         title: 'Как рекурсия видит число?',
         lead: 'Любое десятичное число можно разделить на две части: <b>последнюю цифру</b> (<code>n % 10</code>) и <b>все остальные разряды</b> (<code>n // 10</code>).',
         blocks: [
+          {
+            t: 'split',
+            cls: 'q2-digit-parse-columns',
+            left: [
           { t: 'svg', svg: DIGIT_PARSE_SVG, caption: 'Схема отщепления цифр числа 482' },
+            ],
+            right: [
           {
             t: 'table',
             caption: 'Шаги рекурсивного разбора числа 482',
-            head: ['Вызов', 'Последняя цифра (n % 10)', 'Остаток числа (n // 10)', 'Действие'],
+            head: ['Вызов', 'Цифра<br>n % 10', 'Остаток<br>n // 10', 'Действие'],
             rows: [
               ['digit_sum(482)', '2', '48', '2 + digit_sum(48)'],
               ['digit_sum(48)', '8', '4', '8 + digit_sum(4)'],
               ['digit_sum(4)', '4 (база n < 10)', '—', 'Возврат 4']
             ],
             highlight: 2
+          }
+            ]
           }
         ]
       },
@@ -1476,6 +1484,7 @@
                 text: 'Напиши функцию <code>digit_sum(n)</code>, которая принимает целое положительное число <code>n</code> и возвращает сумму его цифр.<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
                       'База: если <code>n &lt; 10</code>, вернуть <code>n</code>. Шаг: сложить последнюю цифру <code>n % 10</code> и вызов <code>digit_sum(n // 10)</code>.',
+                footer: '<table class="q2-test-cases"><caption>Проверка функции</caption><thead><tr><th scope="col">Ввод n</th><th scope="col">Ожидаемый вывод</th></tr></thead><tbody><tr><td>7</td><td>7</td></tr><tr><td>482</td><td>14</td></tr><tr><td>1005</td><td>6</td></tr></tbody></table>',
                 tone: 'violet'
               },
               {
@@ -1485,6 +1494,7 @@
                 text: 'Напиши функцию <code>count_evens(n)</code>, которая подсчитывает количество четных цифр в числе <code>n</code> (например, для 2481 вернет 3).<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
                       'База: если <code>n &lt; 10</code>, вернуть 1 (если <code>n % 2 == 0</code>), иначе 0. Шаг: проверить последнюю цифру и сложить с результатом от <code>n // 10</code>.',
+                footer: '<table class="q2-test-cases"><caption>Проверка функции</caption><thead><tr><th scope="col">Ввод n</th><th scope="col">Ожидаемый вывод</th></tr></thead><tbody><tr><td>7</td><td>0</td></tr><tr><td>2481</td><td>3</td></tr><tr><td>1020</td><td>3</td></tr></tbody></table>',
                 tone: 'cyan'
               },
               {
@@ -1494,6 +1504,7 @@
                 text: 'Напиши функцию <code>to_binary(n)</code>, которая принимает число <code>n</code> и возвращает его двоичную запись в виде строки (например, для 13 вернет "1101").<br><br>' +
                       '<b>💡 Подсказка:</b><br>' +
                       'База: если <code>n &lt;= 1</code>, вернуть <code>str(n)</code>. Шаг: соединить строки <code>to_binary(n // 2) + str(n % 2)</code>.',
+                footer: '<table class="q2-test-cases"><caption>Проверка функции</caption><thead><tr><th scope="col">Ввод n</th><th scope="col">Ожидаемый вывод</th></tr></thead><tbody><tr><td>0</td><td>"0"</td></tr><tr><td>6</td><td>"110"</td></tr><tr><td>13</td><td>"1101"</td></tr></tbody></table>',
                 tone: 'amber'
               }
             ]
