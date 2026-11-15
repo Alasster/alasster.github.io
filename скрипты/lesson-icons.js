@@ -4,6 +4,11 @@
 
   // Reviewed against the actual content of all 34 lessons / 249 slides.
   const stages = {
+    "11-q2-4": [
+      null,
+      null,
+      { "icon": "book-alt", "title": "Теория · Вспоминаем Python" }
+    ],
     "10emn-q2-1": [
       { "icon": "home", "title": "Рекурсия" },
       { "icon": "binary", "title": "Вспоминаем Python: def" },

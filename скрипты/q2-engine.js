@@ -859,7 +859,7 @@
   WIDGETS.quiz = function (el, cfg) {
     const sourceQuestions = cfg.questions || [];
     const questions = sourceQuestions.map(item => {
-      if (!cfg.shuffleOptions) return item;
+      if (cfg.variant !== 'review' && !cfg.shuffleOptions) return item;
       const choices = (item.options || []).map((text, index) => ({ text, correct: index === item.answer }));
       const options = shuffledCopy(choices);
       return { ...item, options: options.map(option => option.text), answer: options.findIndex(option => option.correct) };
