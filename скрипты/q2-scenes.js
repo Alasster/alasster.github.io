@@ -669,7 +669,7 @@
       <!-- Trace Chain F(1) -> F(5) -->
       <text x="48" y="196" fill="#475569" font-family="sans-serif" font-size="11" font-weight="800">Ручная проверка от базы к ответу:</text>
 
-      <g class="q2-sor-card" transform="translate(30 206)">
+      <g transform="translate(30 206)"><g class="q2-sor-card">
         <rect x="0" y="0" width="68" height="58" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
         <text x="34" y="24" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">F(1)</text>
         <text x="34" y="45" text-anchor="middle" fill="#047857" font-family="monospace" font-size="15" font-weight="800">= 2</text>
@@ -689,7 +689,7 @@
         <rect x="312" y="0" width="68" height="58" rx="11" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
         <text x="346" y="24" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="12" font-weight="800">F(5)</text>
         <text x="346" y="45" text-anchor="middle" fill="#b45309" font-family="monospace" font-size="15" font-weight="800">= 8</text>
-      </g>
+      </g></g>
 
       <!-- Bottom Score & Counter Pill -->
       <rect x="30" y="282" width="380" height="38" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
