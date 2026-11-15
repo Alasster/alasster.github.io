@@ -644,59 +644,210 @@
   };
 
   S.recursionExam = function () {
-    return `<svg viewBox="0 0 440 370" role="img" aria-label="Интерактивная схема решения задач СОР по рекуррентным формулам">
+    return `<svg viewBox="0 0 440 370" role="img" aria-label="Минималистичная анимированная матрёшка: открывается, внутри матрёшка поменьше увеличивается и снова открывается">
+      <defs>
+        <!-- Силуэт матрёшки -->
+        <path id="q2-mat-silhouette"
+              d="M 0 -114 C -36 -114, -56 -88, -58 -52 C -59 -32, -68 -12, -76 14 C -85 44, -81 82, -58 106 C -46 113, -24 115, 0 115 C 24 115, 46 113, 58 106 C 81 82, 85 44, 76 14 C 68 -12, 59 -32, 58 -52 C 56 -88, 36 -114, 0 -114 Z"/>
+
+        <clipPath id="q2-mat-body-clip">
+          <use href="#q2-mat-silhouette"/>
+        </clipPath>
+
+        <clipPath id="q2-mat-face-clip">
+          <ellipse cx="0" cy="-55" rx="35" ry="33"/>
+        </clipPath>
+
+        <!-- Разрез на верхнюю и нижнюю половины по плавной дуге y = 2 -->
+        <clipPath id="q2-mat-top-clip">
+          <path d="M -95 -130 H 95 V 2 Q 0 9 -95 2 Z"/>
+        </clipPath>
+
+        <clipPath id="q2-mat-bot-clip">
+          <path d="M -95 2 Q 0 9 95 2 V 130 H -95 Z"/>
+        </clipPath>
+
+        <!-- Полная минималистичная матрёшка в палитре 10 ЕМН -->
+        <g id="q2-mat-full">
+          <g clip-path="url(#q2-mat-body-clip)">
+            <!-- Основной фон корпуса -->
+            <rect x="-90" y="-120" width="180" height="240" fill="#DCEEFB"/>
+
+            <!-- Мягкие вертикальные полоски на нижней части -->
+            <g fill="#CBE4F8" opacity="0.55">
+              <rect x="-70" y="-10" width="6" height="130"/>
+              <rect x="-56" y="-10" width="6" height="130"/>
+              <rect x="-42" y="-10" width="6" height="130"/>
+              <rect x="-28" y="-10" width="6" height="130"/>
+              <rect x="-14" y="-10" width="6" height="130"/>
+              <rect x="0" y="-10" width="6" height="130"/>
+              <rect x="14" y="-10" width="6" height="130"/>
+              <rect x="28" y="-10" width="6" height="130"/>
+              <rect x="42" y="-10" width="6" height="130"/>
+              <rect x="56" y="-10" width="6" height="130"/>
+              <rect x="70" y="-10" width="6" height="130"/>
+            </g>
+
+            <!-- Волнистая кайма платка -->
+            <path d="M 0 -22 C -22 4, -50 22, -84 36 L -88 -120 H 88 L 84 36 C 50 22, 22 4, 0 -22 Z" fill="#76B4E6"/>
+            <path d="M 0 -17 C -22 7, -50 25, -84 38" fill="none" stroke="#76B4E6" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 13.5"/>
+            <path d="M 0 -17 C 22 7, 50 25, 84 38" fill="none" stroke="#76B4E6" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 13.5"/>
+
+            <!-- Верхний платок -->
+            <path d="M 0 -28 C -22 -2, -50 15, -86 28 L -90 -120 H 90 L 86 28 C 50 15, 22 -2, 0 -28 Z" fill="#3289CE"/>
+
+            <!-- Две минималистичные пуговки -->
+            <circle cx="0" cy="-1" r="3.2" fill="#F6FBFF"/>
+            <circle cx="0" cy="11" r="4.8" fill="#F6FBFF"/>
+
+            <!-- Центральный цветок и листья -->
+            <g fill="#5BA4E5">
+              <path d="M -16 39 C -26 37, -33 30, -31 23 C -23 23, -17 30, -16 39 Z"/>
+              <path d="M 16 39 C 26 37, 33 30, 31 23 C 23 23, 17 30, 16 39 Z"/>
+              <path d="M -15 77 C -24 79, -30 85, -28 91 C -20 91, -15 85, -15 77 Z"/>
+              <path d="M 15 77 C 24 79, 30 85, 28 91 C 20 91, 15 85, 15 77 Z"/>
+            </g>
+
+            <!-- Большой цветок в центре -->
+            <g transform="translate(0 58)">
+              <circle cx="0" cy="-13" r="11" fill="#3289CE"/>
+              <circle cx="11.3" cy="-6.5" r="11" fill="#3289CE"/>
+              <circle cx="11.3" cy="6.5" r="11" fill="#3289CE"/>
+              <circle cx="0" cy="13" r="11" fill="#3289CE"/>
+              <circle cx="-11.3" cy="6.5" r="11" fill="#3289CE"/>
+              <circle cx="-11.3" cy="-6.5" r="11" fill="#3289CE"/>
+              <circle cx="0" cy="0" r="8.5" fill="#1E3A5F"/>
+            </g>
+
+            <!-- Боковые маленькие цветы -->
+            <g transform="translate(-48 63) scale(0.52)">
+              <circle cx="0" cy="-13" r="11" fill="#3289CE"/>
+              <circle cx="11.3" cy="-6.5" r="11" fill="#3289CE"/>
+              <circle cx="11.3" cy="6.5" r="11" fill="#3289CE"/>
+              <circle cx="0" cy="13" r="11" fill="#3289CE"/>
+              <circle cx="-11.3" cy="6.5" r="11" fill="#3289CE"/>
+              <circle cx="-11.3" cy="-6.5" r="11" fill="#3289CE"/>
+              <circle cx="0" cy="0" r="9" fill="#1E3A5F"/>
+            </g>
+            <g transform="translate(48 63) scale(0.52)">
+              <circle cx="0" cy="-13" r="11" fill="#3289CE"/>
+              <circle cx="11.3" cy="-6.5" r="11" fill="#3289CE"/>
+              <circle cx="11.3" cy="6.5" r="11" fill="#3289CE"/>
+              <circle cx="0" cy="13" r="11" fill="#3289CE"/>
+              <circle cx="-11.3" cy="6.5" r="11" fill="#3289CE"/>
+              <circle cx="-11.3" cy="-6.5" r="11" fill="#3289CE"/>
+              <circle cx="0" cy="0" r="9" fill="#1E3A5F"/>
+            </g>
+
+            <!-- Светлый нижний ободок донышка -->
+            <path d="M -66 104 Q 0 112 66 104 V 120 H -66 Z" fill="#EAF4FC"/>
+
+            <!-- Тонкая линия стыка половин -->
+            <path d="M -82 2 Q 0 9 82 2" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.45"/>
+          </g>
+
+          <!-- Лицо и причёска -->
+          <g clip-path="url(#q2-mat-face-clip)">
+            <ellipse cx="0" cy="-55" rx="35" ry="33" fill="#F6FBFF"/>
+            <!-- Чёлка -->
+            <path d="M -38 -59 C -14 -57, 0 -63, 8 -74 C 15 -62, 25 -56, 38 -55 V -92 H -38 Z" fill="#1E3A5F"/>
+            <!-- Румянец -->
+            <circle cx="-25" cy="-35" r="8.5" fill="#B8DDF8" opacity="0.8"/>
+            <circle cx="25" cy="-35" r="8.5" fill="#B8DDF8" opacity="0.8"/>
+            <!-- Брови -->
+            <path d="M -21 -53 Q -14 -56 -7 -53 M 7 -53 Q 14 -56 21 -53" fill="none" stroke="#1E3A5F" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Глаза -->
+            <circle cx="-13.5" cy="-44" r="4.8" fill="#1E3A5F"/>
+            <circle cx="-15" cy="-45.5" r="1.5" fill="#FFFFFF"/>
+            <circle cx="13.5" cy="-44" r="4.8" fill="#1E3A5F"/>
+            <circle cx="12" cy="-45.5" r="1.5" fill="#FFFFFF"/>
+            <!-- Улыбка -->
+            <path d="M -4.5 -31 Q 0 -27.5 4.5 -31" fill="none" stroke="#3289CE" stroke-width="2.2" stroke-linecap="round"/>
+          </g>
+        </g>
+
+        <!-- Внутренний бортик нижней половинки (виден при открытии) -->
+        <g id="q2-mat-inner-collar">
+          <path d="M -72 3 V -6 Q 0 -12 72 -6 V 3 Q 0 9 -72 3 Z" fill="#B5D6F0"/>
+          <ellipse cx="0" cy="-6" rx="72" ry="7" fill="#94C0E3"/>
+        </g>
+      </defs>
+
       <style>
-        @keyframes q2-sor-step {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
+        @keyframes q2-mat-outer-fade {
+          0%, 44% { opacity: 1; transform: scale(1); }
+          80%, 100% { opacity: 0; transform: scale(1.12); }
         }
-        .q2-sor-card { animation: q2-sor-step 4.5s ease-in-out infinite; }
+        @keyframes q2-mat-top-lift {
+          0%, 8% { transform: translateY(0px); }
+          12% { transform: translateY(2px); }
+          38%, 46% { transform: translateY(-82px); }
+          82%, 100% { transform: translateY(-136px); }
+        }
+        @keyframes q2-mat-bot-drop {
+          0%, 8% { transform: translateY(0px); }
+          12% { transform: translateY(-1px); }
+          38%, 46% { transform: translateY(46px); }
+          82%, 100% { transform: translateY(88px); }
+        }
+        @keyframes q2-mat-child-zoom {
+          0%, 34% { transform: translateY(14px) scale(0.48); }
+          84%, 100% { transform: translateY(0px) scale(1); }
+        }
+        @keyframes q2-mat-shadow-anim {
+          0%, 12% { transform: scaleX(1); opacity: 0.55; }
+          40% { transform: scaleX(0.65); opacity: 0.35; }
+          84%, 100% { transform: scaleX(1); opacity: 0.55; }
+        }
+
+        .q2-mat-outer {
+          animation: q2-mat-outer-fade 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .q2-mat-top-part {
+          animation: q2-mat-top-lift 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .q2-mat-bot-part {
+          animation: q2-mat-bot-drop 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .q2-mat-child {
+          animation: q2-mat-child-zoom 4s cubic-bezier(0.34, 1.18, 0.64, 1) infinite;
+        }
+        .q2-mat-shadow {
+          animation: q2-mat-shadow-anim 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
       </style>
-      <rect x="16" y="14" width="408" height="342" rx="22" fill="#e8f1fa" stroke="#b8cde0" stroke-width="2"/>
-      <rect x="28" y="24" width="384" height="30" rx="10" fill="#f5f9fd"/>
-      <text x="220" y="44" text-anchor="middle" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">ПРАКТИКУМ СОР · ТРАССИРОВКА F(n) СНИЗУ ВВЕРХ</text>
 
-      <!-- Recurrence System Box -->
-      <rect x="30" y="64" width="380" height="108" rx="15" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
-      <text x="48" y="88" fill="#1e3a8a" font-family="sans-serif" font-size="12" font-weight="800">Кусочная рекуррентная функция:</text>
-      <rect x="46" y="98" width="348" height="26" rx="7" fill="#d1fae5"/>
-      <text x="58" y="115" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">1) База: F(1) = 2</text>
-      <rect x="46" y="130" width="168" height="30" rx="7" fill="#dbeafe"/>
-      <text x="130" y="149" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="11" font-weight="700">Чётное: n + F(n-1)</text>
-      <rect x="226" y="130" width="168" height="30" rx="7" fill="#ede9fe"/>
-      <text x="310" y="149" text-anchor="middle" fill="#5b21b6" font-family="monospace" font-size="11" font-weight="700">Нечётное: 2 · F(n-2)</text>
+      <g transform="translate(220 186)">
+        <!-- Мягкая тень под матрёшкой -->
+        <g transform="translate(0 115)">
+          <ellipse class="q2-mat-shadow" cx="0" cy="0" rx="58" ry="8" fill="#C5DDF0"/>
+        </g>
 
-      <!-- Trace Chain F(1) -> F(5) -->
-      <text x="48" y="196" fill="#475569" font-family="sans-serif" font-size="11" font-weight="800">Ручная проверка от базы к ответу:</text>
+        <!-- Задний внутренний ободок открывающейся матрёшки -->
+        <g class="q2-mat-outer">
+          <g class="q2-mat-top-part">
+            <ellipse cx="0" cy="2" rx="75" ry="6" fill="#94C0E3"/>
+          </g>
+          <g class="q2-mat-bot-part">
+            <use href="#q2-mat-inner-collar"/>
+          </g>
+        </g>
 
-      <g transform="translate(30 206)"><g class="q2-sor-card">
-        <rect x="0" y="0" width="68" height="58" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
-        <text x="34" y="24" text-anchor="middle" fill="#065f46" font-family="monospace" font-size="12" font-weight="800">F(1)</text>
-        <text x="34" y="45" text-anchor="middle" fill="#047857" font-family="monospace" font-size="15" font-weight="800">= 2</text>
+        <!-- Внутренняя матрёшка поменьше (плавно вырастает до полного размера) -->
+        <g class="q2-mat-child">
+          <use href="#q2-mat-full"/>
+        </g>
 
-        <rect x="78" y="0" width="68" height="58" rx="11" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
-        <text x="112" y="24" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="12" font-weight="800">F(2)</text>
-        <text x="112" y="45" text-anchor="middle" fill="#1d4ed8" font-family="monospace" font-size="15" font-weight="800">= 4</text>
-
-        <rect x="156" y="0" width="68" height="58" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
-        <text x="190" y="24" text-anchor="middle" fill="#5b21b6" font-family="monospace" font-size="12" font-weight="800">F(3)</text>
-        <text x="190" y="45" text-anchor="middle" fill="#6d28d9" font-family="monospace" font-size="15" font-weight="800">= 4</text>
-
-        <rect x="234" y="0" width="68" height="58" rx="11" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
-        <text x="268" y="24" text-anchor="middle" fill="#1e40af" font-family="monospace" font-size="12" font-weight="800">F(4)</text>
-        <text x="268" y="45" text-anchor="middle" fill="#1d4ed8" font-family="monospace" font-size="15" font-weight="800">= 8</text>
-
-        <rect x="312" y="0" width="68" height="58" rx="11" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
-        <text x="346" y="24" text-anchor="middle" fill="#92400e" font-family="monospace" font-size="12" font-weight="800">F(5)</text>
-        <text x="346" y="45" text-anchor="middle" fill="#b45309" font-family="monospace" font-size="15" font-weight="800">= 8</text>
-      </g></g>
-
-      <!-- Bottom Score & Counter Pill -->
-      <rect x="30" y="282" width="380" height="38" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-      <text x="128" y="306" text-anchor="middle" fill="#1e3a8a" font-family="monospace" font-size="12" font-weight="800">Трибоначчи: 3 базы</text>
-      <rect x="242" y="289" width="156" height="24" rx="8" fill="#dcfce7"/>
-      <text x="320" y="305" text-anchor="middle" fill="#15803d" font-family="sans-serif" font-size="11" font-weight="800">ГОТОВНОСТЬ К СОР · 10/10</text>
-      <text x="220" y="346" text-anchor="middle" fill="#527083" font-family="sans-serif" font-size="12" font-weight="700">сверь ручную трассировку с запуском программы в IDLE</text>
+        <!-- Внешняя матрёшка (разделяется на две половинки по линии стыка) -->
+        <g class="q2-mat-outer">
+          <g class="q2-mat-bot-part">
+            <use href="#q2-mat-full" clip-path="url(#q2-mat-bot-clip)"/>
+          </g>
+          <g class="q2-mat-top-part">
+            <use href="#q2-mat-full" clip-path="url(#q2-mat-top-clip)"/>
+          </g>
+        </g>
+      </g>
     </svg>`;
   };
 
