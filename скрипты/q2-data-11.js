@@ -679,7 +679,85 @@
   /* ==========================================================================
      УРОК 3. Матрица смежности
      ========================================================================== */
-  Q2.add('11-q2-3', {
+  // Четыре разных ребра на четырёх вершинах всегда дают связный граф.
+  function makeSchoolNetwork11_3() {
+    const pairs = ['A—B', 'A—C', 'A—D', 'B—C', 'B—D', 'C—D'];
+    const variants = [];
+    for (let i = 0; i < pairs.length; i++) {
+      for (let j = i + 1; j < pairs.length; j++) {
+        const edges = pairs.filter((_, index) => index !== i && index !== j);
+        if (['A', 'B', 'C', 'D'].some(vertex => edges.filter(edge => edge.includes(vertex)).length === 1)) {
+          variants.push(edges);
+        }
+      }
+    }
+    let previous = -1;
+    try {
+      const saved = sessionStorage.getItem('q2-11-3-school-network');
+      if (saved !== null) previous = Number(saved);
+    } catch (_) { /* Без хранилища остаётся обычный случайный выбор. */ }
+    const choices = variants.map((_, index) => index).filter(index => index !== previous);
+    const selected = choices[Math.floor(Math.random() * choices.length)];
+    try { sessionStorage.setItem('q2-11-3-school-network', String(selected)); } catch (_) {}
+    return variants[selected].map(edge => `<code>${edge}</code>`).join(', ');
+  }
+  const schoolNetwork11_3 = makeSchoolNetwork11_3();
+
+  function chooseVariant11_3(variants, key) {
+    let previous = null;
+    try { previous = sessionStorage.getItem(key); } catch (_) {}
+    const choices = variants.filter(item => JSON.stringify(item) !== previous);
+    const chosen = choices[Math.floor(Math.random() * choices.length)];
+    try { sessionStorage.setItem(key, JSON.stringify(chosen)); } catch (_) {}
+    return chosen;
+  }
+
+  function reachable11_3(vertices, edges, start, directed = true) {
+    const seen = new Set([start]);
+    for (let i = 0; i < vertices.length; i++) {
+      edges.forEach(([a, b]) => {
+        if (seen.has(a)) seen.add(b);
+        if (!directed && seen.has(b)) seen.add(a);
+      });
+    }
+    return seen;
+  }
+
+  function makeRobot11_3() {
+    const vertices = ['S', 'A', 'B', 'C'];
+    const pairs = vertices.flatMap(a => vertices.filter(b => b !== a).map(b => [a, b]));
+    const variants = [];
+    // Пять дуг: все вершины достижимы из S, есть цикл и возможность
+    // сделать граф сильно связным добавлением одной дуги.
+    for (let mask = 0; mask < (1 << pairs.length); mask++) {
+      const edges = pairs.filter((_, i) => mask & (1 << i));
+      if (edges.length !== 5 || reachable11_3(vertices, edges, 'S').size !== 4) continue;
+      if (vertices.every(v => reachable11_3(vertices, edges, v).size === 4)) continue;
+      const cyclic = edges.some(([a, b]) => reachable11_3(vertices, edges, b).has(a));
+      if (!cyclic) continue;
+      const repairable = pairs.some(([a, b]) => !edges.some(([u, v]) => a === u && b === v)
+        && vertices.every(v => reachable11_3(vertices, [...edges, [a, b]], v).size === 4));
+      if (repairable) variants.push(edges);
+    }
+    return chooseVariant11_3(variants, 'q2-11-3-robot');
+  }
+
+  function makeDelivery11_3() {
+    const vertices = ['A', 'B', 'C', 'D'];
+    // A—D оставляем для проектируемой дороги с неизвестным временем x.
+    const pairs = [['A', 'B'], ['A', 'C'], ['B', 'C'], ['B', 'D'], ['C', 'D']];
+    const variants = pairs.map((_, omit) => pairs.filter((_, i) => i !== omit));
+    const edges = chooseVariant11_3(variants, 'q2-11-3-delivery-edges');
+    const closable = edges.filter((edge, index) =>
+      reachable11_3(vertices, edges.filter((_, i) => i !== index), 'A', false).size === 4);
+    const closed = closable[Math.floor(Math.random() * closable.length)];
+    const weights = edges.map(() => 2 + Math.floor(Math.random() * 13));
+    return { edges, weights, closed };
+  }
+  const robot11_3 = makeRobot11_3();
+  const delivery11_3 = makeDelivery11_3();
+
+Q2.add('11-q2-3', {
     num: 3,
     cls: '11 класс',
     title: 'Поиск кратчайшего пути',
@@ -702,6 +780,7 @@
       },
       {
         k: 'review',
+        shuffleOptions: true,
         questions: [
           { q: 'Чем ориентированный граф отличается от неориентированного?', options: ['Направлением рёбер', 'Наличием весов', 'Числом вершин', 'Размером рисунка'], answer: 0, explain: 'У дуги есть начало и конец.' },
           { q: 'Что такое вес ребра?', options: ['Числовая характеристика связи', 'Номер вершины', 'Степень вершины', 'Число рёбер'], answer: 0, explain: 'Вес — расстояние, время, стоимость.' },
@@ -711,53 +790,26 @@
         ]
       },
       {
-        k: 'concept',
-        eyebrow: '03 · КАК СТРОИТЬ',
-        title: 'Строки и столбцы — вершины',
-        lead: 'Матрица смежности квадратная: n строк и n столбцов по числу вершин. На пересечении строки A и столбца B ставим 1, если ребро {A, B} существует.',
-        blocks: [
-          {
-            t: 'table',
-            caption: 'Граф: A—B, A—C, B—D, C—D',
-            head: ['', 'A', 'B', 'C', 'D'],
-            rows: [
-              ['A', '0', '1', '1', '0'],
-              ['B', '1', '0', '0', '1'],
-              ['C', '1', '0', '0', '1'],
-              ['D', '0', '1', '1', '0']
-            ],
-            highlight: 1
-          },
-          {
-            t: 'steps',
-            items: [
-              { title: 'Шаг 1. Выпишите вершины', text: 'Порядок важен: он задаёт и строки, и столбцы. Обычно берут алфавитный.' },
-              { title: 'Шаг 2. Нарисуйте таблицу n × n', text: 'Для четырёх вершин — 4 строки и 4 столбца.' },
-              { title: 'Шаг 3. Заполните по рёбрам', text: 'Для каждого ребра {A, B} поставьте 1 в клетках (A, B) и (B, A).' },
-              { title: 'Шаг 4. Проверьте симметрию', text: 'В неориентированном графе матрица симметрична относительно главной диагонали.' }
-            ]
-          },
+        k: 'lab',
+        eyebrow: '03 · МАТРИЦА СМЕЖНОСТИ',
+        title: 'Что такое матрица смежности?',
+        lead: 'Матрица смежности — это квадратная таблица, которая показывает связи между вершинами графа: 1 означает, что ребро есть, а 0 — что ребра нет.',
+        before: [
           {
             t: 'callout',
-            icon: 'fas fa-lightbulb',
-            title: 'Диагональ',
-            text: 'Клетки на главной диагонали отвечают на вопрос «есть ли петля?». Если петель нет, там все нули.'
+            icon: 'fas fa-table-cells',
+            title: 'Строки и столбцы — вершины',
+            text: 'Матрица смежности квадратная: n строк и n столбцов по числу вершин. На пересечении строки A и столбца B ставим 1, если ребро {A, B} существует.'
           }
-        ]
-      },
-      {
-        k: 'lab',
-        eyebrow: '04 · ТРЕНАЖЁР',
-        title: 'Заполните матрицу по рисунку',
-        lead: 'Нажимайте на клетки, чтобы переключить 0 и 1. Затем нажмите «Проверить матрицу». Ошибки подсветятся красным.',
+        ],
         widget: {
           kind: 'matrix',
           config: {
             nodes: [
-              { id: 'A', x: 120, y: 80 },
-              { id: 'B', x: 330, y: 80 },
-              { id: 'C', x: 120, y: 230 },
-              { id: 'D', x: 330, y: 230 }
+              { id: 'A', x: 75, y: 65 },
+              { id: 'B', x: 485, y: 65 },
+              { id: 'C', x: 75, y: 275 },
+              { id: 'D', x: 485, y: 275 }
             ],
             edges: [['A', 'B'], ['A', 'C'], ['B', 'D'], ['C', 'D']]
           }
@@ -769,6 +821,59 @@
             icon: 'fas fa-check',
             title: 'Самопроверка',
             text: 'В матрице должно быть 8 единиц: 4 ребра × 2 конца. Сумма чисел в каждой строке равна степени вершины: у A и B по 2, у C и D по 2.'
+          }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '04 · ОРГРАФ И ВЕСА',
+        title: 'Как записать направления и веса?',
+        lead: 'Сначала задайте одинаковый порядок вершин в строках и столбцах: A, B, C. Затем заполните клетки по связям графа.',
+        blocks: [
+          {
+            t: 'html',
+            html: `<div class="q2-graph-matrix-pair">
+              <div class="q2-graph-matrix-example">
+                <h3>Ориентированный граф</h3>
+                <svg viewBox="0 0 440 220" role="img" aria-label="Орграф: A в B, A в C, C в B">
+                  <defs><marker id="matrix-directed-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#98a7bc"/></marker></defs>
+                  <g stroke="#bac4d3" stroke-width="2" marker-end="url(#matrix-directed-arrow)"><path d="M112 55H328"/><path d="M100 77L205 171"/><path d="M235 171L337 77"/></g>
+                  <g class="q2-example-nodes"><circle cx="90" cy="55" r="22"/><circle cx="350" cy="55" r="22"/><circle cx="220" cy="185" r="22"/></g>
+                  <g class="q2-example-labels"><text x="90" y="55">A</text><text x="350" y="55">B</text><text x="220" y="185">C</text></g>
+                </svg>
+                <table class="q2-table q2-matrix q2-example-matrix"><caption>Матрица смежности орграфа</caption><thead><tr><th scope="col">Из / в</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th></tr></thead><tbody>
+                  <tr><th scope="row">A</th><td><span>0</span></td><td><span>1</span></td><td><span>1</span></td></tr>
+                  <tr><th scope="row">B</th><td><span>0</span></td><td><span>0</span></td><td><span>0</span></td></tr>
+                  <tr><th scope="row">C</th><td><span>0</span></td><td><span>1</span></td><td><span>0</span></td></tr>
+                </tbody></table>
+                <p>Строка — откуда, столбец — куда. Для A → B ставим 1 только в (A, B); обратной дуги нет — в (B, A) стоит 0.</p>
+              </div>
+              <div class="q2-graph-matrix-example">
+                <h3>Взвешенный граф</h3>
+                <svg viewBox="0 0 440 220" role="img" aria-label="Неориентированный граф: A B вес 4, B C вес 2, A C вес 9">
+                  <g stroke="#bac4d3" stroke-width="2"><path d="M90 55H350L220 185Z" fill="none"/></g>
+                  <g class="q2-example-weights"><text x="220" y="43">4</text><text x="302" y="132">2</text><text x="138" y="132">9</text></g>
+                  <g class="q2-example-nodes"><circle cx="90" cy="55" r="22"/><circle cx="350" cy="55" r="22"/><circle cx="220" cy="185" r="22"/></g>
+                  <g class="q2-example-labels"><text x="90" y="55">A</text><text x="350" y="55">B</text><text x="220" y="185">C</text></g>
+                </svg>
+                <table class="q2-table q2-matrix q2-example-matrix"><caption>Матрица весов</caption><thead><tr><th scope="col"></th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th></tr></thead><tbody>
+                  <tr><th scope="row">A</th><td><span>0</span></td><td><span>4</span></td><td><span>9</span></td></tr>
+                  <tr><th scope="row">B</th><td><span>4</span></td><td><span>0</span></td><td><span>2</span></td></tr>
+                  <tr><th scope="row">C</th><td><span>9</span></td><td><span>2</span></td><td><span>0</span></td></tr>
+                </tbody></table>
+                <p>Вместо 1 записываем вес ребра в обеих симметричных клетках. Здесь петель нет, диагональ — 0. Отсутствующее ребро обозначаем ∞, отличая его от веса 0.</p>
+              </div>
+            </div>`
+          },
+          {
+            t: 'table', caption: 'Что можно вычислить по матрице',
+            head: ['Вычисление', 'Пример и условие'],
+            rows: [
+              ['Степени и число связей', 'В матрице 0/1 без петель: сумма строки — исходящая степень, столбца — входящая. Для неориентированного графа сумма всех элементов / 2 — число рёбер.'],
+              ['Стоимость маршрута', 'A → B → C: 4 + 2 = 6. Прямое ребро A—C стоит 9; маршрут через B дешевле. Для поиска кратчайшего пути в общем случае нужен алгоритм.'],
+              ['Сумма весов рёбер', '(4 + 9 + 4 + 2 + 9 + 2) / 2 = 15. Делим на 2 только для неориентированного графа без петель.'],
+              ['Число соседей во взвешенном графе', 'Считаем существующие рёбра, а не складываем веса: у B два соседа, сумма весов его рёбер — 6.']
+            ]
           }
         ]
       },
@@ -794,7 +899,7 @@
             t: 'compare',
             left: {
               title: 'Ориентированный граф',
-              items: ['Матрица не симметрична', '1 в (A, B) значит A → B', 'Сумма строки — исходящая степень', 'Сумма столбца — входящая степень']
+              items: ['Матрица может быть несимметричной', '1 в (A, B) значит A → B', 'В матрице 0/1 сумма строки — исходящая степень', 'В матрице 0/1 сумма столбца — входящая степень']
             },
             right: {
               title: 'Неориентированный граф',
@@ -814,19 +919,35 @@
       {
         k: 'practice',
         eyebrow: '06 · ПРАКТИКА',
-        title: 'Работаем с таблицей',
-        lead: 'Отвечайте по матрице со слайда: A—B, A—C, B—D, C—D.',
-        tasks: [
-          { title: 'Число единиц', q: 'Сколько единиц в матрице неориентированного графа с 5 рёбрами?', answer: '10', type: 'number', explain: 'Каждое ребро даёт две единицы: 5 × 2 = 10.', hint: 'Ребро отмечается в двух клетках.' },
-          { title: 'Степень по строке', q: 'В строке вершины A стоят 1, 0, 1, 0. Чему равна степень A?', answer: '2', type: 'number', explain: 'Сумма строки равна степени вершины.', hint: 'Сложите числа строки.' },
-          { title: 'Чтение клетки', q: 'Что означает 1 на пересечении строки B и столбца D?', answer: ['ребро', 'есть ребро', 'есть связь', 'b и d связаны', 'ребро bd', 'связь'], explain: 'В графе есть ребро {B, D}.', hint: 'Клетка отвечает на вопрос «есть ли связь?».' },
-          { title: 'Диагональ', q: 'Что стоит на главной диагонали, если в графе нет петель?', answer: ['нули', '0', 'все нули'], explain: 'Петля отмечалась бы единицей на диагонали.', hint: 'Петля — ребро из вершины в неё саму.' },
-          { title: 'Изолированная вершина', q: 'Строка вершины E состоит из нулей. Что это значит?', answer: ['изолирована', 'изолированная', 'нет связей', 'нет рёбер', 'вершина изолирована'], explain: 'У вершины нет ни одного ребра — она изолирована.', hint: 'Сумма строки равна степени.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Число единиц связано с числом рёбер.' },
-          { mark: '1 балл', text: 'Степень найдена как сумма строки.' },
-          { mark: '1 балл', text: 'Симметрия и диагональ объяснены верно.' }
+        title: 'Три задания · 10 баллов',
+        lead: 'Выберите вкладку и выполните задание в тетради. Три разные ситуации — 10 баллов суммарно. Петель нет; баллы выставляет учитель по критериям.',
+        before: [
+          {
+            t: 'tabs',
+            items: [
+              {
+                label: 'Задача 1 · Школьная сеть', badge: '3 балла', icon: 'fa-solid fa-network-wired',
+                blocks: [
+                  { t: 'cards', cols: 1, items: [{ badge: '3 балла · Неориентированный граф', icon: 'fa-solid fa-network-wired', tone: 'violet', title: 'Какие кабинеты соединены?', text: `Четыре кабинета A, B, C, D соединены двусторонними кабелями: ${schoolNetwork11_3}.<br><br><b>1)</b> Постройте матрицу смежности 0/1 в порядке A, B, C, D.<br><b>2)</b> Для каждого кабеля определите, сохранится ли связь между всеми кабинетами после его отключения. Найдите все критические кабели и обоснуйте ответ: для некритических укажите обходной путь, для критических — получившиеся группы кабинетов. Если критических кабелей нет, объясните почему.<br><b>3)</b> Предложите один новый кабель между кабинетами, чтобы изолированный кабинет сохранил связь с сетью при обрыве. Покажите изменения в матрице и запишите путь после обрыва.` }] },
+                  { t: 'rubric', title: 'Критерии · 3 балла', items: [{ mark: '1 балл', text: 'Матрица построена верно целиком.' }, { mark: '1 балл', text: 'Проверено отключение каждого кабеля; выводы обоснованы разделением сети или обходными путями.' }, { mark: '1 балл', text: 'Предложен резервный кабель, верно показаны изменения матрицы и записан путь, сохраняющий связь после обрыва.' }] },
+                ]
+              },
+              {
+                label: 'Задача 2 · Робот на складе', badge: '3 балла', icon: 'fa-solid fa-robot',
+                blocks: [
+                  { t: 'cards', cols: 1, items: [{ badge: '3 балла · Орграф', icon: 'fa-solid fa-robot', tone: 'cyan', title: 'Можно ли вернуться к зарядке?', text: `Робот движется по односторонним коридорам: ${robot11_3.map(([a, b]) => `<code>${a} ⟶ ${b}</code>`).join(', ')}. Зарядная станция находится в S.<br><br><b>1)</b> Постройте матрицу смежности в порядке S, A, B, C.<br><b>2)</b> Найдите все пути из S в C без повторения вершин и все простые ориентированные циклы (один цикл, записанный с разных начальных вершин, считайте один раз). Для каждого пути и цикла выпишите соответствующие единичные клетки матрицы.<br><b>3)</b> Добавьте ровно одну отсутствующую дугу так, чтобы из любой вершины можно было добраться до любой другой. Найдите все подходящие варианты. Для одного варианта измените матрицу и подтвердите результат маршрутами из каждой вершины в S и из S во все остальные.` }] },
+                  { t: 'rubric', title: 'Критерии · 3 балла', items: [{ mark: '1 балл', text: 'Матрица верно учитывает направления всех пяти дуг.' }, { mark: '1 балл', text: 'Без пропусков найдены пути и простые циклы; для каждого правильно указаны клетки матрицы.' }, { mark: '1 балл', text: 'Найдены все допустимые дуги; изменение матрицы и маршруты доказывают взаимную достижимость.' }] },
+                ]
+              },
+              {
+                label: 'Задача 3 · Доставка', badge: '4 балла', icon: 'fa-solid fa-truck-fast',
+                blocks: [
+                  { t: 'cards', cols: 1, items: [{ badge: '4 балла · Взвешенный граф', icon: 'fa-solid fa-truck-fast', tone: 'amber', title: 'Сколько минут займёт доставка?', text: `Двусторонние дороги соединяют склад A и пункты B, C, D. Время проезда: ${delivery11_3.edges.map(([a, b], i) => `<code>${a}—${b}: ${delivery11_3.weights[i]} мин</code>`).join(', ')}. Других дорог нет.<br><br><b>1)</b> Постройте матрицу весов в порядке A, B, C, D: на диагонали 0, отсутствующая дорога — ∞.<br><b>2)</b> Самостоятельно перечислите все маршруты из A в D без повторения вершин, вычислите время каждого и найдите кратчайший. Объясните, почему список маршрутов полный.<br><b>3)</b> Дорогу ${delivery11_3.closed.join('—')} закрыли. Измените матрицу и найдите новый кратчайший маршрут A → D. Затем планируют открыть прямую дорогу A—D со временем x &gt; 0 минут. При каких x она будет строго быстрее любого объезда, а при каком x — равноценна лучшему объезду? Обоснуйте неравенством.<br><b>4)</b> По матрице найдите сумму времени проезда по всем четырём дорогам исходного графа (до закрытия), учитывая каждую один раз.` }] },
+                  { t: 'rubric', title: 'Критерии · 4 балла', items: [{ mark: '1 балл', text: 'Матрица симметрична, веса верны, A—D обозначена ∞.' }, { mark: '1 балл', text: 'Перечислены все маршруты без повторов, верно рассчитаны времена и обоснован выбор кратчайшего.' }, { mark: '1 балл', text: 'Учтено закрытие дороги, найден новый минимум и верно выведены условие для x и случай равенства.' }, { mark: '1 балл', text: 'Сумма весов всех дорог исходного графа вычислена без двойного счёта; ∞ не включено в сумму.' }] },
+                ]
+              }
+            ]
+          }
         ]
       },
       {
@@ -853,6 +974,12 @@
           'Матрицу удобно использовать, когда ...',
           'Симметрия матрицы говорит о том, что ...',
           'Для 1000 вершин матрица займёт ...'
+        ],
+        criteriaTitle: 'Всего · 10 баллов',
+        criteria: [
+          { mark: '3 балла', text: 'Школьная сеть: матрица, степень и изменение связей.' },
+          { mark: '3 балла', text: 'Робот на складе: направления, степени и возможность возврата.' },
+          { mark: '4 балла', text: 'Доставка: матрица весов, стоимость маршрутов и сумма весов.' }
         ]
       }
     ]

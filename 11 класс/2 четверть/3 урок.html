@@ -12,6 +12,138 @@
   <link rel="stylesheet" href="../../стили/lessons.css?v=neu-2026-11-02-v69">
   <link rel="stylesheet" href="../../стили/q2.css?v=q2-2026-11-02-30">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .lesson-11-q2-3 .q2-slide-practice [data-pane="1"] code {
+      font-family: Manrope, "Segoe UI Symbol", sans-serif !important;
+      font-size: 1.05em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    body.lesson-11-q2-3 .q2-slide-practice .q2-tab-pane > * + * {
+      margin-top: 28px !important;
+    }
+    body.lesson-11-q2-3 .q2-slide-practice .q2-tabs-widget {
+      margin-bottom: 28px;
+    }
+    html body.lesson-page.lesson-11-q2-3 #q2-root .slide .q2-rubric-panel .rubric-row,
+    html body.lesson-page.lesson-11-q2-3 #q2-root .slide .q2-rubric-panel .rubric-row:hover {
+      background: #fff5ee !important;
+      border: 0 !important;
+      box-shadow: inset 5px 5px 10px rgba(178, 135, 116, 0.4),
+                  inset -5px -5px 10px rgba(255, 255, 255, 0.98) !important;
+      transform: none !important;
+      filter: none !important;
+      transition: none !important;
+      animation: none !important;
+    }
+    html body.lesson-page.lesson-11-q2-3 #q2-root .slide .q2-rubric-panel .rubric-row::before,
+    html body.lesson-page.lesson-11-q2-3 #q2-root .slide .q2-rubric-panel .rubric-row::after {
+      display: none !important;
+    }
+    .lesson-11-q2-3 .q2-matrix-graph .q2-graph-node circle {
+      r: 28px;
+    }
+    .lesson-11-q2-3 .q2-matrix-graph .q2-graph-node text {
+      font-family: Manrope, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      fill: #60443b;
+    }
+    .lesson-11-q2-3 .q2-matrix-graph circle,
+    .lesson-11-q2-3 .q2-example-nodes circle {
+      filter: url(#q2-node-inset);
+      fill: #fff0e8;
+      stroke: #efd3c6;
+      stroke-width: 1;
+    }
+    .lesson-11-q2-3 .q2-graph-matrix-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px;
+      align-items: start;
+    }
+    .q2-graph-matrix-example { min-width: 0; }
+    .q2-graph-matrix-example h3 { text-align: center; margin: 0 0 8px; }
+    .q2-graph-matrix-example svg { display: block; width: 100%; height: auto; }
+    .q2-example-nodes circle { fill: #fff0e8; stroke: #e8b19e; stroke-width: 1.4; }
+    .q2-example-labels text, .q2-example-weights text {
+      fill: #60443b; font: 600 14px Manrope, sans-serif;
+      text-anchor: middle; dominant-baseline: middle;
+    }
+    .q2-example-weights text { font-weight: 800; paint-order: stroke; stroke: #fff9f5; stroke-width: 6px; }
+    .lesson-11-q2-3 .q2-example-matrix {
+      table-layout: fixed;
+      width: 100%;
+      min-width: 0;
+    }
+    .lesson-11-q2-3 .q2-example-matrix th,
+    .lesson-11-q2-3 .q2-example-matrix td {
+      width: 25%;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .q2-example-matrix caption { font-size: 0.85rem; padding: 8px; color: inherit; }
+    .q2-example-matrix td span {
+      display: grid; place-items: center; min-height: 38px;
+      border: 1px solid #d2dbea; border-radius: 12px;
+      background: #fff; color: #8b6558; font-weight: 600;
+    }
+    .q2-graph-matrix-example p { font-size: 0.9rem; line-height: 1.6; margin: 14px 0 24px; }
+    @media (max-width: 700px) {
+      .lesson-11-q2-3 .q2-graph-matrix-pair { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .lesson-11-q2-3 .q2-matrix-lab {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: center;
+      gap: 24px 40px;
+    }
+    .lesson-11-q2-3 .q2-matrix-wrap,
+    .lesson-11-q2-3 .q2-matrix-graph {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    .lesson-11-q2-3 .q2-matrix-wrap {
+      width: 100%;
+      max-width: 480px;
+      justify-self: center;
+      box-sizing: border-box;
+      padding: 0;
+    }
+    .lesson-11-q2-3 .q2-matrix-side { display: contents; }
+    .lesson-11-q2-3 .q2-matrix-graph {
+      width: 100%;
+      max-width: 480px;
+      justify-self: center;
+      box-sizing: border-box;
+    }
+    .lesson-11-q2-3 .q2-matrix-lab .q2-truth-actions {
+      grid-column: 1 / -1;
+      justify-content: center;
+      gap: 16px;
+    }
+    html body.lesson-11-q2-3 .q2-matrix-lab .q2-truth-actions .q2-btn {
+      background: var(--neu-bg, #fff9f5);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 5px 5px 12px rgba(166, 120, 98, 0.22), -5px -5px 12px rgba(255, 255, 255, 0.95);
+      padding: 11px 20px;
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    html body.lesson-11-q2-3 .q2-matrix-lab .q2-truth-actions .q2-btn:hover {
+      box-shadow: 3px 3px 8px rgba(166, 120, 98, 0.22), -3px -3px 8px rgba(255, 255, 255, 0.95);
+      transform: translateY(-1px);
+    }
+    html body.lesson-11-q2-3 .q2-matrix-lab .q2-truth-actions .q2-btn:active {
+      box-shadow: inset 3px 3px 7px rgba(166, 120, 98, 0.22), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+      transform: translateY(0);
+    }
+    .lesson-11-q2-3 .q2-matrix-lab .q2-feedback { grid-column: 1 / -1; }
+    .lesson-11-q2-3 .q2-matrix-lab .q2-feedback:empty { display: none; }
+    @media (max-width: 900px) {
+      .lesson-11-q2-3 .q2-matrix-lab { grid-template-columns: 1fr; gap: 20px; }
+    }
+  </style>
 </head>
 <body class="lesson-page q2-lesson lesson-11-q2-3" data-lesson-id="11-q2-3">
 
@@ -86,8 +218,8 @@
 
   <script src="../../скрипты/q2-scenes.js?v=q2-2026-11-01-15"></script>
   <script src="../../скрипты/q2-engine.js?v=q2-2026-11-07-v3"></script>
-  <script src="../../скрипты/q2-data-11.js?v=q2-2026-11-07-v3"></script>
-  <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-07-v5"></script>
+  <script src="../../скрипты/q2-data-11.js?v=q2-2026-11-15-v17"></script>
+  <script src="../../скрипты/lesson-icons.js?v=flaticon-2026-11-15-v6"></script>
   <script src="../../скрипты/lessons.js?v=auth-cloud-20261107-v9"></script>
 </body>
 </html>

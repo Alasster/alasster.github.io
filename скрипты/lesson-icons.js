@@ -1163,6 +1163,8 @@
     "rotate-left": "refresh",
     "up-right-from-square": "arrow-up-right-from-square",
     "diagram-project": "network",
+    "network-wired": "network",
+    "truck-fast": "time-fast",
     "project-diagram": "network",
     "comments": "comments",
     "pen": "pen-clip",
