@@ -380,7 +380,9 @@
       const statusNode = svg.querySelector('[data-sort-status]');
       if (!nodes.length) return;
       const selection = document.body.dataset.lessonId === '10ogn-q2-3';
+      const insertion = document.body.dataset.lessonId === '10ogn-q2-4';
       if (selection) svg.setAttribute('aria-label', 'Сортировка выбором: поиск минимума и обмен с началом неотсортированной части');
+      if (insertion) svg.setAttribute('aria-label', 'Сортировка вставками: берём элемент, сдвигаем большие вправо и вставляем в готовую часть');
 
       const baseX = 58;
       const stepX = 56;
@@ -397,18 +399,19 @@
         [8, 1, 7, 3, 9, 5]
       ];
       let presetIdx = 0;
+      let held = null;
 
       const applyPositions = (compareSlots = [], sortedFromSlot = items.length, allSorted = false) => {
         items.forEach(item => {
           const x = baseX + item.slot * stepX;
           const isCmp = compareSlots.includes(item.slot);
-          const liftY = isCmp ? -8 : 0;
+          const liftY = item === held ? -55 : isCmp ? -8 : 0;
           item.node.setAttribute('transform', `translate(${x} ${liftY})`);
           item.node.style.transform = `translate(${x}px, ${liftY}px)`;
           item.node.classList.toggle('is-compare', isCmp);
-          item.node.classList.toggle('is-sorted', allSorted || (selection
+          item.node.classList.toggle('is-sorted', item !== held && (allSorted || (selection || insertion
             ? item.slot < items.length - sortedFromSlot
-            : item.slot >= sortedFromSlot));
+            : item.slot >= sortedFromSlot)));
         });
       };
 
@@ -416,6 +419,23 @@
         const sim = items.slice().sort((a, b) => a.slot - b.slot).map(it => it.val);
         const n = sim.length;
         const steps = [];
+        if (insertion) {
+          for (let i = 1; i < n; i++) {
+            const key = sim[i];
+            steps.push({ type: 'take', key, from: i, sortedFrom: n - i });
+            let j = i - 1;
+            while (j >= 0) {
+              steps.push({ type: 'probe', key, at: j, value: sim[j], sortedFrom: n - i });
+              if (sim[j] <= key) break;
+              steps.push({ type: 'shift', key, at: j, value: sim[j], sortedFrom: n - i });
+              sim[j + 1] = sim[j];
+              j--;
+            }
+            sim[j + 1] = key;
+            steps.push({ type: 'insert', key, at: j + 1, sortedFrom: n - i - 1 });
+          }
+          return steps;
+        }
         if (selection) {
           for (let i = 0; i < n - 1; i++) {
             let min = i;
@@ -452,6 +472,26 @@
           const steps = buildSteps();
           for (const st of steps) {
             if (!document.body.contains(svg)) return;
+            if (insertion) {
+              if (st.type === 'take') held = items.find(item => item.slot === st.from);
+              const candidate = items.find(item => item !== held && item.slot === st.at);
+              let text = '';
+              if (st.type === 'take') text = `берём ${st.key} — вставим в готовую часть`;
+              if (st.type === 'probe') text = `сравниваем ${st.key} с ${st.value} слева`;
+              if (st.type === 'shift') {
+                if (candidate) candidate.slot++;
+                text = `${st.value} больше ${st.key} → сдвигаем вправо`;
+              }
+              if (st.type === 'insert') {
+                if (held) held.slot = st.at;
+                held = null;
+                text = `вставляем ${st.key} на место ${st.at + 1}`;
+              }
+              if (statusNode) statusNode.textContent = text;
+              applyPositions(held ? [held.slot, st.at] : [st.at], st.sortedFrom, false);
+              await wait(st.type === 'probe' ? 450 : 650);
+              continue;
+            }
             if (statusNode) statusNode.textContent = st.type === 'compare'
               ? `ищем минимум: сравниваем ${st.aVal} и ${st.bVal}`
               : selection
