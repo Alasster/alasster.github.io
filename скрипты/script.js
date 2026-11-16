@@ -352,8 +352,11 @@ function refreshHomeVisibility() {
 
   homeVisibilityRequest = (async () => {
     try {
-      const localResponse = await fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' });
-      if (localResponse.ok) applyHomeVisibility(await localResponse.json());
+      // The static snapshot is only a fallback; cached server state is newer.
+      if (!homeVisibilityLoaded) {
+        const localResponse = await fetch('/скрипты/lesson-visibility.json?t=' + Date.now(), { cache: 'no-store' });
+        if (localResponse.ok) applyHomeVisibility(await localResponse.json());
+      }
 
       const configResponse = await fetch('/скрипты/backend-config.json?t=' + Date.now(), { cache: 'no-store' });
       if (!configResponse.ok) return;
