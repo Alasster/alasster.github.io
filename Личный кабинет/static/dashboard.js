@@ -1961,13 +1961,21 @@ function renderLessonsCatalog(classes) {
       quarterTitle.textContent = group.name;
       const sectionTitle = document.createElement('span');
       sectionTitle.className = 'catalog-section-title';
+      const firstQuarterSections = {
+        '9 класс': 'Компьютерные сети',
+        '10 ОГН': 'Информационные технологии',
+        '10 ЕМН': 'Машинное обучение',
+        '11 класс': 'Компьютерные системы и сети'
+      };
       const sections = {
         '9 класс': 'Логические основы компьютера',
         '10 ОГН': 'Алгоритмизация и программирование (Python)',
         '10 ЕМН': 'Алгоритмизация и программирование (Python)',
         '11 класс': 'Алгоритмы на графах (Python)'
       };
-      sectionTitle.textContent = group.name === '2 четверть' ? (sections[item.name] || '') : '';
+      sectionTitle.textContent = group.name === '1 четверть'
+        ? (firstQuarterSections[item.name] || '')
+        : group.name === '2 четверть' ? (sections[item.name] || '') : '';
       const quarterLine = document.createElement('div');
       quarterLine.className = 'catalog-quarter-line';
       quarterLine.append(quarterTitle, sectionTitle);
