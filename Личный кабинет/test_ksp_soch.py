@@ -27,8 +27,9 @@ def soch_plan():
     data = plan(False)
     data['stages'] = data['stages'][:3]
     data['stages'][1].update(
-        teacher_actions='Раздаёт варианты СОЧ, наблюдает за самостоятельностью, собирает работы.',
-        student_actions='Учащиеся самостоятельно выполняют задания СОЧ, проверяют и сдают работы.')
+        teacher_actions='Открывает доступ к заданиям СОЧ на сайте www.alasster.site, наблюдает за самостоятельностью.',
+        student_actions='Учащиеся самостоятельно выполняют задания СОЧ на сайте www.alasster.site, проверяют и отправляют работу.',
+        assessment='')
     return normalize_soch_stages(data, soch_source())
 
 
@@ -53,8 +54,9 @@ class SochTests(unittest.TestCase):
     def test_three_stages_and_detailed_descriptors_are_required(self):
         good = soch_plan()
         validate_soch_stages(good)
-        self.assertIn('самостоятельно выполняют задания СОЧ', good['stages'][1]['assessment'])
-        self.assertIn('проверяют полноту', good['stages'][1]['assessment'])
+        self.assertIn('Суммативное оценивание за четверть', good['stages'][1]['assessment'])
+        self.assertIn('alasster.site', good['stages'][1]['assessment'])
+        self.assertNotIn('утверждённые', good['stages'][1]['assessment'].lower())
         self.assertEqual(normalize_soch_stages(copy.deepcopy(good), soch_source()), good)
         for bad in (plan(), plan(False)):
             with self.assertRaises(ValueError):
@@ -62,13 +64,14 @@ class SochTests(unittest.TestCase):
 
     def test_all_four_lesson_types_have_40_minutes(self):
         cases = [(source('Обычный урок'), plan(False)),
-                 (source(variative=True), plan(False)),
+                 (source(variative=True), plan(False, variative=True)),
                  (source(), plan()), (soch_source(), soch_plan())]
         for data, content in cases:
             content = normalize_lesson_timing(content, data)
             names = [s['stage_name'] for s in content['stages']]
             self.assertEqual(sum(int(re.search(r'(\d+) мин', n)[1]) for n in names), 40)
         self.assertIn('(20 мин)', SOR_STAGES[1])
+        self.assertIn('(35 мин)', SOCH_STAGES[1])
 
     def test_model_request_for_soch_is_isolated(self):
         before = copy.deepcopy(ksp_service.GEMINI_PLAN_SCHEMA)
@@ -85,7 +88,7 @@ class SochTests(unittest.TestCase):
         text = payload['contents'][0]['parts'][0]['text']
         self.assertIn('Ровно три этапа', text)
         self.assertIn('ЗА ЧЕТВЕРТЬ', text)
-        self.assertIn('Всё основное время урока', text)
+        self.assertIn('35 мин', text)
         self.assertEqual(payload['generationConfig']['responseSchema']['properties']['stages']['maxItems'], 3)
         self.assertEqual(before, ksp_service.GEMINI_PLAN_SCHEMA)
         self.assertEqual(tuple(s['stage_name'] for s in result['stages']), SOCH_STAGES)
@@ -102,13 +105,15 @@ class SochTests(unittest.TestCase):
             self.assertEqual(tuple(r.cells[0].text for r in rows[2:]), SOCH_STAGES)
             assessment = rows[3]
             self.assertIn('выполняют задания СОЧ', assessment.cells[2].text)
-            self.assertIn('Дескрипторы выполнения СОЧ', assessment.cells[3].text)
-            self.assertIn('за четверть', assessment.cells[4].text)
+            self.assertIn('Суммативное оценивание за четверть', assessment.cells[3].text)
+            self.assertIn('alasster.site', assessment.cells[4].text)
+            self.assertNotIn('Утверждённые', assessment.cells[4].text)
+            self.assertNotIn('бланки ответов', assessment.cells[4].text)
             self.assertFalse(assessment.cells[2]._tc.xpath('.//*[local-name()="pic"]'))
             text = '\n'.join(c.text for r in rows for c in r.cells)
-            self.assertNotIn('АКТУАЛИЗАЦИЯ', text)
-            self.assertNotIn('ОБЪЯСНЕНИЕ НОВОГО', text)
-            self.assertNotIn('ПРАКТИЧЕСКАЯ РАБОТА', text)
+            self.assertNotIn('Актуализация знаний', text)
+            self.assertNotIn('Объяснение нового', text)
+            self.assertNotIn('Практическая работа', text)
 
 
 if __name__ == '__main__':

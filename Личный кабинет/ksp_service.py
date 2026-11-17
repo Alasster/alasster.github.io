@@ -119,7 +119,13 @@ def drive_available() -> bool:
     return bool(local) and (Path(local) / 'Google' / 'DriveFS').is_dir()
 
 
-GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite']
+GEMINI_MODELS = [
+    'gemini-4-hydrogen',
+    'gemini-4-argon',
+    'gemini-3.8-flash',
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+]
 
 GEMINI_PLAN_SCHEMA = {
     'type': 'OBJECT',
@@ -311,7 +317,7 @@ def output_path(source: dict, output_root: Path) -> Path:
 
 
 def sanitize_dict_strings(obj):
-    """Strictly scrubs forbidden classroom equipment words (interactive whiteboards, laptops)."""
+    """Strictly scrubs forbidden classroom equipment words (interactive whiteboards, laptops, paper answer sheets)."""
     if isinstance(obj, str):
         obj = re.sub(r'\bинтерактивн\w*\s+доск\w*', 'платформу www.alasster.site', obj, flags=re.I)
         obj = re.sub(r'\bсмарт[- ]доск\w*', 'платформу www.alasster.site', obj, flags=re.I)
@@ -319,6 +325,9 @@ def sanitize_dict_strings(obj):
         obj = re.sub(r'\bу\s+доски\b', 'на платформе www.alasster.site', obj, flags=re.I)
         obj = re.sub(r'\bна\s+ноутбук\w*', 'на рабочих местах на платформе www.alasster.site', obj, flags=re.I)
         obj = re.sub(r'\bноутбук\w*', 'рабочие места', obj, flags=re.I)
+        obj = re.sub(r'\bутвержд[её]нн\w*\s+(задани\w*|вариант\w*|критери\w*)', r'\1', obj, flags=re.I)
+        obj = re.sub(r'\bбланк\w*\s+ответов\b', 'электронную форму на сайте www.alasster.site', obj, flags=re.I)
+        obj = re.sub(r'\bразда[её]т\s+(?:варианты\s+и\s+)?бланк\w*', 'открывает доступ к заданиям на сайте www.alasster.site', obj, flags=re.I)
         return obj
     elif isinstance(obj, dict):
         return {k: sanitize_dict_strings(v) for k, v in obj.items()}
@@ -360,71 +369,71 @@ def generate(source: dict) -> dict:
     is_variative = bool(source.get('is_variative'))
 
     if is_variative:
-        timing_and_stages_block = f"""6. ОСОБЕННОСТЬ ВАРИАТИВНОГО УРОКА ДЛЯ 10 «А» КЛАССА (ОГН) ПО ВТОРНИКАМ (5 ЭТАПОВ — МЕНЬШЕ ТЕОРИИ, БОЛЬШЕ УГЛУБЛЕННОЙ ПРАКТИКИ):
+        timing_and_stages_block = f"""6. ОСОБЕННОСТЬ ВАРИАТИВНОГО УРОКА ДОП ДЛЯ 10 «А» КЛАССА (ОГН) ПО ВТОРНИКАМ (5 ЭТАПОВ: 2 + 5 + 5 + 25 + 3 = 40 МИН — УГЛУБЛЕННОЕ ИЗУЧЕНИЕ, ДОП ЗАДАНИЯ, ЧИСТО УСТНОЕ ОЦЕНИВАНИЕ БЕЗ БАЛЛОВ):
    - Это вариативный курс «Информатика и искусственный интеллект. Вариативный компонент» специально для 10 «А» класса ОГН (урок проходит по вторникам, дата: {source['date']}).
-   - Учащиеся 10 «А» класса работают с тем же уроком на платформе www.alasster.site, что и на основном уроке, но занятие построено с минимальным объёмом повторной теории и максимальным упором на практику, исследование, эксперименты и дополнительные задания повышенной сложности в соответствии с целями вариативного КТП: {' '.join(source['goals'])}.
-   - РАСПРЕДЕЛЕНИЕ ВРЕМЕНИ (РОВНО 5 ЭТАПОВ):
-     - 1. ОРГ. МОМЕНТ (5 мин):
+   - Учащиеся 10 «А» класса работают с тем же уроком на платформе www.alasster.site, что и на основном уроке, но занятие построено с минимальным объёмом повторной теории и максимальным упором на углублённое изучение, практику, эксперименты и дополнительные задания повышенной сложности в соответствии с целями вариативного КТП: {' '.join(source['goals'])}.
+   - РАСПРЕДЕДЕНИЕ ВРЕМЕНИ И НАЗВАНИЯ ЭТАПОВ (РОВНО 5 ЭТАПОВ, stage_name СТРОГО):
+     - 1. Организационный момент (2 мин):
        * **Приветствие:** Живая речь учителя для 10 «А» класса («Здравствуйте, ребята! Садитесь. Проверьте готовность рабочих мест...»).
        * **Психологический настрой:** Мотивация на углублённый практикум и исследовательскую работу.
        * **Тема урока:** Чёткое объявление темы вариативного занятия «{source['title']}».
        * **Цель урока:** Разъяснение углублённых целей обучения вариативного курса.
        * **Критерии успеха:** Конкретные практические и исследовательские результаты учащихся к концу урока.
-     - 2. АКТУАЛИЗАЦИЯ ЗНАНИЙ (5 мин):
+     - 2. Актуализация знаний (5 мин):
        * **Интерактивная разминка:** Быстрый блиц-опрос по базовым вопросам урока на платформе www.alasster.site (из раздела «АКТУАЛИЗАЦИЯ И РАЗМИНКА (ВОПРОСЫ С ПЛАТФОРМЫ)»).
        * **Вопрос 1:** Конкретный вопрос строго по теме «{source['title']}».
        * **Ожидаемый ответ 1:** Точный ответ учащихся.
        * **Вопрос 2:** Проблемный вопрос на сопоставление, анализ или выбор метода по теме «{source['title']}».
        * **Ожидаемый ответ 2:** Ответ учащихся.
        * **Подводка к углубленной практике:** Переход от базовых понятий сразу к практическому моделированию и решению расширенных задач.
-     - 3. ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (5 мин — краткий концентрат теории с акцентом на практику):
-       * Без длинных лекций: сжатое повторение опорных правил с платформы www.alasster.site и разбор тонкостей для выполнения углублённой практики по теме «{source['title']}».
+     - 3. Объяснение нового материала (5 мин):
+       * Без длинных лекций: сжатое углублённое объяснение опорных правил с платформы www.alasster.site и разбор тонкостей для выполнения углублённой практики по теме «{source['title']}».
        * **Теоретический блок (краткий концентрат):** Сжатая выжимка ключевых закономерностей, формул или конструкций темы «{source['title']}».
        * **Ключевые понятия и алгоритмические приёмы:** Опорные ориентиры и правила анализа данных/кода.
        * **Разбор ключевого примера:** Конкретный прикладной разбор по материалам платформы www.alasster.site с анализом пограничных случаев и типичных ошибок.
        * **Контрольный вопрос перед практикой:** 1-2 быстрых вопроса на готовность к самостоятельной работе.
-     - 4. ПРАКТИЧЕСКАЯ РАБОТА (20 мин — основной фокус урока + дополнительные углубленные задания):
+     - 4. Практическая работа (25 мин):
        * **Инструктаж по технике безопасности:** Правила работы за компьютером и соблюдение академической честности.
-       * ОБЯЗАТЕЛЬНО ВКЛЮЧИ 5 КОНКРЕТНЫХ ЗАДАНИЙ С ПОЛНЫМИ УСЛОВИЯМИ, РЕШЕНИЯМИ И ДЕСКРИПТОРАМИ СТРОГО ПО ТЕМЕ «{source['title']}» (3 задания с платформы www.alasster.site + 2 дополнительных углублённых задания вариативного курса):
-         - **Задание 1 (базовый практикум с платформы):** Полное условие задания с платформы www.alasster.site. Решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (без баллов).
-         - **Задание 2 (прикладной практикум с платформы):** Полное условие второго задания с платформы www.alasster.site. Пошаговое решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (без баллов).
-         - **Задание 3 (профильный практикум с платформы):** Полное условие третьего задания с платформы www.alasster.site. Решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (без баллов).
-         - **Дополнительное задание 4 (углублённый вариативный уровень — модификация и эксперимент):** Дополнительная практическая задача повышенной сложности по теме «{source['title']}», развивающая материал урока (самостоятельная настройка параметров, расширение кода/модели, серия испытаний на новых наборах данных). Полное условие, подробное решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (без баллов).
-         - **Дополнительное задание 5 (исследовательский уровень — анализ и обоснование):** Дополнительное исследовательское или аналитическое задание по целям вариативного КТП («{' '.join(source['goals'])}» — сравнение эффективности, поиск ошибок/ограничений, аргументированный вывод). Полное условие, эталонное решение и выводы для учителя. Дескриптор: качественные критерии выполнения (без баллов).
-     - 5. ПОДВЕДЕНИЕ ИТОГОВ УРОКА (5 мин):
+       * ОБЯЗАТЕЛЬНО ВКЛЮЧИ 5 КОНКРЕТНЫХ ЗАДАНИЙ С ПОЛНЫМИ УСЛОВИЯМИ, РЕШЕНИЯМИ И ДЕСКРИПТОРАМИ СТРОГО ПО ТЕМЕ «{source['title']}» (3 задания с платформы www.alasster.site + 2 дополнительных углублённых задания вариативного курса, БЕЗ БАЛЛОВ):
+         - **Задание 1 (базовый практикум с платформы):** Полное условие задания с платформы www.alasster.site. Решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (чисто устно, без баллов).
+         - **Задание 2 (прикладной практикум с платформы):** Полное условие второго задания с платформы www.alasster.site. Пошаговое решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (чисто устно, без баллов).
+         - **Задание 3 (профильный практикум с платформы):** Полное условие третьего задания с платформы www.alasster.site. Решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (чисто устно, без баллов).
+         - **Дополнительное задание 4 (углублённый вариативный уровень — модификация и эксперимент):** Дополнительная практическая задача повышенной сложности по теме «{source['title']}», развивающая материал урока. Полное условие, подробное решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (чисто устно, без баллов).
+         - **Дополнительное задание 5 (исследовательский уровень — анализ и обоснование):** Дополнительное исследовательское или аналитическое задание по целям вариативного КТП («{' '.join(source['goals'])}»). Полное условие, эталонное решение и выводы для учителя. Дескриптор: качественные критерии выполнения (чисто устно, без баллов).
+     - 5. Подведение итогов урока (3 мин):
        * **Обобщение темы:** Вывод учителя по результатам углублённого практикума.
        * **Рефлексия:** Самооценка выполнения базовых и дополнительных заданий («Что удалось протестировать и доказать?», «Какая задача потребовала наибольшего анализа?»).
-       * **Оценивание:** Устное качественное формативное оценивание (БЕЗ баллов, БЕЗ отметок и БЕЗ 10-балльной шкалы, т.к. вариативный курс не оценивается в журнале): содержательный устный комментарий учителя, словесная похвала, акцент на успешных исследовательских решениях и прогрессе учеников, техника обратной связи «Похвала – Вопрос – Рекомендация».
+       * **Оценивание:** Чисто устное качественное оценивание (БЕЗ баллов, БЕЗ отметок и БЕЗ 10-балльной шкалы, т.к. вариативный курс не имеет балльного оценивания): содержательный устный комментарий учителя, словесная похвала, обратная связь «Похвала – Вопрос – Рекомендация».
        * **Домашнее задание:** Инструктаж по выполнению ДЗ и повторению на платформе www.alasster.site."""
     else:
-        timing_and_stages_block = f"""6. РОВНО 5 ЭТАПОВ (ПОЛНАЯ ДЕТАЛИЗАЦИЯ):
-   - 1. ОРГ. МОМЕНТ (5 мин):
+        timing_and_stages_block = f"""6. РОВНО 5 ЭТАПОВ ОБЫЧНОГО УРОКА (2 + 5 + 10 + 20 + 3 = 40 МИН, stage_name СТРОГО):
+   - 1. Организационный момент (2 мин):
        * **Приветствие:** Живая речь учителя («Здравствуйте, ребята! Садитесь. Проверьте готовность рабочих мест...»).
        * **Психологический настрой:** Позитивная мотивация.
        * **Тема урока:** Чёткое объявление темы «{source['title']}».
        * **Цель урока:** Разъяснение цели простым и понятным языком.
        * **Критерии успеха:** Что конкретно учащиеся смогут делать к концу урока.
-   - 2. АКТУАЛИЗАЦИЯ ЗНАНИЙ (5 мин):
+   - 2. Актуализация знаний (5 мин):
        * **Интерактивная разминка:** Фронтальный опрос строго по теме «{source['title']}» на платформе www.alasster.site.
        * **Вопрос 1:** Прямая речь учителя с конкретным вопросом строго по содержанию темы «{source['title']}».
        * **Ожидаемый ответ 1:** Точный развёрнутый ответ учащихся.
        * **Вопрос 2:** Проблемный вопрос, подводящий к изучению темы «{source['title']}».
        * **Ожидаемый ответ 2:** Ответ учащихся.
        * **Подводка к новой теме:** Логический переход к изучению темы «{source['title']}».
-   - 3. ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (10 мин):
+   - 3. Объяснение нового материала (10 мин):
        * КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНЫ общие отписки! Текст объяснения учителя расписывай ПОЛНОСТЬЮ слово в слово строго по теме «{source['title']}»!
        * **Теоретический блок:** Фундаментальное изложение сути темы со всеми определениями и принципами.
        * **Ключевые термины и понятия:** Список терминов текущего урока с их точными формулировками.
        * **Разбор примера 1 (пошаговый разбор ситуации/задачи):** Подробнейший пошаговый разбор конкретного примера или задачи строго по материалу урока «{source['title']}».
        * **Разбор примера 2 (практический кейс):** Разбор реальной жизненной ситуации или прикладного сценария по теме «{source['title']}».
        * **Контрольные вопросы для проверки понимания:** 2-3 экспресс-вопроса учащимся по объясненному материалу.
-   - 4. ПРАКТИЧЕСКАЯ РАБОТА (15 мин):
+   - 4. Практическая работа (20 мин):
        * **Инструктаж по технике безопасности:** Правила работы за компьютером.
        * ОБЯЗАТЕЛЬНО МИНИМУМ 3 КОНКРЕТНЫХ ЗАДАНИЯ С ПОЛНЫМИ УСЛОВИЯМИ, РЕШЕНИЯМИ И ДЕСКРИПТОРАМИ СТРОГО ПО ТЕМЕ «{source['title']}»:
          - **Задание 1 (базовый уровень — знание и понимание):** Полное условие. Решение и правильный ответ для учителя. Дескриптор с баллами (1-3 балла).
          - **Задание 2 (средний уровень — применение):** Полное условие практической задачи. Пошаговое решение и правильный ответ для учителя. Дескриптор с баллами (1-4 балла).
          - **Задание 3 (высокий уровень — анализ/исследование):** Творческая или проблемная задача повышенной сложности. Полное решение для учителя. Дескриптор с баллами (1-3 балла).
-   - 5. ПОДВЕДЕНИЕ ИТОГОВ УРОКА (5 мин):
+   - 5. Подведение итогов урока (3 мин):
        * **Обобщение темы:** Развёрнутый вывод учителя по уроку с повторением сути изученного.
        * **Рефлексия:** Приём рефлексии (вопросы самооценки «Что усвоено?», «Какие моменты вызвали затруднения?»).
        * **Оценивание:** Выставление и комментирование баллов формативного оценивания (ФО) по 10-балльной шкале.
@@ -539,30 +548,39 @@ def generate(source: dict) -> dict:
     last_error = None
     for model in GEMINI_MODELS:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-        try:
-            with httpx.Client(timeout=httpx.Timeout(90.0, connect=15.0)) as client:
-                resp = client.post(url, json=payload)
-                if resp.status_code == 200:
-                    text_content = resp.json()['candidates'][0]['content']['parts'][0]['text']
-                    plan = json.loads(text_content)
-                    plan = sanitize_dict_strings(plan)
-                    plan = normalize_soch_stages(plan, source)
-                    plan = normalize_sor_stages(plan, source)
-                    plan = normalize_lesson_timing(plan, source)
-                    validate_plan(plan, source)
-                    return plan
-                elif resp.status_code == 403:
-                    resp_json = resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {}
-                    err_msg = resp_json.get('error', {}).get('message', '')
-                    if 'leaked' in err_msg.lower():
-                        raise ValueError('Ключ Gemini API заблокирован Google (обнаружен в публичном доступе). Пожалуйста, создайте новый бесплатный ключ на https://aistudio.google.com/app/apikey и добавьте в .env')
-                    last_error = f"Gemini 403: {err_msg or resp.text[:200]}"
-                else:
-                    last_error = f"Gemini {model} вернул статус {resp.status_code}: {resp.text[:250]}"
-        except ValueError:
-            raise
-        except Exception as exc:
-            last_error = f"Gemini {model} ошибка подключения: {str(exc)}"
+        for attempt in range(2):
+            try:
+                with httpx.Client(timeout=httpx.Timeout(90.0, connect=15.0)) as client:
+                    resp = client.post(url, json=payload)
+                    if resp.status_code == 200:
+                        text_content = resp.json()['candidates'][0]['content']['parts'][0]['text']
+                        plan = json.loads(text_content)
+                        plan = sanitize_dict_strings(plan)
+                        plan = normalize_soch_stages(plan, source)
+                        plan = normalize_sor_stages(plan, source)
+                        plan = normalize_lesson_timing(plan, source)
+                        validate_plan(plan, source)
+                        return plan
+                    elif resp.status_code == 403:
+                        resp_json = resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {}
+                        err_msg = resp_json.get('error', {}).get('message', '')
+                        if 'leaked' in err_msg.lower():
+                            raise ValueError('Ключ Gemini API заблокирован Google (обнаружен в публичном доступе). Пожалуйста, создайте новый бесплатный ключ на https://aistudio.google.com/app/apikey и добавьте в .env')
+                        last_error = f"Gemini 403: {err_msg or resp.text[:200]}"
+                        break
+                    elif resp.status_code in (429, 500, 502, 503, 504) and attempt == 0:
+                        last_error = f"Gemini {model} вернул статус {resp.status_code}: {resp.text[:250]}"
+                        import time as _t
+                        _t.sleep(1.2)
+                        continue
+                    else:
+                        last_error = f"Gemini {model} вернул статус {resp.status_code}: {resp.text[:250]}"
+                        break
+            except ValueError:
+                raise
+            except Exception as exc:
+                last_error = f"Gemini {model} ошибка подключения: {str(exc)}"
+                break
 
     raise ValueError(f"Не удалось сгенерировать КСП: {last_error}")
 
@@ -588,6 +606,7 @@ class KspService:
         self._index = {}
         self._index_ts = 0.0
         self._last_upload_ts = 0.0
+        self._error_ts: dict[str, float] = {}
         self.lock = threading.Lock()
 
         with self.db() as db:
@@ -645,10 +664,10 @@ class KspService:
                     all_keys.add(f'доп|{rel}')
         return all_keys
 
-    def sync_existing_files(self):
+    def sync_existing_files(self, force: bool = False):
         """Detect existing docx files on disk and register them as ready (or remove if deleted)."""
         if self.cloud:
-            return self.sync_cloud()
+            return self.sync_cloud(max_age=0.0 if force else 3.0)
         if not self.local:
             return
         self._ensure_local_pool()
@@ -663,7 +682,7 @@ class KspService:
                         if row and row['status'] in ('queued', 'generating', 'validating', 'saving', 'error'):
                             continue
                         if target.is_file():
-                            if not row or row['status'] != 'ready':
+                            if not row or row['status'] != 'ready' or row['path'] != str(target):
                                 ident = row['id'] if row else uuid.uuid4().hex
                                 db.execute(
                                     'INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
@@ -673,10 +692,14 @@ class KspService:
                             db.execute('DELETE FROM jobs WHERE key=?', (key,))
                     except Exception:
                         continue
+                for r in db.execute("SELECT key, path FROM jobs WHERE status='ready'").fetchall():
+                    p = r['path']
+                    if p and not str(p).startswith('gdrive:') and not Path(p).is_file():
+                        db.execute('DELETE FROM jobs WHERE key=?', (r['key'],))
         except Exception:
             pass
 
-    def sync_cloud(self, max_age: float = 5.0):
+    def sync_cloud(self, max_age: float = 3.0):
         """Cloud mode: the Google Drive folder is the source of truth (Render disk is ephemeral)."""
         import time
         if time.time() - self._index_ts < max_age:
@@ -685,7 +708,7 @@ class KspService:
             index = self.drive.index_docs()
         except Exception:
             return
-        if not index:
+        if index is None:
             return
         self._index, self._index_ts = index, time.time()
         try:
@@ -706,8 +729,9 @@ class KspService:
                     )
                     if not doc_id:
                         prefix = title.split(' — ', 1)[0] + ' — '
+                        allowed_cls = {folder_class, src['class_name']} if src.get('is_variative') else {folder_class}
                         matches = {ident for (cls, quarter, name), ident in index.items()
-                                   if cls == folder_class and quarter == src['quarter'] and name.startswith(prefix)}
+                                   if cls in allowed_cls and quarter == src['quarter'] and name.startswith(prefix)}
                         if len(matches) == 1:
                             doc_id = matches.pop()
                     row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
@@ -717,15 +741,22 @@ class KspService:
                         ident = row['id'] if row else uuid.uuid4().hex
                         db.execute('INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',
                                    (key, ident, 'ready', 'КСП готов в Google Диске', f'gdrive:{doc_id}', src['source_hash']))
-                    elif row and row['status'] == 'ready' and str(row['path']).startswith('gdrive:'):
-                        file_id = str(row['path'])[7:]
-                        if file_id not in index.values() and (time.time() - self._last_upload_ts > 15.0):
+                    elif row and row['status'] == 'ready':
+                        if time.time() - self._last_upload_ts > 5.0:
                             db.execute('DELETE FROM jobs WHERE key=?', (key,))  # doc was deleted from Drive
         except Exception:
             pass
 
-    def statuses(self):
-        self.sync_existing_files()
+    def statuses(self, force: bool = False):
+        import time
+        with self.db() as db:
+            for r in db.execute("SELECT key FROM jobs WHERE status='error'").fetchall():
+                k = r['key']
+                ts = self._error_ts.get(k)
+                if ts is not None and (time.time() - ts > 12.0):
+                    db.execute('DELETE FROM jobs WHERE key=?', (k,))
+                    self._error_ts.pop(k, None)
+        self.sync_existing_files(force=force)
         with self.db() as db:
             rows = db.execute('SELECT * FROM jobs').fetchall()
         out = {}
@@ -758,6 +789,11 @@ class KspService:
         return result
 
     def update(self, key: str, status: str, message: str, path: str = ''):
+        import time
+        if status == 'error':
+            self._error_ts[key] = time.time()
+        else:
+            self._error_ts.pop(key, None)
         with self.db() as db:
             db.execute(
                 'UPDATE jobs SET status=?, message=?, path=? WHERE key=?',
@@ -893,7 +929,8 @@ def install_routes(app, require_superadmin, reload_env=lambda: None):
         denied = authorize(request)
         if denied is not None:
             return denied
-        resp = JSONResponse({'lessons': get_service().statuses()})
+        fresh = request.query_params.get('fresh') == '1'
+        resp = JSONResponse({'lessons': get_service().statuses(force=fresh)})
         resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         resp.headers['Pragma'] = 'no-cache'
         return resp

@@ -18,6 +18,8 @@
   let jobs = {};
   let timer;
   let refreshing = false;
+  let pendingRefresh = false;
+  let pendingFresh = false;
   const starting = new Set();
   let watchedKey = '';
 
@@ -86,8 +88,13 @@
     });
   }
 
-  async function refresh() {
-    if (refreshing) return;
+  async function refresh(forceFresh = false) {
+    paint();
+    if (refreshing) {
+      pendingRefresh = true;
+      if (forceFresh) pendingFresh = true;
+      return;
+    }
     const role = getUserRole();
     if (!role) {
       setTimeout(refresh, 400);
@@ -97,7 +104,8 @@
 
     refreshing = true;
     try {
-      const response = await fetch('/api/ksp?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+      const qs = (forceFresh ? 'fresh=1&t=' : 't=') + Date.now();
+      const response = await fetch('/api/ksp?' + qs, { cache: 'no-store', signal: AbortSignal.timeout(15000) });
       if (!response.ok) return;
       const result = await response.json();
       jobs = result.lessons || {};
@@ -107,6 +115,13 @@
     } finally {
       refreshing = false;
       clearTimeout(timer);
+      if (pendingRefresh) {
+        const nextFresh = pendingFresh;
+        pendingRefresh = false;
+        pendingFresh = false;
+        refresh(nextFresh);
+        return;
+      }
       const busy = Object.values(jobs).some(job => active.has(job?.status)) || starting.size > 0;
       timer = setTimeout(refresh, document.hidden ? 30000 : busy ? 2000 : 15000);
     }
@@ -127,7 +142,7 @@
     // If ready and not forcing re-generation: verify it still exists in Google Drive before opening!
     if (isReady && !isShiftClick) {
       try {
-        const checkResp = await fetch('/api/ksp?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+        const checkResp = await fetch('/api/ksp?fresh=1&t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(12000) });
         if (checkResp.ok) {
           const checkData = await checkResp.json();
           jobs = checkData.lessons || {};
@@ -171,8 +186,12 @@
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) refresh();
+    if (!document.hidden) refresh(true);
   });
+
+  if (typeof window.addEventListener === 'function') {
+    window.addEventListener('focus', () => refresh(true));
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => setTimeout(refresh, 200));

@@ -160,6 +160,12 @@ class KspRegressions(unittest.TestCase):
             row = db.execute('SELECT status,message FROM jobs').fetchone()
             self.assertEqual(tuple(row), (status, 'Generation did not finish'))
 
+        # When all files are deleted from Google Drive (index == {}), ready jobs must be cleared
+        db.execute("UPDATE jobs SET status='ready', path='gdrive:drive-document'")
+        obj.drive = SimpleNamespace(index_docs=lambda: {})
+        ns['sync_cloud'](obj, max_age=0)
+        self.assertIsNone(db.execute('SELECT * FROM jobs WHERE key=?', ('lesson-key',)).fetchone())
+
 
 if __name__ == '__main__':
     unittest.main()

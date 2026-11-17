@@ -11,16 +11,13 @@ from docx import Document
 
 import ksp_document
 import ksp_service
-from ksp_lesson_policy import SOR_STAGES, is_sor_lesson, normalize_sor_stages, normalize_lesson_timing
+from ksp_lesson_policy import (
+    REGULAR_STAGES, DOP_STAGES, SOR_STAGES,
+    is_sor_lesson, normalize_sor_stages, normalize_lesson_timing,
+)
 
 BASE = Path(__file__).resolve().parent
-NORMAL_STAGES = (
-    '1. ОРГ. МОМЕНТ (5 мин)',
-    '2. АКТУАЛИЗАЦИЯ ЗНАНИЙ (5 мин)',
-    '3. ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (10 мин)',
-    '4. ПРАКТИЧЕСКАЯ РАБОТА (15 мин)',
-    '5. ПОДВЕДЕНИЕ ИТОГОВ УРОКА (5 мин)',
-)
+NORMAL_STAGES = REGULAR_STAGES
 QUOTE = {'kz': 'Адал еңбек', 'ru': 'Честный труд'}
 
 
@@ -33,16 +30,17 @@ def source(title='СОР 2: Построение логических схем',
                 content='Практическая работа: постройте схему для A ∧ B и проверьте её.')
 
 
-def plan(sor=True):
+def plan(sor=True, variative=False):
+    stage_names = SOR_STAGES if sor else (DOP_STAGES if variative else NORMAL_STAGES)
     stages = [dict(stage_name=name, teacher_actions='Организует работу учащихся.',
                    student_actions='Выполняют задания по теме урока.',
                    assessment='Обратная связь по выполненной работе.', resources='Ресурсы урока.')
-              for name in (SOR_STAGES if sor else NORMAL_STAGES)]
+              for name in stage_names]
     if sor:
         stages[1].update(
-            teacher_actions='Раздаёт утверждённые задания СОР. Наблюдает и собирает работы.',
-            student_actions='Учащиеся самостоятельно выполняют задания СОР в течение 20 минут. Сдают работы.',
-            assessment='После сбора работ учитель проверяет ответы по утверждённым критериям.')
+            teacher_actions='Открывает доступ к заданиям СОР на платформе www.alasster.site. Наблюдает за самостоятельностью.',
+            student_actions='Учащиеся самостоятельно выполняют задания СОР в течение 20 минут на сайте www.alasster.site.',
+            assessment='Суммативное оценивание за раздел на платформе www.alasster.site.')
     return dict(header=dict(school='Школа', teacher='Педагог', subject='Информатика',
                             section='Логические основы компьютера', date='17.11.2026',
                             grade='9 класс', theme='Построение логических схем',
@@ -143,8 +141,9 @@ class SorDocumentTests(unittest.TestCase):
             metadata = [{'index': i, 'title': f'Раздел {i+1}'} for i in range(7)]
             for index, data in enumerate((source(), source('Обычный урок'), source(variative=True))):
                 sor = is_sor_lesson(data)
+                variative = bool(data.get('is_variative'))
                 target = folder / f'case-{index}.docx'
-                expected = plan(sor)
+                expected = plan(sor, variative=variative)
                 with patch.object(ksp_document, 'get_lesson_slides_meta', return_value=metadata), \
                      patch.object(ksp_document, 'capture_lesson_slides', return_value={i: str(image) for i in range(7)}), \
                      patch.object(ksp_document, 'get_weekly_quote', return_value=QUOTE):
@@ -153,19 +152,20 @@ class SorDocumentTests(unittest.TestCase):
                 rows = doc.tables[1].rows
                 self.assertEqual(len(rows), 6 if sor else 7)
                 labels = [row.cells[0].text for row in rows[2:]]
-                self.assertEqual(labels, list(SOR_STAGES if sor else NORMAL_STAGES))
+                self.assertEqual(labels, list(SOR_STAGES if sor else (DOP_STAGES if variative else NORMAL_STAGES)))
                 if sor:
                     assessment = rows[3]
                     self.assertIn('20 минут', assessment.cells[2].text)
-                    self.assertIn('Утверждённые задания СОР', assessment.cells[4].text)
-                    self.assertNotIn('alasster.site', assessment.cells[4].text)
+                    self.assertIn('alasster.site', assessment.cells[4].text)
+                    self.assertNotIn('Утверждённые', assessment.cells[4].text)
+                    self.assertNotIn('бланки ответов', assessment.cells[4].text)
                     self.assertFalse(assessment.cells[2]._tc.xpath('.//*[local-name()="pic"]'))
                     self.assertTrue(rows[4].cells[2]._tc.xpath('.//*[local-name()="pic"]'))
                     self.assertNotIn('Объяснение', '\n'.join(cell.text for cell in assessment.cells))
                     self.assertIn('Нравственный вывод', rows[5].cells[1].text)
                 else:
-                    self.assertIn('АКТУАЛИЗАЦИЯ', rows[3].cells[0].text)
-                    self.assertIn('ОБЪЯСНЕНИЕ', rows[4].cells[0].text)
+                    self.assertIn('Актуализация', rows[3].cells[0].text)
+                    self.assertIn('Объяснение', rows[4].cells[0].text)
 
 
 if __name__ == '__main__':

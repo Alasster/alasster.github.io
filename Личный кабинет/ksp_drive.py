@@ -252,18 +252,73 @@ class DriveClient:
         raise ValueError('В облачном пуле Google Диска закончились свободные слоты (.pool). Откройте кабинет локально для синхронизации.')
 
     def index_docs(self) -> dict[tuple, str]:
-        """Map (класс, четверть, название без .docx) -> doc id for every KSP file under КСП/2026–2027."""
+        """Map (класс, четверть, название без .docx) -> doc id for every KSP file under КСП/2026–2027 in 3 batched requests."""
         year = self.ensure_path(['2026–2027'])
         result: dict[tuple, str] = {}
         classes = self._list_children(year, FOLDER_MIME)
-        for cls in classes:
-            for quarter in self._list_children(cls['id'], FOLDER_MIME):
-                for doc in self._list_files(quarter['id']):
-                    raw_name = doc['name']
-                    stem = raw_name[:-5] if raw_name.lower().endswith('.docx') else raw_name
-                    result[(cls['name'], quarter['name'], stem)] = doc['id']
-                    result[(cls['name'], quarter['name'], raw_name)] = doc['id']
+        if not classes:
+            return result
+        cls_by_id = {c['id']: c['name'] for c in classes if c.get('id') and c.get('name')}
+        if not cls_by_id:
+            return result
+
+        # Batch fetch all quarter folders under all class folders
+        quarters = self._list_by_parents(list(cls_by_id.keys()), FOLDER_MIME, only_folders=True)
+        if not quarters:
+            return result
+        q_info = {}
+        for qf in quarters:
+            qid = qf.get('id')
+            qname = qf.get('name')
+            parents = qf.get('parents') or []
+            cid = next((p for p in parents if p in cls_by_id), None)
+            if qid and qname and cid:
+                q_info[qid] = (cls_by_id[cid], qname)
+        if not q_info:
+            return result
+
+        # Batch fetch all KSP documents under all quarter folders
+        docs = self._list_by_parents(list(q_info.keys()), FOLDER_MIME, only_folders=False)
+        for doc in docs:
+            raw_name = doc.get('name') or ''
+            did = doc.get('id')
+            parents = doc.get('parents') or []
+            qid = next((p for p in parents if p in q_info), None)
+            if not (raw_name and did and qid):
+                continue
+            cls_name, quarter_name = q_info[qid]
+            stem = raw_name[:-5] if raw_name.lower().endswith('.docx') else raw_name
+            result[(cls_name, quarter_name, stem)] = did
+            result[(cls_name, quarter_name, raw_name)] = did
         return result
+
+    def _list_by_parents(self, parent_ids: list[str], folder_mime: str, only_folders: bool) -> list[dict]:
+        if not parent_ids:
+            return []
+        out = []
+        # Chunk up to 25 parent IDs per query to keep query string compact
+        for i in range(0, len(parent_ids), 25):
+            chunk = parent_ids[i:i + 25]
+            parents_clause = ' or '.join(f"'{pid}' in parents" for pid in chunk)
+            mime_clause = f"mimeType='{folder_mime}'" if only_folders else f"mimeType!='{folder_mime}'"
+            q = f"({parents_clause}) and {mime_clause} and trashed=false"
+            token = None
+            while True:
+                params = {
+                    'q': q,
+                    'fields': 'nextPageToken,files(id,name,mimeType,parents)',
+                    'pageSize': 500,
+                    'supportsAllDrives': 'true',
+                    'includeItemsFromAllDrives': 'true',
+                }
+                if token:
+                    params['pageToken'] = token
+                data = self._req('GET', f'{API}/files', params=params).json()
+                out += data.get('files', [])
+                token = data.get('nextPageToken')
+                if not token:
+                    break
+        return out
 
     def _list_children(self, parent: str, mime: str) -> list[dict]:
         out, token = [], None

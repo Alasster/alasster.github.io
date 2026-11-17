@@ -126,18 +126,37 @@ def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False
             temp_html = temp_dir / f'temp_ksp_{h_hash}_s{slide_idx}.html'
 
             if is_q2:
-                # Q2 dynamic engine: inject base tag, disable animations, and activate slide via goToSlide
+                # Q2 dynamic engine: inject base tag, advance animations to active state, and wait for full render
                 mod_html = html_raw
                 if '<head>' in mod_html:
                     mod_html = mod_html.replace('<head>', f'<head>\n  {base_tag}')
                 inject = f'''
-<style>* {{ animation: none !important; transition: none !important; }}</style>
+<style>
+  *, *::before, *::after {{
+    transition: none !important;
+    animation-delay: -2.2s !important;
+    animation-play-state: paused !important;
+  }}
+</style>
 <script>
-window.addEventListener('DOMContentLoaded', () => {{
-    setTimeout(() => {{
+(function() {{
+    function activateSlide() {{
         if (window.goToSlide) window.goToSlide({slide_idx});
-    }}, 150);
-}});
+        if (window.AlassterLessonIcons && window.AlassterLessonIcons.decorate) {{
+            window.AlassterLessonIcons.decorate(document.body);
+        }}
+    }}
+    window.addEventListener('DOMContentLoaded', () => {{
+        activateSlide();
+        setTimeout(activateSlide, 200);
+        setTimeout(activateSlide, 600);
+        setTimeout(activateSlide, 1200);
+    }});
+    window.addEventListener('load', () => {{
+        activateSlide();
+        setTimeout(activateSlide, 400);
+    }});
+}})();
 </script>
 </body>
 '''
@@ -150,7 +169,7 @@ window.addEventListener('DOMContentLoaded', () => {{
                     '--disable-gpu',
                     '--no-sandbox',
                     '--window-size=1200,750',
-                    '--virtual-time-budget=2500',
+                    '--virtual-time-budget=5500',
                     f'--user-data-dir={user_data}',
                     f'--screenshot={str(cache_file)}',
                     temp_html.as_uri()
@@ -159,7 +178,7 @@ window.addEventListener('DOMContentLoaded', () => {{
                 # Q1 static slides: activate slide_idx and render with fonts intact
                 clean_html = re.sub(r'<script\b[^>]*>.*?</script>', '', html_raw, flags=re.S | re.I)
                 clean_html = re.sub(r'(<head\b[^>]*>)', r'\1' + base_tag, clean_html, flags=re.I)
-                clean_html = re.sub(r'(</head>)', '<style>* { animation: none !important; transition: none !important; }</style>\\1', clean_html, flags=re.I)
+                clean_html = re.sub(r'(</head>)', '<style>*, *::before, *::after { transition: none !important; animation-delay: -2.2s !important; animation-play-state: paused !important; }</style>\\1', clean_html, flags=re.I)
 
                 parts = re.split(r"(<section\b[^>]*class=[\'\"][^\'\"]*slide[^'\"]*[\'\"][^>]*>)", clean_html)
                 new_parts = []
@@ -183,7 +202,7 @@ window.addEventListener('DOMContentLoaded', () => {{
                     '--disable-gpu',
                     '--no-sandbox',
                     '--window-size=1200,750',
-                    '--virtual-time-budget=1500',
+                    '--virtual-time-budget=3500',
                     f'--user-data-dir={user_data}',
                     f'--screenshot={str(cache_file)}',
                     temp_html.as_uri()
@@ -191,8 +210,8 @@ window.addEventListener('DOMContentLoaded', () => {{
 
             try:
                 cmd[1:1] = ['--disable-dev-shm-usage', '--allow-file-access-from-files',
-                            '--disable-background-networking', '--timeout=8000']
-                completed = subprocess.run(cmd, capture_output=True, timeout=25)
+                            '--disable-background-networking', '--timeout=12000']
+                completed = subprocess.run(cmd, capture_output=True, timeout=30)
                 if getattr(completed, 'returncode', 0):
                     detail = (completed.stderr or b'').decode('utf-8', errors='replace')[-350:]
                     capture_errors.append(detail.strip())
@@ -232,7 +251,7 @@ def capture_lesson_screenshot(lesson_relative_path: str) -> str | None:
 
 
 def sanitize_ksp_text(text: str) -> str:
-    """Strictly scrub forbidden classroom equipment words (interactive whiteboards, laptops)."""
+    """Strictly scrub forbidden classroom equipment words (interactive whiteboards, laptops, paper answer sheets)."""
     if not text:
         return ''
     text = re.sub(r'\bинтерактивн\w*\s+доск\w*', 'платформу www.alasster.site', text, flags=re.I)
@@ -242,6 +261,9 @@ def sanitize_ksp_text(text: str) -> str:
     text = re.sub(r'\bэлектронн\w*\s+доск\w*', 'материалы платформы www.alasster.site', text, flags=re.I)
     text = re.sub(r'\bноутбук\w*', 'рабочих местах', text, flags=re.I)
     text = re.sub(r'\bноутбуках\b', 'рабочих местах', text, flags=re.I)
+    text = re.sub(r'\bутвержд[её]нн\w*\s+(задани\w*|вариант\w*|критери\w*)', r'\1', text, flags=re.I)
+    text = re.sub(r'\bбланк\w*\s+ответов\b', 'электронную форму на сайте www.alasster.site', text, flags=re.I)
+    text = re.sub(r'\bразда[её]т\s+(?:варианты\s+и\s+)?бланк\w*', 'открывает доступ к заданиям на сайте www.alasster.site', text, flags=re.I)
     return text
 
 
@@ -521,6 +543,7 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
     """
     template_path = Path(template_path)
     target_path = Path(target_path)
+    shutil.rmtree(BASE / 'ksp_screenshots', ignore_errors=True)
 
     if not template_path.is_file():
         raise FileNotFoundError(f"Шаблон КСП не найден: {template_path}")
@@ -738,9 +761,9 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
             # Column 5: Resources mentioning the exact sections
             raw_res = stage.get('resources', '').strip()
             if soch_lesson:
-                res_text = 'Утверждённые задания СОЧ за четверть; бланки ответов; критерии оценивания и дескрипторы учителя.'
+                res_text = 'Платформа www.alasster.site (электронное выполнение заданий СОЧ за четверть)'
             elif sor_lesson and i == 1:
-                res_text = 'Утверждённые задания СОР по разделу; бланки ответов; критерии оценивания и дескрипторы учителя.'
+                res_text = 'Платформа www.alasster.site (электронное выполнение заданий СОР по разделу)'
             elif not raw_res or 'alasster.site' not in raw_res.lower() or not re.search(r'раздел|слайд', raw_res, re.I):
                 res_text = f"Платформа www.alasster.site ({', '.join(section_labels)})"
             else:
