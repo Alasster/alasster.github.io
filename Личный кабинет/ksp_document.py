@@ -99,6 +99,7 @@ def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False
     is_q2 = len(parts_rel) >= 3 and parts_rel[1] == '2 четверть'
 
     results = {}
+    capture_errors = []
     user_data = None
     temp_dir = Path(output_dir or tempfile.mkdtemp(prefix='ksp-shots-'))
     temp_dir.mkdir(parents=True, exist_ok=True)
@@ -189,12 +190,16 @@ window.addEventListener('DOMContentLoaded', () => {{
                 ]
 
             try:
-                cmd[1:1] = ['--disable-dev-shm-usage', '--allow-file-access-from-files']
-                subprocess.run(cmd, capture_output=True, timeout=15)
+                cmd[1:1] = ['--disable-dev-shm-usage', '--allow-file-access-from-files',
+                            '--disable-background-networking', '--timeout=8000']
+                completed = subprocess.run(cmd, capture_output=True, timeout=25)
+                if getattr(completed, 'returncode', 0):
+                    detail = (completed.stderr or b'').decode('utf-8', errors='replace')[-350:]
+                    capture_errors.append(detail.strip())
                 if cache_file.is_file() and cache_file.stat().st_size > 1000:
                     results[slide_idx] = str(cache_file)
-            except Exception:
-                pass
+            except Exception as exc:
+                capture_errors.append(type(exc).__name__ + ': ' + str(exc)[:200])
             finally:
                 if temp_html.exists():
                     try:
@@ -203,7 +208,8 @@ window.addEventListener('DOMContentLoaded', () => {{
                         pass
 
         if not results:
-            raise ValueError('Не удалось получить новые скриншоты урока. Проверьте установку и запуск Chromium на сервере.')
+            detail = capture_errors[-1] if capture_errors else 'Chromium не создал изображение.'
+            raise ValueError('Не удалось получить новые скриншоты урока. ' + detail)
         if 0 in results: results['intro'] = results[0]
         if 1 in results: results['theory'] = results[1]
         if min(4, total_slides - 1) in results: results['practice'] = results[min(4, total_slides - 1)]
