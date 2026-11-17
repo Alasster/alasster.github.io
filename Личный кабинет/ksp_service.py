@@ -6,6 +6,7 @@ from __future__ import annotations
 import ksp_content
 
 import base64
+import copy
 import hashlib
 import json
 import os
@@ -27,6 +28,7 @@ from pydantic import BaseModel
 
 from ksp_document import build_docx, docx_to_html, get_weekly_quote
 import ksp_drive
+from ksp_lesson_policy import is_sor_lesson, normalize_sor_stages, sor_instructions, validate_sor_stages
 
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
@@ -315,7 +317,9 @@ def validate_plan(plan: dict, source: dict):
     header = plan.get('header', {})
     stages = plan.get('stages', [])
 
-    if len(stages) < 5:
+    if is_sor_lesson(source):
+        validate_sor_stages(plan)
+    elif len(stages) < 5:
         raise ValueError('План должен содержать ровно пять этапов общей длительностью 45 минут')
 
     full_text = json.dumps(plan, ensure_ascii=False)
@@ -495,11 +499,17 @@ def generate(source: dict) -> dict:
 {source['content'][:25000]}
 """
 
+    response_schema = GEMINI_PLAN_SCHEMA
+    if is_sor_lesson(source):
+        system_instructions = sor_instructions(source, teacher_name, school_name, quote_info)
+        response_schema = copy.deepcopy(GEMINI_PLAN_SCHEMA)
+        response_schema['properties']['stages'].update(minItems=4, maxItems=4)
+
     payload = {
         'contents': [{'parts': [{'text': system_instructions}]}],
         'generationConfig': {
             'responseMimeType': 'application/json',
-            'responseSchema': GEMINI_PLAN_SCHEMA,
+            'responseSchema': response_schema,
             'temperature': 0.25
         }
     }
@@ -514,6 +524,7 @@ def generate(source: dict) -> dict:
                     text_content = resp.json()['candidates'][0]['content']['parts'][0]['text']
                     plan = json.loads(text_content)
                     plan = sanitize_dict_strings(plan)
+                    plan = normalize_sor_stages(plan, source)
                     validate_plan(plan, source)
                     return plan
                 elif resp.status_code == 403:

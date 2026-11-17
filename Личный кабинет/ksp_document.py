@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 import ksp_content
+from ksp_lesson_policy import is_sor_lesson, validate_sor_stages
 
 import base64
 import hashlib
@@ -525,6 +526,9 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
 
     t0 = doc.tables[0]
     t1 = doc.tables[1]
+    sor_lesson = is_sor_lesson(source)
+    if sor_lesson:
+        validate_sor_stages(plan)
 
     # 1. Remove all OOP / ZPR rows from Table 0
     for row in list(t0.rows):
@@ -536,6 +540,12 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
     for row in list(t1.rows):
         first_cell_text = row.cells[0].text if row.cells else ''
         if re.search(r'\bООП\b|\bЗПР\b|особым[и]? образовательн', first_cell_text, re.I):
+            row._tr.getparent().remove(row._tr)
+
+    if sor_lesson:
+        # Two header rows + four stages; remove the fifth template stage entirely.
+        while len(t1.rows) > 6:
+            row = t1.rows[-1]
             row._tr.getparent().remove(row._tr)
 
     # 3. Ensure Table 1 ("Ход урока") starts strictly on Page 2
@@ -670,6 +680,14 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
     else:
         stage_slide_indices = {i: [min(i, max(0, total_s - 1))] for i in range(5)}
 
+    if sor_lesson:
+        stage_slide_indices = {
+            0: stage_slide_indices.get(0, []),
+            1: [],  # No theory or warm-up screenshots inside an independent assessment.
+            2: stage_slide_indices.get(3, []),
+            3: stage_slide_indices.get(4, []),
+        }
+
     # Populate Table 1 stages strictly in 12pt with formatted paragraphs and screenshots
     stages = plan.get('stages', [])
     for i, stage in enumerate(stages[:5]):
@@ -680,7 +698,10 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
             set_cell_formatted(r.cells[0], s_name, bold=True, font_size=FONT_SIZE)
 
             # 1. Enriched teacher actions with Quote of the week & Values connections
-            teacher_act = enrich_teacher_actions(stage.get('teacher_actions', ''), i, source.get('title', ''), source.get('date', ''), source.get('number', ''))
+            teacher_act = stage.get('teacher_actions', '')
+            enrichment_index = [0, None, 3, 4][i] if sor_lesson else i
+            if enrichment_index is not None:
+                teacher_act = enrich_teacher_actions(teacher_act, enrichment_index, source.get('title', ''), source.get('date', ''), source.get('number', ''))
             set_cell_formatted(r.cells[1], teacher_act, font_size=FONT_SIZE)
 
             # 2. Student actions text
@@ -698,7 +719,9 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
 
             # Column 5: Resources mentioning the exact sections
             raw_res = stage.get('resources', '').strip()
-            if not raw_res or 'alasster.site' not in raw_res.lower() or not re.search(r'раздел|слайд', raw_res, re.I):
+            if sor_lesson and i == 1:
+                res_text = 'Утверждённые задания СОР по разделу; бланки ответов; критерии оценивания и дескрипторы учителя.'
+            elif not raw_res or 'alasster.site' not in raw_res.lower() or not re.search(r'раздел|слайд', raw_res, re.I):
                 res_text = f"Платформа www.alasster.site ({', '.join(section_labels)})"
             else:
                 res_text = raw_res
