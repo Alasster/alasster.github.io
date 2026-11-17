@@ -116,15 +116,19 @@ def drive_available() -> bool:
     if os.environ.get('KSP_OUTPUT_ROOT'):
         return True
     local = os.environ.get('LOCALAPPDATA', '')
-    return bool(local) and (Path(local) / 'Google' / 'DriveFS').is_dir()
+    try:
+        return bool(local) and (Path(local) / 'Google' / 'DriveFS').is_dir()
+    except Exception:
+        return False
 
 
 GEMINI_MODELS = [
+    'gemini-3.8-flash',
     'gemini-4-hydrogen',
     'gemini-4-argon',
-    'gemini-3.8-flash',
     'gemini-3.5-flash',
     'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
 ]
 
 GEMINI_PLAN_SCHEMA = {
@@ -304,6 +308,9 @@ def lesson_source(key: str) -> dict:
     timetable_file = BASE / 'ksp-timetable.json'
     schedule = json.loads(timetable_file.read_text(encoding='utf-8')) if timetable_file.is_file() else {}
     slot = (schedule.get(canonical_key) or schedule.get(clean_key, {})) if is_variative else schedule.get(clean_key, {})
+    if not slot:
+        fallback_key = f"{class_name}/{quarter}/{num} урок.html"
+        slot = (schedule.get(f"доп|{fallback_key}") or schedule.get(fallback_key, {})) if is_variative else schedule.get(fallback_key, {})
 
     goals = list(slot.get('goals') or [])
     if not goals and q2_data.get('goal'):
@@ -336,6 +343,9 @@ def lesson_source(key: str) -> dict:
             quarter_goals = _collect_quarter_goals(class_name, quarter, schedule)
             if quarter_goals:
                 goals = quarter_goals
+    elif re.search(r'(?<!\w)(?:СОР|СОЧ)(?!\w)', theme_val, re.I):
+        theme_val = visible_title
+    theme_val = re.sub(r'\s+', ' ', theme_val).strip()
 
     lesson_content = q2_data.get('content') or plain(html)
     hash_seed = f"variative:{html}" if is_variative else html
