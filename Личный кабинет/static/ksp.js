@@ -89,9 +89,8 @@
     } finally {
       refreshing = false;
       clearTimeout(timer);
-      if (Object.values(jobs).some(job => active.has(job?.status)) || starting.size > 0) {
-        timer = setTimeout(refresh, document.hidden ? 8000 : 2000);
-      }
+      const busy = Object.values(jobs).some(job => active.has(job?.status)) || starting.size > 0;
+      timer = setTimeout(refresh, document.hidden ? 30000 : busy ? 2000 : 15000);
     }
   }
 

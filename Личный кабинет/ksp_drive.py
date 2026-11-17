@@ -213,6 +213,11 @@ class DriveClient:
             or self._find(stem_name, parent, GDOC_MIME)
             or self._find(stem_name, parent)
         )
+        if not existing:
+            prefix = stem_name.split(' — ', 1)[0] + ' — '
+            matches = [doc for doc in self._list_files(parent) if doc['name'].startswith(prefix)]
+            if len(matches) == 1:
+                existing = matches[0]
         boundary = 'ksp' + str(int(time.time() * 1000))
         if existing:
             meta = {'name': existing.get('name') or docx_name}

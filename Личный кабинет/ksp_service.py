@@ -284,9 +284,14 @@ def output_path(source: dict, output_root: Path) -> Path:
         filename = f"Урок {int(source['number']):02d} Доп КСП (10А) — {safe_name(source['title'])}.docx"
     else:
         filename = f"Урок {int(source['number']):02d} КСП — {safe_name(source['title'])}.docx"
-    return (
-        output_root / '2026–2027' / folder_class / source['quarter'] / filename
-    )
+    target = output_root / '2026–2027' / folder_class / source['quarter'] / filename
+    if not target.is_file():
+        # A lesson title can change after its KSP has already been saved.
+        prefix = filename.split(' — ', 1)[0] + ' — '
+        matches = [p for p in target.parent.glob('*.docx') if p.name.startswith(prefix)]
+        if len(matches) == 1:
+            return matches[0]
+    return target
 
 
 def sanitize_dict_strings(obj):
@@ -597,10 +602,11 @@ class KspService:
         schedule = json.loads(timetable_file.read_text(encoding='utf-8')) if timetable_file.is_file() else {}
         all_keys = set(schedule.keys())
         for p in ROOT.glob('*/*/* урок.html'):
-            if p.parts[0] != 'Python основы':
+            parts = p.relative_to(ROOT).parts
+            if parts[0] != 'Python основы':
                 rel = str(p.relative_to(ROOT)).replace('\\', '/')
                 all_keys.add(rel)
-                if p.parts[0] == '10 ОГН':
+                if parts[0] == '10 ОГН':
                     all_keys.add(f'доп|{rel}')
         return all_keys
 
@@ -619,6 +625,8 @@ class KspService:
                         src = lesson_source(key)
                         target = output_path(src, self.output_root)
                         row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
+                        if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
+                            continue
                         if target.is_file():
                             if not row or row['status'] != 'ready':
                                 ident = row['id'] if row else uuid.uuid4().hex
@@ -661,6 +669,12 @@ class KspService:
                         or (index.get((src['class_name'], src['quarter'], title)) if src.get('is_variative') else None)
                         or (index.get((src['class_name'], src['quarter'], f'{title}.docx')) if src.get('is_variative') else None)
                     )
+                    if not doc_id:
+                        prefix = title.split(' — ', 1)[0] + ' — '
+                        matches = {ident for (cls, quarter, name), ident in index.items()
+                                   if cls == folder_class and quarter == src['quarter'] and name.startswith(prefix)}
+                        if len(matches) == 1:
+                            doc_id = matches.pop()
                     row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                     if doc_id:
                         if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):

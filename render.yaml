@@ -4,12 +4,14 @@ services:
     runtime: python
     plan: free
     region: frankfurt
-    buildCommand: pip install -r "Личный кабинет/requirements.txt"
+    buildCommand: pip install -r "Личный кабинет/requirements.txt" && python -m playwright install chromium
     startCommand: cd "Личный кабинет" && uvicorn server:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*'
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.9
+      - key: PLAYWRIGHT_BROWSERS_PATH
+        value: /opt/render/project/src/.cache/ms-playwright
       - key: BAGALAU_AUTO_INTERNET
         value: "0"
       - key: TURSO_CABINET_URL

@@ -3,7 +3,7 @@
 - Table 1 starts on Page 2.
 - Normal horizontal text direction everywhere (all w:textDirection stripped).
 - Distinct paragraphs with blank line spacing (space_after = Pt(5), space_before = Pt(2)) and bold section titles.
-- Captures, caches and embeds real section screenshots for all interactive lesson stages from www.alasster.site.
+- Captures fresh section screenshots per build and deletes them after embedding.
 - Strictly zero mentions of OOP / ZPR, interactive whiteboards, or laptops.
 """
 from __future__ import annotations
@@ -15,7 +15,6 @@ import os
 import re
 import subprocess
 import shutil
-import glob
 import tempfile
 from pathlib import Path
 import docx
@@ -27,22 +26,6 @@ ROOT = BASE.parent
 
 FONT_SIZE = Pt(12)
 FONT_NAME = 'Times New Roman'
-
-# Committed to git so the cloud server (no Chrome) can embed the same screenshots.
-SCREENSHOTS_DIR = BASE / 'ksp_screenshots'
-SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
-
-def cleanup_ksp_temp_files(slide_shots: dict | None = None):
-    """Automatically cleans up temporary html files in %TEMP%."""
-    # Clean temporary HTML files in %TEMP%
-    temp_dir = tempfile.gettempdir()
-    for pattern in ('temp_*_*.html', 'ksp_slide_*.html'):
-        for f in glob.glob(os.path.join(temp_dir, pattern)):
-            try:
-                os.unlink(f)
-            except Exception:
-                pass
-
 
 def _normalize_lesson_rel_path(lesson_relative_path: str) -> str:
     rel = str(lesson_relative_path or '').strip()
@@ -84,18 +67,28 @@ def get_lesson_slides_meta(lesson_relative_path: str) -> list[dict]:
         return []
 
 
-def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False) -> dict[any, str]:
-    """Capture and cache crisp, fully-rendered screenshots of all slides in the lesson."""
+def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False, output_dir=None) -> dict[any, str]:
+    """Capture current sources; never reuse committed screenshots from an older lesson."""
     lesson_relative_path = _normalize_lesson_rel_path(lesson_relative_path)
     browser = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
     if not os.path.exists(browser):
         browser = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
     if not os.path.exists(browser):
-        browser = None
+        browser = shutil.which('chromium') or shutil.which('google-chrome')
+    if not browser:
+        try:
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as playwright:
+                candidate = playwright.chromium.executable_path
+            browser = candidate if Path(candidate).is_file() else None
+        except Exception:
+            browser = None
 
     lesson_path = (ROOT / lesson_relative_path).resolve()
     if not lesson_path.is_file():
         return {}
+    if not browser:
+        raise ValueError('Для новых скриншотов КСП нужен Chrome, Edge или Chromium (python -m playwright install chromium).')
 
     h_hash = hashlib.md5(lesson_relative_path.encode('utf-8')).hexdigest()[:10]
     parts_rel = Path(lesson_relative_path).parts
@@ -103,7 +96,8 @@ def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False
 
     results = {}
     user_data = None
-    temp_dir = Path(tempfile.gettempdir())
+    temp_dir = Path(output_dir or tempfile.mkdtemp(prefix='ksp-shots-'))
+    temp_dir.mkdir(parents=True, exist_ok=True)
 
     try:
         html_raw = lesson_path.read_text(encoding='utf-8-sig', errors='replace')
@@ -116,10 +110,7 @@ def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False
             return {}
 
         for slide_idx in range(total_slides):
-            cache_file = SCREENSHOTS_DIR / f'slide_{h_hash}_s{slide_idx}.png'
-            if not force_rebuild and cache_file.is_file() and cache_file.stat().st_size > 1000:
-                results[slide_idx] = str(cache_file)
-                continue
+            cache_file = temp_dir / f'slide_{h_hash}_s{slide_idx}.png'
 
             if not browser:
                 continue
@@ -194,6 +185,7 @@ window.addEventListener('DOMContentLoaded', () => {{
                 ]
 
             try:
+                cmd[1:1] = ['--disable-dev-shm-usage', '--allow-file-access-from-files']
                 subprocess.run(cmd, capture_output=True, timeout=15)
                 if cache_file.is_file() and cache_file.stat().st_size > 1000:
                     results[slide_idx] = str(cache_file)
@@ -499,6 +491,11 @@ def enrich_teacher_actions(text: str, stage_idx: int, lesson_title: str, date_st
     return text
 
 def build_docx(template_path: Path | str, target_path: Path | str, source: dict, plan: dict):
+    with tempfile.TemporaryDirectory(prefix='ksp-build-') as shots_dir:
+        return _build_docx(template_path, target_path, source, plan, shots_dir)
+
+
+def _build_docx(template_path: Path | str, target_path: Path | str, source: dict, plan: dict, shots_dir):
     """
     Builds a finished, formatted KSP docx based on the school's template.
     1. Font size: 12pt Times New Roman everywhere.
@@ -644,7 +641,7 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     lesson_rel_path = source.get('lesson_path') or _normalize_lesson_rel_path(source.get('key', ''))
     slides_meta = get_lesson_slides_meta(lesson_rel_path)
     total_s = len(slides_meta)
-    slide_shots = capture_lesson_slides(lesson_rel_path)
+    slide_shots = capture_lesson_slides(lesson_rel_path, output_dir=shots_dir)
 
     if total_s >= 9:
         stage_slide_indices = {
@@ -747,9 +744,6 @@ def build_docx(template_path: Path | str, target_path: Path | str, source: dict,
     if not target_path.is_file() or target_path.stat().st_size != local_file.stat().st_size:
         raise ValueError('Не удалось сохранить КСП в папку Google Диска')
     local_file.unlink(missing_ok=True)
-
-    # Immediately clean up all temporary screenshots and temp files now that they are embedded in docx
-    cleanup_ksp_temp_files(slide_shots)
 
     return str(target_path)
 

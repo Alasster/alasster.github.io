@@ -1,7 +1,7 @@
 """Pre-render crisp screenshots of every lesson slide into ksp_screenshots/ (needs Chrome/Edge, run on the PC).
 
     python prepare_ksp_screenshots.py
-Then commit & push ksp_screenshots/ so the Render server can embed them into КСП.
+This optional export is for manual inspection; KSP generation captures its own fresh images.
 """
 import sys, re, os, glob, hashlib
 from pathlib import Path
@@ -13,7 +13,10 @@ BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
 sys.path.insert(0, str(BASE))
 
-from ksp_document import capture_lesson_slides, get_lesson_slides_meta, SCREENSHOTS_DIR  # noqa: E402
+from ksp_document import capture_lesson_slides, get_lesson_slides_meta  # noqa: E402
+
+SCREENSHOTS_DIR = BASE / 'ksp_screenshots'
+SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 print("=== STARTING FULL SCREENSHOT GENERATION ===", flush=True)
 
@@ -35,7 +38,7 @@ for class_dir in ('9 класс', '10 ЕМН', '10 ОГН', '11 класс'):
             if m_s and int(m_s.group(1)) >= total_meta:
                 old_file.unlink(missing_ok=True)
 
-        shots = capture_lesson_slides(rel, force_rebuild=True)
+        shots = capture_lesson_slides(rel, force_rebuild=True, output_dir=SCREENSHOTS_DIR)
         int_shots = [k for k in shots if isinstance(k, int)]
         print(f"[Q2] {rel}: {len(int_shots)}/{total_meta} slides captured", flush=True)
         total_rendered += len(int_shots)
@@ -47,7 +50,7 @@ for class_dir in ('9 класс', '10 ЕМН', '10 ОГН', '11 класс'):
         continue
     for html in sorted(q1_dir.glob('*.html')):
         rel = html.relative_to(ROOT).as_posix()
-        shots = capture_lesson_slides(rel, force_rebuild=False)
+        shots = capture_lesson_slides(rel, force_rebuild=True, output_dir=SCREENSHOTS_DIR)
         int_shots = [k for k in shots if isinstance(k, int)]
         print(f"[Q1] {rel}: {len(int_shots)} slides ready", flush=True)
 
