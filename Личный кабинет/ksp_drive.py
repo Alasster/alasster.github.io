@@ -220,7 +220,7 @@ class DriveClient:
                 existing = matches[0]
         boundary = 'ksp' + str(int(time.time() * 1000))
         if existing:
-            meta = {'name': existing.get('name') or docx_name}
+            meta = {'name': docx_name}
             url = f"{UPLOAD}/{existing['id']}?uploadType=multipart&supportsAllDrives=true&fields=id"
             body = (
                 f'--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'

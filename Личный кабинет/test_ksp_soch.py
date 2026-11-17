@@ -43,9 +43,14 @@ class SochTests(unittest.TestCase):
         self.assertFalse(is_soch_lesson({**soch_source(), 'key': 'доп|lesson.html'}))
 
     def test_real_10emn_soch_pages_are_detected(self):
-        for key in ('10 ЕМН/1 четверть/13 урок.html', '10 ЕМН/2 четверть/15 урок.html'):
+        expected_titles = {
+            '10 ЕМН/1 четверть/13 урок.html': 'Суммативная работа за 1 четверть',
+            '10 ЕМН/2 четверть/15 урок.html': 'Суммативная работа за 2 четверть',
+        }
+        for key, exp_title in expected_titles.items():
             data = ksp_service.lesson_source(key)
             self.assertTrue(is_soch_lesson(data), data['title'])
+            self.assertEqual(data['title'], exp_title)
             self.assertEqual(data['duration'], 40)
             self.assertGreaterEqual(len(data['goals']), 4)
             self.assertEqual(len(data['goals']), len(set(data['goals'])))

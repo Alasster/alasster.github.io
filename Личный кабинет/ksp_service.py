@@ -330,8 +330,9 @@ def lesson_source(key: str) -> dict:
     if assessment_type:
         theme_val = visible_title
         if assessment_type == 'soch':
-            if not re.search(r'(?<!\w)СОЧ(?!\w)', theme_val, re.I):
-                theme_val = 'СОЧ: ' + theme_val
+            q_num_m = re.search(r'\d+', quarter)
+            q_num = q_num_m.group(0) if q_num_m else '1'
+            theme_val = f"Суммативная работа за {q_num} четверть"
             quarter_goals = _collect_quarter_goals(class_name, quarter, schedule)
             if quarter_goals:
                 goals = quarter_goals
@@ -363,6 +364,15 @@ def lesson_source(key: str) -> dict:
 
 def safe_name(value: str) -> str:
     return re.sub(r'[<>:"/\\|?*\x00-\x1f]', ' ', value).strip(' .')[:145]
+
+
+def canonical_output_path(source: dict, output_root: Path) -> Path:
+    folder_class = source.get('folder_name') or ('10 ДОП' if source.get('is_variative') else source['class_name'])
+    if source.get('is_variative'):
+        filename = f"Урок {int(source['number']):02d} Доп КСП (10А) — {safe_name(source['title'])}.docx"
+    else:
+        filename = f"Урок {int(source['number']):02d} КСП — {safe_name(source['title'])}.docx"
+    return output_root / '2026–2027' / folder_class / source['quarter'] / filename
 
 
 def output_path(source: dict, output_root: Path) -> Path:
@@ -743,6 +753,13 @@ class KspService:
                     try:
                         src = lesson_source(key)
                         target = output_path(src, self.output_root)
+                        canonical = canonical_output_path(src, self.output_root)
+                        if target != canonical and target.is_file() and not canonical.exists():
+                            try:
+                                target.replace(canonical)
+                                target = canonical
+                            except Exception:
+                                pass
                         row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                         if row and row['status'] in ('queued', 'generating', 'validating', 'saving', 'error'):
                             continue
@@ -925,7 +942,7 @@ class KspService:
                     build_docx(self.template, tmp, source, plan)
                     self.update(key, 'saving', 'Загрузка в Google Диск…')
                     folder_class = source.get('folder_name') or ('10 ДОП' if source.get('is_variative') else source['class_name'])
-                    title = output_path(source, self.output_root).stem
+                    title = canonical_output_path(source, self.output_root).stem
                     doc_id = self.drive.upload_docx_as_gdoc(tmp, [folder_class, source['quarter']], title)
                     import time
                     self._last_upload_ts = time.time()
@@ -940,8 +957,19 @@ class KspService:
                             tmp.unlink(missing_ok=True)
                         except Exception:
                             pass
-            target = output_path(source, self.output_root)
+            old_target = output_path(source, self.output_root)
+            target = canonical_output_path(source, self.output_root)
+            if old_target != target and old_target.is_file() and not target.exists():
+                try:
+                    old_target.replace(target)
+                except Exception:
+                    pass
             build_docx(self.template, target, source, plan)
+            if old_target != target and old_target.is_file():
+                try:
+                    old_target.unlink(missing_ok=True)
+                except Exception:
+                    pass
             import time
             for _ in range(45):  # wait up to ~90s for Google Drive to register the file
                 if get_google_drive_file_url(target):

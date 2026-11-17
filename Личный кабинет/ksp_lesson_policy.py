@@ -42,7 +42,11 @@ def is_soch_lesson(source: dict) -> bool:
         return False
     if source.get('is_variative') or str(source.get('key', '')).startswith('доп|'):
         return False
-    return source.get('assessment_type') == 'soch' or bool(re.search(r'(?<!\w)СОЧ(?!\w)', str(source.get('title', '')), re.I))
+    title = str(source.get('title', ''))
+    return (
+        source.get('assessment_type') == 'soch'
+        or bool(re.search(r'(?<!\w)СОЧ(?!\w)|суммативн\w*\s+(?:работа|оценивание)\s+за\s+(?:\d+\s*)?четверть', title, re.I))
+    )
 
 
 def normalize_lesson_timing(plan: dict, source: dict) -> dict:
