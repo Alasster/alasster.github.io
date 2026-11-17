@@ -190,6 +190,67 @@ def _shift_monday_to_tuesday(date_str: str) -> str:
     return date_str
 
 
+def _collect_quarter_goals(class_name: str, quarter: str, schedule: dict) -> list[str]:
+    """Collect all unique curriculum goals across all lessons of the given class and quarter."""
+    qdir = ROOT / class_name / quarter
+    lesson_nums: list[int] = []
+    html_files: list[Path] = []
+    if qdir.is_dir():
+        for f in qdir.glob('*.html'):
+            nums = [int(n) for n in re.findall(r'\d+', f.stem)]
+            if nums:
+                html_files.append((min(nums), f))
+                for n in nums:
+                    if n not in lesson_nums:
+                        lesson_nums.append(n)
+    lesson_nums.sort()
+    html_files.sort(key=lambda x: x[0])
+
+    unique_goals: list[str] = []
+    seen_norm: set[str] = set()
+
+    def _add_goal(raw_g: str):
+        cleaned = re.sub(r'\s+', ' ', str(raw_g or '')).strip().strip('"').strip("'")
+        if not cleaned:
+            return
+        norm = cleaned.lower()
+        if norm not in seen_norm:
+            seen_norm.add(norm)
+            unique_goals.append(cleaned)
+
+    # 1. Collect from timetable slots corresponding to actual lessons in this quarter
+    for n in lesson_nums:
+        slot_key = f"{class_name}/{quarter}/{n} урок.html"
+        for g in (schedule.get(slot_key, {}).get('goals') or []):
+            _add_goal(g)
+
+    for _, f in html_files:
+        rel_key = f.relative_to(ROOT).as_posix()
+        for g in (schedule.get(rel_key, {}).get('goals') or []):
+            _add_goal(g)
+
+    # 2. If still empty (e.g. quarter not in timetable), extract from lesson files / Q2 data
+    if not unique_goals:
+        for n, f in html_files:
+            if quarter == '2 четверть':
+                try:
+                    qd = ksp_content.get_q2_lesson_text(class_name, n)
+                    if qd.get('goal'):
+                        _add_goal(qd['goal'])
+                except Exception:
+                    pass
+            try:
+                raw_html = f.read_text(encoding='utf-8-sig', errors='replace')
+                for definition in re.findall(r'<div\b[^>]*class=[\'"][^\'"]*\bdefinition\b[^\'"]*[\'"][^>]*>(.*?)</div>', raw_html, re.S | re.I):
+                    for g in re.split(r';\s*(?=\d+\.\d+\.\d+\.\d+)', plain(definition)):
+                        if re.match(r'^\s*\d+\.\d+\.\d+\.\d+\s*[—–-]', g):
+                            _add_goal(g)
+            except Exception:
+                pass
+
+    return unique_goals
+
+
 def lesson_source(key: str) -> dict:
     """Extract authoritative lesson metadata from project, q2 data, and confirmed timetable."""
     raw_key = unquote(key).strip()
@@ -268,8 +329,12 @@ def lesson_source(key: str) -> dict:
     assessment_type = 'soch' if is_soch_lesson(label_source) else 'sor' if is_sor_lesson(label_source) else ''
     if assessment_type:
         theme_val = visible_title
-        if assessment_type == 'soch' and not re.search(r'(?<!\w)СОЧ(?!\w)', theme_val, re.I):
-            theme_val = 'СОЧ: ' + theme_val
+        if assessment_type == 'soch':
+            if not re.search(r'(?<!\w)СОЧ(?!\w)', theme_val, re.I):
+                theme_val = 'СОЧ: ' + theme_val
+            quarter_goals = _collect_quarter_goals(class_name, quarter, schedule)
+            if quarter_goals:
+                goals = quarter_goals
 
     lesson_content = q2_data.get('content') or plain(html)
     hash_seed = f"variative:{html}" if is_variative else html

@@ -47,6 +47,8 @@ class SochTests(unittest.TestCase):
             data = ksp_service.lesson_source(key)
             self.assertTrue(is_soch_lesson(data), data['title'])
             self.assertEqual(data['duration'], 40)
+            self.assertGreaterEqual(len(data['goals']), 4)
+            self.assertEqual(len(data['goals']), len(set(data['goals'])))
         sor = ksp_service.lesson_source('9 класс/1 четверть/7 урок.html')
         self.assertEqual(sor['assessment_type'], 'sor')
         self.assertIn('СОР', sor['title'])
