@@ -1798,7 +1798,10 @@
   const logicSign = { and: '∧', or: '∨' };
   function logicHTML(node, algebraic = false) {
     if (typeof node === 'string') return node;
-    if (node.op === 'not') return `<span class="q2-overline">${logicHTML(node.child, algebraic)}</span>`;
+    if (node.op === 'not') {
+      const child = logicHTML(node.child, algebraic);
+      return `<span class="q2-overline">${typeof node.child === 'string' ? child : `(${child})`}</span>`;
+    }
     const operand = child => typeof child !== 'string' && child.op !== 'not'
       ? `(${logicHTML(child, algebraic)})` : logicHTML(child, algebraic);
     if (algebraic && node.op === 'and') return `${operand(node.left)}${operand(node.right)}`;
