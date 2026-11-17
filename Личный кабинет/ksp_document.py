@@ -9,6 +9,7 @@
 from __future__ import annotations
 import ksp_content
 from ksp_lesson_policy import is_sor_lesson, validate_sor_stages
+from ksp_lesson_policy import is_soch_lesson, validate_soch_stages
 
 import base64
 import hashlib
@@ -78,6 +79,8 @@ def capture_lesson_slides(lesson_relative_path: str, force_rebuild: bool = False
         browser = shutil.which('chromium') or shutil.which('google-chrome')
     if not browser:
         try:
+            if os.environ.get('RENDER'):
+                os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', str(ROOT / '.cache' / 'ms-playwright'))
             from playwright.sync_api import sync_playwright
             with sync_playwright() as playwright:
                 candidate = playwright.chromium.executable_path
@@ -199,12 +202,16 @@ window.addEventListener('DOMContentLoaded', () => {{
                     except Exception:
                         pass
 
+        if not results:
+            raise ValueError('Не удалось получить новые скриншоты урока. Проверьте установку и запуск Chromium на сервере.')
         if 0 in results: results['intro'] = results[0]
         if 1 in results: results['theory'] = results[1]
         if min(4, total_slides - 1) in results: results['practice'] = results[min(4, total_slides - 1)]
         if (total_slides - 1) in results: results['summary'] = results[total_slides - 1]
 
         return results
+    except ValueError:
+        raise
     except Exception:
         return {}
     finally:
@@ -527,7 +534,10 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
     t0 = doc.tables[0]
     t1 = doc.tables[1]
     sor_lesson = is_sor_lesson(source)
-    if sor_lesson:
+    soch_lesson = is_soch_lesson(source)
+    if soch_lesson:
+        validate_soch_stages(plan)
+    elif sor_lesson:
         validate_sor_stages(plan)
 
     # 1. Remove all OOP / ZPR rows from Table 0
@@ -542,9 +552,9 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
         if re.search(r'\bООП\b|\bЗПР\b|особым[и]? образовательн', first_cell_text, re.I):
             row._tr.getparent().remove(row._tr)
 
-    if sor_lesson:
+    if sor_lesson or soch_lesson:
         # Two header rows + four stages; remove the fifth template stage entirely.
-        while len(t1.rows) > 6:
+        while len(t1.rows) > (5 if soch_lesson else 6):
             row = t1.rows[-1]
             row._tr.getparent().remove(row._tr)
 
@@ -680,7 +690,9 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
     else:
         stage_slide_indices = {i: [min(i, max(0, total_s - 1))] for i in range(5)}
 
-    if sor_lesson:
+    if soch_lesson:
+        stage_slide_indices = {0: stage_slide_indices.get(0, []), 1: [], 2: []}
+    elif sor_lesson:
         stage_slide_indices = {
             0: stage_slide_indices.get(0, []),
             1: [],  # No theory or warm-up screenshots inside an independent assessment.
@@ -699,7 +711,7 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
 
             # 1. Enriched teacher actions with Quote of the week & Values connections
             teacher_act = stage.get('teacher_actions', '')
-            enrichment_index = [0, None, 3, 4][i] if sor_lesson else i
+            enrichment_index = [0, None, 4][i] if soch_lesson else [0, None, 3, 4][i] if sor_lesson else i
             if enrichment_index is not None:
                 teacher_act = enrich_teacher_actions(teacher_act, enrichment_index, source.get('title', ''), source.get('date', ''), source.get('number', ''))
             set_cell_formatted(r.cells[1], teacher_act, font_size=FONT_SIZE)
@@ -719,7 +731,9 @@ def _build_docx(template_path: Path | str, target_path: Path | str, source: dict
 
             # Column 5: Resources mentioning the exact sections
             raw_res = stage.get('resources', '').strip()
-            if sor_lesson and i == 1:
+            if soch_lesson:
+                res_text = 'Утверждённые задания СОЧ за четверть; бланки ответов; критерии оценивания и дескрипторы учителя.'
+            elif sor_lesson and i == 1:
                 res_text = 'Утверждённые задания СОР по разделу; бланки ответов; критерии оценивания и дескрипторы учителя.'
             elif not raw_res or 'alasster.site' not in raw_res.lower() or not re.search(r'раздел|слайд', raw_res, re.I):
                 res_text = f"Платформа www.alasster.site ({', '.join(section_labels)})"

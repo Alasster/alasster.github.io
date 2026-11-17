@@ -154,6 +154,11 @@ class KspRegressions(unittest.TestCase):
         row = db.execute('SELECT status,path FROM jobs WHERE key=?', ('lesson-key',)).fetchone()
         self.assertIsNotNone(row)
         self.assertEqual(tuple(row), ('ready', 'gdrive:drive-document'))
+        for status in ('generating', 'error'):
+            db.execute("UPDATE jobs SET status=?, message='Generation did not finish'", (status,))
+            ns['sync_cloud'](obj, max_age=0)
+            row = db.execute('SELECT status,message FROM jobs').fetchone()
+            self.assertEqual(tuple(row), (status, 'Generation did not finish'))
 
 
 if __name__ == '__main__':

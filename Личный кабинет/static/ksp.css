@@ -1,4 +1,15 @@
 /* Neumorphic KSP Action Buttons: Yellow (Busy), Green (Ready), Red (Error) */
+.ksp-status {
+  margin: 12px 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--surface, #e7ebf3);
+  color: var(--text-dark, #263248);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ksp-status[hidden] { display: none; }
+.ksp-status.is-error { color: #991b1b; background: #fee2e2; }
 
 .lesson-ksp-button {
   flex: 0 0 auto;

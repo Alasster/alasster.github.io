@@ -7,11 +7,19 @@
   // Remove any obsolete status banner if present
   const existingStatus = document.getElementById('ksp-status');
   if (existingStatus) existingStatus.remove();
+  const status = document.createElement('p');
+  status.id = 'ksp-status';
+  status.className = 'ksp-status';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  status.hidden = true;
+  grid.before(status);
 
   let jobs = {};
   let timer;
   let refreshing = false;
   const starting = new Set();
+  let watchedKey = '';
 
   function getUserRole() {
     if (window.currentCabinetUser?.role) return window.currentCabinetUser.role;
@@ -25,6 +33,16 @@
   }
 
   function paint() {
+    if (watchedKey) {
+      const job = jobs[watchedKey];
+      const busy = starting.has(watchedKey) || active.has(job?.status);
+      status.hidden = !busy && !job;
+      status.classList.toggle('is-error', job?.status === 'error');
+      status.textContent = job?.status === 'error'
+        ? 'Не удалось обновить КСП: ' + job.message + ' Старый документ сохранён.'
+        : busy ? (job?.message || 'Запускается создание КСП…')
+        : job?.status === 'ready' ? 'КСП сохранён в Google Диске.' : '';
+    }
     const role = getUserRole();
     const canUseKsp = role === 'superadmin' || role === 'teacher';
 
@@ -54,7 +72,7 @@
       button.textContent = label;
 
       if (busy) {
-        button.title = isDop ? 'Создание вариативного КСП (10А)…' : 'Создание КСП…';
+        button.title = job?.message || (isDop ? 'Создание вариативного КСП (10А)…' : 'Создание КСП…');
       } else if (ready) {
         button.title = isDop
           ? 'Открыть вариативный КСП (10А) в Google Документах (Shift + клик для повторного создания)'
@@ -127,6 +145,7 @@
     }
 
     // Otherwise: trigger generation (or forced re-generation)
+    watchedKey = key;
     starting.add(key);
     paint();
 

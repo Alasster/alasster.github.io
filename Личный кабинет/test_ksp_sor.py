@@ -11,14 +11,14 @@ from docx import Document
 
 import ksp_document
 import ksp_service
-from ksp_lesson_policy import SOR_STAGES, is_sor_lesson, normalize_sor_stages
+from ksp_lesson_policy import SOR_STAGES, is_sor_lesson, normalize_sor_stages, normalize_lesson_timing
 
 BASE = Path(__file__).resolve().parent
 NORMAL_STAGES = (
     '1. ОРГ. МОМЕНТ (5 мин)',
     '2. АКТУАЛИЗАЦИЯ ЗНАНИЙ (5 мин)',
     '3. ОБЪЯСНЕНИЕ НОВОГО МАТЕРИАЛА (10 мин)',
-    '4. ПРАКТИЧЕСКАЯ РАБОТА (20 мин)',
+    '4. ПРАКТИЧЕСКАЯ РАБОТА (15 мин)',
     '5. ПОДВЕДЕНИЕ ИТОГОВ УРОКА (5 мин)',
 )
 QUOTE = {'kz': 'Адал еңбек', 'ru': 'Честный труд'}
@@ -100,7 +100,7 @@ class SorPolicyTests(unittest.TestCase):
         schema_before = copy.deepcopy(ksp_service.GEMINI_PLAN_SCHEMA)
         for data in (source(), source('Обычный урок'), source(variative=True)):
             sor = is_sor_lesson(data)
-            expected = plan(sor)
+            expected = normalize_lesson_timing(plan(sor), data)
             response = Mock(status_code=200)
             response.json.return_value = {'candidates': [{'content': {'parts': [{'text': json.dumps(expected)}]}}]}
             client = Mock()

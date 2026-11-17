@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     region: frankfurt
-    buildCommand: pip install -r "Личный кабинет/requirements.txt" && python -m playwright install chromium
+    buildCommand: pip install -r "Личный кабинет/requirements.txt" && PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright" python -m playwright install chromium
     startCommand: cd "Личный кабинет" && uvicorn server:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*'
     healthCheckPath: /health
     envVars:

@@ -29,6 +29,8 @@ from pydantic import BaseModel
 from ksp_document import build_docx, docx_to_html, get_weekly_quote
 import ksp_drive
 from ksp_lesson_policy import is_sor_lesson, normalize_sor_stages, sor_instructions, validate_sor_stages
+from ksp_lesson_policy import is_soch_lesson, normalize_soch_stages, soch_instructions, validate_soch_stages
+from ksp_lesson_policy import normalize_lesson_timing
 
 BASE = Path(__file__).resolve().parent
 ROOT = BASE.parent
@@ -251,6 +253,17 @@ def lesson_source(key: str) -> dict:
 
     section_val = slot.get('section') or 'Информатика'
     theme_val = q2_data.get('title') or slot.get('theme') or title
+    # The visible lesson label controls assessment mode. Historical timetable
+    # themes can be stale (including a СОР theme on the actual СОЧ page).
+    page_title = re.search(r'<title\b[^>]*>(.*?)</title>', html, re.S | re.I)
+    visible_title = q2_data.get('title') or title
+    labels = visible_title + ' ' + (plain(page_title.group(1)) if page_title else '')
+    label_source = dict(class_name=class_name, title=labels, is_variative=is_variative, key=canonical_key)
+    assessment_type = 'soch' if is_soch_lesson(label_source) else 'sor' if is_sor_lesson(label_source) else ''
+    if assessment_type:
+        theme_val = visible_title
+        if assessment_type == 'soch' and not re.search(r'(?<!\w)СОЧ(?!\w)', theme_val, re.I):
+            theme_val = 'СОЧ: ' + theme_val
 
     lesson_content = q2_data.get('content') or plain(html)
     hash_seed = f"variative:{html}" if is_variative else html
@@ -259,6 +272,7 @@ def lesson_source(key: str) -> dict:
         key=canonical_key,
         lesson_path=clean_key,
         is_variative=is_variative,
+        assessment_type=assessment_type,
         class_name=class_name,
         folder_name='10 ДОП' if is_variative else class_name,
         grade_label='10 «А» класс (ОГН)' if is_variative else class_name,
@@ -269,7 +283,7 @@ def lesson_source(key: str) -> dict:
         goals=goals,
         date=date_val,
         section=section_val,
-        duration=45,
+        duration=40,
         language='ru',
         content=lesson_content,
         source_hash=hashlib.sha256(hash_seed.encode()).hexdigest()
@@ -317,10 +331,12 @@ def validate_plan(plan: dict, source: dict):
     header = plan.get('header', {})
     stages = plan.get('stages', [])
 
-    if is_sor_lesson(source):
+    if is_soch_lesson(source):
+        validate_soch_stages(plan)
+    elif is_sor_lesson(source):
         validate_sor_stages(plan)
     elif len(stages) < 5:
-        raise ValueError('План должен содержать ровно пять этапов общей длительностью 45 минут')
+        raise ValueError('План должен содержать пять этапов в установленном порядке')
 
     full_text = json.dumps(plan, ensure_ascii=False)
     if re.search(r'\bООП\b|\bЗПР\b|особым[и]? образовательн', full_text, re.I):
@@ -344,10 +360,10 @@ def generate(source: dict) -> dict:
     is_variative = bool(source.get('is_variative'))
 
     if is_variative:
-        timing_and_stages_block = f"""6. ОСОБЕННОСТЬ ВАРИАТИВНОГО УРОКА ДЛЯ 10 «А» КЛАССА (ОГН) ПО ВТОРНИКАМ (45 МИНУТ, 5 ЭТАПОВ — МЕНЬШЕ ТЕОРИИ, БОЛЬШЕ УГЛУБЛЕННОЙ ПРАКТИКИ):
+        timing_and_stages_block = f"""6. ОСОБЕННОСТЬ ВАРИАТИВНОГО УРОКА ДЛЯ 10 «А» КЛАССА (ОГН) ПО ВТОРНИКАМ (5 ЭТАПОВ — МЕНЬШЕ ТЕОРИИ, БОЛЬШЕ УГЛУБЛЕННОЙ ПРАКТИКИ):
    - Это вариативный курс «Информатика и искусственный интеллект. Вариативный компонент» специально для 10 «А» класса ОГН (урок проходит по вторникам, дата: {source['date']}).
    - Учащиеся 10 «А» класса работают с тем же уроком на платформе www.alasster.site, что и на основном уроке, но занятие построено с минимальным объёмом повторной теории и максимальным упором на практику, исследование, эксперименты и дополнительные задания повышенной сложности в соответствии с целями вариативного КТП: {' '.join(source['goals'])}.
-   - РАСПРЕДЕЛЕНИЕ ВРЕМЕНИ (РОВНО 5 ЭТАПОВ, 45 МИНУТ):
+   - РАСПРЕДЕЛЕНИЕ ВРЕМЕНИ (РОВНО 5 ЭТАПОВ):
      - 1. ОРГ. МОМЕНТ (5 мин):
        * **Приветствие:** Живая речь учителя для 10 «А» класса («Здравствуйте, ребята! Садитесь. Проверьте готовность рабочих мест...»).
        * **Психологический настрой:** Мотивация на углублённый практикум и исследовательскую работу.
@@ -367,7 +383,7 @@ def generate(source: dict) -> dict:
        * **Ключевые понятия и алгоритмические приёмы:** Опорные ориентиры и правила анализа данных/кода.
        * **Разбор ключевого примера:** Конкретный прикладной разбор по материалам платформы www.alasster.site с анализом пограничных случаев и типичных ошибок.
        * **Контрольный вопрос перед практикой:** 1-2 быстрых вопроса на готовность к самостоятельной работе.
-     - 4. ПРАКТИЧЕСКАЯ РАБОТА (25 мин — основной фокус урока + дополнительные углубленные задания):
+     - 4. ПРАКТИЧЕСКАЯ РАБОТА (20 мин — основной фокус урока + дополнительные углубленные задания):
        * **Инструктаж по технике безопасности:** Правила работы за компьютером и соблюдение академической честности.
        * ОБЯЗАТЕЛЬНО ВКЛЮЧИ 5 КОНКРЕТНЫХ ЗАДАНИЙ С ПОЛНЫМИ УСЛОВИЯМИ, РЕШЕНИЯМИ И ДЕСКРИПТОРАМИ СТРОГО ПО ТЕМЕ «{source['title']}» (3 задания с платформы www.alasster.site + 2 дополнительных углублённых задания вариативного курса):
          - **Задание 1 (базовый практикум с платформы):** Полное условие задания с платформы www.alasster.site. Решение и правильный ответ для учителя. Дескриптор: качественные критерии выполнения (без баллов).
@@ -381,7 +397,7 @@ def generate(source: dict) -> dict:
        * **Оценивание:** Устное качественное формативное оценивание (БЕЗ баллов, БЕЗ отметок и БЕЗ 10-балльной шкалы, т.к. вариативный курс не оценивается в журнале): содержательный устный комментарий учителя, словесная похвала, акцент на успешных исследовательских решениях и прогрессе учеников, техника обратной связи «Похвала – Вопрос – Рекомендация».
        * **Домашнее задание:** Инструктаж по выполнению ДЗ и повторению на платформе www.alasster.site."""
     else:
-        timing_and_stages_block = f"""6. ОБЩЕЕ ВРЕМЯ УРОКА — 45 МИНУТ, РОВНО 5 ЭТАПОВ (ПОЛНАЯ ДЕТАЛИЗАЦИЯ):
+        timing_and_stages_block = f"""6. РОВНО 5 ЭТАПОВ (ПОЛНАЯ ДЕТАЛИЗАЦИЯ):
    - 1. ОРГ. МОМЕНТ (5 мин):
        * **Приветствие:** Живая речь учителя («Здравствуйте, ребята! Садитесь. Проверьте готовность рабочих мест...»).
        * **Психологический настрой:** Позитивная мотивация.
@@ -402,7 +418,7 @@ def generate(source: dict) -> dict:
        * **Разбор примера 1 (пошаговый разбор ситуации/задачи):** Подробнейший пошаговый разбор конкретного примера или задачи строго по материалу урока «{source['title']}».
        * **Разбор примера 2 (практический кейс):** Разбор реальной жизненной ситуации или прикладного сценария по теме «{source['title']}».
        * **Контрольные вопросы для проверки понимания:** 2-3 экспресс-вопроса учащимся по объясненному материалу.
-   - 4. ПРАКТИЧЕСКАЯ РАБОТА (20 мин):
+   - 4. ПРАКТИЧЕСКАЯ РАБОТА (15 мин):
        * **Инструктаж по технике безопасности:** Правила работы за компьютером.
        * ОБЯЗАТЕЛЬНО МИНИМУМ 3 КОНКРЕТНЫХ ЗАДАНИЯ С ПОЛНЫМИ УСЛОВИЯМИ, РЕШЕНИЯМИ И ДЕСКРИПТОРАМИ СТРОГО ПО ТЕМЕ «{source['title']}»:
          - **Задание 1 (базовый уровень — знание и понимание):** Полное условие. Решение и правильный ответ для учителя. Дескриптор с баллами (1-3 балла).
@@ -499,8 +515,14 @@ def generate(source: dict) -> dict:
 {source['content'][:25000]}
 """
 
+    system_instructions += '\nУчитывай 40 минут при распределении этапов. Не добавляй в КСП отдельную строку о длительности урока.\n'
+
     response_schema = GEMINI_PLAN_SCHEMA
-    if is_sor_lesson(source):
+    if is_soch_lesson(source):
+        system_instructions = soch_instructions(source, teacher_name, school_name, quote_info)
+        response_schema = copy.deepcopy(GEMINI_PLAN_SCHEMA)
+        response_schema['properties']['stages'].update(minItems=3, maxItems=3)
+    elif is_sor_lesson(source):
         system_instructions = sor_instructions(source, teacher_name, school_name, quote_info)
         response_schema = copy.deepcopy(GEMINI_PLAN_SCHEMA)
         response_schema['properties']['stages'].update(minItems=4, maxItems=4)
@@ -524,7 +546,9 @@ def generate(source: dict) -> dict:
                     text_content = resp.json()['candidates'][0]['content']['parts'][0]['text']
                     plan = json.loads(text_content)
                     plan = sanitize_dict_strings(plan)
+                    plan = normalize_soch_stages(plan, source)
                     plan = normalize_sor_stages(plan, source)
+                    plan = normalize_lesson_timing(plan, source)
                     validate_plan(plan, source)
                     return plan
                 elif resp.status_code == 403:
@@ -636,7 +660,7 @@ class KspService:
                         src = lesson_source(key)
                         target = output_path(src, self.output_root)
                         row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
-                        if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
+                        if row and row['status'] in ('queued', 'generating', 'validating', 'saving', 'error'):
                             continue
                         if target.is_file():
                             if not row or row['status'] != 'ready':
@@ -688,7 +712,7 @@ class KspService:
                             doc_id = matches.pop()
                     row = db.execute('SELECT * FROM jobs WHERE key=?', (key,)).fetchone()
                     if doc_id:
-                        if row and row['status'] in ('queued', 'generating', 'validating', 'saving'):
+                        if row and row['status'] in ('queued', 'generating', 'validating', 'saving', 'error'):
                             continue
                         ident = row['id'] if row else uuid.uuid4().hex
                         db.execute('INSERT OR REPLACE INTO jobs VALUES (?,?,?,?,?,?)',

@@ -16,12 +16,13 @@ test('KSP polling recovers after timeout, paints ready, and keeps checking Drive
     },
     setAttribute() {},
   };
-  const grid = { querySelectorAll: () => [button], addEventListener() {} };
+  const grid = { querySelectorAll: () => [button], addEventListener() {}, before() {} };
   let calls = 0;
   const context = {
     window: { currentCabinetUser: { role: 'superadmin' } },
     document: { readyState: 'complete', hidden: false, addEventListener() {},
-      getElementById: id => id === 'lesson-catalog-grid' ? grid : null },
+      getElementById: id => id === 'lesson-catalog-grid' ? grid : null,
+      createElement: () => ({setAttribute() {}, classList: {toggle() {}}}) },
     AbortSignal: { timeout: () => undefined },
     setTimeout: (callback, delay) => { timers.push({ callback, delay }); return timers.length; },
     clearTimeout() {},
@@ -39,4 +40,45 @@ test('KSP polling recovers after timeout, paints ready, and keeps checking Drive
   assert.equal(button.disabled, false);
   assert.equal(timers[0].delay, 15000);
   assert.equal(calls, 2);
+});
+
+test('Shift-click forces regeneration and shows the server error instead of success', async () => {
+  const classes = new Set();
+  const key = '9 класс/1 четверть/7 урок.html';
+  const button = { dataset: { lessonPath: key },
+    classList: { contains: n => classes.has(n), toggle: (n, v) => v ? classes.add(n) : classes.delete(n) },
+    setAttribute() {},
+  };
+  let clickHandler;
+  const notice = { setAttribute() {}, classList: { toggle() {} } };
+  const grid = { querySelectorAll: () => [button], contains: b => b === button, before() {},
+    addEventListener: (event, handler) => { if (event === 'click') clickHandler = handler; } };
+  let state = { status: 'ready', id: 'old-job' };
+  let posted;
+  const context = {
+    window: { currentCabinetUser: { role: 'superadmin' } },
+    document: { readyState: 'complete', hidden: false, addEventListener() {},
+      getElementById: id => id === 'lesson-catalog-grid' ? grid : null, createElement: () => notice },
+    AbortSignal: { timeout: () => undefined },
+    setTimeout() {}, clearTimeout() {},
+    fetch: async (url, options) => {
+      if (options?.method === 'POST') {
+        posted = JSON.parse(options.body);
+        state = { status: 'error', id: 'new-job', message: 'Chromium не установлен' };
+        return { ok: true, json: async () => ({ status: 'queued', id: 'new-job' }) };
+      }
+      return { ok: true, json: async () => ({ lessons: { [key]: state } }) };
+    },
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'static/ksp.js'), 'utf8'), context);
+  await context.window.KspButtons.refresh();
+  assert.ok(classes.has('ksp-ready'));
+  await clickHandler({ target: { closest: () => button }, shiftKey: true, preventDefault() {} });
+  await new Promise(setImmediate);
+  assert.equal(posted.force, true);
+  assert.equal(posted.lesson_path, key);
+  assert.ok(classes.has('ksp-error'));
+  assert.ok(!classes.has('ksp-ready'));
+  assert.ok(notice.textContent.includes('Chromium не установлен'));
+  assert.ok(notice.textContent.includes('Старый документ сохранён'));
 });
