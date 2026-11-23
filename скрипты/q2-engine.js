@@ -2358,7 +2358,8 @@
             if (inPort) {
               const target = inPort.dataset.portIn;
               if (fromId !== target.split(':')[0]) {
-                st.wires = st.wires.filter(w => w.to !== target);
+                const isVar = fromId === 'A' || fromId === 'B' || fromId === 'C';
+                st.wires = st.wires.filter(w => w.to !== target && (isVar || w.from !== fromId));
                 st.wires.push({ from: fromId, to: target });
                 pendingFrom = null;
                 render(idx);
@@ -2395,7 +2396,8 @@
             return;
           }
           if (pendingFrom === target.split(':')[0]) return;
-          st.wires = st.wires.filter(w => w.to !== target);
+          const isVar = pendingFrom === 'A' || pendingFrom === 'B' || pendingFrom === 'C';
+          st.wires = st.wires.filter(w => w.to !== target && (isVar || w.from !== pendingFrom));
           st.wires.push({ from: pendingFrom, to: target });
           pendingFrom = null;
           panel.querySelectorAll('[data-port-out]').forEach(p => p.classList.remove('is-active'));
