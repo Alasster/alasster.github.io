@@ -1795,7 +1795,7 @@
   /* --------------------- порядок логических действий ------------------- */
   const logicNot = child => ({ op: 'not', child });
   const logicBinary = (op, left, right) => ({ op, left, right });
-  const logicSign = { and: '∧', or: '∨' };
+  const logicSign = { and: '∧', or: '∨', xor: '⊕' };
   function logicHTML(node, algebraic = false) {
     if (typeof node === 'string') return node;
     if (node.op === 'not') {
@@ -1822,7 +1822,9 @@
     if (node.op === 'not') return 1 - logicValue(node.child, A, B, C);
     const left = logicValue(node.left, A, B, C);
     const right = logicValue(node.right, A, B, C);
-    return node.op === 'and' ? left & right : left | right;
+    if (node.op === 'and') return left & right;
+    if (node.op === 'xor') return left ^ right;
+    return left | right;
   }
   function logicColumns(node, result = []) {
     if (typeof node === 'string') return result;
@@ -2054,10 +2056,20 @@
     render(0);
   };
 
-  WIDGETS.circuitBuilder = function (el) {
+  WIDGETS.circuitBuilder = function (el, cfg) {
     el.classList.add('q2-circuit-builder');
+    const is3 = !!(cfg && cfg.vars === 3);
+    const hasXor = !!(cfg && cfg.xor);
+    const useRect = !!(cfg && cfg.shape === 'rect');
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-    const tier1 = [
+    const tier1 = is3 ? [
+      logicBinary('xor', logicBinary('and', 'A', 'B'), 'C'),
+      logicBinary('and', logicBinary('xor', 'A', 'B'), 'C'),
+      logicBinary('or', logicBinary('xor', 'A', 'B'), 'C'),
+      logicBinary('xor', logicBinary('or', 'A', 'B'), 'C'),
+      logicBinary('xor', 'A', logicBinary('and', 'B', 'C')),
+      logicBinary('and', 'A', logicBinary('xor', 'B', 'C'))
+    ] : [
       logicBinary('and', logicNot('A'), 'B'),
       logicBinary('and', 'A', logicNot('B')),
       logicBinary('or', 'A', logicNot('B')),
@@ -2067,7 +2079,14 @@
       logicBinary('and', logicNot('A'), logicNot('B')),
       logicBinary('or', logicNot('A'), logicNot('B'))
     ];
-    const tier2 = [
+    const tier2 = is3 ? [
+      logicBinary('xor', logicBinary('and', 'A', 'B'), logicNot('C')),
+      logicBinary('and', logicBinary('xor', 'A', 'B'), logicNot('C')),
+      logicBinary('or', logicBinary('xor', 'A', logicNot('B')), 'C'),
+      logicNot(logicBinary('xor', logicBinary('or', 'A', 'B'), 'C')),
+      logicBinary('xor', logicNot('A'), logicBinary('or', 'B', 'C')),
+      logicBinary('and', logicNot('A'), logicBinary('xor', 'B', 'C'))
+    ] : [
       logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('A')),
       logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('B')),
       logicBinary('or', logicBinary('and', 'A', 'B'), logicNot('B')),
@@ -2077,7 +2096,14 @@
       logicBinary('and', logicNot(logicBinary('and', 'A', 'B')), 'A'),
       logicBinary('and', logicNot(logicBinary('and', 'A', 'B')), 'B')
     ];
-    const tier3 = [
+    const tier3 = is3 ? [
+      logicBinary('xor', logicBinary('and', 'A', logicNot('B')), logicBinary('or', 'B', 'C')),
+      logicBinary('or', logicBinary('xor', 'A', 'B'), logicBinary('and', logicNot('B'), 'C')),
+      logicBinary('and', logicBinary('xor', 'A', 'C'), logicBinary('or', logicNot('A'), 'B')),
+      logicBinary('xor', logicBinary('or', 'A', 'B'), logicBinary('and', 'A', logicNot('C'))),
+      logicBinary('and', logicNot(logicBinary('xor', 'A', 'B')), logicBinary('or', 'B', 'C')),
+      logicBinary('xor', logicNot(logicBinary('and', 'A', 'B')), logicBinary('or', 'B', 'C'))
+    ] : [
       logicBinary('and', logicBinary('or', 'A', logicNot('B')), logicBinary('or', logicNot('A'), 'B')),
       logicBinary('or', logicBinary('and', 'A', logicNot('B')), logicBinary('and', logicNot('A'), 'B')),
       logicBinary('or', logicNot(logicBinary('and', 'A', 'B')), logicBinary('and', logicNot('A'), 'B')),
@@ -2088,7 +2114,7 @@
       logicBinary('and', logicNot(logicBinary('or', 'A', 'B')), logicBinary('or', 'A', logicNot('B')))
     ];
     const tasks = [pick(tier1), pick(tier2), pick(tier3)];
-    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, zoom: 1 }));
+    const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, c: 0, zoom: 1 }));
     const solved = tasks.map(() => false);
     let current = 0;
     let pendingFrom = null;
@@ -2118,41 +2144,67 @@
         t.setAttribute('aria-selected', String(i === idx));
       });
       const st = states[idx];
-      const evalSource = (src, A, B, visiting) => {
+      const evalSource = (src, A, B, C, visiting) => {
         if (src === 'A') return A;
         if (src === 'B') return B;
+        if (src === 'C') return C;
         if (visiting.has(src)) return null;
         const gate = st.gates.find(g => g.id === src);
         if (!gate) return null;
         visiting.add(src);
         const w0 = st.wires.find(w => w.to === `${src}:0`);
         if (!w0) return null;
-        const v0 = evalSource(w0.from, A, B, new Set(visiting));
+        const v0 = evalSource(w0.from, A, B, C, new Set(visiting));
         if (v0 === null) return null;
         if (gate.op === 'not') return 1 - v0;
         const w1 = st.wires.find(w => w.to === `${src}:1`);
         if (!w1) return null;
-        const v1 = evalSource(w1.from, A, B, new Set(visiting));
+        const v1 = evalSource(w1.from, A, B, C, new Set(visiting));
         if (v1 === null) return null;
-        return gate.op === 'and' ? (v0 & v1) : (v0 | v1);
+        if (gate.op === 'and') return v0 & v1;
+        if (gate.op === 'xor') return v0 ^ v1;
+        return v0 | v1;
       };
       const yWireNow = st.wires.find(w => w.to === 'Y:0');
-      const liveY = yWireNow ? evalSource(yWireNow.from, st.a, st.b, new Set()) : null;
-      const ttRows = [[0, 0], [0, 1], [1, 0], [1, 1]];
+      const liveY = yWireNow ? evalSource(yWireNow.from, st.a, st.b, st.c, new Set()) : null;
+      const ttRows = is3
+        ? [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1]]
+        : [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0]];
       const ttCols = logicColumns(tasks[idx]);
       const gateShape = op => {
+        if (useRect) {
+          const styles = {
+            and: ['#f5f3ff', '#7c3aed', '#5b21b6', 'И ∧', 16],
+            or: ['#ecfeff', '#0891b2', '#0e7490', 'ИЛИ ∨', 15],
+            not: ['#fffbeb', '#d97706', '#b45309', 'НЕ ¬', 16],
+            xor: ['#fdf2f8', '#db2777', '#9d174d', 'XOR ⊕', 15]
+          };
+          const [fill, stroke, textFill, text, size] = styles[op] || styles.and;
+          return `<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><rect x="3" y="8" width="102" height="58" rx="14" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/><text x="54" y="43" text-anchor="middle" font-size="${size}" font-weight="800" fill="${textFill}">${text}</text></svg>`;
+        }
         if (op === 'and') return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><path d="M10 6 H56 A31 31 0 0 1 56 68 H10 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.5"/><text x="45" y="42" text-anchor="middle" font-size="16" font-weight="800" fill="#5b21b6">И</text></svg>';
         if (op === 'or') return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><path d="M10 6 Q28 37 10 68 Q62 68 96 37 Q62 6 10 6 Z" fill="#ecfeff" stroke="#0891b2" stroke-width="2.5"/><text x="50" y="42" text-anchor="middle" font-size="15" font-weight="800" fill="#0e7490">ИЛИ</text></svg>';
+        if (op === 'xor') return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><rect x="3" y="8" width="102" height="58" rx="14" fill="#fdf2f8" stroke="#db2777" stroke-width="2.5"/><text x="54" y="43" text-anchor="middle" font-size="15" font-weight="800" fill="#9d174d">XOR ⊕</text></svg>';
         return '<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><polygon points="10,6 10,68 78,37" fill="#fffbeb" stroke="#d97706" stroke-width="2.5"/><circle cx="86" cy="37" r="6" fill="#fffbeb" stroke="#d97706" stroke-width="2.5"/><text x="34" y="42" text-anchor="middle" font-size="14" font-weight="800" fill="#b45309">НЕ</text></svg>';
       };
+      const fixedInputs = is3 ? `
+            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:36px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:142px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="c" style="left:16px;top:248px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить C">C = ${st.c}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="C" aria-label="Выход C"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:142px;transform:scale(${st.zoom}) !important;">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>`
+        : `
+            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:68px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:210px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
+            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;transform:scale(${st.zoom}) !important;">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>`;
       panel.innerHTML = `
         <div class="q2-cb-formula">
           <div class="q2-math-display" role="math" aria-label="${attr(logicText(tasks[idx], true))}">${logicHTML(tasks[idx], true)}</div>
         </div>
         <div class="q2-cb-toolbar">
-          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="and">+ И</button>
-          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">+ ИЛИ</button>
-          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">+ НЕ</button>
+          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="and">${useRect ? '+ И (∧)' : '+ И'}</button>
+          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">${useRect ? '+ ИЛИ (∨)' : '+ ИЛИ'}</button>
+          <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">${useRect ? '+ НЕ (¬)' : '+ НЕ'}</button>
+          ${hasXor ? `<button type="button" class="q2-btn q2-btn-sm" data-cb-add="xor">${useRect ? '+ XOR (⊕)' : '+ XOR'}</button>` : ''}
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
           <span style="display:inline-flex;gap:6px;">
             <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-0.15" aria-label="Уменьшить масштаб">−</button>
@@ -2165,11 +2217,9 @@
             <svg class="q2-cb-wires" data-cb-wires>
               <defs><marker id="q2-cb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1"/></marker></defs>
             </svg>
-            <div class="q2-cb-node is-fixed" data-cb-toggle="a" style="left:16px;top:68px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить A">A = ${st.a}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="A" aria-label="Выход A"></button></div>
-            <div class="q2-cb-node is-fixed" data-cb-toggle="b" style="left:16px;top:210px;cursor:pointer;transform:scale(${st.zoom}) !important;" title="Нажмите, чтобы переключить B">B = ${st.b}<button type="button" class="q2-cb-port q2-cb-port-out" data-port-out="B" aria-label="Выход B"></button></div>
-            <div class="q2-cb-node is-fixed" data-cb-node="Y" style="right:16px;top:139px;transform:scale(${st.zoom}) !important;">Y = ${liveY === null ? '?' : liveY}<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="Y:0" aria-label="Вход Y"></button></div>
+            ${fixedInputs}
             ${st.gates.map(g => {
-              const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : 'НЕ';
+              const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : g.op === 'xor' ? 'XOR' : 'НЕ';
               const inPorts = g.op === 'not'
                 ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
                 : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
@@ -2180,20 +2230,20 @@
           <div class="q2-cb-table-box">
             <h4>Таблица истинности</h4>
             <table class="q2-cb-tt">
-              <thead><tr><th>A</th><th>B</th>${ttCols.map((c, ci) => `<th>${ci === ttCols.length - 1 ? 'Y' : logicHTML(c, true)}</th>`).join('')}</tr></thead>
+              <thead><tr><th>A</th><th>B</th>${is3 ? '<th>C</th>' : ''}${ttCols.map((c, ci) => `<th>${ci === ttCols.length - 1 ? 'Y' : logicHTML(c, true)}</th>`).join('')}</tr></thead>
               <tbody>
-                ${ttRows.map(([A, B]) => {
-                  const exp = logicValue(tasks[idx], A, B, 0);
-                  const isCur = A === st.a && B === st.b;
+                ${ttRows.map(([A, B, C]) => {
+                  const exp = logicValue(tasks[idx], A, B, C);
+                  const isCur = A === st.a && B === st.b && (!is3 || C === st.c);
                   const cls = isCur && liveY !== null ? (liveY === exp ? 'is-match' : 'is-mismatch') : '';
-                  return `<tr class="${cls}"><td>${A}</td><td>${B}</td>${ttCols.map(c => `<td>${logicValue(c, A, B, 0)}</td>`).join('')}</tr>`;
+                  return `<tr class="${cls}"><td>${A}</td><td>${B}</td>${is3 ? `<td>${C}</td>` : ''}${ttCols.map(c => `<td>${logicValue(c, A, B, C)}</td>`).join('')}</tr>`;
                 }).join('')}
               </tbody>
             </table>
           </div>
         </div>
         <div class="q2-cb-actions">
-          <p class="q2-feedback" data-cb-feedback role="status" aria-live="polite">Добавьте элементы и соедините их стрелками от A и B к Y. Нажимайте на A и B, чтобы проверить наборы.</p>
+          <p class="q2-feedback" data-cb-feedback role="status" aria-live="polite">${is3 ? 'Добавьте элементы и соедините их стрелками от A, B и C к Y. Нажимайте на A, B и C, чтобы проверить наборы.' : 'Добавьте элементы и соедините их стрелками от A и B к Y. Нажимайте на A и B, чтобы проверить наборы.'}</p>
           <button type="button" class="q2-btn" data-cb-check>Проверить</button>
         </div>
       `;
@@ -2238,6 +2288,14 @@
         st.b = 1 - st.b;
         render(idx);
       });
+      const toggleC = panel.querySelector('[data-cb-toggle="c"]');
+      if (toggleC) {
+        toggleC.addEventListener('click', e => {
+          if (e.target.closest('button')) return;
+          st.c = 1 - st.c;
+          render(idx);
+        });
+      }
 
       panel.querySelectorAll('[data-cb-add]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -2375,15 +2433,17 @@
 
       panel.querySelector('[data-cb-check]').addEventListener('click', () => {
         const yWire = st.wires.find(w => w.to === 'Y:0');
-        const results = ttRows.map(([A, B]) => {
-          const got = yWire ? evalSource(yWire.from, A, B, new Set()) : null;
-          const expected = logicValue(tasks[idx], A, B, 0);
-          return { A, B, got, expected, ok: got !== null && got === expected };
+        const results = ttRows.map(([A, B, C]) => {
+          const got = yWire ? evalSource(yWire.from, A, B, C, new Set()) : null;
+          const expected = logicValue(tasks[idx], A, B, C);
+          return { A, B, C, got, expected, ok: got !== null && got === expected };
         });
         panel.querySelectorAll('.q2-cb-tt tbody tr').forEach((row, i) => {
           row.classList.toggle('is-match', results[i].ok);
           row.classList.toggle('is-mismatch', !results[i].ok);
-          row.setAttribute('aria-label', `A=${results[i].A}, B=${results[i].B}: ${results[i].ok ? 'верно' : 'ошибка'}`);
+          row.setAttribute('aria-label', is3
+            ? `A=${results[i].A}, B=${results[i].B}, C=${results[i].C}: ${results[i].ok ? 'верно' : 'ошибка'}`
+            : `A=${results[i].A}, B=${results[i].B}: ${results[i].ok ? 'верно' : 'ошибка'}`);
         });
         solved[idx] = results.every(r => r.ok);
         tabs[idx].classList.toggle('is-done', solved[idx]);
@@ -2394,13 +2454,17 @@
             ? 'Выход Y ещё не подключён. Проведите стрелку к Y.'
             : failed.got === null
               ? 'Не все входы элементов подключены или в схеме есть петля.'
-              : `На наборе A=${failed.A}, B=${failed.B} схема даёт ${failed.got}, а должно быть ${failed.expected}.`;
+              : is3
+                ? `На наборе A=${failed.A}, B=${failed.B}, C=${failed.C} схема даёт ${failed.got}, а должно быть ${failed.expected}.`
+                : `На наборе A=${failed.A}, B=${failed.B} схема даёт ${failed.got}, а должно быть ${failed.expected}.`;
           return;
         }
         solved[idx] = true;
         tabs[idx].classList.add('is-done');
         feedback.className = 'q2-feedback is-good';
-        feedback.textContent = 'Верно! Схема работает правильно на всех четырёх наборах.';
+        feedback.textContent = is3
+          ? 'Верно! Схема работает правильно на всех восьми наборах.'
+          : 'Верно! Схема работает правильно на всех четырёх наборах.';
       });
     };
 
@@ -2409,6 +2473,105 @@
   };
 
   WIDGETS.circuitDemo = function (el, cfg) {
+    if (cfg && cfg.mode === 'threeVarSingle') {
+      let a = 1, b = 0, c = 0;
+      const render3 = () => {
+        const xorAB = a ^ b;
+        const notC = 1 - c;
+        const y = xorAB & notC;
+        const wc = act => act ? 'q2-hero-wire-anim' : '';
+        const col = (act, on) => act ? on : '#cbd5e1';
+        el.innerHTML = `<div style="user-select:none;-webkit-user-select:none;border-radius:16px;padding:12px 14px;background:var(--bg,#f4f5fc);box-shadow:inset 2px 3px 8px rgba(148,163,184,.35),inset -2px -2px 6px rgba(255,255,255,.85);">
+          <svg viewBox="0 0 560 184" role="img" aria-label="Интерактивный пример схемы (A XOR B) И НЕ C" style="width:100%;height:auto;display:block;">
+            <text x="280" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">Выражение: (A ⊕ B)<tspan style="text-decoration:overline">C</tspan> → сначала XOR и НЕ, затем И</text>
+            <g data-d3="a" style="cursor:pointer;"><rect x="26" y="34" width="52" height="28" rx="8" fill="${a ? '#eef2ff' : '#fff'}" stroke="${a ? '#6366f1' : '#94a3b8'}" stroke-width="1.8"/><text x="52" y="53" text-anchor="middle" font-size="13" font-weight="800" fill="${a ? '#4338ca' : '#1e293b'}">A = ${a}</text></g>
+            <g data-d3="b" style="cursor:pointer;"><rect x="26" y="80" width="52" height="28" rx="8" fill="${b ? '#fdf2f8' : '#fff'}" stroke="${b ? '#db2777' : '#94a3b8'}" stroke-width="1.8"/><text x="52" y="99" text-anchor="middle" font-size="13" font-weight="800" fill="${b ? '#9d174d' : '#1e293b'}">B = ${b}</text></g>
+            <g data-d3="c" style="cursor:pointer;"><rect x="26" y="132" width="52" height="28" rx="8" fill="${c ? '#fffbeb' : '#fff'}" stroke="${c ? '#d97706' : '#94a3b8'}" stroke-width="1.8"/><text x="52" y="151" text-anchor="middle" font-size="13" font-weight="800" fill="${c ? '#b45309' : '#1e293b'}">C = ${c}</text></g>
+            <path d="M78 48 C112 48, 120 62, 154 62" fill="none" stroke="${col(a, '#db2777')}" stroke-width="2.3" class="${wc(a)}"/>
+            <path d="M78 94 C112 94, 120 80, 154 80" fill="none" stroke="${col(b, '#db2777')}" stroke-width="2.3" class="${wc(b)}"/>
+            <line x1="78" y1="146" x2="154" y2="146" stroke="${col(c, '#f59e0b')}" stroke-width="2.3" class="${wc(c)}"/>
+            <rect x="154" y="48" width="84" height="46" rx="12" fill="#fdf2f8" stroke="#db2777" stroke-width="2.2"/>
+            <text x="196" y="76" text-anchor="middle" font-size="14" font-weight="800" fill="#9d174d">XOR ⊕</text>
+            <rect x="154" y="124" width="84" height="44" rx="12" fill="#fffbeb" stroke="#d97706" stroke-width="2.2"/>
+            <text x="196" y="151" text-anchor="middle" font-size="14" font-weight="800" fill="#b45309">НЕ ¬</text>
+            <path d="M238 71 C278 71, 286 95, 322 95" fill="none" stroke="${col(xorAB, '#7c3aed')}" stroke-width="2.3" class="${wc(xorAB)}"/>
+            <path d="M238 146 C278 146, 286 115, 322 115" fill="none" stroke="${col(notC, '#7c3aed')}" stroke-width="2.3" class="${wc(notC)}"/>
+            <rect x="322" y="82" width="82" height="46" rx="12" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.2"/>
+            <text x="363" y="110" text-anchor="middle" font-size="14" font-weight="800" fill="#5b21b6">И ∧</text>
+            <line x1="404" y1="105" x2="474" y2="105" stroke="${col(y, '#10b981')}" stroke-width="2.6" class="${wc(y)}"/>
+            <rect x="474" y="90" width="54" height="30" rx="8" fill="${y ? '#ecfdf5' : '#fff'}" stroke="${y ? '#10b981' : '#94a3b8'}" stroke-width="1.8"/>
+            <text x="501" y="110" text-anchor="middle" font-size="13.5" font-weight="800" fill="${y ? '#047857' : '#1e293b'}">Y = ${y}</text>
+          </svg>
+        </div>`;
+        el.querySelector('[data-d3="a"]').addEventListener('click', () => { a = 1 - a; render3(); });
+        el.querySelector('[data-d3="b"]').addEventListener('click', () => { b = 1 - b; render3(); });
+        el.querySelector('[data-d3="c"]').addEventListener('click', () => { c = 1 - c; render3(); });
+      };
+      render3();
+      return;
+    }
+    if (cfg && cfg.mode === 'twoExamples3') {
+      let a1 = 1, b1 = 0, c1 = 0;
+      let a2 = 1, b2 = 1, c2 = 0;
+      const renderTwo3 = () => {
+        const xor1 = a1 ^ b1, y1 = xor1 | c1;
+        const and2 = a2 & b2, notC2 = 1 - c2, y2 = and2 ^ notC2;
+        const wc = act => act ? 'q2-hero-wire-anim' : '';
+        const col = (act, on) => act ? on : '#cbd5e1';
+        const box = 'user-select:none;-webkit-user-select:none;border-radius:16px;padding:12px 14px;background:var(--bg,#f4f5fc);box-shadow:inset 2px 3px 8px rgba(148,163,184,.35),inset -2px -2px 6px rgba(255,255,255,.85);';
+        el.innerHTML = `<div style="display:grid;gap:14px;">
+          <div style="${box}">
+            <svg viewBox="0 0 560 154" role="img" aria-label="Пример 1: (A XOR B) ИЛИ C" style="width:100%;height:auto;display:block;">
+              <text x="280" y="18" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 1: (A ⊕ B) + C — сначала XOR, затем ИЛИ с C</text>
+              <g data-ex3="a1" style="cursor:pointer;"><rect x="26" y="30" width="50" height="26" rx="7" fill="${a1 ? '#eef2ff' : '#fff'}" stroke="${a1 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="51" y="47" text-anchor="middle" font-size="12.5" font-weight="800" fill="${a1 ? '#4338ca' : '#1e293b'}">A=${a1}</text></g>
+              <g data-ex3="b1" style="cursor:pointer;"><rect x="26" y="68" width="50" height="26" rx="7" fill="${b1 ? '#fdf2f8' : '#fff'}" stroke="${b1 ? '#db2777' : '#94a3b8'}" stroke-width="1.6"/><text x="51" y="85" text-anchor="middle" font-size="12.5" font-weight="800" fill="${b1 ? '#9d174d' : '#1e293b'}">B=${b1}</text></g>
+              <g data-ex3="c1" style="cursor:pointer;"><rect x="26" y="110" width="50" height="26" rx="7" fill="${c1 ? '#ecfeff' : '#fff'}" stroke="${c1 ? '#0891b2' : '#94a3b8'}" stroke-width="1.6"/><text x="51" y="127" text-anchor="middle" font-size="12.5" font-weight="800" fill="${c1 ? '#0e7490' : '#1e293b'}">C=${c1}</text></g>
+              <path d="M76 43 C112 43, 120 54, 156 54" fill="none" stroke="${col(a1, '#db2777')}" stroke-width="2.2" class="${wc(a1)}"/>
+              <path d="M76 81 C112 81, 120 70, 156 70" fill="none" stroke="${col(b1, '#db2777')}" stroke-width="2.2" class="${wc(b1)}"/>
+              <rect x="156" y="42" width="80" height="42" rx="11" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+              <text x="196" y="68" text-anchor="middle" font-size="13.5" font-weight="800" fill="#9d174d">XOR ⊕</text>
+              <path d="M236 63 C276 63, 286 82, 322 82" fill="none" stroke="${col(xor1, '#0891b2')}" stroke-width="2.2" class="${wc(xor1)}"/>
+              <path d="M76 123 C200 123, 270 98, 322 98" fill="none" stroke="${col(c1, '#0891b2')}" stroke-width="2.2" class="${wc(c1)}"/>
+              <rect x="322" y="69" width="80" height="42" rx="11" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+              <text x="362" y="95" text-anchor="middle" font-size="13.5" font-weight="800" fill="#0e7490">ИЛИ ∨</text>
+              <line x1="402" y1="90" x2="476" y2="90" stroke="${col(y1, '#10b981')}" stroke-width="2.4" class="${wc(y1)}"/>
+              <rect x="476" y="76" width="52" height="28" rx="7" fill="${y1 ? '#ecfdf5' : '#fff'}" stroke="${y1 ? '#10b981' : '#94a3b8'}" stroke-width="1.6"/>
+              <text x="502" y="95" text-anchor="middle" font-size="13" font-weight="800" fill="${y1 ? '#047857' : '#1e293b'}">Y=${y1}</text>
+            </svg>
+          </div>
+          <div style="${box}">
+            <svg viewBox="0 0 560 156" role="img" aria-label="Пример 2: (A И B) XOR (НЕ C)" style="width:100%;height:auto;display:block;">
+              <text x="280" y="18" text-anchor="middle" font-size="12.5" font-weight="800" fill="#334155">Пример 2: (AB) ⊕ <tspan style="text-decoration:overline">C</tspan> — параллельно И и НЕ, затем XOR</text>
+              <g data-ex3="a2" style="cursor:pointer;"><rect x="26" y="30" width="50" height="26" rx="7" fill="${a2 ? '#eef2ff' : '#fff'}" stroke="${a2 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="51" y="47" text-anchor="middle" font-size="12.5" font-weight="800" fill="${a2 ? '#4338ca' : '#1e293b'}">A=${a2}</text></g>
+              <g data-ex3="b2" style="cursor:pointer;"><rect x="26" y="68" width="50" height="26" rx="7" fill="${b2 ? '#eef2ff' : '#fff'}" stroke="${b2 ? '#6366f1' : '#94a3b8'}" stroke-width="1.6"/><text x="51" y="85" text-anchor="middle" font-size="12.5" font-weight="800" fill="${b2 ? '#4338ca' : '#1e293b'}">B=${b2}</text></g>
+              <g data-ex3="c2" style="cursor:pointer;"><rect x="26" y="112" width="50" height="26" rx="7" fill="${c2 ? '#fffbeb' : '#fff'}" stroke="${c2 ? '#d97706' : '#94a3b8'}" stroke-width="1.6"/><text x="51" y="129" text-anchor="middle" font-size="12.5" font-weight="800" fill="${c2 ? '#b45309' : '#1e293b'}">C=${c2}</text></g>
+              <path d="M76 43 C112 43, 120 53, 156 53" fill="none" stroke="${col(a2, '#7c3aed')}" stroke-width="2.2" class="${wc(a2)}"/>
+              <path d="M76 81 C112 81, 120 69, 156 69" fill="none" stroke="${col(b2, '#7c3aed')}" stroke-width="2.2" class="${wc(b2)}"/>
+              <line x1="76" y1="125" x2="156" y2="125" stroke="${col(c2, '#f59e0b')}" stroke-width="2.2" class="${wc(c2)}"/>
+              <rect x="156" y="41" width="80" height="40" rx="11" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+              <text x="196" y="66" text-anchor="middle" font-size="13.5" font-weight="800" fill="#5b21b6">И ∧</text>
+              <rect x="156" y="105" width="80" height="40" rx="11" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+              <text x="196" y="130" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">НЕ ¬</text>
+              <path d="M236 61 C276 61, 286 81, 322 81" fill="none" stroke="${col(and2, '#db2777')}" stroke-width="2.2" class="${wc(and2)}"/>
+              <path d="M236 125 C276 125, 286 99, 322 99" fill="none" stroke="${col(notC2, '#db2777')}" stroke-width="2.2" class="${wc(notC2)}"/>
+              <rect x="322" y="69" width="80" height="42" rx="11" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+              <text x="362" y="95" text-anchor="middle" font-size="13.5" font-weight="800" fill="#9d174d">XOR ⊕</text>
+              <line x1="402" y1="90" x2="476" y2="90" stroke="${col(y2, '#10b981')}" stroke-width="2.4" class="${wc(y2)}"/>
+              <rect x="476" y="76" width="52" height="28" rx="7" fill="${y2 ? '#ecfdf5' : '#fff'}" stroke="${y2 ? '#10b981' : '#94a3b8'}" stroke-width="1.6"/>
+              <text x="502" y="95" text-anchor="middle" font-size="13" font-weight="800" fill="${y2 ? '#047857' : '#1e293b'}">Y=${y2}</text>
+            </svg>
+          </div>
+        </div>`;
+        el.querySelector('[data-ex3="a1"]').addEventListener('click', () => { a1 = 1 - a1; renderTwo3(); });
+        el.querySelector('[data-ex3="b1"]').addEventListener('click', () => { b1 = 1 - b1; renderTwo3(); });
+        el.querySelector('[data-ex3="c1"]').addEventListener('click', () => { c1 = 1 - c1; renderTwo3(); });
+        el.querySelector('[data-ex3="a2"]').addEventListener('click', () => { a2 = 1 - a2; renderTwo3(); });
+        el.querySelector('[data-ex3="b2"]').addEventListener('click', () => { b2 = 1 - b2; renderTwo3(); });
+        el.querySelector('[data-ex3="c2"]').addEventListener('click', () => { c2 = 1 - c2; renderTwo3(); });
+      };
+      renderTwo3();
+      return;
+    }
     if (cfg && cfg.mode === 'twoExamples') {
       let a1 = 0, b1 = 0, a2 = 0, b2 = 1;
       const renderTwo = () => {

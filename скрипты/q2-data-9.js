@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    9 КЛАСС · 2 ЧЕТВЕРТЬ — ЛОГИЧЕСКИЕ ОСНОВЫ
    Данные уроков. Логика объясняется через лампочки и выключатели.
    ========================================================================== */
@@ -889,8 +889,95 @@
   });
 
   /* ==========================================================================
-     УРОК 5. XOR и соединение элементов
+     УРОК 5. Логические элементы ПК: 3 переменные, XOR и прямоугольные блоки
      ========================================================================== */
+  const GATES4_HERO_SVG = `<svg viewBox="0 0 360 220" role="img" aria-label="Четыре логических элемента в прямоугольной записи: И, ИЛИ, НЕ, XOR">
+    <rect x="14" y="14" width="158" height="88" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="93" y="34" text-anchor="middle" font-size="12" font-weight="800" fill="#5b21b6">AND</text>
+    <line x1="36" y1="56" x2="64" y2="56" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="36" y1="74" x2="64" y2="74" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect class="q2-gate-rect" x="64" y="46" width="58" height="38" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="93" y="70" text-anchor="middle" font-size="13" font-weight="800" fill="#5b21b6">И ∧</text>
+    <line x1="122" y1="65" x2="150" y2="65" stroke="#7c3aed" stroke-width="2" class="q2-hero-wire-anim"/>
+
+    <rect x="188" y="14" width="158" height="88" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="267" y="34" text-anchor="middle" font-size="12" font-weight="800" fill="#0e7490">OR</text>
+    <line x1="210" y1="56" x2="238" y2="56" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="210" y1="74" x2="238" y2="74" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect class="q2-gate-rect" x="238" y="46" width="58" height="38" rx="10" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+    <text x="267" y="70" text-anchor="middle" font-size="12" font-weight="800" fill="#0e7490">ИЛИ ∨</text>
+    <line x1="296" y1="65" x2="324" y2="65" stroke="#0891b2" stroke-width="2" class="q2-hero-wire-anim"/>
+
+    <rect x="14" y="118" width="158" height="88" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="93" y="138" text-anchor="middle" font-size="12" font-weight="800" fill="#b45309">NOT</text>
+    <line x1="36" y1="169" x2="64" y2="169" stroke="#f59e0b" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect class="q2-gate-rect" x="64" y="150" width="58" height="38" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <text x="93" y="174" text-anchor="middle" font-size="13" font-weight="800" fill="#b45309">НЕ ¬</text>
+    <line x1="122" y1="169" x2="150" y2="169" stroke="#d97706" stroke-width="2" class="q2-hero-wire-anim"/>
+
+    <rect x="188" y="118" width="158" height="88" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="267" y="138" text-anchor="middle" font-size="12" font-weight="800" fill="#9d174d">XOR</text>
+    <line x1="210" y1="160" x2="238" y2="160" stroke="#ec4899" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="210" y1="178" x2="238" y2="178" stroke="#ec4899" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect class="q2-gate-rect" x="238" y="150" width="58" height="38" rx="10" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+    <text x="267" y="174" text-anchor="middle" font-size="11.5" font-weight="800" fill="#9d174d">XOR ⊕</text>
+    <line x1="296" y1="169" x2="324" y2="169" stroke="#db2777" stroke-width="2" class="q2-hero-wire-anim"/>
+  </svg>`;
+
+  const GATES4_ROW_SVG = `<svg viewBox="0 0 560 116" role="img" aria-label="Четыре логических элемента: И, ИЛИ, НЕ и XOR в виде скруглённых прямоугольников">
+    <defs>
+      <filter id="q2-inset-card-5" x="-10%" y="-10%" width="120%" height="120%">
+        <feOffset dx="2" dy="3"/>
+        <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
+        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+        <feFlood flood-color="#94a3b8" flood-opacity="0.38" result="color"/>
+        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+        <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+      </filter>
+    </defs>
+    <rect x="6" y="8" width="131" height="100" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card-5)"/>
+    <text x="71" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#5b21b6">AND</text>
+    <line x1="18" y1="49" x2="36" y2="49" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="18" y1="63" x2="36" y2="63" stroke="#8b5cf6" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect x="36" y="39" width="66" height="34" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="69" y="61" text-anchor="middle" font-size="13" font-weight="800" fill="#5b21b6">И ∧</text>
+    <line x1="102" y1="56" x2="124" y2="56" stroke="#7c3aed" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="71" y="94" text-anchor="middle" font-size="9.2" font-weight="600" fill="#475569">1 только при двух 1</text>
+
+    <rect x="145" y="8" width="131" height="100" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card-5)"/>
+    <text x="210" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#0e7490">OR</text>
+    <line x1="157" y1="49" x2="175" y2="49" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="157" y1="63" x2="175" y2="63" stroke="#06b6d4" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect x="175" y="39" width="66" height="34" rx="9" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+    <text x="208" y="61" text-anchor="middle" font-size="12" font-weight="800" fill="#0e7490">ИЛИ ∨</text>
+    <line x1="241" y1="56" x2="263" y2="56" stroke="#0891b2" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="210" y="94" text-anchor="middle" font-size="9.2" font-weight="600" fill="#475569">1 при любой 1</text>
+
+    <rect x="284" y="8" width="131" height="100" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card-5)"/>
+    <text x="349" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#b45309">NOT</text>
+    <line x1="296" y1="56" x2="314" y2="56" stroke="#f59e0b" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect x="314" y="39" width="66" height="34" rx="9" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <text x="347" y="61" text-anchor="middle" font-size="13" font-weight="800" fill="#b45309">НЕ ¬</text>
+    <line x1="380" y1="56" x2="402" y2="56" stroke="#d97706" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="349" y="94" text-anchor="middle" font-size="9.2" font-weight="600" fill="#475569">Меняет 0 ↔ 1</text>
+
+    <rect x="423" y="8" width="131" height="100" rx="14" fill="var(--bg, #f4f5fc)" stroke="none" filter="url(#q2-inset-card-5)"/>
+    <text x="488" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#9d174d">XOR</text>
+    <line x1="435" y1="49" x2="453" y2="49" stroke="#ec4899" stroke-width="2" class="q2-hero-wire-anim"/>
+    <line x1="435" y1="63" x2="453" y2="63" stroke="#ec4899" stroke-width="2" class="q2-hero-wire-anim"/>
+    <rect x="453" y="39" width="66" height="34" rx="9" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+    <text x="486" y="61" text-anchor="middle" font-size="11.5" font-weight="800" fill="#9d174d">XOR ⊕</text>
+    <line x1="519" y1="56" x2="541" y2="56" stroke="#db2777" stroke-width="2" class="q2-hero-wire-anim"/>
+    <text x="488" y="94" text-anchor="middle" font-size="9.2" font-weight="600" fill="#475569">1 при разных входах</text>
+  </svg>`;
+
+  const CIRCUIT5_CRITERIA = [
+    { mark: '1 балл', text: 'Во всех трёх заданиях выбраны только нужные прямоугольные элементы (И, ИЛИ, НЕ, XOR).' },
+    { mark: '2 балла', text: 'Задание 1 (A, B, C): верно составлена и проверена схема — 2 балла.' },
+    { mark: '3 балла', text: 'Задание 2 (A, B, C с НЕ и XOR): верен порядок элементов — 1 балл; схема проходит проверку на 8 наборах — 2 балла.' },
+    { mark: '4 балла', text: 'Задание 3 (комбинированная схема): верен порядок элементов — 1 балл; нет лишних связей — 1 балл; схема проходит проверку на 8 наборах — 2 балла.' }
+  ];
+
   Q2.add('9-q2-5', {
     num: 5,
     cls: '9 класс',
@@ -900,165 +987,92 @@
         k: 'hero',
         eyebrow: '9 КЛАСС · 2 ЧЕТВЕРТЬ · УРОК 5',
         title: 'Логические <span class="accent-text">элементы ПК</span>',
-        lead: 'Обычное ИЛИ слишком щедрое: оно включает лампу и тогда, когда сигналы пришли сразу по двум проводам. Иногда нужно строгое правило — ровно один сигнал.',
-        goal: 'Объяснять принципы работы логических элементов компьютера, включая XOR и соединение элементов.',
+        lead: 'Переходим к схемам с тремя переменными (A, B, C) и операцией исключающего ИЛИ (XOR). Теперь каждый элемент обозначается единым скруглённым прямоугольником с операцией и знаком внутри.',
+        goal: 'Объяснять принципы работы логических элементов компьютера (И, ИЛИ, НЕ, XOR).',
         goalCode: '9.3.2.1',
         chips: [
-          { icon: 'fas fa-code-branch', text: 'Исключающее ИЛИ' },
-          { icon: 'fas fa-link', text: 'Цепочки элементов' },
-          { icon: 'fas fa-arrow-right-arrow-left', text: 'Промежуточный сигнал' }
+          { icon: 'fas fa-sliders', text: '3 переменные: A, B, C' },
+          { icon: 'fas fa-code-branch', text: 'Операция XOR (⊕)' },
+          { icon: 'fas fa-diagram-project', text: 'Прямоугольные блоки' }
         ],
-        visual: 'gate',
-        visualCaption: 'Проходной выключатель — живой пример XOR',
-        cta: 'Собрать цепочку'
+        visual: GATES4_HERO_SVG,
+        cta: 'Перейти к уроку'
       },
       {
         k: 'review',
         shuffleOptions: true,
         questions: [
-          { q: 'Какой элемент даёт 1 только при двух единицах на входе?', options: ['И', 'ИЛИ', 'НЕ', 'XOR'], answer: 0, explain: 'Это конъюнктор (И).' },
-          { q: 'Какой элемент переворачивает сигнал?', options: ['И', 'ИЛИ', 'НЕ', 'XOR'], answer: 2, explain: 'Инвертор (НЕ): ¬0 = 1, ¬1 = 0.' },
-          { q: 'Лампа горит, если включён хотя бы один выключатель. Какой элемент использован?', options: ['И', 'ИЛИ', 'НЕ', 'Никакой'], answer: 1, explain: 'Достаточно одного сигнала — это ИЛИ.' },
-          { q: 'На входе НЕ сигнал 0. Что на выходе?', options: ['0', '1', 'Не меняется', 'Ошибка'], answer: 1, explain: 'Инвертор превращает 0 в 1.' },
-          { q: 'Что означает 1 на проводе схемы?', options: ['Есть сигнал', 'Нет сигнала', 'Провод сломан', 'Сигнал неизвестен'], answer: 0, explain: '1 — наличие напряжения, то есть истина.' }
+          { q: 'В каком порядке соединяют элементы на схеме для выражения A ∧ ¬B?', options: ['Сначала НЕ для B, затем И с A', 'Сначала И для A и B, затем НЕ', 'Сначала НЕ для A, затем И с B', 'Порядок не имеет значения'], answer: 0, explain: 'Отрицание относится только к B, поэтому сначала ставят элемент НЕ на линию B, затем соединяют с A через И.' },
+          { q: 'На схеме для выражения ¬(A ∨ B) какой элемент стоит ближе всего к выходу Y?', options: ['ИЛИ', 'НЕ', 'И', 'Вход A'], answer: 1, explain: 'Сначала вычисляется сумма в скобках (A ∨ B), а последним действием выполняется инверсия (НЕ) перед выходом Y.' },
+          { q: 'При A = 1 и B = 1 какой сигнал будет на выходе схемы ¬(A ∨ B)?', options: ['1', '0', 'Равен A', 'Схема не сработает'], answer: 1, explain: '1 ∨ 1 = 1, затем элемент НЕ инвертирует результат: ¬1 = 0.' },
+          { q: 'Сколько входов у базового элемента НЕ (инвертора)?', options: ['Два входа', 'Три входа', 'Один вход', 'Зависит от схемы'], answer: 2, explain: 'Инвертор (НЕ) всегда принимает ровно один входной сигнал и меняет его на противоположный.' },
+          { q: 'При каком наборе (A, B) схема (A ∨ B) ∧ ¬A выдаст 1?', options: ['A = 0, B = 1', 'A = 1, B = 1', 'A = 1, B = 0', 'A = 0, B = 0'], answer: 0, explain: 'Чтобы ¬A = 1, нужно A = 0; тогда для A ∨ B = 1 требуется B = 1. Получаем (0, 1).' }
         ]
       },
       {
         k: 'concept',
-        eyebrow: '03 · ИСКЛЮЧАЮЩЕЕ ИЛИ',
-        title: 'Одна лампа, два выключателя, проходная схема',
-        lead: 'Представьте лестницу: светом управляют два проходных выключателя. Щёлкнули любым — свет изменился. Включили оба — свет погас. Это и есть XOR.',
+        eyebrow: '03 · ЭЛЕМЕНТЫ И СХЕМА',
+        title: 'Четыре элемента и прямоугольная запись',
+        lead: 'К базовым элементам И (∧), ИЛИ (∨) и НЕ (¬) добавляется XOR (⊕) — исключающее ИЛИ: оно выдаёт 1 только тогда, когда входные сигналы разные (0 и 1). Чтобы схемы с тремя переменными A, B и C оставались понятными, все элементы рисуют одинаково — скруглённым прямоугольником с операцией и знаком внутри.',
         blocks: [
-          { t: 'svg', svg: XOR_GATE_SVG },
-          {
-            t: 'table',
-            caption: 'Сравните ИЛИ и XOR на одних и тех же наборах',
-            head: ['A', 'B', 'A ∨ B (ИЛИ)', 'A ⊕ B (XOR)'],
-            rows: [
-              ['0', '0', '0', '0'],
-              ['0', '1', '1', '1'],
-              ['1', '0', '1', '1'],
-              ['1', '1', '1', '0']
-            ],
-            highlight: 3
-          },
+          { t: 'svg', svg: GATES4_ROW_SVG },
+          { t: 'widget', kind: 'circuitDemo', config: { mode: 'threeVarSingle' } }
+        ]
+      },
+      {
+        k: 'concept',
+        eyebrow: '04 · ДВА ПРИМЕРА',
+        title: 'Два примера схем по трём высказываниям',
+        lead: 'Нажимайте на входы A, B и C, чтобы увидеть, как сигналы проходят через прямоугольные элементы И, ИЛИ, НЕ и XOR к выходу Y.',
+        blocks: [
+          { t: 'widget', kind: 'circuitDemo', config: { mode: 'twoExamples3' } },
           {
             t: 'callout',
-            icon: 'fas fa-lightbulb',
-            title: 'Формула словами',
-            text: 'A ⊕ B = «A или B, но не оба сразу». Через уже знакомые операции это записывают так: (A ∨ B) ∧ ¬(A ∧ B).'
-          },
-          {
-            t: 'cards',
-            cols: 2,
-            items: [
-              { badge: 'ИЛИ', title: 'Мягкое правило', text: 'Пропускает всё, где есть хотя бы один сигнал. Два сигнала — тоже норма.', tone: 'cyan' },
-              { badge: 'XOR', title: 'Строгое правило', text: 'Пропускает только нечётное число сигналов. Два сигнала гасят друг друга.', tone: 'violet' }
-            ]
+            tone: 'info',
+            icon: 'fas fa-diagram-project',
+            title: 'Главное правило',
+            text: 'Сигнал всегда идёт слева направо: от A, B и C через прямоугольные блоки к выходу Y. Для трёх переменных в таблице истинности всегда 8 наборов (2³ = 8).'
           }
         ]
       },
       {
         k: 'lab',
-        eyebrow: '04 · ЛАБОРАТОРИЯ',
-        title: 'Поймайте разницу между ИЛИ и XOR',
-        lead: 'Переключайте элементы и наборы A/B. Обратите внимание на строку 1 и 1: у ИЛИ лампа горит, у XOR — нет.',
+        eyebrow: '05 · ПРАКТИКА',
+        title: 'Соберите логическую схему',
         widget: {
-          kind: 'lamp',
-          config: {
-            gate: 'xor',
-            a: 1,
-            b: 1,
-            gates: ['or', 'xor', 'and'],
-            task: {
-              gate: 'xor',
-              a: 1,
-              b: 0,
-              text: 'Верно: выбран XOR, включён ровно один выключатель — лампа горит. Попробуйте включить второй: лампа погаснет.'
-            }
-          }
+          kind: 'circuitBuilder',
+          config: { vars: 3, xor: true, shape: 'rect' }
         },
         after: [
-          {
-            t: 'callout',
-            tone: 'warn',
-            icon: 'fas fa-triangle-exclamation',
-            title: 'Главная ловушка',
-            text: 'В быту «или» часто означает «одно из двух». В логике ИЛИ разрешает оба сигнала, а строгое «одно из двух» — это XOR. На СОР формулировку читают буквально.'
-          }
-        ]
-      },
-      {
-        k: 'concept',
-        eyebrow: '05 · ЦЕПОЧКИ',
-        title: 'Выход одного элемента — вход другого',
-        lead: 'Сложные схемы собираются из простых. Сигнал проходит по цепочке, и на каждом шаге появляется промежуточный результат.',
-        blocks: [
-          {
-            t: 'widget',
-            kind: 'chain',
-            config: { g1: 'and', g2: 'not', a: 1, b: 1 }
-          },
-          {
-            t: 'steps',
-            items: [
-              { title: 'Шаг 1. Читаем входы', text: 'A = 1, B = 1. Оба провода под напряжением.' },
-              { title: 'Шаг 2. Первый элемент', text: 'S1 = A ∧ B = 1 ∧ 1 = 1. Промежуточный сигнал равен единице.' },
-              { title: 'Шаг 3. Второй элемент', text: 'Y = ¬S1 = ¬1 = 0. Инвертор гасит лампу.' },
-              { title: 'Шаг 4. Записываем выражение', text: 'Y = ¬(A ∧ B). Такая схема — «не оба сразу», элемент И-НЕ.' }
-            ]
-          },
-          {
-            t: 'callout',
-            icon: 'fas fa-diagram-project',
-            title: 'Правило чтения цепочки',
-            text: 'Двигайтесь слева направо и подписывайте каждый провод: A, B, затем S1, S2 … и только в конце Y. Так ошибка видна сразу, а не в последней строке таблицы.'
-          }
-        ]
-      },
-      {
-        k: 'practice',
-        eyebrow: '06 · ПРАКТИКА',
-        title: 'Считаем цепочки вручную',
-        lead: 'Решите задачи без схемы: подставляйте числа шаг за шагом и записывайте промежуточные сигналы.',
-        tasks: [
-          { title: 'Промежуточный сигнал', q: 'A = 1, B = 0. Чему равно S1 = A ∧ B?', answer: '0', type: 'number', explain: '1 ∧ 0 = 0.', hint: 'Для И нужны две единицы.' },
-          { title: 'Второй шаг', q: 'S1 = 0. Чему равно Y = ¬S1?', answer: '1', type: 'number', explain: '¬0 = 1.', hint: 'Инвертор меняет значение.' },
-          { title: 'XOR', q: 'A = 1, B = 1. Чему равно A ⊕ B?', answer: '0', type: 'number', explain: 'Два сигнала гасят друг друга.', hint: 'XOR пропускает только один сигнал.' },
-          { title: 'Выбор элемента', q: 'Нужно, чтобы лампа горела, когда включён ровно один из двух выключателей. Какой элемент подходит?', answer: ['xor', 'исключающее или', '⊕'], explain: 'Строгое «одно из двух» — это XOR.', hint: 'ИЛИ здесь не подойдёт: оно разрешает и два сигнала.' },
-          { title: 'Выражение', q: 'Запишите выражение схемы: A и B подаются на И, результат инвертируется.', answer: ['¬(a∧b)', '¬(a&b)', 'не(a и b)', '¬(a и b)', 'not(a and b)'], explain: 'Сначала И, затем НЕ: Y = ¬(A ∧ B).', hint: 'Инвертор стоит после конъюнктора.' }
-        ],
-        criteria: [
-          { mark: '1 балл', text: 'Промежуточный сигнал найден до вычисления выхода.' },
-          { mark: '1 балл', text: 'XOR не путается с ИЛИ на наборе 1 и 1.' },
-          { mark: '1 балл', text: 'Выражение записано со скобками и знаком отрицания.' }
+          { t: 'rubric', title: 'Дескриптор · 10 баллов', items: CIRCUIT5_CRITERIA }
         ]
       },
       {
         k: 'quiz',
-        eyebrow: '07 · ПРОВЕРКА',
+        eyebrow: '06 · ПРОВЕРКА',
         questions: [
-          { q: 'Чем XOR отличается от ИЛИ?', options: ['XOR даёт 0 при двух единицах', 'XOR даёт 0 при двух нулях', 'XOR не имеет таблицы', 'Они одинаковы'], answer: 0, explain: 'XOR запрещает одновременные сигналы: 1 ⊕ 1 = 0.' },
-          { q: 'A = 0, B = 1. Чему равно A ⊕ B?', options: ['0', '1', 'Не определено', 'Зависит от схемы'], answer: 1, explain: 'Ровно один сигнал — XOR даёт 1.' },
-          { q: 'Что такое промежуточный сигнал?', options: ['Выход одного элемента, который идёт на вход следующего', 'Питание схемы', 'Ошибка в цепи', 'Значение лампы'], answer: 0, explain: 'В цепочке сигнал между элементами называют промежуточным.' },
-          { q: 'Y = ¬(A ∧ B). Чему равен Y при A = 1, B = 1?', options: ['1', '0', '2', 'Не определено'], answer: 1, explain: 'A ∧ B = 1, отрицание даёт 0.' },
-          { q: 'Бытовой проходной выключатель на лестнице реализует...', options: ['И', 'ИЛИ', 'XOR', 'НЕ'], answer: 2, explain: 'Щелчок любым выключателем меняет состояние — это XOR.' }
+          { q: 'При каких входных сигналах элемент XOR (⊕) выдаёт на выходе 1?', options: ['Когда оба входа равны 1', 'Когда входы разные (0 и 1, или 1 и 0)', 'Когда оба входа равны 0', 'Когда хотя бы один вход равен 1'], answer: 1, explain: 'Исключающее ИЛИ (XOR) даёт 1 только при несовпадающих сигналах: 0 ⊕ 1 = 1 и 1 ⊕ 0 = 1, а 1 ⊕ 1 = 0.' },
+          { q: 'Чему равно значение выражения (A ⊕ B) ∧ C при A = 1, B = 1, C = 1?', options: ['1', '0', '2', 'Не определено'], answer: 1, explain: 'Сначала 1 ⊕ 1 = 0, затем 0 ∧ 1 = 0.' },
+          { q: 'Сколько строк в таблице истинности для логической схемы с тремя входами A, B и C?', options: ['4 строки', '6 строк', '8 строк', '9 строк'], answer: 2, explain: 'Три переменные дают 2³ = 8 различных комбинаций от 000 до 111.' },
+          { q: 'Какой сигнал Y получится на выходе схемы (A ∨ B) ⊕ ¬C при A = 1, B = 0, C = 0?', options: ['1', '0', 'Равен C', 'Зависит от формы блока'], answer: 1, explain: 'A ∨ B = 1 ∨ 0 = 1, ¬C = ¬0 = 1, затем 1 ⊕ 1 = 0.' },
+          { q: 'Как в этом уроке обозначаются все логические элементы на схеме?', options: ['Разными фигурами без подписей', 'Скруглённым прямоугольником с операцией и знаком внутри', 'Только кругами с цифрами', 'Стрелками без блоков'], answer: 1, explain: 'Каждый элемент обозначается скруглённым прямоугольником с названием и знаком операции внутри: И ∧, ИЛИ ∨, НЕ ¬, XOR ⊕.' }
         ]
       },
       {
         k: 'summary',
         points: [
-          'XOR даёт 1, когда сигнал пришёл ровно по одному проводу.',
-          'Формула XOR: (A ∨ B) ∧ ¬(A ∧ B).',
-          'Сложная схема — это цепочка простых элементов.',
-          'Промежуточный сигнал подписывают, чтобы не запутаться.',
-          'Выражение читают слева направо, учитывая скобки.'
+          'Элемент XOR (⊕) выдаёт 1 только тогда, когда входные сигналы различны (0 ⊕ 1 = 1, 1 ⊕ 1 = 0).',
+          'В схемах с тремя переменными (A, B, C) таблица истинности содержит 8 строк (2³ = 8).',
+          'Все логические элементы записываются скруглённым прямоугольником с операцией и знаком внутри: И ∧, ИЛИ ∨, НЕ ¬, XOR ⊕.',
+          'Сигнал на схеме всегда движется слева направо по порядку действий в выражении.'
         ],
         ticket: [
-          'XOR отличается от ИЛИ тем, что ...',
-          'Промежуточный сигнал нужен, чтобы ...',
-          'Читая цепочку, я сначала ..., а потом ...'
-        ]
+          'Элемент XOR (⊕) выдаёт 1, когда ...',
+          'Отличие схемы с тремя переменными от схемы с двумя в том, что ...',
+          'Чтобы проверить собранную схему с A, B и C, нужно проверить ...'
+        ],
+        criteriaTitle: 'Дескрипторы урока · 10 баллов',
+        criteria: CIRCUIT5_CRITERIA
       }
     ]
   });
