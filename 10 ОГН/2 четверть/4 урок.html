@@ -14,6 +14,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     .lesson-10ogn-q2-4 .q2-insertion-practice-split { align-items: stretch; }
+    @media (max-width: 1024px) {
+      .lesson-10ogn-q2-4 .q2-insertion-practice-split {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
     .lesson-10ogn-q2-4 .q2-insertion-practice-split > .q2-split-left > .q2-grid { flex: 1; align-items: stretch; }
     .lesson-10ogn-q2-4 .q2-insertion-practice-split .q2-split-left .q2-card { display: flex; flex-direction: column; }
     .lesson-10ogn-q2-4 .q2-insertion-practice-split .q2-card-footer { margin-top: auto; }
