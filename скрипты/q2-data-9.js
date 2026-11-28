@@ -263,7 +263,7 @@
     <text x="446" y="54" text-anchor="middle" font-size="17" font-weight="700" fill="#94a3b8">→</text>
 
     <rect x="460" y="14" width="124" height="68" rx="16" fill="#eaf8f3" filter="url(#q9-inset-build)"/>
-    <text x="522" y="45" text-anchor="middle" font-size="12.5" font-weight="800" fill="#047857">3. И (∧)</text>
+    <text x="522" y="45" text-anchor="middle" font-size="12.5" font-weight="800" fill="#047857">3. A ∧ ¬B</text>
     <text x="522" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">конъюнкция</text>
     <text x="598" y="54" text-anchor="middle" font-size="17" font-weight="700" fill="#94a3b8">→</text>
 
