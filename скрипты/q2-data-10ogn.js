@@ -1757,7 +1757,7 @@
           {
             t: 'code',
             title: 'key.py',
-            code: 'words = ["груша", "осень", "дом", "море"]\n\nprint(sorted(words))                  # по алфавиту\nprint(sorted(words, key=len))         # по длине\nprint(sorted(words, key=len, reverse=True))  # по длине, убывание\n\n# Список пар (имя, возраст)\npeople = [("Аня", 15), ("Бек", 14), ("Дана", 16)]\n# Сортируем по второму элементу пары — возрасту (p[1])\nprint(sorted(people, key=lambda p: p[1]))'
+            code: 'words = ["груша", "осень", "дом", "море"]\n\nprint(sorted(words))                  # по алфавиту\nprint(sorted(words, key=len))         # по длине (по количеству символов)\nprint(sorted(words, key=len, reverse=True))  # по длине, убывание\n\n# Список пар (имя, возраст)\npeople = [("Аня", 15), ("Бек", 14), ("Дана", 16)]\n# Сортируем по второму элементу пары — возрасту (p[1])\nprint(sorted(people, key=lambda p: p[1]))'
           },
           {
             t: 'widget',
