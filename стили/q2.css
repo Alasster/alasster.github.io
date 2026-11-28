@@ -6416,12 +6416,63 @@ html body.lesson-page[data-lesson-id="9-q2-6"] .q2-hero-slide .q2-visual svg :is
 .q2-cb-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+}
+.q2-cb-pills .q2-btn {
+  background: #EEEBF8 !important;
+  color: #302A49 !important;
+  border: none !important;
+  border-radius: 12px;
+  box-shadow: 4px 4px 8px rgba(185, 175, 215, 0.55), -4px -4px 8px rgba(255, 255, 255, 0.95) !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.q2-cb-pills .q2-btn:hover {
+  background: #F4F1FC !important;
+  transform: translateY(-1px);
+}
+.q2-cb-pills .q2-btn:active {
+  box-shadow: inset 3px 3px 6px rgba(185, 175, 215, 0.6), inset -3px -3px 6px rgba(255, 255, 255, 0.9) !important;
+  transform: translateY(0);
 }
 .q2-cb-pills .q2-btn.is-picked {
-  background: #5B21B6 !important;
+  background: linear-gradient(145deg, #6D28D9, #5B21B6) !important;
   color: #FFFFFF !important;
-  border-color: #5B21B6 !important;
+  box-shadow: inset 2px 2px 5px rgba(35, 10, 80, 0.45), 3px 3px 8px rgba(91, 33, 182, 0.28) !important;
+}
+.q2-an-seq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #E8E4F5;
+  box-shadow: inset 2px 2px 5px rgba(185, 175, 215, 0.5), inset -2px -2px 5px rgba(255, 255, 255, 0.85);
+  min-height: 42px;
+}
+.q2-an-seq-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px 4px 6px;
+  border-radius: 10px;
+  background: #EEEBF8;
+  color: #302A49;
+  font-weight: 700;
+  font-size: 0.86rem;
+  box-shadow: 2px 2px 5px rgba(185, 175, 215, 0.5), -2px -2px 5px rgba(255, 255, 255, 0.9);
+}
+.q2-an-seq-item .q2-an-num {
+  background: #5B21B6;
+  color: #FFFFFF;
+}
+.q2-an-arrow {
+  color: #6D28D9;
+  font-weight: 800;
+}
+.q2-an-seq-hint {
+  color: #6B6584;
+  font-size: 0.85rem;
 }
 .q2-an-num {
   display: inline-grid;

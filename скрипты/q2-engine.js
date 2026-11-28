@@ -2251,6 +2251,14 @@
                     return `<button type="button" class="q2-btn q2-btn-sm${pos >= 0 ? ' is-picked' : ''}" data-an-step="${s.id}">${badge}${esc(s.label)}</button>`;
                   }).join('')}
                 </div>
+                <div class="q2-an-seq">
+                  ${analyzeState.order.length
+                    ? analyzeState.order.map((id, i) => {
+                        const st = analyzeTask.steps.find(x => x.id === id);
+                        return `<span class="q2-an-seq-item"><span class="q2-an-num">${i + 1}</span>${esc(st ? st.label : id)}</span>`;
+                      }).join('<span class="q2-an-arrow">→</span>')
+                    : '<span class="q2-an-seq-hint">Нажимайте на действия по очереди — здесь появится ваш порядок</span>'}
+                </div>
               </div>
               <div class="q2-cb-analyze-step">
                 <h4>3. Какое действие главное (выполняется последним)?</h4>
