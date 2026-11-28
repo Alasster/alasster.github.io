@@ -1584,7 +1584,7 @@
         before: [
           {
             t: 'split',
-            cls: 'q2-split-practice-60-40',
+            style: 'grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);',
             left: [
               {
                 t: 'cards',
@@ -1801,7 +1801,7 @@
         before: [
           {
             t: 'split',
-            cls: 'q2-split-practice-60-40',
+            style: 'grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);',
             left: [
               {
                 t: 'cards',
