@@ -1843,7 +1843,7 @@
                   {
                     badge: '3',
                     title: 'Обратный порядок (2 балла)',
-                    text: 'Выведите <code>words</code> от самого длинного слова к самому короткому с помощью <code>key</code> и <code>reverse=True</code>.'
+                    text: 'Выведите <code>words</code> от самого длинного слова к самому короткому с помощью <code>key</code>.'
                   },
                   {
                     badge: '4',
