@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    ALASSTER.SITE — Q2 LESSON ENGINE
    Общий слой уроков 2 четверти (9, 10 ЕМН, 10 ОГН, 11 классы).
    Данные уроков лежат в q2-9.js, q2-10emn.js, q2-10ogn.js, q2-11.js.
@@ -1795,7 +1795,7 @@
   /* --------------------- порядок логических действий ------------------- */
   const logicNot = child => ({ op: 'not', child });
   const logicBinary = (op, left, right) => ({ op, left, right });
-  const logicSign = { and: '∧', or: '∨', xor: '⊕', eq: '≡' };
+  const logicSign = { and: '∧', or: '∨', xor: '⊕', eq: '↔' };
   function logicHTML(node, algebraic = false) {
     if (typeof node === 'string') return node;
     if (node.op === 'not') {
@@ -2140,16 +2140,16 @@
         mainOp: 'ИЛИ (∨)'
       },
       {
-        expr: '(¬A ∨ B) ≡ ¬(B ∧ C)',
+        expr: '(¬A ∨ B) ↔ ¬(B ∧ C)',
         opsCount: 5,
         steps: [
           { id: 'notA', label: '¬A', order: 1 },
           { id: 'orAB', label: '¬A ∨ B', order: 2 },
           { id: 'andBC', label: 'B ∧ C', order: 3 },
           { id: 'notRight', label: '¬(B ∧ C)', order: 4 },
-          { id: 'eqAll', label: '(¬A ∨ B) ≡ ¬(B ∧ C)', order: 5 }
+          { id: 'eqAll', label: '(¬A ∨ B) ↔ ¬(B ∧ C)', order: 5 }
         ],
-        mainOp: 'ЭКВ (≡)'
+        mainOp: 'ЭКВ (↔)'
       },
       {
         expr: '((A ⊕ ¬B) ∧ C) ∨ ¬A',
@@ -2164,20 +2164,20 @@
         mainOp: 'ИЛИ (∨)'
       },
       {
-        expr: '¬((A ∨ ¬B) ∧ (B ≡ ¬C))',
+        expr: '¬((A ∨ ¬B) ∧ (B ↔ ¬C))',
         opsCount: 6,
         steps: [
           { id: 'notB', label: '¬B', order: 1 },
           { id: 'orAB', label: 'A ∨ ¬B', order: 2 },
           { id: 'notC', label: '¬C', order: 3 },
-          { id: 'eqBC', label: 'B ≡ ¬C', order: 4 },
-          { id: 'andMid', label: '(A ∨ ¬B) ∧ (B ≡ ¬C)', order: 5 },
-          { id: 'notAll', label: '¬((A ∨ ¬B) ∧ (B ≡ ¬C))', order: 6 }
+          { id: 'eqBC', label: 'B ↔ ¬C', order: 4 },
+          { id: 'andMid', label: '(A ∨ ¬B) ∧ (B ↔ ¬C)', order: 5 },
+          { id: 'notAll', label: '¬((A ∨ ¬B) ∧ (B ↔ ¬C))', order: 6 }
         ],
         mainOp: 'НЕ (¬)'
       },
       {
-        expr: '(¬(A ∧ B) ⊕ C) ≡ (A ∨ ¬C)',
+        expr: '(¬(A ∧ B) ⊕ C) ↔ (A ∨ ¬C)',
         opsCount: 6,
         steps: [
           { id: 'andAB', label: 'A ∧ B', order: 1 },
@@ -2185,9 +2185,9 @@
           { id: 'xorC', label: '¬(A ∧ B) ⊕ C', order: 3 },
           { id: 'notC', label: '¬C', order: 4 },
           { id: 'orAC', label: 'A ∨ ¬C', order: 5 },
-          { id: 'eqAll', label: '(¬(A ∧ B) ⊕ C) ≡ (A ∨ ¬C)', order: 6 }
+          { id: 'eqAll', label: '(¬(A ∧ B) ⊕ C) ↔ (A ∨ ¬C)', order: 6 }
         ],
-        mainOp: 'ЭКВ (≡)'
+        mainOp: 'ЭКВ (↔)'
       }
     ];
     const analyzeTask = pick(analyzePool);
@@ -2255,7 +2255,7 @@
               <div class="q2-cb-analyze-step">
                 <h4>3. Какое действие главное (выполняется последним)?</h4>
                 <div class="q2-cb-pills">
-                  ${['И (∧)', 'ИЛИ (∨)', 'НЕ (¬)', 'XOR (⊕)', 'ЭКВ (≡)'].map(op => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.mainOp === op ? ' is-picked' : ''}" data-an-main="${attr(op)}">${esc(op)}</button>`).join('')}
+                  ${['И (∧)', 'ИЛИ (∨)', 'НЕ (¬)', 'XOR (⊕)', 'ЭКВ (↔)'].map(op => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.mainOp === op ? ' is-picked' : ''}" data-an-main="${attr(op)}">${esc(op)}</button>`).join('')}
                 </div>
               </div>
               ` : ''}
@@ -2299,7 +2299,7 @@
               if (!countOk) {
                 const fb = panel.querySelector('[data-an-fb]');
                 fb.className = 'q2-feedback is-bad';
-                fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕, ≡) в выражении.';
+                fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕, ↔) в выражении.';
                 return;
               }
               analyzeState.step1Done = true;
@@ -2319,7 +2319,7 @@
             tabs[0].classList.toggle('is-done', allOk);
             if (!countOk) {
               fb.className = 'q2-feedback is-bad';
-              fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕, ≡) в выражении.';
+              fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕, ↔) в выражении.';
             } else if (!orderOk) {
               fb.className = 'q2-feedback is-bad';
               fb.textContent = 'Проверьте шаг 2: сначала скобки и НЕ, затем И, потом ИЛИ / XOR / ЭКВ.';
@@ -2371,7 +2371,7 @@
             or: ['#ecfeff', '#0891b2', '#0e7490', 'ИЛИ ∨', 15],
             not: ['#fffbeb', '#d97706', '#b45309', 'НЕ ¬', 16],
             xor: ['#fdf2f8', '#db2777', '#9d174d', 'XOR ⊕', 15],
-            eq: ['#eff6ff', '#2563eb', '#1e40af', 'ЭКВ ≡', 15]
+            eq: ['#eff6ff', '#2563eb', '#1e40af', 'ЭКВ ↔', 15]
           };
           const [fill, stroke, textFill, text, size] = styles[op] || styles.and;
           return `<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><rect x="3" y="8" width="102" height="58" rx="14" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/><text x="54" y="43" text-anchor="middle" font-size="${size}" font-weight="800" fill="${textFill}">${text}</text></svg>`;
@@ -2399,7 +2399,7 @@
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">${useRect ? '+ ИЛИ (∨)' : '+ ИЛИ'}</button>
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">${useRect ? '+ НЕ (¬)' : '+ НЕ'}</button>
           ${hasXor ? `<button type="button" class="q2-btn q2-btn-sm" data-cb-add="xor">${useRect ? '+ XOR (⊕)' : '+ XOR'}</button>` : ''}
-          ${hasEq ? `<button type="button" class="q2-btn q2-btn-sm" data-cb-add="eq">${useRect ? '+ ЭКВ (≡)' : '+ ЭКВ'}</button>` : ''}
+          ${hasEq ? `<button type="button" class="q2-btn q2-btn-sm" data-cb-add="eq">${useRect ? '+ ЭКВ (↔)' : '+ ЭКВ'}</button>` : ''}
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
           <span style="display:inline-flex;gap:6px;">
             <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-0.15" aria-label="Уменьшить масштаб">−</button>
