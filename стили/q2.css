@@ -6242,7 +6242,8 @@ body.lesson-page:is([class*="lesson-11-"], [data-lesson-id^="11-"]) .q2-scene-we
 .q2-cb-node.is-gate-and,
 .q2-cb-node.is-gate-or,
 .q2-cb-node.is-gate-not,
-.q2-cb-node.is-gate-xor {
+.q2-cb-node.is-gate-xor,
+.q2-cb-node.is-gate-eq {
   width: 108px;
   height: 74px;
   padding: 0;
