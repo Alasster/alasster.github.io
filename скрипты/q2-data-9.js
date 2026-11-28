@@ -236,23 +236,35 @@
     </g>
   </svg>`;
 
-  const BUILD_SVG = `<svg viewBox="0 0 480 250" role="img" aria-label="Как из выражения получается схема">
-    <rect x="20" y="30" width="180" height="60" rx="14" fill="rgba(83,109,254,.09)" stroke="rgba(83,109,254,.28)" stroke-width="1.5"/>
-    <text x="110" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#3e55d8">A ∧ ¬B</text>
-    <text x="110" y="76" text-anchor="middle" font-size="11" fill="#748097">выражение</text>
-    <path d="M200 60 H 250" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#q9-ar2)"/>
-    <defs><marker id="q9-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#94a3b8"/></marker></defs>
-    <rect x="250" y="30" width="200" height="60" rx="14" fill="rgba(217,119,6,.08)" stroke="rgba(217,119,6,.3)" stroke-width="1.5"/>
-    <text x="350" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#b45309">1. ¬B</text>
-    <text x="350" y="76" text-anchor="middle" font-size="11" fill="#748097">сначала отрицание</text>
-    <rect x="250" y="110" width="200" height="60" rx="14" fill="rgba(5,150,105,.08)" stroke="rgba(5,150,105,.3)" stroke-width="1.5"/>
-    <text x="350" y="136" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">2. A ∧ (результат)</text>
-    <text x="350" y="156" text-anchor="middle" font-size="11" fill="#748097">затем И с A</text>
-    <path d="M350 90 V 108" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#q9-ar2)"/>
-    <rect x="20" y="110" width="180" height="60" rx="14" fill="rgba(148,163,184,.09)" stroke="rgba(148,163,184,.3)" stroke-width="1.5"/>
-    <text x="110" y="136" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">скобки = порядок сборки</text>
-    <text x="110" y="156" text-anchor="middle" font-size="11" fill="#748097">действие в скобках первым</text>
-    <text x="240" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#748097">схема повторяет порядок действий, а не внешний вид записи</text>
+  const BUILD_SVG = `<svg viewBox="0 0 640 96" role="img" aria-label="Как из выражения получается схема">
+    <defs>
+      <filter id="q9-inset-build" x="-10%" y="-10%" width="120%" height="120%">
+        <feOffset dx="2" dy="3"/>
+        <feGaussianBlur stdDeviation="2.5" result="offset-blur"/>
+        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+        <feFlood flood-color="#94a3b8" flood-opacity="0.38" result="color"/>
+        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+        <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+      </filter>
+    </defs>
+    <rect x="6" y="14" width="126" height="68" rx="16" fill="#eef0ff" filter="url(#q9-inset-build)"/>
+    <text x="69" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#3e55d8">A ∧ ¬B</text>
+    <text x="69" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">выражение</text>
+    <text x="148" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+
+    <rect x="164" y="14" width="126" height="68" rx="16" fill="#fff4eb" filter="url(#q9-inset-build)"/>
+    <text x="227" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">1. ¬B</text>
+    <text x="227" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">сначала НЕ</text>
+    <text x="306" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+
+    <rect x="322" y="14" width="138" height="68" rx="16" fill="#eaf8f3" filter="url(#q9-inset-build)"/>
+    <text x="391" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">2. A ∧ (результат)</text>
+    <text x="391" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">затем И с A</text>
+    <text x="476" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+
+    <rect x="492" y="14" width="142" height="68" rx="16" fill="#f3ebff" filter="url(#q9-inset-build)"/>
+    <text x="563" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#7c3aed">Скобки первыми</text>
+    <text x="563" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">порядок сборки</text>
   </svg>`;
 
   const READ_SVG = `<svg viewBox="0 0 480 250" role="img" aria-label="Как читать схему и записывать выражение">
