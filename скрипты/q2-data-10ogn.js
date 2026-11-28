@@ -1584,7 +1584,7 @@
         before: [
           {
             t: 'split',
-            style: 'grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);',
+            cls: 'q2-split-practice-60-40',
             left: [
               {
                 t: 'cards',
