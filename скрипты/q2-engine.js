@@ -1360,7 +1360,7 @@
   WIDGETS.pythonRef = function (el, cfg) {
     const groups = cfg.groups || [];
     el.classList.add('q2-pythonref');
-    el.innerHTML = `<details class="q2-ref" open>
+    el.innerHTML = `<details class="q2-ref"${cfg.open ? ' open' : ''}>
       <summary><i class="fas fa-book-open"></i> ${cfg.title || 'Напоминание Python'}</summary>
       <div class="q2-ref-body">
         ${groups.map(group => `<div class="q2-ref-group"><h5>${group.title}</h5>
