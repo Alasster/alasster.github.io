@@ -2450,6 +2450,103 @@
   /* ==========================================================================
      УРОК 9. Сортировка: постановка задачи
      ========================================================================== */
+  const ORDER_SVG = `<svg viewBox="0 0 380 280" role="img" aria-label="Карточки до и после сортировки">
+    <text class="q2-scene-caption" x="190" y="28" text-anchor="middle">1. Было (неотсортированный список):</text>
+    <g class="q2-scene-row">
+      <rect class="q2-scene-panel" x="34" y="42" width="66" height="62" rx="14"/>
+      <rect class="q2-scene-panel" x="114" y="42" width="66" height="62" rx="14"/>
+      <rect class="q2-scene-panel" x="194" y="42" width="66" height="62" rx="14"/>
+      <rect class="q2-scene-panel" x="274" y="42" width="66" height="62" rx="14"/>
+      <text class="q2-scene-cell" x="67" y="80" text-anchor="middle">7</text>
+      <text class="q2-scene-cell" x="147" y="80" text-anchor="middle">3</text>
+      <text class="q2-scene-cell" x="227" y="80" text-anchor="middle">9</text>
+      <text class="q2-scene-cell" x="307" y="80" text-anchor="middle">1</text>
+    </g>
+    <path class="q2-scene-arrow" d="M190 116 V 150" fill="none" marker-end="url(#q10o-arrow)"/>
+    <defs><marker id="q10o-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/></marker></defs>
+    <text class="q2-scene-caption" x="190" y="172" text-anchor="middle">2. Стало (по возрастанию ↑):</text>
+    <g class="q2-scene-row is-true">
+      <rect class="q2-scene-panel" x="34" y="186" width="66" height="62" rx="14"/>
+      <rect class="q2-scene-panel" x="114" y="186" width="66" height="62" rx="14"/>
+      <rect class="q2-scene-panel" x="194" y="186" width="66" height="62" rx="14"/>
+      <rect class="q2-scene-panel" x="274" y="186" width="66" height="62" rx="14"/>
+      <text class="q2-scene-cell" x="67" y="224" text-anchor="middle">1</text>
+      <text class="q2-scene-cell" x="147" y="224" text-anchor="middle">3</text>
+      <text class="q2-scene-cell" x="227" y="224" text-anchor="middle">7</text>
+      <text class="q2-scene-cell" x="307" y="224" text-anchor="middle">9</text>
+    </g>
+    <text class="q2-scene-caption" x="190" y="268" text-anchor="middle">количество чисел не меняется — меняется порядок</text>
+  </svg>`;
+
+  const IDLE_SVG = `<svg viewBox="0 0 430 300" role="img" aria-label="Схема шагов запуска программы в Python IDLE">
+    <defs>
+      <marker id="q10o-idle-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+      </marker>
+    </defs>
+
+    <!-- Шаг 1: Пуск -> IDLE и верхнее меню File -> New File -->
+    <rect class="q2-scene-panel" x="14" y="10" width="402" height="114" rx="16"/>
+    <rect x="14" y="10" width="402" height="28" rx="16" fill="rgba(5, 150, 105, 0.14)"/>
+    <circle cx="32" cy="24" r="5" fill="#fca5a5"/>
+    <circle cx="46" cy="24" r="5" fill="#fcd34d"/>
+    <circle cx="60" cy="24" r="5" fill="#86efac"/>
+    <text x="78" y="28" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#065f46">1. Окно IDLE Shell (Пуск → Python → IDLE)</text>
+
+    <!-- Строка меню -->
+    <rect x="26" y="44" width="52" height="22" rx="6" fill="#059669"/>
+    <text x="52" y="59" text-anchor="middle" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#ffffff">File ▾</text>
+    <text x="92" y="59" font-family="var(--font-main)" font-size="11" font-weight="700" fill="#64748b">Edit     Shell     Debug     Options</text>
+
+    <!-- Выпадающее меню File -->
+    <rect x="26" y="68" width="196" height="48" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
+    <rect x="32" y="73" width="184" height="20" rx="6" fill="rgba(16, 185, 129, 0.16)"/>
+    <text x="40" y="87" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#065f46">2. New File</text>
+    <text x="208" y="87" text-anchor="end" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="#047857">Ctrl + N</text>
+    <text x="40" y="107" font-family="var(--font-main)" font-size="10.5" font-weight="600" fill="#64748b">Open... / Save</text>
+    <text x="208" y="107" text-anchor="end" font-family="var(--font-mono)" font-size="10" font-weight="600" fill="#64748b">Ctrl + S</text>
+
+    <!-- Подсказка справа в первом блоке -->
+    <rect x="236" y="68" width="166" height="48" rx="10" fill="rgba(5, 150, 105, 0.08)" stroke="rgba(5, 150, 105, 0.28)"/>
+    <text x="319" y="88" text-anchor="middle" font-family="var(--font-main)" font-size="10.5" font-weight="800" fill="#065f46">Создаём новый файл</text>
+    <text x="319" y="104" text-anchor="middle" font-family="var(--font-main)" font-size="10" font-weight="600" fill="#047857">откроется окно редактора ↓</text>
+
+    <path d="M 215 126 V 146" stroke="#059669" stroke-width="2" stroke-dasharray="3 3" fill="none" marker-end="url(#q10o-idle-arr)"/>
+
+    <!-- Шаг 3 и 4: Окно редактора файла и меню Run -> Run Module (F5) -->
+    <rect class="q2-scene-panel" x="14" y="152" width="402" height="138" rx="16"/>
+    <rect x="14" y="152" width="402" height="28" rx="16" fill="rgba(5, 150, 105, 0.14)"/>
+    <circle cx="32" cy="166" r="5" fill="#fca5a5"/>
+    <circle cx="46" cy="166" r="5" fill="#fcd34d"/>
+    <circle cx="60" cy="166" r="5" fill="#86efac"/>
+    <text x="78" y="170" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#065f46">Окно редактора файла (.py)</text>
+
+    <!-- Меню File (Save) и Run (Run Module F5) -->
+    <rect x="26" y="186" width="52" height="22" rx="6" fill="rgba(5, 150, 105, 0.16)" stroke="#059669" stroke-width="1"/>
+    <text x="52" y="201" text-anchor="middle" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#065f46">File</text>
+    <text x="90" y="201" font-family="var(--font-main)" font-size="11" font-weight="700" fill="#64748b">Edit    Format</text>
+    <rect x="178" y="186" width="56" height="22" rx="6" fill="#059669"/>
+    <text x="206" y="201" text-anchor="middle" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#ffffff">Run ▾</text>
+
+    <!-- Блок 3: Сохранение -->
+    <rect x="26" y="214" width="140" height="64" rx="10" fill="#ffffff" stroke="rgba(5, 150, 105, 0.45)" stroke-width="1.5"/>
+    <text x="96" y="234" text-anchor="middle" font-family="var(--font-main)" font-size="10.5" font-weight="800" fill="#065f46">3. File → Save</text>
+    <rect x="48" y="242" width="96" height="24" rx="7" fill="rgba(16, 185, 129, 0.14)"/>
+    <text x="96" y="258" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="800" fill="#047857">Ctrl + S</text>
+
+    <!-- Выпадающее меню Run -> Run Module F5 -->
+    <rect x="178" y="214" width="154" height="64" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
+    <text x="188" y="233" font-family="var(--font-main)" font-size="10" font-weight="700" fill="#64748b">4. Меню запуска:</text>
+    <rect x="184" y="240" width="142" height="28" rx="7" fill="rgba(16, 185, 129, 0.18)"/>
+    <text x="192" y="258" font-family="var(--font-main)" font-size="11" font-weight="800" fill="#065f46">Run Module</text>
+    <text x="318" y="258" text-anchor="end" font-family="var(--font-mono)" font-size="11" font-weight="800" fill="#047857">F5</text>
+
+    <!-- Клавиша F5 -->
+    <rect x="344" y="214" width="60" height="64" rx="12" fill="#059669"/>
+    <text x="374" y="244" text-anchor="middle" font-family="var(--font-mono)" font-size="18" font-weight="800" fill="#ffffff">F5</text>
+    <text x="374" y="264" text-anchor="middle" font-family="var(--font-main)" font-size="9.5" font-weight="700" fill="#d1fae5">Старт!</text>
+  </svg>`;
+
   Q2.add('10emn-q2-9', {
     num: 9,
     cls: '10 ЕМН',
