@@ -996,6 +996,7 @@
           { icon: 'fas fa-diagram-project', text: 'Прямоугольные блоки' }
         ],
         visual: GATES4_HERO_SVG,
+        visualCaption: 'Европейская (IEC) система обозначения',
         cta: 'Перейти к уроку'
       },
       {
