@@ -2191,7 +2191,7 @@
       }
     ];
     const analyzeTask = pick(analyzePool);
-    const analyzeState = { count: null, order: [], mainOp: null };
+    const analyzeState = { count: null, step1Done: false, order: [], mainOp: null };
     const tasks = [pick(tier1), pick(tier2), pick(tier3)];
     const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, c: 0, zoom: 1 }));
     const solved = tasks.map(() => false);
@@ -2238,6 +2238,7 @@
                   ${[3, 4, 5, 6, 7].map(n => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.count === n ? ' is-picked' : ''}" data-an-count="${n}">${n}</button>`).join('')}
                 </div>
               </div>
+              ${analyzeState.step1Done ? `
               <div class="q2-cb-analyze-step">
                 <div class="q2-cb-analyze-head">
                   <h4>2. Нажимайте на действия в правильном порядке выполнения:</h4>
@@ -2257,6 +2258,7 @@
                   ${['И (∧)', 'ИЛИ (∨)', 'НЕ (¬)', 'XOR (⊕)', 'ЭКВ (≡)'].map(op => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.mainOp === op ? ' is-picked' : ''}" data-an-main="${attr(op)}">${esc(op)}</button>`).join('')}
                 </div>
               </div>
+              ` : ''}
               <div class="q2-cb-actions">
                 <button type="button" class="q2-btn" data-an-check>Проверить</button>
                 <span class="q2-feedback" data-an-fb></span>
@@ -2278,10 +2280,13 @@
               renderAnalyze();
             });
           });
-          panel.querySelector('[data-an-reset]').addEventListener('click', () => {
-            analyzeState.order = [];
-            renderAnalyze();
-          });
+          const resetBtn = panel.querySelector('[data-an-reset]');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              analyzeState.order = [];
+              renderAnalyze();
+            });
+          }
           panel.querySelectorAll('[data-an-main]').forEach(btn => {
             btn.addEventListener('click', () => {
               analyzeState.mainOp = btn.dataset.anMain;
@@ -2289,8 +2294,22 @@
             });
           });
           panel.querySelector('[data-an-check]').addEventListener('click', () => {
-            const fb = panel.querySelector('[data-an-fb]');
             const countOk = analyzeState.count === analyzeTask.opsCount;
+            if (!analyzeState.step1Done) {
+              if (!countOk) {
+                const fb = panel.querySelector('[data-an-fb]');
+                fb.className = 'q2-feedback is-bad';
+                fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕, ≡) в выражении.';
+                return;
+              }
+              analyzeState.step1Done = true;
+              renderAnalyze();
+              const fb = panel.querySelector('[data-an-fb]');
+              fb.className = 'q2-feedback is-good';
+              fb.textContent = 'Верно! Теперь выполните шаги 2 и 3.';
+              return;
+            }
+            const fb = panel.querySelector('[data-an-fb]');
             const expectedOrder = [...analyzeTask.steps].sort((a, b) => a.order - b.order).map(s => s.id);
             const orderOk = analyzeState.order.length === expectedOrder.length &&
               analyzeState.order.every((id, i) => id === expectedOrder[i]);
@@ -2300,10 +2319,10 @@
             tabs[0].classList.toggle('is-done', allOk);
             if (!countOk) {
               fb.className = 'q2-feedback is-bad';
-              fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕) в выражении.';
+              fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕, ≡) в выражении.';
             } else if (!orderOk) {
               fb.className = 'q2-feedback is-bad';
-              fb.textContent = 'Проверьте шаг 2: сначала скобки и НЕ, затем И, потом ИЛИ / XOR.';
+              fb.textContent = 'Проверьте шаг 2: сначала скобки и НЕ, затем И, потом ИЛИ / XOR / ЭКВ.';
             } else if (!mainOk) {
               fb.className = 'q2-feedback is-bad';
               fb.textContent = 'Проверьте шаг 3: главное действие — то, которое выполняется последним.';
