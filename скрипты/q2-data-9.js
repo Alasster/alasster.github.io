@@ -252,14 +252,14 @@
     <text x="73" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">выражение</text>
     <text x="155" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
 
-    <rect x="170" y="14" width="122" height="68" rx="16" fill="#fff4eb" filter="url(#q9-inset-build)"/>
-    <text x="231" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">1. ¬B</text>
-    <text x="231" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">сначала НЕ</text>
-    <text x="307" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+    <rect x="170" y="14" width="134" height="68" rx="16" fill="#eaf8f3" filter="url(#q9-inset-build)"/>
+    <text x="237" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">1. A ∧ ¬B</text>
+    <text x="237" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">скобка: И</text>
+    <text x="319" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
 
-    <rect x="322" y="14" width="134" height="68" rx="16" fill="#eaf8f3" filter="url(#q9-inset-build)"/>
-    <text x="389" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">2. A ∧ ¬B</text>
-    <text x="389" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">скобка: И</text>
+    <rect x="334" y="14" width="122" height="68" rx="16" fill="#fff4eb" filter="url(#q9-inset-build)"/>
+    <text x="395" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">2. ¬B</text>
+    <text x="395" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">отрицание НЕ</text>
     <text x="471" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
 
     <rect x="486" y="14" width="148" height="68" rx="16" fill="#f3ebff" filter="url(#q9-inset-build)"/>
