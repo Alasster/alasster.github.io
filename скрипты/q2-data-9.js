@@ -247,24 +247,24 @@
         <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
       </filter>
     </defs>
-    <rect x="6" y="14" width="126" height="68" rx="16" fill="#eef0ff" filter="url(#q9-inset-build)"/>
-    <text x="69" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#3e55d8">A ∧ ¬B</text>
-    <text x="69" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">выражение</text>
-    <text x="148" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+    <rect x="6" y="14" width="134" height="68" rx="16" fill="#eef0ff" filter="url(#q9-inset-build)"/>
+    <text x="73" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#3e55d8">(A ∧ ¬B) ∨ C</text>
+    <text x="73" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">выражение</text>
+    <text x="155" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
 
-    <rect x="164" y="14" width="126" height="68" rx="16" fill="#fff4eb" filter="url(#q9-inset-build)"/>
-    <text x="227" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">1. ¬B</text>
-    <text x="227" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">сначала НЕ</text>
-    <text x="306" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+    <rect x="170" y="14" width="122" height="68" rx="16" fill="#fff4eb" filter="url(#q9-inset-build)"/>
+    <text x="231" y="45" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">1. ¬B</text>
+    <text x="231" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">сначала НЕ</text>
+    <text x="307" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
 
-    <rect x="322" y="14" width="138" height="68" rx="16" fill="#eaf8f3" filter="url(#q9-inset-build)"/>
-    <text x="391" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">2. A ∧ (результат)</text>
-    <text x="391" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">затем И с A</text>
-    <text x="476" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
+    <rect x="322" y="14" width="134" height="68" rx="16" fill="#eaf8f3" filter="url(#q9-inset-build)"/>
+    <text x="389" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">2. A ∧ ¬B</text>
+    <text x="389" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">скобка: И</text>
+    <text x="471" y="54" text-anchor="middle" font-size="18" font-weight="700" fill="#94a3b8">→</text>
 
-    <rect x="492" y="14" width="142" height="68" rx="16" fill="#f3ebff" filter="url(#q9-inset-build)"/>
-    <text x="563" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#7c3aed">Скобки первыми</text>
-    <text x="563" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">порядок сборки</text>
+    <rect x="486" y="14" width="148" height="68" rx="16" fill="#f3ebff" filter="url(#q9-inset-build)"/>
+    <text x="560" y="45" text-anchor="middle" font-size="12.5" font-weight="800" fill="#7c3aed">3. (A ∧ ¬B) ∨ C</text>
+    <text x="560" y="64" text-anchor="middle" font-size="10.5" font-weight="600" fill="#64748b">затем ИЛИ</text>
   </svg>`;
 
   const READ_SVG = `<svg viewBox="0 0 480 250" role="img" aria-label="Как читать схему и записывать выражение">
