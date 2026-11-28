@@ -1059,7 +1059,7 @@
         title: 'Соберите логическую схему',
         widget: {
           kind: 'circuitBuilder',
-          config: { vars: 3, xor: true, shape: 'rect' }
+          config: { vars: 3, xor: true, shape: 'rect', task1Mode: 'analyze' }
         },
         after: [
           { t: 'rubric', title: 'Дескриптор · 10 баллов', items: CIRCUIT5_CRITERIA }
@@ -1164,7 +1164,7 @@
         lead: 'Перетаскивайте прямоугольные элементы И, ИЛИ, НЕ и XOR, соединяйте их проводами слева направо и проверяйте схему на всех 8 наборах (A, B, C).',
         widget: {
           kind: 'circuitBuilder',
-          config: { vars: 3, xor: true, shape: 'rect' }
+          config: { vars: 3, xor: true, shape: 'rect', task1Mode: 'analyze' }
         },
         after: [
           { t: 'rubric', title: 'Дескриптор · 10 баллов', items: CIRCUIT5_CRITERIA }

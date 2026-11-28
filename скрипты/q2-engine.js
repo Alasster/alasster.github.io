@@ -2061,6 +2061,7 @@
     const is3 = !!(cfg && cfg.vars === 3);
     const hasXor = !!(cfg && cfg.xor);
     const useRect = !!(cfg && cfg.shape === 'rect');
+    const task1Analyze = !!(cfg && cfg.task1Mode === 'analyze');
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const tier1 = is3 ? [
       logicBinary('xor', logicBinary('and', 'A', 'B'), 'C'),
@@ -2113,6 +2114,64 @@
       logicBinary('or', logicNot(logicBinary('or', 'A', 'B')), logicBinary('and', 'A', 'B')),
       logicBinary('and', logicNot(logicBinary('or', 'A', 'B')), logicBinary('or', 'A', logicNot('B')))
     ];
+    const analyzePool = [
+      {
+        expr: '(A ∨ ¬B) ∧ C',
+        opsCount: 3,
+        steps: [
+          { id: 'notB', label: '¬B', order: 1 },
+          { id: 'orAB', label: 'A ∨ ¬B', order: 2 },
+          { id: 'andC', label: '(A ∨ ¬B) ∧ C', order: 3 }
+        ],
+        mainOp: 'И (∧)'
+      },
+      {
+        expr: '¬(A ∧ B) ∨ C',
+        opsCount: 3,
+        steps: [
+          { id: 'andAB', label: 'A ∧ B', order: 1 },
+          { id: 'notAll', label: '¬(A ∧ B)', order: 2 },
+          { id: 'orC', label: '¬(A ∧ B) ∨ C', order: 3 }
+        ],
+        mainOp: 'ИЛИ (∨)'
+      },
+      {
+        expr: '(A ⊕ ¬B) ∧ ¬C',
+        opsCount: 4,
+        steps: [
+          { id: 'notB', label: '¬B', order: 1 },
+          { id: 'notC', label: '¬C', order: 2 },
+          { id: 'xorAB', label: 'A ⊕ ¬B', order: 3 },
+          { id: 'andAll', label: '(A ⊕ ¬B) ∧ ¬C', order: 4 }
+        ],
+        mainOp: 'И (∧)'
+      },
+      {
+        expr: '(¬A ∧ B) ⊕ (B ∨ C)',
+        opsCount: 4,
+        steps: [
+          { id: 'notA', label: '¬A', order: 1 },
+          { id: 'andAB', label: '¬A ∧ B', order: 2 },
+          { id: 'orBC', label: 'B ∨ C', order: 3 },
+          { id: 'xorAll', label: '(¬A ∧ B) ⊕ (B ∨ C)', order: 4 }
+        ],
+        mainOp: 'XOR (⊕)'
+      },
+      {
+        expr: '¬(A ∨ B) ∧ (B ⊕ ¬C)',
+        opsCount: 5,
+        steps: [
+          { id: 'orAB', label: 'A ∨ B', order: 1 },
+          { id: 'notAB', label: '¬(A ∨ B)', order: 2 },
+          { id: 'notC', label: '¬C', order: 3 },
+          { id: 'xorBC', label: 'B ⊕ ¬C', order: 4 },
+          { id: 'andAll', label: '¬(A ∨ B) ∧ (B ⊕ ¬C)', order: 5 }
+        ],
+        mainOp: 'И (∧)'
+      }
+    ];
+    const analyzeTask = pick(analyzePool);
+    const analyzeState = { count: null, order: [], mainOp: null };
     const tasks = [pick(tier1), pick(tier2), pick(tier3)];
     const states = tasks.map(() => ({ gates: [], wires: [], nextId: 1, a: 0, b: 0, c: 0, zoom: 1 }));
     const solved = tasks.map(() => false);
@@ -2143,6 +2202,98 @@
         t.classList.toggle('is-done', solved[i]);
         t.setAttribute('aria-selected', String(i === idx));
       });
+      if (task1Analyze && idx === 0) {
+        const shuffledSteps = shuffledCopy(analyzeTask.steps);
+        const renderAnalyze = () => {
+          panel.innerHTML = `
+            <div class="q2-cb-formula">
+              <div class="q2-math-display" role="math" aria-label="${attr(analyzeTask.expr)}">${esc(analyzeTask.expr)}</div>
+            </div>
+            <div class="q2-cb-analyze">
+              <div class="q2-cb-analyze-step">
+                <h4>1. Сколько всего логических операций в выражении?</h4>
+                <div class="q2-cb-pills">
+                  ${[2, 3, 4, 5, 6].map(n => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.count === n ? ' is-picked' : ''}" data-an-count="${n}">${n}</button>`).join('')}
+                </div>
+              </div>
+              <div class="q2-cb-analyze-step">
+                <div class="q2-cb-analyze-head">
+                  <h4>2. Нажимайте на действия в правильном порядке выполнения:</h4>
+                  <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-an-reset>Сбросить порядок</button>
+                </div>
+                <div class="q2-cb-pills">
+                  ${shuffledSteps.map(s => {
+                    const pos = analyzeState.order.indexOf(s.id);
+                    const badge = pos >= 0 ? `<span class="q2-an-num">${pos + 1}</span>` : '';
+                    return `<button type="button" class="q2-btn q2-btn-sm${pos >= 0 ? ' is-picked' : ''}" data-an-step="${s.id}">${badge}${esc(s.label)}</button>`;
+                  }).join('')}
+                </div>
+              </div>
+              <div class="q2-cb-analyze-step">
+                <h4>3. Какое действие главное (выполняется последним)?</h4>
+                <div class="q2-cb-pills">
+                  ${['И (∧)', 'ИЛИ (∨)', 'НЕ (¬)', 'XOR (⊕)'].map(op => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.mainOp === op ? ' is-picked' : ''}" data-an-main="${attr(op)}">${esc(op)}</button>`).join('')}
+                </div>
+              </div>
+              <div class="q2-cb-actions">
+                <button type="button" class="q2-btn" data-an-check>Проверить</button>
+                <span class="q2-feedback" data-an-fb></span>
+              </div>
+            </div>
+          `;
+          panel.querySelectorAll('[data-an-count]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              analyzeState.count = Number(btn.dataset.anCount);
+              renderAnalyze();
+            });
+          });
+          panel.querySelectorAll('[data-an-step]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.dataset.anStep;
+              const pos = analyzeState.order.indexOf(id);
+              if (pos >= 0) analyzeState.order.splice(pos, 1);
+              else analyzeState.order.push(id);
+              renderAnalyze();
+            });
+          });
+          panel.querySelector('[data-an-reset]').addEventListener('click', () => {
+            analyzeState.order = [];
+            renderAnalyze();
+          });
+          panel.querySelectorAll('[data-an-main]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              analyzeState.mainOp = btn.dataset.anMain;
+              renderAnalyze();
+            });
+          });
+          panel.querySelector('[data-an-check]').addEventListener('click', () => {
+            const fb = panel.querySelector('[data-an-fb]');
+            const countOk = analyzeState.count === analyzeTask.opsCount;
+            const expectedOrder = [...analyzeTask.steps].sort((a, b) => a.order - b.order).map(s => s.id);
+            const orderOk = analyzeState.order.length === expectedOrder.length &&
+              analyzeState.order.every((id, i) => id === expectedOrder[i]);
+            const mainOk = analyzeState.mainOp === analyzeTask.mainOp;
+            const allOk = countOk && orderOk && mainOk;
+            solved[0] = allOk;
+            tabs[0].classList.toggle('is-done', allOk);
+            if (!countOk) {
+              fb.className = 'q2-feedback is-bad';
+              fb.textContent = 'Проверьте шаг 1: посчитайте каждую операцию (¬, ∧, ∨, ⊕) в выражении.';
+            } else if (!orderOk) {
+              fb.className = 'q2-feedback is-bad';
+              fb.textContent = 'Проверьте шаг 2: сначала скобки и НЕ, затем И, потом ИЛИ / XOR.';
+            } else if (!mainOk) {
+              fb.className = 'q2-feedback is-bad';
+              fb.textContent = 'Проверьте шаг 3: главное действие — то, которое выполняется последним.';
+            } else {
+              fb.className = 'q2-feedback is-good';
+              fb.textContent = 'Отлично! Количество операций, порядок действий и главное действие определены верно.';
+            }
+          });
+        };
+        renderAnalyze();
+        return;
+      }
       const st = states[idx];
       const evalSource = (src, A, B, C, visiting) => {
         if (src === 'A') return A;
