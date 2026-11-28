@@ -1811,7 +1811,7 @@
                     badge: 'Образец · Заготовка',
                     icon: 'fas fa-keyboard',
                     title: 'Сортировка с помощью sorted() и key',
-                    text: 'Откройте <b>Python IDLE</b> (<code>File → New File</code>). Скопируйте заготовку и допишите решения для 5 заданий.',
+                    text: 'Откройте <b>Python IDLE</b> (<code>File → New File</code>). Перепишите заготовку и допишите решения для 5 заданий.',
                     code: [
                       '# Ввод слов через пробел',
                       'words = input("Слова: ").split()',
