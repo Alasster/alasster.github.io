@@ -2435,6 +2435,30 @@
 
       panel.querySelector('[data-cb-check]').addEventListener('click', () => {
         const yWire = st.wires.find(w => w.to === 'Y:0');
+        const astFromSource = (src, visiting) => {
+          if (src === 'A' || src === 'B' || src === 'C') return src;
+          if (visiting.has(src)) return null;
+          const gate = st.gates.find(g => g.id === src);
+          if (!gate) return null;
+          visiting.add(src);
+          const w0 = st.wires.find(w => w.to === `${src}:0`);
+          if (!w0) return null;
+          const left = astFromSource(w0.from, new Set(visiting));
+          if (!left) return null;
+          if (gate.op === 'not') return { op: 'not', arg: left };
+          const w1 = st.wires.find(w => w.to === `${src}:1`);
+          if (!w1) return null;
+          const right = astFromSource(w1.from, new Set(visiting));
+          if (!right) return null;
+          return { op: gate.op, left, right };
+        };
+        const sameAst = (a, b) => {
+          if (typeof a === 'string' || typeof b === 'string') return a === b;
+          if (!a || !b || a.op !== b.op) return false;
+          if (a.op === 'not') return sameAst(a.arg, b.arg);
+          return (sameAst(a.left, b.left) && sameAst(a.right, b.right)) ||
+                 (sameAst(a.left, b.right) && sameAst(a.right, b.left));
+        };
         const results = ttRows.map(([A, B, C]) => {
           const got = yWire ? evalSource(yWire.from, A, B, C, new Set()) : null;
           const expected = logicValue(tasks[idx], A, B, C);
@@ -2447,7 +2471,9 @@
             ? `A=${results[i].A}, B=${results[i].B}, C=${results[i].C}: ${results[i].ok ? 'верно' : 'ошибка'}`
             : `A=${results[i].A}, B=${results[i].B}: ${results[i].ok ? 'верно' : 'ошибка'}`);
         });
-        solved[idx] = results.every(r => r.ok);
+        const builtAst = yWire ? astFromSource(yWire.from, new Set()) : null;
+        const structureOk = builtAst !== null && sameAst(builtAst, tasks[idx]);
+        solved[idx] = results.every(r => r.ok) && structureOk;
         tabs[idx].classList.toggle('is-done', solved[idx]);
         const failed = results.find(r => !r.ok);
         if (failed) {
@@ -2459,6 +2485,11 @@
               : is3
                 ? `На наборе A=${failed.A}, B=${failed.B}, C=${failed.C} схема даёт ${failed.got}, а должно быть ${failed.expected}.`
                 : `На наборе A=${failed.A}, B=${failed.B} схема даёт ${failed.got}, а должно быть ${failed.expected}.`;
+          return;
+        }
+        if (!structureOk) {
+          feedback.className = 'q2-feedback is-bad';
+          feedback.textContent = 'Таблица истинности совпадает, но схема не соответствует заданной формуле (проверьте порядок операций и элементы).';
           return;
         }
         solved[idx] = true;
