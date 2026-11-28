@@ -272,8 +272,13 @@
       body = `${head(slide, index)}${blocks(slide.before)}${widget(slide.widget.kind, slide.widget.config || {})}${blocks(slide.after)}`;
     } else if (kind === 'practice') {
       const tasks = slide.tasks ? widget('mini', { tasks: slide.tasks }) : '';
-      body = `${head(slide, index)}${blocks(slide.before)}${tasks}${blocks(slide.after)}
-        ${slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Дескриптор', items: slide.criteria }) : ''}`;
+      const content = `${blocks(slide.before)}${tasks}${blocks(slide.after)}`;
+      const rubric = slide.criteria ? block({ t: 'rubric', title: slide.criteriaTitle || 'Дескриптор', items: slide.criteria }) : '';
+      const ognPractice = document.body.dataset.lessonId?.startsWith('10ogn-q2-');
+      const hasSplit = [...(slide.before || []), ...(slide.after || [])].some(item => item.t === 'split');
+      body = `${head(slide, index)}${ognPractice && !hasSplit && rubric
+        ? `<div class="q2-ogn-practice-layout"><div>${content}</div><div>${rubric}</div></div>`
+        : `${content}${rubric}`}`;
     } else if (kind === 'review') {
       body = `${head({ eyebrow: slide.eyebrow || '02 · ПОВТОРЕНИЕ', title: slide.title || 'Повторение предыдущей темы', lead: slide.lead || 'Ответьте на 5 вопросов — они помогут вспомнить главное перед новой темой.' }, index)}${widget('quiz', { questions: slide.questions, variant: 'review', shuffleOptions: slide.shuffleOptions })}`;
     } else if (kind === 'quiz') {
