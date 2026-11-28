@@ -384,8 +384,8 @@
       const nodes = Array.from(svg.querySelectorAll('.q2-autosort-item'));
       const statusNode = svg.querySelector('[data-sort-status]');
       if (!nodes.length) return;
-      const selection = document.body.dataset.lessonId === '10ogn-q2-3';
-      const insertion = document.body.dataset.lessonId === '10ogn-q2-4';
+      const selection = ['10ogn-q2-3', '10emn-q2-11'].includes(document.body.dataset.lessonId);
+      const insertion = ['10ogn-q2-4', '10emn-q2-12'].includes(document.body.dataset.lessonId);
       if (selection) svg.setAttribute('aria-label', 'Сортировка выбором: поиск минимума и обмен с началом неотсортированной части');
       if (insertion) svg.setAttribute('aria-label', 'Сортировка вставками: берём элемент, сдвигаем большие вправо и вставляем в готовую часть');
 

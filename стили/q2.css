@@ -6457,6 +6457,15 @@ body.lesson-page:is([data-lesson-id="10emn-q2-9"], [data-lesson-id="10emn-q2-10"
   align-items: center;
 }
 
+/* Sorting hero cards use the grade surface without an inset white panel. */
+body.lesson-page:is([data-lesson-id="10emn-q2-9"], [data-lesson-id="10emn-q2-10"], [data-lesson-id="10emn-q2-11"], [data-lesson-id="10emn-q2-12"]) .q2-hero-slide .q2-visual {
+  background: var(--lesson-card-surface, #E8F2FC) !important;
+}
+body.lesson-page:is([data-lesson-id="10emn-q2-9"], [data-lesson-id="10emn-q2-10"], [data-lesson-id="10emn-q2-11"], [data-lesson-id="10emn-q2-12"]) .q2-hero-slide .q2-visual .q2-scene-panel {
+  fill: none !important;
+  stroke: none !important;
+}
+
 /* Grade 10 OGN practice: desktop columns, stacked on tablets and phones. */
 body[data-lesson-id^="10ogn-q2-"] .q2-slide-practice :is(.q2-split, .q2-ogn-practice-layout) {
   display: grid;
