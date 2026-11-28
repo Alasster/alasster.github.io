@@ -2128,58 +2128,66 @@
     ];
     const analyzePool = [
       {
-        expr: '(A ∨ ¬B) ∧ C',
-        opsCount: 3,
+        expr: '¬(A ∧ ¬B) ∨ (B ⊕ C)',
+        opsCount: 5,
         steps: [
           { id: 'notB', label: '¬B', order: 1 },
-          { id: 'orAB', label: 'A ∨ ¬B', order: 2 },
-          { id: 'andC', label: '(A ∨ ¬B) ∧ C', order: 3 }
-        ],
-        mainOp: 'И (∧)'
-      },
-      {
-        expr: '¬(A ∧ B) ∨ C',
-        opsCount: 3,
-        steps: [
-          { id: 'andAB', label: 'A ∧ B', order: 1 },
-          { id: 'notAll', label: '¬(A ∧ B)', order: 2 },
-          { id: 'orC', label: '¬(A ∧ B) ∨ C', order: 3 }
+          { id: 'andAB', label: 'A ∧ ¬B', order: 2 },
+          { id: 'notLeft', label: '¬(A ∧ ¬B)', order: 3 },
+          { id: 'xorBC', label: 'B ⊕ C', order: 4 },
+          { id: 'orAll', label: '¬(A ∧ ¬B) ∨ (B ⊕ C)', order: 5 }
         ],
         mainOp: 'ИЛИ (∨)'
       },
       {
-        expr: '(A ⊕ ¬B) ∧ ¬C',
-        opsCount: 4,
-        steps: [
-          { id: 'notB', label: '¬B', order: 1 },
-          { id: 'notC', label: '¬C', order: 2 },
-          { id: 'xorAB', label: 'A ⊕ ¬B', order: 3 },
-          { id: 'andAll', label: '(A ⊕ ¬B) ∧ ¬C', order: 4 }
-        ],
-        mainOp: 'И (∧)'
-      },
-      {
-        expr: '(¬A ∧ B) ⊕ (B ∨ C)',
-        opsCount: 4,
-        steps: [
-          { id: 'notA', label: '¬A', order: 1 },
-          { id: 'andAB', label: '¬A ∧ B', order: 2 },
-          { id: 'orBC', label: 'B ∨ C', order: 3 },
-          { id: 'xorAll', label: '(¬A ∧ B) ⊕ (B ∨ C)', order: 4 }
-        ],
-        mainOp: 'XOR (⊕)'
-      },
-      {
-        expr: '¬(A ∨ B) ∧ (B ⊕ ¬C)',
+        expr: '(¬A ∨ B) ≡ ¬(B ∧ C)',
         opsCount: 5,
         steps: [
-          { id: 'orAB', label: 'A ∨ B', order: 1 },
-          { id: 'notAB', label: '¬(A ∨ B)', order: 2 },
-          { id: 'notC', label: '¬C', order: 3 },
-          { id: 'xorBC', label: 'B ⊕ ¬C', order: 4 },
-          { id: 'andAll', label: '¬(A ∨ B) ∧ (B ⊕ ¬C)', order: 5 }
+          { id: 'notA', label: '¬A', order: 1 },
+          { id: 'orAB', label: '¬A ∨ B', order: 2 },
+          { id: 'andBC', label: 'B ∧ C', order: 3 },
+          { id: 'notRight', label: '¬(B ∧ C)', order: 4 },
+          { id: 'eqAll', label: '(¬A ∨ B) ≡ ¬(B ∧ C)', order: 5 }
         ],
-        mainOp: 'И (∧)'
+        mainOp: 'ЭКВ (≡)'
+      },
+      {
+        expr: '((A ⊕ ¬B) ∧ C) ∨ ¬A',
+        opsCount: 5,
+        steps: [
+          { id: 'notB', label: '¬B', order: 1 },
+          { id: 'xorAB', label: 'A ⊕ ¬B', order: 2 },
+          { id: 'andC', label: '(A ⊕ ¬B) ∧ C', order: 3 },
+          { id: 'notA', label: '¬A', order: 4 },
+          { id: 'orAll', label: '((A ⊕ ¬B) ∧ C) ∨ ¬A', order: 5 }
+        ],
+        mainOp: 'ИЛИ (∨)'
+      },
+      {
+        expr: '¬((A ∨ ¬B) ∧ (B ≡ ¬C))',
+        opsCount: 6,
+        steps: [
+          { id: 'notB', label: '¬B', order: 1 },
+          { id: 'orAB', label: 'A ∨ ¬B', order: 2 },
+          { id: 'notC', label: '¬C', order: 3 },
+          { id: 'eqBC', label: 'B ≡ ¬C', order: 4 },
+          { id: 'andMid', label: '(A ∨ ¬B) ∧ (B ≡ ¬C)', order: 5 },
+          { id: 'notAll', label: '¬((A ∨ ¬B) ∧ (B ≡ ¬C))', order: 6 }
+        ],
+        mainOp: 'НЕ (¬)'
+      },
+      {
+        expr: '(¬(A ∧ B) ⊕ C) ≡ (A ∨ ¬C)',
+        opsCount: 6,
+        steps: [
+          { id: 'andAB', label: 'A ∧ B', order: 1 },
+          { id: 'notAB', label: '¬(A ∧ B)', order: 2 },
+          { id: 'xorC', label: '¬(A ∧ B) ⊕ C', order: 3 },
+          { id: 'notC', label: '¬C', order: 4 },
+          { id: 'orAC', label: 'A ∨ ¬C', order: 5 },
+          { id: 'eqAll', label: '(¬(A ∧ B) ⊕ C) ≡ (A ∨ ¬C)', order: 6 }
+        ],
+        mainOp: 'ЭКВ (≡)'
       }
     ];
     const analyzeTask = pick(analyzePool);
@@ -2227,7 +2235,7 @@
               <div class="q2-cb-analyze-step">
                 <h4>1. Сколько всего логических операций в выражении?</h4>
                 <div class="q2-cb-pills">
-                  ${[2, 3, 4, 5, 6].map(n => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.count === n ? ' is-picked' : ''}" data-an-count="${n}">${n}</button>`).join('')}
+                  ${[3, 4, 5, 6, 7].map(n => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.count === n ? ' is-picked' : ''}" data-an-count="${n}">${n}</button>`).join('')}
                 </div>
               </div>
               <div class="q2-cb-analyze-step">
@@ -2246,7 +2254,7 @@
               <div class="q2-cb-analyze-step">
                 <h4>3. Какое действие главное (выполняется последним)?</h4>
                 <div class="q2-cb-pills">
-                  ${['И (∧)', 'ИЛИ (∨)', 'НЕ (¬)', 'XOR (⊕)'].map(op => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.mainOp === op ? ' is-picked' : ''}" data-an-main="${attr(op)}">${esc(op)}</button>`).join('')}
+                  ${['И (∧)', 'ИЛИ (∨)', 'НЕ (¬)', 'XOR (⊕)', 'ЭКВ (≡)'].map(op => `<button type="button" class="q2-btn q2-btn-sm${analyzeState.mainOp === op ? ' is-picked' : ''}" data-an-main="${attr(op)}">${esc(op)}</button>`).join('')}
                 </div>
               </div>
               <div class="q2-cb-actions">
