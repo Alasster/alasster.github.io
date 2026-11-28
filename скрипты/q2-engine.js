@@ -1824,6 +1824,7 @@
     const right = logicValue(node.right, A, B, C);
     if (node.op === 'and') return left & right;
     if (node.op === 'xor') return left ^ right;
+    if (node.op === 'eq') return left === right ? 1 : 0;
     return left | right;
   }
   function logicColumns(node, result = []) {
@@ -2060,6 +2061,7 @@
     el.classList.add('q2-circuit-builder');
     const is3 = !!(cfg && cfg.vars === 3);
     const hasXor = !!(cfg && cfg.xor);
+    const hasEq = !!(cfg && cfg.eq);
     const useRect = !!(cfg && cfg.shape === 'rect');
     const task1Analyze = !!(cfg && cfg.task1Mode === 'analyze');
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -2080,14 +2082,19 @@
       logicBinary('and', logicNot('A'), logicNot('B')),
       logicBinary('or', logicNot('A'), logicNot('B'))
     ];
-    const tier2 = is3 ? [
+    const tier2 = is3 ? (hasEq ? [
+      logicBinary('eq', logicBinary('and', 'A', 'B'), logicNot('C')),
+      logicBinary('and', logicBinary('eq', 'A', 'B'), logicNot('C')),
+      logicBinary('or', logicBinary('xor', 'A', logicNot('B')), 'C'),
+      logicBinary('eq', logicNot('A'), logicBinary('or', 'B', 'C'))
+    ] : [
       logicBinary('xor', logicBinary('and', 'A', 'B'), logicNot('C')),
       logicBinary('and', logicBinary('xor', 'A', 'B'), logicNot('C')),
       logicBinary('or', logicBinary('xor', 'A', logicNot('B')), 'C'),
       logicNot(logicBinary('xor', logicBinary('or', 'A', 'B'), 'C')),
       logicBinary('xor', logicNot('A'), logicBinary('or', 'B', 'C')),
       logicBinary('and', logicNot('A'), logicBinary('xor', 'B', 'C'))
-    ] : [
+    ]) : [
       logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('A')),
       logicBinary('and', logicBinary('or', 'A', 'B'), logicNot('B')),
       logicBinary('or', logicBinary('and', 'A', 'B'), logicNot('B')),
@@ -2097,14 +2104,19 @@
       logicBinary('and', logicNot(logicBinary('and', 'A', 'B')), 'A'),
       logicBinary('and', logicNot(logicBinary('and', 'A', 'B')), 'B')
     ];
-    const tier3 = is3 ? [
+    const tier3 = is3 ? (hasEq ? [
+      logicBinary('eq', logicBinary('and', 'A', logicNot('B')), logicBinary('or', 'B', 'C')),
+      logicBinary('or', logicBinary('eq', 'A', 'B'), logicBinary('and', logicNot('B'), 'C')),
+      logicBinary('and', logicBinary('xor', 'A', 'C'), logicBinary('eq', logicNot('A'), 'B')),
+      logicBinary('eq', logicBinary('xor', 'A', 'B'), logicNot('C'))
+    ] : [
       logicBinary('xor', logicBinary('and', 'A', logicNot('B')), logicBinary('or', 'B', 'C')),
       logicBinary('or', logicBinary('xor', 'A', 'B'), logicBinary('and', logicNot('B'), 'C')),
       logicBinary('and', logicBinary('xor', 'A', 'C'), logicBinary('or', logicNot('A'), 'B')),
       logicBinary('xor', logicBinary('or', 'A', 'B'), logicBinary('and', 'A', logicNot('C'))),
       logicBinary('and', logicNot(logicBinary('xor', 'A', 'B')), logicBinary('or', 'B', 'C')),
       logicBinary('xor', logicNot(logicBinary('and', 'A', 'B')), logicBinary('or', 'B', 'C'))
-    ] : [
+    ]) : [
       logicBinary('and', logicBinary('or', 'A', logicNot('B')), logicBinary('or', logicNot('A'), 'B')),
       logicBinary('or', logicBinary('and', 'A', logicNot('B')), logicBinary('and', logicNot('A'), 'B')),
       logicBinary('or', logicNot(logicBinary('and', 'A', 'B')), logicBinary('and', logicNot('A'), 'B')),
@@ -2316,6 +2328,7 @@
         if (v1 === null) return null;
         if (gate.op === 'and') return v0 & v1;
         if (gate.op === 'xor') return v0 ^ v1;
+        if (gate.op === 'eq') return v0 === v1 ? 1 : 0;
         return v0 | v1;
       };
       const yWireNow = st.wires.find(w => w.to === 'Y:0');
@@ -2330,7 +2343,8 @@
             and: ['#f5f3ff', '#7c3aed', '#5b21b6', 'И ∧', 16],
             or: ['#ecfeff', '#0891b2', '#0e7490', 'ИЛИ ∨', 15],
             not: ['#fffbeb', '#d97706', '#b45309', 'НЕ ¬', 16],
-            xor: ['#fdf2f8', '#db2777', '#9d174d', 'XOR ⊕', 15]
+            xor: ['#fdf2f8', '#db2777', '#9d174d', 'XOR ⊕', 15],
+            eq: ['#eff6ff', '#2563eb', '#1e40af', 'ЭКВ ≡', 15]
           };
           const [fill, stroke, textFill, text, size] = styles[op] || styles.and;
           return `<svg width="108" height="74" viewBox="0 0 108 74" aria-hidden="true"><rect x="3" y="8" width="102" height="58" rx="14" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/><text x="54" y="43" text-anchor="middle" font-size="${size}" font-weight="800" fill="${textFill}">${text}</text></svg>`;
@@ -2358,6 +2372,7 @@
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="or">${useRect ? '+ ИЛИ (∨)' : '+ ИЛИ'}</button>
           <button type="button" class="q2-btn q2-btn-sm" data-cb-add="not">${useRect ? '+ НЕ (¬)' : '+ НЕ'}</button>
           ${hasXor ? `<button type="button" class="q2-btn q2-btn-sm" data-cb-add="xor">${useRect ? '+ XOR (⊕)' : '+ XOR'}</button>` : ''}
+          ${hasEq ? `<button type="button" class="q2-btn q2-btn-sm" data-cb-add="eq">${useRect ? '+ ЭКВ (≡)' : '+ ЭКВ'}</button>` : ''}
           <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-clear>Очистить</button>
           <span style="display:inline-flex;gap:6px;">
             <button type="button" class="q2-btn q2-btn-sm q2-btn-ghost" data-cb-size="-0.15" aria-label="Уменьшить масштаб">−</button>
@@ -2372,7 +2387,7 @@
             </svg>
             ${fixedInputs}
             ${st.gates.map(g => {
-              const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : g.op === 'xor' ? 'XOR' : 'НЕ';
+              const label = g.op === 'and' ? 'И' : g.op === 'or' ? 'ИЛИ' : g.op === 'xor' ? 'XOR' : g.op === 'eq' ? 'ЭКВ' : 'НЕ';
               const inPorts = g.op === 'not'
                 ? `<button type="button" class="q2-cb-port q2-cb-port-in0" data-port-in="${g.id}:0" aria-label="Вход ${label}"></button>`
                 : `<button type="button" class="q2-cb-port q2-cb-port-in1" data-port-in="${g.id}:0" aria-label="Вход 1 ${label}"></button><button type="button" class="q2-cb-port q2-cb-port-in2" data-port-in="${g.id}:1" aria-label="Вход 2 ${label}"></button>`;
