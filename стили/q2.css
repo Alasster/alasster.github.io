@@ -6410,7 +6410,7 @@ html body.lesson-page[data-lesson-id="9-q2-6"] .q2-hero-slide .q2-visual svg :is
 }
 
 .q2-split-practice-60-40 {
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) !important;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: stretch;
 }
 .q2-split-practice-60-40 > .q2-split-col {
@@ -6427,6 +6427,11 @@ html body.lesson-page[data-lesson-id="9-q2-6"] .q2-hero-slide .q2-visual svg :is
 }
 .q2-split-practice-60-40 .q2-code-block {
   flex: 1;
+}
+@media (max-width: 1024px) {
+  .q2-split-practice-60-40 {
+    grid-template-columns: 1fr;
+  }
 }
 
   .q2-pythonref,
