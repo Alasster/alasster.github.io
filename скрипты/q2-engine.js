@@ -1795,7 +1795,7 @@
   /* --------------------- порядок логических действий ------------------- */
   const logicNot = child => ({ op: 'not', child });
   const logicBinary = (op, left, right) => ({ op, left, right });
-  const logicSign = { and: '∧', or: '∨', xor: '⊕' };
+  const logicSign = { and: '∧', or: '∨', xor: '⊕', eq: '≡' };
   function logicHTML(node, algebraic = false) {
     if (typeof node === 'string') return node;
     if (node.op === 'not') {
